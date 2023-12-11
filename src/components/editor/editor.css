@@ -1,0 +1,46 @@
+.ql-bubble {
+  border: 1px solid #303030;
+  border-radius: 8px;
+}
+
+.ql-container.ql-snow,
+.ql-container.ql-bubble {
+  border: 0px solid #303030;
+  border-radius: 8px;
+  background-color: #000;
+  /* overflow-y: auto;
+    max-height: 1000px; */
+}
+
+.ql-toolbar.ql-snow {
+  border: 0px solid #303030;
+  border-radius: 8px;
+}
+
+.ql-editor p {
+  margin: 12px 0;
+  font-family: 'Inter';
+}
+
+.ql-editor {
+  line-height: 1.5;
+}
+
+.ql-editor li {
+  margin: 12px 0;
+  font-family: 'Inter';
+}
+
+.ql-editor h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: 'Inter';
+}
+
+.ql-container {
+  font-size: 16px;
+}
+
+

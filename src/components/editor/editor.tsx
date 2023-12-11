@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 // import './editor.css';
 import QuillNamespace, { Quill } from 'quill';
 import QuillBetterTable from 'quill-better-table';
@@ -18,6 +18,10 @@ import { useDispatch, useSelector } from 'react-redux';
 // 	signSelector,
 // } from 'slices/app-slice';
 import { Space, Card, Typography } from 'antd';
+import { EditorProps } from './editor.types';
+import axios from 'axios';
+import { BASE_URL } from '../../config/config';
+import { ApiEntity } from '../../config/enum';
 // import { ContractValue, TimelineItems } from 'config/types';
 // import {
 // 	useCheckContractValueMutation,
@@ -38,7 +42,16 @@ QuillNamespace.register(
 	true
 );
 
-const Editor = () => {
+const Editor: FC<EditorProps> = ({
+	contractKey,
+	clientKey,
+	userKey,
+	readonly,
+	view,
+}) => {
+	// if (!process.env.SENDFORSIGN_API_KEY) {
+	//  TO DO
+	// }
 	// dayjs.extend(utc);
 	// const dispatch = useDispatch();
 	// const history = useHistory();
@@ -51,6 +64,7 @@ const Editor = () => {
 	// const templateText = useSelector(templateTextSelector);
 	// const textState = useSelector(textSelector);
 	// const [spinLoad, setSpinLoad] = useState(true);
+	const [value, setValue] = useState('');
 	const { Title, Text } = Typography;
 	const quillRef = useRef<Quill>();
 	// const { isLoaded, userId, sessionId, getToken } = useAuth();
@@ -65,6 +79,7 @@ const Editor = () => {
 	// );
 
 	// console.log('EditorBlock');
+	// const createEditor = useCallback(() => {}, []);
 	useEffect(() => {
 		quillRef.current = new QuillNamespace('#editor-container', {
 			modules: {
@@ -125,9 +140,44 @@ const Editor = () => {
 			function (delta: any, oldDelta: any, source: any) {
 				if (source === 'user') {
 					// handleChange(quillRef.current.root.innerHTML);
+					setValue(
+						quillRef.current && quillRef.current.root.innerHTML
+							? quillRef.current.root.innerHTML
+							: ''
+					);
 				}
 			}
 		);
+		let body = {
+			data: {
+				action: 'read',
+				clientKey: clientKey,
+				userKey: userKey,
+				contract: {
+					contractKey: contractKey,
+				},
+			},
+		};
+
+		const getContract = async () => {
+			await axios
+				.post(BASE_URL + ApiEntity.CONTRACT, body, {
+					headers: {
+						Accept: 'application/vnd.api+json',
+						'Content-Type': 'application/vnd.api+json',
+						'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+					},
+					responseType: 'json',
+				})
+				.then((payload) => {
+					console.log('editor read', payload);
+					setValue(payload.data.contract.value);
+					quillRef?.current?.clipboard.dangerouslyPasteHTML(
+						payload.data.contract.value
+					);
+				});
+		};
+		getContract();
 	}, []);
 
 	// useEffect(() => {
