@@ -16,3 +16,8 @@ export const enum Action {
 	UPDATE = 'update',
 	LIST = 'list',
 }
+export const enum ContractType {
+	DOCX = 6,
+	PDF = 7,
+	EMPTY = 8,
+}

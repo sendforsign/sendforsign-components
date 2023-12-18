@@ -1,7 +1,7 @@
 import React from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 
-import Editor from '../components/editor';
+import { Editor } from '../components/editor';
 
 const meta: Meta<typeof Editor> = {
 	component: Editor,
