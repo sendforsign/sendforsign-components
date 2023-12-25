@@ -9,6 +9,10 @@ export const enum ApiEntity {
 	USER = 'user',
 	CLIENT = 'client',
 	TEMPLATE = 'template',
+	UPLOAD_PDF = 'upload_pdf',
+	CONTRACT_SHARE_LINK = 'contract_share_link',
+	CONTRACT_SIGN = 'contract_sign',
+	CONTRACT_APPROVE = 'contract_approve',
 }
 export const enum Action {
 	READ = 'read',
@@ -20,4 +24,9 @@ export const enum ContractType {
 	DOCX = 6,
 	PDF = 7,
 	EMPTY = 8,
+}
+
+export const enum ContractAction {
+	SIGN = 'sign',
+	APPROVE = 'approve',
 }

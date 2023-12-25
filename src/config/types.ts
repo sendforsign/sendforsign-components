@@ -1,0 +1,143 @@
+import { ShareLinkView } from './enum';
+
+export type Contract = {
+	contractType?: number;
+	controlLink?: string;
+	shareLink?: string;
+	createTime?: Date;
+	contractValue?: string;
+	statusId?: number;
+	statusName?: string;
+	changeTime?: Date;
+	changed?: boolean;
+	view?: ShareLinkView;
+	owner?: boolean;
+	userId?: string;
+	result?: boolean;
+};
+export type ContractLinkCheck = {
+	controlLink?: string;
+	shareLink?: string;
+	userId?: string;
+	find?: boolean;
+};
+export type Feature = {
+	id: number;
+	name: string;
+	price: number;
+	active?: boolean;
+	count?: number;
+	description?: string;
+	description_img?: string;
+};
+export type ContractFeature = {
+	controlLink?: string;
+	shareLink?: string;
+	contractId?: number;
+	featureId?: number;
+	createTime?: Date;
+	changeTime?: Date;
+	count?: number;
+	paid?: boolean;
+	active?: boolean;
+	description_img?: string;
+	userId?: string;
+};
+export type ContractType = {
+	id?: number;
+	name?: string;
+	active?: boolean;
+	description?: string;
+	icon?: boolean;
+	categoryId?: number;
+	categoryName?: string;
+	color?: string;
+	template?: string;
+	imgUrl?: string;
+};
+export type TemplateText = {
+	id?: number;
+	templateText?: string;
+};
+export type LemonSqueezy = {
+	data?: any;
+	type?: string;
+	attributes?: {
+		custom_price?: number;
+		product_options?: any;
+		checkout_options?: any;
+		checkout_data?: any;
+	};
+};
+export type ContractApprove = {
+	shareLink?: string;
+	controlLink?: string;
+	fullName?: string;
+	email?: string;
+	id?: number;
+	createTime?: Date;
+	userId?: string;
+};
+export type ContractSign = {
+	shareLink?: string;
+	controlLink?: string;
+	fullName?: string;
+	email?: string;
+	id?: number;
+	createTime?: Date;
+	owner?: boolean;
+	base64?: string;
+	userId?: string;
+};
+export type ContractSignAi = {
+	fullName?: string;
+	urls?: { url: string }[];
+};
+export type ContractEmail = {
+	shareLink?: string;
+	controlLink?: string;
+	contractValue?: string;
+	result?: boolean;
+	userId?: string;
+};
+export type ContractValue = {
+	contractValue?: string;
+	changeTime?: Date;
+}; 
+export type PdfFormData = {
+	shareLink?: string;
+	controlLink?: string;
+	userId?: string;
+	data?: any;
+};
+export type ContractShareLink = {
+	id?: number;
+	shareLink?: string;
+	controlLink?: string;
+	createTime?: Date;
+	changeTime?: Date;
+	view?: ShareLinkView;
+	userId?: string;
+};
+export type EventStatus = {
+	id?: number;
+	name?: string;
+	color?: string;
+};
+export type ContractEvent = {
+	controlLink?: string;
+	id?: number;
+	createTime?: Date;
+	shareLink?: string;
+	status?: string;
+	email?: string;
+	name?: string;
+	userId?: string;
+};
+export type PdfDownload = {
+	fileName?: string;
+};
+export type UserInfo = {
+	payload?: string;
+	result?: boolean;
+};

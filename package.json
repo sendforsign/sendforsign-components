@@ -23,6 +23,9 @@
 	"author": "Pavel Zhukov",
 	"license": "MIT",
 	"devDependencies": {
+		"@fortawesome/fontawesome-svg-core": "^6.4.2",
+		"@fortawesome/free-solid-svg-icons": "^6.4.2",
+		"@fortawesome/react-fontawesome": "^0.2.0",
 		"@reduxjs/toolkit": "^2.0.1",
 		"@rollup/plugin-commonjs": "^25.0.7",
 		"@rollup/plugin-node-resolve": "^15.2.3",
@@ -40,6 +43,7 @@
 		"@types/react": "^18.2.42",
 		"antd": "^5.12.1",
 		"jest-environment-jsdom": "^29.7.0",
+		"mammoth": "^1.6.0",
 		"quill": "^2.0.0-dev.4",
 		"quill-better-table": "^1.2.10",
 		"react": "^16.14.0",
@@ -52,15 +56,20 @@
 		"styled-components": "^6.1.1",
 		"tslib": "^2.6.2",
 		"typescript": "^5.3.2",
-		"mammoth": "^1.6.0",
+		"use-debounce": "^9.0.4",
 		"vite": "^5.0.6"
 	},
 	"dependencies": {
+		"@react-pdf/renderer": "^3.1.14",
 		"@rollup/plugin-babel": "^6.0.4",
 		"@rollup/plugin-json": "^6.0.1",
 		"axios": "^1.6.2",
+		"localforage": "^1.10.0",
+		"pdf-merger-js": "^4.3.0",
+		"react-copy-to-clipboard": "^5.1.0",
 		"react-pdf": "^7.6.0",
 		"react-resize-detector": "^9.1.0",
+		"react-signature-canvas": "^1.0.6",
 		"rollup-plugin-postcss": "^4.0.2"
 	},
 	"files": [

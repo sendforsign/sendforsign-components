@@ -1,5 +1,3 @@
-import React from 'react';
-
 export interface EditorProps {
 	clientKey?: string;
 	userKey?: string;
