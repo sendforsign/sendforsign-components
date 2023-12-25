@@ -38,6 +38,7 @@ export const HtmlBlock = () => {
 		clientKey,
 		userKey,
 		contractValue,
+		setContractValue,
 		sign,
 		setSign,
 		contractSign,
@@ -116,6 +117,7 @@ export const HtmlBlock = () => {
 	useEffect(() => {
 		if (contractValue) {
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(contractValue);
+			setContractValue('');
 		}
 	}, [contractValue]);
 	useEffect(() => {
@@ -146,7 +148,6 @@ export const HtmlBlock = () => {
 	};
 	const handleChangeText = useDebouncedCallback(
 		async (content: string) => {
-			quillRef?.current?.clipboard.dangerouslyPasteHTML(content);
 			let body = {
 				data: {
 					action: Action.UPDATE,
@@ -168,9 +169,9 @@ export const HtmlBlock = () => {
 					console.log('editor read', payload);
 				});
 		},
-		2000,
+		5000,
 		// The maximum time func is allowed to be delayed before it's invoked:
-		{ maxWait: 2000 }
+		{ maxWait: 5000 }
 	);
 	return (
 		<Card style={{ display: 'flex' }} bordered={true} id='part-2'>

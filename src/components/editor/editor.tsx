@@ -98,8 +98,10 @@ export const Editor: FC<EditorProps> = ({
 	const [loadEditor, setLoadEditor] = useState(false);
 	const [btnName, setBtnName] = useState('Create contract');
 	const [shareLinks, setShareLinks] = useState([]);
+	const [refreshShareLink, setRefreshShareLink] = useState(0);
 	const [changeSpin, setChangeSpin] = useState(false);
 	const [deleteSpin, setDeleteSpin] = useState(false);
+	const [addBtnSpin, setAddBtnSpin] = useState(false);
 	const [sign, setSign] = useState('');
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
 	const [refreshSign, setRefreshSign] = useState(0);
@@ -107,11 +109,7 @@ export const Editor: FC<EditorProps> = ({
 		text: string | React.ReactNode;
 	}>({ text: '' });
 	const { Title, Text } = Typography;
-	// const quillRef = useRef<Quill>();
-	const padRef = useRef(null);
-	const templateRef = useRef(0);
 	const contractKeyRef = useRef(contractKey);
-	const { width, ref } = useResizeDetector();
 
 	useEffect(() => {
 		clearArrayBuffer();
@@ -278,30 +276,12 @@ export const Editor: FC<EditorProps> = ({
 					})
 					.then((payload) => {
 						console.log('getShareLinks read', payload);
-						let optionsTmp: SegmentedLabeledOption[] = [];
-						optionsTmp.push({
-							label: 'Sign',
-							value: ShareLinkView.SIGN.toString(),
-						});
-						optionsTmp.push({
-							label: 'Approve',
-							value: ShareLinkView.APPROVE.toString(),
-						});
-						optionsTmp.push({
-							label: 'View',
-							value: ShareLinkView.VIEW.toString(),
-						});
-						optionsTmp.push({
-							value: ShareLinkView.LOCK.toString(),
-							icon: <FontAwesomeIcon icon={faLock} />,
-						});
-						setOptionsShareLink(optionsTmp);
 						setShareLinks(payload.data);
 					});
 			};
 			getShareLinks();
 		}
-	}, [currContractKey]);
+	}, [currContractKey, refreshShareLink]);
 
 	const handleCreate = () => {
 		setFieldBlockVisible(true);
@@ -446,10 +426,27 @@ export const Editor: FC<EditorProps> = ({
 			setTemplateKey(e);
 		}
 	};
-	const handleClick = () => {
-		setNotification({
-			text: 'Sharing link copied. Share the link with recipients for reviewing, signing, and more.',
-		});
+
+	const handleAddShareLink = async () => {
+		setAddBtnSpin(true);
+		const body = {
+			clientKey: clientKey,
+			contractKey: contractKey,
+		};
+		await axios
+			.post(BASE_URL + ApiEntity.CONTRACT_SHARE_LINK, body, {
+				headers: {
+					Accept: 'application/vnd.api+json',
+					'Content-Type': 'application/vnd.api+json',
+					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+				},
+				responseType: 'json',
+			})
+			.then((payload) => {
+				console.log('handleAddShareLink read', payload);
+				setRefreshShareLink(refreshShareLink + 1);
+				setAddBtnSpin(false);
+			});
 	};
 	return (
 		<EditorContext.Provider
@@ -476,6 +473,8 @@ export const Editor: FC<EditorProps> = ({
 				setPdfFileLoad,
 				refreshSign,
 				setRefreshSign,
+				refreshShareLink,
+				setRefreshShareLink,
 				contractValue,
 				setContractValue,
 			}}
@@ -601,8 +600,8 @@ export const Editor: FC<EditorProps> = ({
 									<Tooltip title='Add another link to this contract.'>
 										<Button
 											icon={<FontAwesomeIcon icon={faSquarePlus} />}
-											// onClick={handleAddShareLink}
-											// loading={addBtnSpin}
+											onClick={handleAddShareLink}
+											loading={addBtnSpin}
 										></Button>
 									</Tooltip>
 								</Space>

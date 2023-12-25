@@ -5,8 +5,10 @@ import { faLock, faCopy, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Button, Tooltip, Row, Col, Input, Segmented, Spin } from 'antd';
 
 import { SegmentedLabeledOption } from 'antd/es/segmented';
-import { ShareLinkView } from '../../../config/enum';
+import { ApiEntity, ShareLinkView } from '../../../config/enum';
 import { useEditorContext } from '../editor-context';
+import axios from 'axios';
+import { BASE_URL } from '../../../config/config';
 
 type Props = {
 	controlLink: string;
@@ -16,7 +18,8 @@ type Props = {
 };
 
 export const ShareLinkLine = ({ controlLink, id, shareLink, view }: Props) => {
-	const { setNotification } = useEditorContext();
+	const { setNotification, clientKey, refreshShareLink, setRefreshShareLink } =
+		useEditorContext();
 	const options = [
 		{ label: 'Sign', value: ShareLinkView.SIGN },
 		{ label: 'Approve', value: ShareLinkView.APPROVE },
@@ -37,24 +40,50 @@ export const ShareLinkLine = ({ controlLink, id, shareLink, view }: Props) => {
 	};
 	const handleDelete = async () => {
 		setDeleteSpin(true);
-		// await deleteShareLink({
-		// 	id: id,
-		// 	shareLink: shareLink,
-		// 	controlLink: controlLink,
-		// }).then(() => {
-		// 	setDeleteSpin(false);
-		// });
+		const body = {
+			clientKey: clientKey,
+			contractKey: controlLink,
+			id: id,
+		};
+		await axios
+			.delete(BASE_URL + ApiEntity.CONTRACT_SHARE_LINK, {
+				data: body,
+				headers: {
+					Accept: 'application/vnd.api+json',
+					'Content-Type': 'application/vnd.api+json',
+					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+				},
+				responseType: 'json',
+			})
+			.then((payload) => {
+				console.log('handleDelete read', payload);
+				setRefreshShareLink(refreshShareLink + 1);
+				setDeleteSpin(false);
+			});
 	};
 	const handleChange = async (e: any) => {
 		setChangeSpin(true);
-		// await updateShareLink({
-		// 	id: id,
-		// 	shareLink: shareLink,
-		// 	controlLink: controlLink,
-		// 	view: e,
-		// }).then(() => {
-		// 	setChangeSpin(false);
-		// });
+		const body = {
+			clientKey: clientKey,
+			contractKey: controlLink,
+			shareLink: shareLink,
+			id: id,
+			view: e,
+		};
+		await axios
+			.put(BASE_URL + ApiEntity.CONTRACT_SHARE_LINK, body, {
+				headers: {
+					Accept: 'application/vnd.api+json',
+					'Content-Type': 'application/vnd.api+json',
+					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+				},
+				responseType: 'json',
+			})
+			.then((payload) => {
+				console.log('handleChange read', payload);
+				setRefreshShareLink(refreshShareLink + 1);
+				setChangeSpin(false);
+			});
 	};
 	return (
 		<Row gutter={8} align='middle'>

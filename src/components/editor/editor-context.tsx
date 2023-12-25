@@ -24,6 +24,8 @@ export type TEditorContextType = {
 	setPdfFileLoad: (pdfFileLoad: number) => void;
 	refreshSign: number;
 	setRefreshSign: (refreshSign: number) => void;
+	refreshShareLink: number;
+	setRefreshShareLink: (refreshShareLink: number) => void;
 	contractValue: string;
 	setContractValue: (contractValue: string) => void;
 };
