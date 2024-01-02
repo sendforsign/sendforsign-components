@@ -1,3 +1,2 @@
-export { Editor } from './editor';
-export { List } from './list';
-export { ModalView } from './modal-view';
+export { ContractEditor } from './contract-editor';
+export { ContractList } from './contract-list';

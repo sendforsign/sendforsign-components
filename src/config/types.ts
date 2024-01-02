@@ -103,7 +103,7 @@ export type ContractEmail = {
 export type ContractValue = {
 	contractValue?: string;
 	changeTime?: Date;
-}; 
+};
 export type PdfFormData = {
 	shareLink?: string;
 	controlLink?: string;
@@ -140,4 +140,12 @@ export type PdfDownload = {
 export type UserInfo = {
 	payload?: string;
 	result?: boolean;
+};
+export type Template = {
+	createTime?: Date;
+	changeTime?: Date;
+	templateKey?: string;
+	value?: string;
+	name?: string;
+	isPdf?: boolean;
 };

@@ -13,6 +13,11 @@ export const enum ApiEntity {
 	CONTRACT_SHARE_LINK = 'contract_share_link',
 	CONTRACT_SIGN = 'contract_sign',
 	CONTRACT_APPROVE = 'contract_approve',
+	CONTRACT_EMAIL_SIGN = 'contract_email_sign',
+	CONTRACT_EMAIL_SIGN_PDF = 'contract_email_sign_pdf',
+	CONTRACT_EMAIL_APPROVE = 'contract_email_approve',
+	CONTRACT_EVENT = 'contract_event',
+	EVENT_STATUS = 'event_status',
 }
 export const enum Action {
 	READ = 'read',
