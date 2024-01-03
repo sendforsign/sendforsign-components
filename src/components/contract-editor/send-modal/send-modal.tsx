@@ -7,29 +7,29 @@ import {
   Button,
   Input,
   Modal,
-  Tabs,
+  Tooltip,
   Spin,
+  Segmented,
+  InputNumber,
 } from "antd";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLock, faCopy, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useContractEditorContext } from "../contract-editor-context";
 import { BASE_URL } from "../../../config/config";
 import { ApiEntity, ContractAction } from "../../../config/enum";
 import axios from "axios";
-import env from "dotenv";
-//env.config();
 
-export const SignModal = () => {
+export const SendModal = () => {
   const {
-    signModal,
-    setSignModal,
+    sendModal,
+    setSendModal,
     contractKey,
     clientKey,
     setSign,
     setResultModal,
     refreshSign,
-    refreshEvent,
     setRefreshSign,
     setContractSign,
-    setRefreshEvent,
   } = useContractEditorContext();
   const [signLoad, setSignLoad] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -67,7 +67,6 @@ export const SignModal = () => {
           handleCancel();
           setResultModal({ open: true, action: ContractAction.SIGN });
           setRefreshSign(refreshSign + 1);
-          setRefreshEvent(refreshEvent + 1);
         });
     }
   };
@@ -95,96 +94,115 @@ export const SignModal = () => {
     setFullName("");
     setEmail("");
     handleClear();
-    setSignModal(false);
+    setSendModal(false);
   };
-  const items = [
-    {
-      key: "1",
-      label: `Leave your signature`,
-      children: (
-        <SignatureCanvas
-          ref={padRef}
-          penColor="rgb(34, 30, 252)"
-          canvasProps={{ width: 350, height: 200, className: "sigCanvas" }}
-          onBegin={handleBegin}
-        />
-      ),
-    },
-  ];
+
   return (
     <Modal
-      title="Sign this document"
-      open={signModal}
+      title="Send this document"
+      open={sendModal}
       centered
       onOk={handleOk}
       onCancel={handleCancel}
       footer={
         <>
-          <Button key="clear" onClick={handleClear} style={{ float: "left" }}>
-            Start over
-          </Button>
           <Button key="back" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button
-            key="submit"
-            type="primary"
-            disabled={signDisable}
-            onClick={handleOk}
-            loading={signLoad}
-          >
-            Sign
+          <Button key="submit" type="primary" loading={signLoad}>
+            Send to 2 recipients
           </Button>
         </>
       }
     >
       <Space
         direction="vertical"
-        style={{ display: "flex", margin: "32px 0 0 0" }}
+        size="large"
+        style={{ display: "flex", margin: "32px 0 32px 0" }}
       >
         <Card>
           <Space direction="vertical" size={16} style={{ display: "flex" }}>
             <Space direction="vertical" size={2}>
               <Title level={5} style={{ margin: "0 0 0 0" }}>
-                Leave your name and email
+                Enter the recipient's information.
               </Title>
               <Text type="secondary">
-                We will send the signed document to this email.
+                We will send the document to this recipient.
               </Text>
             </Space>
             <Input
               id="FullName"
-              placeholder="Enter your full name"
+              placeholder="Recipient's full name"
               value={fullName}
               onChange={handleChange}
             />
             <Input
               id="Email"
-              placeholder="Enter your email"
+              placeholder="Recipient's email"
               value={email}
               onChange={handleChange}
             />
+            <Input
+              id="CustomMessage"
+              placeholder="Private note; leave empty for the default message"
+            />
+            <Space>
+              <Spin spinning={false}>
+                <Tooltip title="Set what recipient needs to do with the document or lock so they can't open it.">
+                  <Segmented options={["Sign", "Approve", "View", "Lock"]} />
+                </Tooltip>
+              </Spin>
+              <Tooltip title="Set signing order.">
+                <InputNumber min={1} max={10} defaultValue={1} />
+              </Tooltip>
+            </Space>
           </Space>
         </Card>
-        <Spin spinning={!fullName || !email} style={{ display: "none" }}>
-          <Space direction="vertical" style={{ display: "flex" }}>
-            <Card bordered={true}>
-              <Space direction="vertical" size={16} style={{ display: "flex" }}>
-                <Space direction="vertical" size={2}>
-                  {/* <Title level={5} style={{ margin: '0 0 0 0' }}>
-									Leave your signature
-								</Title> */}
-                  <Tabs defaultActiveKey="1" items={items} size="small" />
-                </Space>
-              </Space>
-            </Card>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              By clicking Sign, I acknowledge that this electronic signature
-              will represent my signature in all document uses, including
-              legally binding contracts.
-            </Text>
+
+        <Card>
+          <Space direction="vertical" size={16} style={{ display: "flex" }}>
+            <Space direction="vertical" size={2}>
+              <Title level={5} style={{ margin: "0 0 0 0" }}>
+                Enter the recipient's information.
+              </Title>
+              <Text type="secondary">
+                We will send the document to this recipient.
+              </Text>
+            </Space>
+            <Input
+              id="FullName"
+              placeholder="Recipient's full name"
+              value={fullName}
+              onChange={handleChange}
+            />
+            <Input
+              id="Email"
+              placeholder="Recipient's email"
+              value={email}
+              onChange={handleChange}
+            />
+            <Input
+              id="CustomMessage"
+              placeholder="Private note; leave empty for the default message"
+            />
+            <Space>
+              <Spin spinning={false}>
+                <Tooltip title="Set what recipient needs to do with the document or lock so they can't open it.">
+                  <Segmented options={["Sign", "Approve", "View", "Lock"]} />
+                </Tooltip>
+              </Spin>
+              <Tooltip title="Set signing order.">
+                <InputNumber min={1} max={10} defaultValue={1} />
+              </Tooltip>
+              <Tooltip title="Delete recipient.">
+                <Button type="text" icon={<FontAwesomeIcon icon={faTrash} />} />
+              </Tooltip>
+            </Space>
           </Space>
-        </Spin>
+        </Card>
+        <Button type="dashed" block>
+          Add recipient
+        </Button>
       </Space>
     </Modal>
   );

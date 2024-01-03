@@ -78,7 +78,7 @@ export const ChooseContractType = () => {
 								<Tag style={{ margin: '4px 0' }} color={'magenta'}>
 									File
 								</Tag>
-								<div style={{ padding: '4px 0' }}>DOCX</div>
+								<div style={{ padding: '4px 0' }}>Upload your DOCX file</div>
 							</div>
 						),
 						value: `template_${ContractType.DOCX}`,
@@ -96,7 +96,7 @@ export const ChooseContractType = () => {
 								<Tag style={{ margin: '4px 0' }} color={'magenta'}>
 									File
 								</Tag>
-								<div style={{ padding: '4px 0' }}>PDF</div>
+								<div style={{ padding: '4px 0' }}>Upload your PDF file</div>
 							</div>
 						),
 						value: `template_${ContractType.PDF}`,
@@ -114,7 +114,7 @@ export const ChooseContractType = () => {
 								<Tag style={{ margin: '4px 0' }} color={'cyan'}>
 									Empty
 								</Tag>
-								<div style={{ padding: '4px 0' }}>EMPTY</div>
+								<div style={{ padding: '4px 0' }}>Draft from scratch</div>
 							</div>
 						),
 						value: `template_${ContractType.EMPTY}`,
@@ -292,7 +292,7 @@ export const ChooseContractType = () => {
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 					<Space direction='vertical' size={2}>
 						<Title level={4} style={{ margin: '0' }}>
-							Select a document type or upload your file
+							Select a document type or upload a file
 						</Title>
 						<Text type='secondary'>
 							This will speed up the drafting process.

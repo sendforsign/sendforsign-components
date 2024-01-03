@@ -49,7 +49,7 @@ export const ChooseTemplateType = () => {
 						<Tag style={{ margin: '4px 0' }} color={'magenta'}>
 							File
 						</Tag>
-						<div style={{ padding: '4px 0' }}>DOCX</div>
+						<div style={{ padding: '4px 0' }}>Upload your DOCX file</div>
 					</div>
 				),
 				value: ContractType.DOCX,
@@ -67,7 +67,7 @@ export const ChooseTemplateType = () => {
 						<Tag style={{ margin: '4px 0' }} color={'magenta'}>
 							File
 						</Tag>
-						<div style={{ padding: '4px 0' }}>PDF</div>
+						<div style={{ padding: '4px 0' }}>Upload your PDF file</div>
 					</div>
 				),
 				value: ContractType.PDF,
@@ -85,7 +85,7 @@ export const ChooseTemplateType = () => {
 						<Tag style={{ margin: '4px 0' }} color={'cyan'}>
 							Empty
 						</Tag>
-						<div style={{ padding: '4px 0' }}>EMPTY</div>
+						<div style={{ padding: '4px 0' }}>Draft from scratch</div>
 					</div>
 				),
 				value: ContractType.EMPTY,
@@ -197,7 +197,7 @@ export const ChooseTemplateType = () => {
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 					<Space direction='vertical' size={2}>
 						<Title level={4} style={{ margin: '0' }}>
-							Select a document type or upload your file
+							Draft from scratch or upload a file
 						</Title>
 						<Text type='secondary'>
 							This will speed up the drafting process.
@@ -206,7 +206,6 @@ export const ChooseTemplateType = () => {
 					<Segmented
 						options={options}
 						onChange={handleChoose}
-						style={{ display: 'flex' }}
 					/>
 					<Button
 						type='primary'

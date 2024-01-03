@@ -9,6 +9,7 @@ import { ContractSign } from '../../config/types';
 import { ContractEditorContext } from './contract-editor-context';
 import { ApproveModal } from './approve-modal/approve-modal';
 import { SignModal } from './sign-modal/sign-modal';
+import { SendModal } from './send-modal/send-modal';
 import { ResultModal } from './result-modal/result-modal';
 import { HtmlBlock } from './html-block/html-block';
 import { PdfBlock } from './pdf-block/pdf-block';
@@ -32,6 +33,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const { setArrayBuffer, getArrayBuffer, clearArrayBuffer } =
 		useSaveArrayBuffer();
 	const [signModal, setSignModal] = useState(false);
+	const [sendModal, setSendModal] = useState(false);
 	const [approveModal, setApproveModal] = useState(false);
 	const [resultModal, setResultModal] = useState({ open: false, action: '' });
 	const [contractName, setContractName] = useState('');
@@ -176,6 +178,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			value={{
 				signModal,
 				setSignModal,
+				sendModal,
+				setSendModal,
 				approveModal,
 				setApproveModal,
 				resultModal,
@@ -228,6 +232,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				)}
 			</Space>
 			<SignModal />
+			<SendModal />
 			<ApproveModal />
 			<ResultModal />
 			<Notification />

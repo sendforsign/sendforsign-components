@@ -5,6 +5,8 @@ import { ContractType } from '../../config/enum';
 export type TContractEditorContextType = {
 	signModal: boolean;
 	setSignModal: (signModal: boolean) => void;
+	sendModal: boolean;
+	setSendModal: (sendModal: boolean) => void;
 	approveModal: boolean;
 	setApproveModal: (approveModal: boolean) => void;
 	resultModal: { open: boolean; action: string };

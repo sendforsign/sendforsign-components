@@ -23,7 +23,7 @@ export const ModalView = () => {
 			onCancel={handleCancel}
 			closable={true}
 			footer={<></>}
-			style={{ display: 'flex', maxWidth: '1200px' }}
+			width={1200}
 		>
 			<Space direction='vertical' size='large' style={{ display: 'flex' }}>
 				<ContractEditor

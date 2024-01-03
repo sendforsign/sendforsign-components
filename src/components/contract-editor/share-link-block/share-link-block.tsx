@@ -6,6 +6,8 @@ import { useContractEditorContext } from '../contract-editor-context';
 import axios from 'axios';
 import { BASE_URL } from '../../../config/config';
 import {
+	faPaperPlane,
+	faPlane,
 	faSignature,
 	faSquarePlus,
 	faStamp,
@@ -18,6 +20,7 @@ export const ShareLinkBlock = () => {
 		contractKey,
 		clientKey,
 		setSignModal,
+		setSendModal,
 		setApproveModal,
 		refreshShareLink,
 		setRefreshShareLink,
@@ -104,6 +107,20 @@ export const ShareLinkBlock = () => {
 					})}
 
 				<Space style={{ marginBottom: '24px' }}>
+				<Tooltip title='Share the document with recipients.'>
+						<Button
+							id='sendContract'
+							type='default'
+							icon={<FontAwesomeIcon icon={faPaperPlane} />}
+							onClick={() => {
+								setSendModal(true);
+							}}
+							// disabled={signDisable}
+							// loading={signSpin}
+						>
+							Send
+						</Button>
+					</Tooltip>
 					<Tooltip title='Sign the document from your side.'>
 						<Button
 							id='signContract'
