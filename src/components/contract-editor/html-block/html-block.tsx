@@ -3,21 +3,8 @@ import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 import 'quill/dist/quill.bubble.css';
 import QuillNamespace, { Quill } from 'quill';
 import QuillBetterTable from 'quill-better-table';
-import { Document, Page, pdfjs } from 'react-pdf';
 import { useDebouncedCallback } from 'use-debounce';
-import {
-	Space,
-	Card,
-	Typography,
-	Button,
-	Spin,
-	Tag,
-	Input,
-	Tooltip,
-	Row,
-	Col,
-	Modal,
-} from 'antd';
+import { Space, Card, Typography } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -49,74 +36,83 @@ export const HtmlBlock = () => {
 	} = useContractEditorContext();
 	const { Title, Text } = Typography;
 	const quillRef = useRef<Quill>();
+	const container = document.querySelector('#contract-editor-container');
+	const [containerInit, setContainerInit] = useState(false);
+	
 	useEffect(() => {
-		quillRef.current = new QuillNamespace('#editor-container', {
-			modules: {
-				toolbar: {
-					container: [
-						['bold', 'italic', 'underline', 'strike', 'blockquote'],
-						[{ color: [] }, { background: [] }],
-						[
-							{ list: 'ordered' },
-							{ list: 'bullet' },
-							{ indent: '-1' },
-							{ indent: '+1' },
+		if (container && !containerInit) {
+			setContainerInit(true);
+			quillRef.current = new QuillNamespace('#contract-editor-container', {
+				modules: {
+					toolbar: {
+						container: [
+							['bold', 'italic', 'underline', 'strike', 'blockquote'],
+							[{ color: [] }, { background: [] }],
+							[
+								{ list: 'ordered' },
+								{ list: 'bullet' },
+								{ indent: '-1' },
+								{ indent: '+1' },
+							],
+							[{ align: [] }],
+							['link', 'image', 'table'],
+							['blockquote', 'code-block'],
+							[{ direction: 'rtl' }],
 						],
-						[{ align: [] }],
-						['link', 'image', 'table'],
-						['blockquote', 'code-block'],
-						[{ direction: 'rtl' }],
-					],
-					handlers: {
-						table: addTable,
+						handlers: {
+							table: addTable,
+						},
 					},
-				},
-				table: false, // disable table module
-				'better-table': {
-					operationMenu: {
-						items: {
-							unmergeCells: {
-								text: 'Unmerge',
+					table: false, // disable table module
+					'better-table': {
+						operationMenu: {
+							items: {
+								unmergeCells: {
+									text: 'Unmerge',
+								},
 							},
 						},
 					},
+					keyboard: {
+						bindings: QuillBetterTable.keyboardBindings,
+					},
+					history: {
+						delay: 5000,
+						maxStack: 5000,
+						userOnly: true,
+					},
 				},
-				keyboard: {
-					bindings: QuillBetterTable.keyboardBindings,
-				},
-				history: {
-					delay: 5000,
-					maxStack: 5000,
-					userOnly: true,
-				},
-			},
-			scrollingContainer: 'body',
-			theme: 'bubble',
-		});
+				scrollingContainer: 'body',
+				theme: 'bubble',
+			});
 
-		if (quillRef.current) {
-			quillRef.current
-				.getModule('toolbar')
-				.container.addEventListener(
-					'mousedown',
-					(e: { preventDefault: () => void; stopPropagation: () => void }) => {
-						e.preventDefault();
-						e.stopPropagation();
+			if (quillRef.current) {
+				quillRef.current
+					.getModule('toolbar')
+					.container.addEventListener(
+						'mousedown',
+						(e: {
+							preventDefault: () => void;
+							stopPropagation: () => void;
+						}) => {
+							e.preventDefault();
+							e.stopPropagation();
+						}
+					);
+
+				quillRef.current.on(
+					'text-change',
+					function (delta: any, oldDelta: any, source: any) {
+						if (source === 'user') {
+							handleChangeText(
+								quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
+							);
+						}
 					}
 				);
-
-			quillRef.current.on(
-				'text-change',
-				function (delta: any, oldDelta: any, source: any) {
-					if (source === 'user') {
-						handleChangeText(
-							quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
-						);
-					}
-				}
-			);
+			}
 		}
-	}, []);
+	}, [container]);
 	useEffect(() => {
 		if (contractValue) {
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(contractValue);
@@ -214,7 +210,7 @@ export const HtmlBlock = () => {
 					</Text>
 				</Space>
 				<div id='scroll-container'>
-					<div id='editor-container' />
+					<div id='contract-editor-container' />
 				</div>
 			</Space>
 		</Card>

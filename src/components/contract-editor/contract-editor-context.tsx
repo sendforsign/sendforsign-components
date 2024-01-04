@@ -47,6 +47,8 @@ export type TContractEditorContextType = {
 	setContinueDisable: (continueDisable: boolean) => void;
 	continueLoad: boolean;
 	setContinueLoad: (continueDisable: boolean) => void;
+	editorVisible: boolean;
+	setEditorVisible: (editorVisible: boolean) => void;
 };
 export const ContractEditorContext = createContext<
 	TContractEditorContextType | undefined

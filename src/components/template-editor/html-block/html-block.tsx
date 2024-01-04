@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-// import './editor.css';
 import 'quill/dist/quill.bubble.css';
 import QuillNamespace, { Quill } from 'quill';
 import QuillBetterTable from 'quill-better-table';

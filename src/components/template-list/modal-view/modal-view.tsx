@@ -7,6 +7,7 @@ import { TemplateEditor } from '../../template-editor';
 export const ModalView = () => {
 	const {
 		templateKey,
+		setTemplateKey,
 		clientKey,
 		userKey,
 		templateModal,
@@ -15,6 +16,7 @@ export const ModalView = () => {
 		setRefreshTemplate,
 	} = useTemplateListContext();
 	const handleCancel = () => {
+		setTemplateKey('');
 		setRefreshTemplate(refreshTemplate + 1);
 		setTemplateModal(false);
 	};

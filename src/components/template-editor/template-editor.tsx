@@ -3,7 +3,7 @@ import { Space } from 'antd';
 import { TemplateEditorProps } from './template-editor.types';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
-import { Action, ApiEntity, ContractType } from '../../config/enum';
+import { Action, ApiEntity } from '../../config/enum';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
 import { TemplateEditorContext } from './template-editor-context';
 import { HtmlBlock } from './html-block/html-block';

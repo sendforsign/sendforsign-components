@@ -5,9 +5,16 @@ import { useContractListContext } from '../contract-list-context';
 import { ContractEditor } from '../../contract-editor';
 
 export const ModalView = () => {
-	const { contractKey, clientKey, userKey, contractModal, setContractModal } =
-		useContractListContext();
+	const {
+		contractKey,
+		setContractKey,
+		clientKey,
+		userKey,
+		contractModal,
+		setContractModal,
+	} = useContractListContext();
 	const handleCancel = () => {
+		setContractKey('');
 		setContractModal(false);
 	};
 	console.log(

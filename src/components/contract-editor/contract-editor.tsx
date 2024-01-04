@@ -220,6 +220,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setContinueDisable,
 				continueLoad,
 				setContinueLoad,
+				editorVisible,
+				setEditorVisible,
 			}}
 		>
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
