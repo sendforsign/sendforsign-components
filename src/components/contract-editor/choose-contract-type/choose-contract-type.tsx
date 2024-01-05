@@ -313,12 +313,12 @@ export const ChooseContractType = () => {
           <Space direction="vertical" size={16} style={{ display: "flex" }}>
             <Space direction="vertical" size={2}>
               <Title level={4} style={{ margin: "0" }}>
-                Fill additional information on the contract
+                Let's create your document
               </Title>
             </Space>
             <Input
               id="ContractName"
-              placeholder="Enter your contract name"
+              placeholder="Enter your document name"
               value={contractName}
               onChange={handleChange}
               // readOnly={!continueDisable}

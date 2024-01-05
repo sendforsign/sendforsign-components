@@ -218,7 +218,7 @@ export const ChooseTemplateType = () => {
           <Space direction="vertical" size={16} style={{ display: "flex" }}>
             <Space direction="vertical" size={2}>
               <Title level={4} style={{ margin: "0" }}>
-                Fill additional information on the template
+                Let's create your template
               </Title>
             </Space>
             <Input
