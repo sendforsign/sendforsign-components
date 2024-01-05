@@ -83,7 +83,6 @@ export const HtmlBlock = () => {
           },
         },
         scrollingContainer: "body",
-        placeholder: 'Compose an epic...',
         theme: "bubble",
       });
 
