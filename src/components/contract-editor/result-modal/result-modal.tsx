@@ -32,12 +32,16 @@ export const ResultModal = () => {
 					title={
 						resultModal.action === ContractAction.SIGN
 							? 'Document signed'
-							: 'Document approved'
+							: resultModal.action === ContractAction.APPROVE
+							? 'Document approved'
+							: 'Document sent'
 					}
 					subTitle={
 						resultModal.action === ContractAction.SIGN
 							? 'We will send the signed PDF to all signatories via email.'
-							: 'We will send email confirmations to all approvers.'
+							: resultModal.action === ContractAction.APPROVE
+							? 'We will send email confirmations to all approvers.'
+							: 'We will send email to all recepients.'
 					}
 					extra={
 						<Button key='back' onClick={handleCancel}>

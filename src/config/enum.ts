@@ -4,11 +4,18 @@ export const enum ShareLinkView {
 	LOCK = '3',
 	VIEW = '4',
 }
+export const enum ShareLinkViewText {
+	SIGN = 'sign',
+	APPROVE = 'approve',
+	LOCK = 'lock',
+	VIEW = 'view',
+}
 export const enum ApiEntity {
 	CONTRACT = 'contract',
 	USER = 'user',
 	CLIENT = 'client',
 	TEMPLATE = 'template',
+	EMAIL = 'email',
 	UPLOAD_PDF = 'upload_pdf',
 	CONTRACT_SHARE_LINK = 'contract_share_link',
 	CONTRACT_SIGN = 'contract_sign',
@@ -24,6 +31,7 @@ export const enum Action {
 	CREATE = 'create',
 	UPDATE = 'update',
 	LIST = 'list',
+	SEND = 'send',
 }
 export const enum ContractType {
 	DOCX = 6,
@@ -34,4 +42,5 @@ export const enum ContractType {
 export const enum ContractAction {
 	SIGN = 'sign',
 	APPROVE = 'approve',
+	SEND = 'send',
 }
