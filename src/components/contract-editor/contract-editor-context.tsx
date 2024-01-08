@@ -1,6 +1,5 @@
 import { createContext, useContext } from 'react';
 import { ContractSign } from '../../config/types';
-import { ContractType } from '../../config/enum';
 
 export type TContractEditorContextType = {
 	signModal: boolean;

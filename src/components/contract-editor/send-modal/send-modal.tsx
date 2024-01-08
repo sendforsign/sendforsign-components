@@ -36,6 +36,8 @@ export const SendModal = () => {
 		contractKey,
 		clientKey,
 		userKey,
+		refreshEvent,
+		setRefreshEvent,
 		setResultModal,
 	} = useContractEditorContext();
 	const [sendLoad, setSendLoad] = useState(false);
@@ -90,6 +92,7 @@ export const SendModal = () => {
 					handleCancel();
 					if (payload.data.result) {
 						setResultModal({ open: true, action: ContractAction.SEND });
+						setRefreshEvent(refreshEvent + 1);
 					}
 				});
 		}

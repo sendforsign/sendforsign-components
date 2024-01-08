@@ -38,6 +38,11 @@ export const enum ContractType {
 	PDF = 7,
 	EMPTY = 8,
 }
+export const enum ContractTypeText {
+	DOCX = 'docx',
+	PDF = 'pdf',
+	EMPTY = 'empty',
+}
 
 export const enum ContractAction {
 	SIGN = 'sign',
