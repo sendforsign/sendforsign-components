@@ -18,7 +18,5 @@ export const Primary: Story = (args) => (
 Primary.args = {
 	clientKey: 'b817e635-ee26-40f9-ba82-f4612077a2f4',
 	userKey: '',
-	contractKey: 'd0b60b2e-53b8-40df-aaff-7f11277c3b60',
-	readonly: false,
-	view: '',
+	contractKey: '036dae26-c394-46d1-b277-e602622631f1',
 };

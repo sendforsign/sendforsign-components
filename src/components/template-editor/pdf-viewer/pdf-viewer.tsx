@@ -7,7 +7,7 @@ import { useTemplateEditorContext } from '../template-editor-context';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 export const PdfViewer = () => {
-	const { pdfFileLoad } = useTemplateEditorContext();
+	const { pdfFileLoad, setContinueLoad } = useTemplateEditorContext();
 	const [pdfData, setPdfData] = useState<ArrayBuffer>();
 	const [numPages, setNumPages] = useState(1);
 	const [scale, setScale] = useState(1);

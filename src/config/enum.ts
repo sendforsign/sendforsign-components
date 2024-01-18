@@ -15,7 +15,7 @@ export const enum ApiEntity {
 	USER = 'user',
 	CLIENT = 'client',
 	TEMPLATE = 'template',
-	EMAIL = 'email',
+	RECIPIENT = 'recipient',
 	UPLOAD_PDF = 'upload_pdf',
 	CONTRACT_SHARE_LINK = 'contract_share_link',
 	CONTRACT_SIGN = 'contract_sign',
@@ -25,11 +25,13 @@ export const enum ApiEntity {
 	CONTRACT_EMAIL_APPROVE = 'contract_email_approve',
 	CONTRACT_EVENT = 'contract_event',
 	EVENT_STATUS = 'event_status',
+	CHECK_CONTRACT_VALUE = 'check_contract_value',
 }
 export const enum Action {
 	READ = 'read',
 	CREATE = 'create',
 	UPDATE = 'update',
+	DELETE = 'delete',
 	LIST = 'list',
 	SEND = 'send',
 }

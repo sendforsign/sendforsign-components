@@ -12,6 +12,7 @@ export const ChooseTemplateType = () => {
 		templateName,
 		setTemplateName,
 		setTemplateType,
+		templateType,
 		setTemplateValue,
 		setCreateTemplate,
 		pdfFileLoad,
@@ -93,9 +94,71 @@ export const ChooseTemplateType = () => {
 		]);
 	}, []);
 
-	const handleCreate = () => {
-		setFieldBlockVisible(true);
-		setCreateDisable(true);
+	const handleCreate = async () => {
+		let input = null;
+		switch (templateType) {
+			case ContractType.DOCX.toString():
+				input = document.createElement('input');
+				input.type = 'file';
+				input.accept =
+					'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+				input.onchange = (e: any) => {
+					// debugger;
+					let file = e.target.files[0];
+					let reader = new FileReader();
+					reader.readAsArrayBuffer(file);
+					reader.onload = (readerEvent) => {
+						if (readerEvent) {
+							docx2html(
+								readerEvent?.target?.result as ArrayBuffer,
+								(payload: any) => {
+									debugger;
+									setTemplateValue(payload);
+									setFieldBlockVisible(true);
+									setCreateDisable(true);
+								}
+							);
+						}
+					};
+				};
+
+				input.click();
+				break;
+			case ContractType.PDF.toString():
+				input = document.createElement('input');
+				input.type = 'file';
+				input.accept = 'application/pdf';
+
+				input.onchange = (e: any) => {
+					let file = e.target.files[0];
+					const fileSize = Math.round(file.size / 1048576);
+					if (fileSize > 15) {
+						alert('File too big, please select a file less than 15mb');
+						return;
+					}
+					let reader = new FileReader();
+					reader.readAsArrayBuffer(file);
+					reader.onload = async (readerEvent) => {
+						debugger;
+						setIsPdf(true);
+						const arrayBuffer = readerEvent?.target?.result as ArrayBuffer;
+						await setArrayBuffer('pdfFileTemplate', arrayBuffer);
+						setFieldBlockVisible(true);
+						setCreateDisable(true);
+						setPdfFileLoad(pdfFileLoad + 1);
+					};
+				};
+
+				input.click();
+				break;
+			case ContractType.EMPTY.toString():
+				setFieldBlockVisible(true);
+				setCreateDisable(true);
+				break;
+			default:
+				break;
+		}
 	};
 
 	const handleContinue = async () => {
@@ -116,7 +179,7 @@ export const ChooseTemplateType = () => {
 		}
 	};
 
-	const handleChoose = async (e: any) => {
+	const handleChoose = (e: any) => {
 		if (
 			e.toString() === ContractType.DOCX.toString() ||
 			e.toString() === ContractType.PDF.toString()
@@ -125,70 +188,8 @@ export const ChooseTemplateType = () => {
 		} else {
 			setBtnName('Create template');
 		}
-		let input = null;
-		switch (e) {
-			case ContractType.DOCX:
-				input = document.createElement('input');
-				input.type = 'file';
-				input.accept =
-					'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-
-				input.onchange = (e: any) => {
-					// debugger;
-					let file = e.target.files[0];
-					let reader = new FileReader();
-					reader.readAsArrayBuffer(file);
-					reader.onload = (readerEvent) => {
-						if (readerEvent) {
-							docx2html(
-								readerEvent?.target?.result as ArrayBuffer,
-								(payload: any) => {
-									debugger;
-									setTemplateValue(payload);
-									setTemplateType(ContractType.DOCX.toString());
-									setCreateDisable(false);
-								}
-							);
-						}
-					};
-				};
-
-				input.click();
-				break;
-			case ContractType.PDF:
-				input = document.createElement('input');
-				input.type = 'file';
-				input.accept = 'application/pdf';
-
-				input.onchange = (e: any) => {
-					let file = e.target.files[0];
-					const fileSize = Math.round(file.size / 1048576);
-					if (fileSize > 15) {
-						alert('File too big, please select a file less than 15mb');
-						return;
-					}
-					let reader = new FileReader();
-					reader.readAsArrayBuffer(file);
-					reader.onload = async (readerEvent) => {
-						debugger;
-						setTemplateType(ContractType.PDF.toString());
-						setIsPdf(true);
-						const arrayBuffer = readerEvent?.target?.result as ArrayBuffer;
-						await setArrayBuffer('pdfFileTemplate', arrayBuffer);
-						setCreateDisable(false);
-						setPdfFileLoad(pdfFileLoad + 1);
-					};
-				};
-
-				input.click();
-				break;
-			case ContractType.EMPTY:
-				setTemplateType(ContractType.EMPTY.toString());
-				setCreateDisable(false);
-				break;
-			default:
-				break;
-		}
+		setTemplateType(e.toString());
+		setCreateDisable(false);
 	};
 
 	return (

@@ -21,8 +21,11 @@ export const ChooseContractType = () => {
 		setContractValue,
 		setContractName,
 		setContractType,
+		contractType,
 		setTemplateKey,
+		templateKey,
 		continueLoad,
+		setPdfDownload,
 	} = useContractEditorContext();
 	// if (!process.env.SENDFORSIGN_API_KEY) {
 	// 	console.log(
@@ -37,15 +40,16 @@ export const ChooseContractType = () => {
 	const [createDisable, setCreateDisable] = useState(true);
 	const [fieldBlockVisible, setFieldBlockVisible] = useState(false);
 	const [loadSegmented, setLoadSegmented] = useState(false);
+	const [segmentedValue, setSegmentedValue] = useState('');
 	const [btnName, setBtnName] = useState('Create contract');
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
 	const { Title, Text } = Typography;
-	const { setArrayBuffer, getArrayBuffer, clearArrayBuffer } =
-		useSaveArrayBuffer();
+	const { setArrayBuffer } = useSaveArrayBuffer();
 	useEffect(() => {
 		// clearArrayBuffer();
 
 		const getTemplates = async () => {
+			setLoadSegmented(true);
 			let body = {
 				data: {
 					action: Action.LIST,
@@ -140,43 +144,16 @@ export const ChooseContractType = () => {
 						});
 					});
 					setOptions(array);
+					setLoadSegmented(false);
 				});
 		};
 		getTemplates();
 	}, []);
 
-	const handleCreate = () => {
-		setFieldBlockVisible(true);
-		setCreateDisable(true);
-	};
-	const handleContinue = async () => {
-		setCreateContract(true);
-	};
-	const handleChange = (e: any) => {
-		switch (e.target.id) {
-			case 'ContractName':
-				setContractName(e.target.value);
-				if (e.target.value) {
-					setContinueDisable(false);
-				} else {
-					setContinueDisable(true);
-				}
-				break;
-		}
-	};
-	const handleChoose = async (e: any) => {
-		let contractType = e.toString().split('_');
-		if (
-			contractType[1] === ContractTypeText.DOCX.toString() ||
-			contractType[1] === ContractTypeText.PDF.toString()
-		) {
-			setBtnName('Upload file');
-		} else {
-			setBtnName('Create contract');
-		}
-		if (contractType[1]) {
+	const handleCreate = async () => {
+		if (contractType) {
 			let input = null;
-			switch (contractType[1]) {
+			switch (contractType) {
 				case ContractTypeText.DOCX.toString():
 					input = document.createElement('input');
 					input.type = 'file';
@@ -195,8 +172,8 @@ export const ChooseContractType = () => {
 									(payload: any) => {
 										debugger;
 										setContractValue(payload);
-										setContractType(ContractTypeText.DOCX.toString());
-										setCreateDisable(false);
+										setFieldBlockVisible(true);
+										setCreateDisable(true);
 									}
 								);
 							}
@@ -226,17 +203,20 @@ export const ChooseContractType = () => {
 							const arrayBuffer = readerEvent?.target?.result as ArrayBuffer;
 							await setArrayBuffer('pdfFile', arrayBuffer);
 							await setArrayBuffer('pdfFileOriginal', arrayBuffer);
-							setContractType(ContractTypeText.PDF.toString());
-							setCreateDisable(false);
+							setPdfDownload(true);
 							setPdfFileLoad(pdfFileLoad + 1);
+							setFieldBlockVisible(true);
+							setCreateDisable(true);
 						};
 					};
 
 					input.click();
 					break;
 				case ContractTypeText.EMPTY.toString():
-					setContractType(ContractTypeText.EMPTY.toString());
-					setCreateDisable(false);
+					setFieldBlockVisible(true);
+					setCreateDisable(true);
+					debugger;
+					setContractValue('<div></div>');
 					break;
 				default:
 					break;
@@ -247,7 +227,7 @@ export const ChooseContractType = () => {
 					action: Action.READ,
 					clientKey: clientKey,
 					userKey: userKey,
-					template: { templateKey: e },
+					template: { templateKey },
 				},
 			};
 			let template: Template = {};
@@ -276,15 +256,50 @@ export const ChooseContractType = () => {
 						await setArrayBuffer('pdfFileOriginal', response.data);
 						// setPdfData(response.data);
 						setPdfFileLoad(pdfFileLoad + 1);
-						setContractValue(template.value ? template.value : '');
-						setCreateDisable(false);
+						setContractValue(template.value as string);
+						setFieldBlockVisible(true);
+						setCreateDisable(true);
 					});
 			} else {
-				setContractValue(template.value ? template.value : '');
-				setCreateDisable(false);
+				debugger;
+				setContractValue(template.value as string);
+				setFieldBlockVisible(true);
+				setCreateDisable(true);
 			}
+		}
+	};
+	const handleContinue = async () => {
+		setCreateContract(true);
+	};
+	const handleChange = (e: any) => {
+		switch (e.target.id) {
+			case 'ContractName':
+				setContractName(e.target.value);
+				if (e.target.value) {
+					setContinueDisable(false);
+				} else {
+					setContinueDisable(true);
+				}
+				break;
+		}
+	};
+	const handleChoose = async (e: any) => {
+		let contractTypeTmp = e.toString().split('_');
+		if (
+			contractTypeTmp[1] === ContractTypeText.DOCX.toString() ||
+			contractTypeTmp[1] === ContractTypeText.PDF.toString()
+		) {
+			setBtnName('Upload file');
+		} else {
+			setBtnName('Create contract');
+		}
+		if (contractTypeTmp[1]) {
+			setContractType(contractTypeTmp[1]);
+		} else {
 			setTemplateKey(e);
 		}
+		setSegmentedValue(e);
+		setCreateDisable(false);
 	};
 	return (
 		<Space direction='vertical' size={16} style={{ display: 'flex' }}>
@@ -298,7 +313,11 @@ export const ChooseContractType = () => {
 							This will speed up the drafting process.
 						</Text>
 					</Space>
-					<Segmented options={options} onChange={handleChoose} />
+					<Segmented
+						options={options}
+						onChange={handleChoose}
+						value={segmentedValue}
+					/>
 					<Button
 						type='primary'
 						disabled={createDisable}

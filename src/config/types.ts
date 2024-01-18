@@ -1,4 +1,4 @@
-import { ShareLinkView } from './enum';
+import { ShareLinkView, ShareLinkViewText } from './enum';
 
 export type Contract = {
 	contractType?: number;
@@ -148,4 +148,16 @@ export type Template = {
 	value?: string;
 	name?: string;
 	isPdf?: boolean;
+};
+export type Recipient = {
+	id?: number;
+	createTime?: Date;
+	changeTime?: Date;
+	fullname?: string;
+	email?: string;
+	customMessage?: string;
+	position?: number;
+	action?: ShareLinkViewText;
+	recipientKey?: string;
+	isDone?: boolean;
 };

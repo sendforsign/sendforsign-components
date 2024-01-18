@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import './contract-editor.css';
-import { Space } from 'antd';
+import { Card, Space, Typography } from 'antd';
 import { ContractEditorProps } from './contract-editor.types';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
@@ -29,6 +29,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	contractKey,
 	clientKey,
 	userKey,
+	id,
 }) => {
 	// if (!process.env.SENDFORSIGN_API_KEY) {
 	// 	console.log(
@@ -46,11 +47,9 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [contractValue, setContractValue] = useState('');
 	const [contractSign, setContractSign] = useState<ContractSign>({});
 	const [isPdf, setIsPdf] = useState(false);
-	const [isNew, setIsNew] = useState(contractKey ? false : true);
+	const [isNew, setIsNew] = useState(false);
 	const [continueDisable, setContinueDisable] = useState(true);
-	const [editorVisible, setEditorVisible] = useState(
-		contractKey ? true : false
-	);
+	const [editorVisible, setEditorVisible] = useState(false);
 	const [contractType, setContractType] = useState('');
 	const [templateKey, setTemplateKey] = useState('');
 	const [currContractKey, setCurrContractKey] = useState(contractKey);
@@ -58,20 +57,46 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [currUserKey, setCurrUserKey] = useState(userKey);
 	const [continueLoad, setContinueLoad] = useState(false);
 	const [createContract, setCreateContract] = useState(false);
-	const [refreshShareLink, setRefreshShareLink] = useState(0);
+	const [readonly, setReadonly] = useState(false);
+	const [pdfDownload, setPdfDownload] = useState(false);
 	const [sign, setSign] = useState('');
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
 	const [refreshSign, setRefreshSign] = useState(0);
 	const [refreshEvent, setRefreshEvent] = useState(0);
+	const [refreshShareLink, setRefreshShareLink] = useState(0);
+	const [refreshRecipients, setRefreshRecipients] = useState(0);
+	const [signCount, setSignCount] = useState(0);
 	const [notification, setNotification] = useState<{
 		text: string | React.ReactNode;
 	}>({ text: '' });
 	const contractKeyRef = useRef(contractKey);
-
+	const { Title } = Typography;
+	console.log('contractKey', contractKey, currClientKey);
+	// useEffect(() => {
+	// 	debugger;
+	// 	setEditorVisible(false);
+	// }, []);
 	useEffect(() => {
+		setCurrClientKey(clientKey);
+	}, [clientKey]);
+	useEffect(() => {
+		setCurrUserKey(userKey);
+	}, [userKey]);
+	useEffect(() => {
+		// debugger;
+		setEditorVisible(false);
+		setContinueLoad(true);
+		contractKeyRef.current = contractKey;
+		setCurrContractKey(contractKey);
 		clearArrayBuffer();
 		let body = {};
 		if (contractKeyRef.current) {
+			setIsNew(false);
+			setEditorVisible(true);
+			setContinueLoad(true);
+			setRefreshEvent(refreshEvent + 1);
+			setRefreshShareLink(refreshShareLink + 1);
+			setRefreshSign(refreshSign + 1);
 			body = {
 				data: {
 					action: Action.READ,
@@ -107,20 +132,32 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 							setIsPdf(true);
 							await setArrayBuffer('pdfFile', response.data);
 							await setArrayBuffer('pdfFileOriginal', response.data);
+							setPdfDownload(true);
 							// setPdfData(response.data);
 							setPdfFileLoad(pdfFileLoad + 1);
 						});
 				} else {
-					setContractValue(contractTmp.value as string);
+					// debugger;
+					setContractValue(
+						contractTmp.value ? (contractTmp.value as string) : '<div></div>'
+					);
 				}
 			};
 			getContract();
+		} else {
+			setIsNew(true);
+			setPdfDownload(false);
+			setContractName('');
+			setContractType('');
+			// debugger;
+			setContractValue('<div></div>');
+			setReadonly(false);
 		}
-	}, []);
+	}, [contractKey]);
 
 	useEffect(() => {
 		const handleContinue = async () => {
-			debugger;
+			// debugger;
 			setContinueLoad(true);
 			let body = {
 				data: {
@@ -150,7 +187,6 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					setCurrContractKey(payload.data.contract.contractKey);
 					contractKeyTmp = payload.data.contract.contractKey;
 					setRefreshEvent(refreshEvent + 1);
-					setIsNew(false);
 				});
 			if (contractType === ContractTypeText.PDF.toString() && !templateKey) {
 				const formData = new FormData();
@@ -170,15 +206,17 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					});
 			}
 			setEditorVisible(true);
-			setContinueLoad(false);
 			setContinueDisable(true);
+			// debugger;
+			setIsNew(false);
+			setContinueLoad(false);
 		};
 		if (createContract) {
 			handleContinue();
 			setCreateContract(false);
 		}
 	}, [createContract]);
-
+	console.log('editorVisible', continueLoad);
 	return (
 		<ContractEditorContext.Provider
 			value={{
@@ -216,6 +254,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setRefreshEvent,
 				refreshShareLink,
 				setRefreshShareLink,
+				refreshRecipients,
+				setRefreshRecipients,
 				contractValue,
 				setContractValue,
 				createContract,
@@ -228,13 +268,27 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setContinueLoad,
 				editorVisible,
 				setEditorVisible,
+				readonly,
+				setReadonly,
+				signCount,
+				setSignCount,
+				pdfDownload,
+				setPdfDownload,
 			}}
 		>
-			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
+			<Space id={id} direction='vertical' size={16} style={{ display: 'flex' }}>
 				{isNew ? <ChooseContractType /> : <DocumentTimilineBlock />}
-				{editorVisible && (
+				{!isNew && (
 					<>
-						{!isPdf ? <HtmlBlock /> : <PdfBlock />}
+						{editorVisible && (
+							<>
+								{!isPdf ? (
+									<>{contractValue && <HtmlBlock value={contractValue} />}</>
+								) : (
+									<PdfBlock />
+								)}
+							</>
+						)}
 						<ShareLinkBlock />
 					</>
 				)}

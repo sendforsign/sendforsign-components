@@ -5,4 +5,5 @@ export interface ModalViewProps {
 	clientKey?: string;
 	userKey?: string;
 	contractKey?: string;
+	id?: string;
 }

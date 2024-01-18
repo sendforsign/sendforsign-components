@@ -1,5 +1,5 @@
-import React, { FC, useContext, useEffect, useRef, useState } from 'react';
-// import './editor.css';
+import React, { useEffect, useRef, useState } from 'react';
+// import './html-block.css';
 import 'quill/dist/quill.bubble.css';
 import QuillNamespace, { Quill } from 'quill';
 import QuillBetterTable from 'quill-better-table';
@@ -11,37 +11,45 @@ import utc from 'dayjs/plugin/utc';
 import { useContractEditorContext } from '../contract-editor-context';
 import { BASE_URL } from '../../../config/config';
 import { Action, ApiEntity } from '../../../config/enum';
-import env from 'dotenv';
+import { ContractSign } from '../../../config/types';
 //env.config();
-
+type Props = {
+	value: string;
+};
 QuillNamespace.register(
 	{
 		'modules/better-table': QuillBetterTable,
 	},
 	true
 );
-export const HtmlBlock = () => {
+export const HtmlBlock = ({ value }: Props) => {
 	dayjs.extend(utc);
 	const {
 		contractKey,
 		clientKey,
 		userKey,
-		contractValue,
-		setContractValue,
 		sign,
 		setSign,
 		contractSign,
 		setContractSign,
 		continueLoad,
+		setContinueLoad,
+		setNotification,
+		readonly,
+		refreshSign,
+		setReadonly,
+		setSignCount,
 	} = useContractEditorContext();
 	const { Title, Text } = Typography;
 	const quillRef = useRef<Quill>();
 	const container = document.querySelector('#contract-editor-container');
-	const [containerInit, setContainerInit] = useState(false);
-
+	// console.log(
+	// 	'container1',
+	// 	document.querySelector('#contract-editor-container'),
+	// 	quillRef
+	// );
 	useEffect(() => {
-		if (container && !containerInit) {
-			setContainerInit(true);
+		if (document.querySelector('#contract-editor-container')) {
 			quillRef.current = new QuillNamespace('#contract-editor-container', {
 				modules: {
 					toolbar: {
@@ -114,11 +122,16 @@ export const HtmlBlock = () => {
 		}
 	}, [container]);
 	useEffect(() => {
-		if (contractValue) {
-			quillRef?.current?.clipboard.dangerouslyPasteHTML(contractValue);
-			setContractValue('');
+		if (value && quillRef?.current) {
+			quillRef?.current?.clipboard.dangerouslyPasteHTML(value);
+			setContinueLoad(false);
 		}
-	}, [contractValue]);
+	}, [value]);
+	useEffect(() => {
+		if (readonly) {
+			quillRef?.current?.enable(!readonly);
+		}
+	}, [readonly]);
 	useEffect(() => {
 		if (sign && contractSign) {
 			let textTmp =
@@ -132,32 +145,21 @@ export const HtmlBlock = () => {
 					'YYYY-MM-DD HH:mm:ss'
 				)} GMT</p>`;
 
-			handleChangeText(textTmp);
+			handleChangeText(textTmp, false);
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(textTmp);
+			debugger;
+			setContinueLoad(false);
 			setSign('');
 			setContractSign({});
 			quillRef?.current?.enable(false);
 			sendEmail();
 		}
 	}, [sign, contractSign]);
-	const addTable = () => {
-		debugger;
-		(quillRef.current as QuillNamespace)
-			.getModule('better-table')
-			.insertTable(3, 3);
-	};
-	const handleChangeText = useDebouncedCallback(
-		async (content: string) => {
-			let body = {
-				data: {
-					action: Action.UPDATE,
-					clientKey: clientKey,
-					userKey: userKey,
-					contract: { contractKey: contractKey, value: content },
-				},
-			};
+	useEffect(() => {
+		const getSigns = async () => {
+			let url = `${BASE_URL}${ApiEntity.CONTRACT_SIGN}?contractKey=${contractKey}&clientKey=${clientKey}`;
 			await axios
-				.post(BASE_URL + ApiEntity.CONTRACT, body, {
+				.get(url, {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
@@ -166,8 +168,78 @@ export const HtmlBlock = () => {
 					responseType: 'json',
 				})
 				.then((payload) => {
-					console.log('editor read', payload);
+					console.log('getSigns read', payload);
+					setSignCount(payload.data.length);
+					if (payload.data.length > 0) {
+						setReadonly(true);
+					}
 				});
+		};
+		getSigns();
+	}, [refreshSign]);
+
+	const addTable = () => {
+		debugger;
+		(quillRef.current as QuillNamespace)
+			.getModule('better-table')
+			.insertTable(3, 3);
+	};
+	const handleChangeText = useDebouncedCallback(
+		async (content: string, needCheck: boolean = true) => {
+			let body = {};
+			let changed = false;
+			let contractValueTmp = '';
+			if (needCheck) {
+				body = {
+					clientKey: clientKey,
+					userKey: userKey,
+					contractKey: contractKey,
+				};
+				await axios
+					.post(BASE_URL + ApiEntity.CHECK_CONTRACT_VALUE, body, {
+						headers: {
+							Accept: 'application/vnd.api+json',
+							'Content-Type': 'application/vnd.api+json',
+							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+						},
+						responseType: 'json',
+					})
+					.then((payload) => {
+						console.log('CHECK_CONTRACT_VALUE read', payload);
+						changed = payload.data.changed;
+						contractValueTmp = payload.data.contractValue;
+					});
+			}
+			if (!changed) {
+				body = {
+					data: {
+						action: Action.UPDATE,
+						clientKey: clientKey,
+						userKey: userKey,
+						contract: { contractKey: contractKey, value: content },
+					},
+				};
+				await axios
+					.post(BASE_URL + ApiEntity.CONTRACT, body, {
+						headers: {
+							Accept: 'application/vnd.api+json',
+							'Content-Type': 'application/vnd.api+json',
+							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+						},
+						responseType: 'json',
+					})
+					.then((payload) => {
+						console.log('editor read', payload);
+					});
+			} else {
+				setReadonly(true);
+				if (contractValueTmp) {
+					quillRef?.current?.clipboard.dangerouslyPasteHTML(contractValueTmp);
+				}
+				setNotification({
+					text: 'Contract updated. You must check document again.',
+				});
+			}
 		},
 		5000,
 		// The maximum time func is allowed to be delayed before it's invoked:
@@ -192,9 +264,10 @@ export const HtmlBlock = () => {
 			});
 	};
 
+	console.log('editorVisible html', quillRef);
 	return (
 		<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-			<Card loading={continueLoad}>
+			<Card>
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 					<Space direction='vertical' size={2}>
 						<Title level={4} style={{ margin: '0 0 0 0' }}>

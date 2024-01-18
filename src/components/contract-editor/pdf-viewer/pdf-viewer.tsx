@@ -7,27 +7,30 @@ import { useContractEditorContext } from '../contract-editor-context';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 export const PdfViewer = () => {
-	const { pdfFileLoad } = useContractEditorContext();
+	const { pdfFileLoad, setContinueLoad, continueLoad } =
+		useContractEditorContext();
 	const [pdfData, setPdfData] = useState<ArrayBuffer>();
 	const [numPages, setNumPages] = useState(1);
 	const [scale, setScale] = useState(1);
 	const { getArrayBuffer } = useSaveArrayBuffer();
 
 	const { width, ref } = useResizeDetector();
-
+	console.log('PdfViewer');
 	useEffect(() => {
 		const getValue = async () => {
 			const arrayBuffer: ArrayBuffer = (await getArrayBuffer(
 				'pdfFile'
 			)) as ArrayBuffer;
-			return setPdfData(arrayBuffer);
+			setPdfData(arrayBuffer);
+			// debugger;
+			setContinueLoad(false);
 		};
 		getValue();
 	}, [pdfFileLoad]);
 	return (
 		<div ref={ref}>
 			<Document
-				loading={<Spin spinning={true} />}
+				loading={<Spin spinning={continueLoad} />}
 				file={pdfData}
 				onLoadSuccess={({ numPages }) => {
 					setNumPages(numPages);

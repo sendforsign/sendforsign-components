@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	Space,
 	Card,
@@ -22,13 +22,8 @@ import {
 } from '../../../config/enum';
 import axios from 'axios';
 import { BASE_URL } from '../../../config/config';
-type Recipient = {
-	fullname?: string;
-	email?: string;
-	customMessage?: string;
-	position?: number;
-	action?: ShareLinkViewText;
-};
+import { Recipient } from '../../../config/types';
+
 export const SendModal = () => {
 	const {
 		sendModal,
@@ -37,10 +32,17 @@ export const SendModal = () => {
 		clientKey,
 		userKey,
 		refreshEvent,
+		refreshRecipients,
 		setRefreshEvent,
 		setResultModal,
 	} = useContractEditorContext();
 	const [sendLoad, setSendLoad] = useState(false);
+	const [dataLoad, setDataLoad] = useState(false);
+	const [changeRecipient, setChangeRecipient] = useState<Recipient[]>([]);
+	const [insertRecipient, setInsertRecipient] = useState<Recipient[]>([]);
+	const [deleteRecipient, setDeleteRecipient] = useState<Recipient[]>([]);
+	const [id, setId] = useState(0);
+	const [recipientInit, setRecipientInit] = useState(false);
 	const [recipients, setRecipients] = useState<Recipient[]>([
 		{
 			fullname: '',
@@ -61,6 +63,78 @@ export const SendModal = () => {
 	];
 	const { Title, Text } = Typography;
 
+	useEffect(() => {
+		if (contractKey) {
+			const body = {
+				data: {
+					action: Action.LIST,
+					clientKey: clientKey,
+					userKey: userKey,
+					contractKey: contractKey,
+				},
+			};
+			setDataLoad(true);
+			const getRecipients = async () => {
+				setChangeRecipient([]);
+				setDeleteRecipient([]);
+				setInsertRecipient([]);
+				await axios
+					.post(BASE_URL + ApiEntity.RECIPIENT, body, {
+						headers: {
+							Accept: 'application/vnd.api+json',
+							'Content-Type': 'application/vnd.api+json',
+							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+						},
+						responseType: 'json',
+					})
+					.then((payload) => {
+						console.log('getShareLinks read', payload);
+						if (payload.data.recipients && payload.data.recipients.length > 0) {
+							setRecipientInit(false);
+							setRecipients(
+								payload.data.recipients.map((recipient: Recipient) => {
+									return {
+										id: recipient.id,
+										fullname: recipient.fullname,
+										email: recipient.email,
+										customMessage: recipient.customMessage,
+										position: recipient.position,
+										action: recipient.action,
+										recipientKey: recipient.recipientKey,
+									};
+								})
+							);
+							let idArr = payload.data.recipients.map(
+								(recipient: Recipient) => {
+									return parseInt(
+										recipient.id ? recipient.id?.toString() : '0',
+										10
+									);
+								}
+							);
+							let idTmp = Math.max(...idArr);
+							setId(idTmp);
+							setDataLoad(false);
+						} else {
+							setRecipientInit(true);
+							setId(0);
+							setRecipients([
+								{
+									id: 0,
+									fullname: '',
+									email: '',
+									customMessage: '',
+									position: 1,
+									action: ShareLinkViewText.SIGN,
+								},
+							]);
+							setDataLoad(false);
+						}
+					});
+			};
+			getRecipients();
+		}
+	}, [refreshRecipients]);
 	const handleSend = async () => {
 		if (
 			recipients &&
@@ -79,7 +153,7 @@ export const SendModal = () => {
 				},
 			};
 			await axios
-				.post(BASE_URL + ApiEntity.EMAIL, body, {
+				.post(BASE_URL + ApiEntity.RECIPIENT, body, {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
@@ -111,16 +185,140 @@ export const SendModal = () => {
 				break;
 		}
 		setRecipients(recipientsTmp);
+		if (
+			!changeRecipient.find(
+				(recipient) => recipient.id === recipientsTmp[index].id
+			) &&
+			recipientsTmp[index].recipientKey
+		) {
+			changeRecipient.push(recipientsTmp[index]);
+			setChangeRecipient(changeRecipient);
+		}
 	};
 	const handleClick = (e: any, index: number) => {
 		let recipientsTmp = [...recipients];
 		recipientsTmp[index].action = e;
 		setRecipients(recipientsTmp);
+		if (recipientsTmp[index].recipientKey) {
+			if (
+				!changeRecipient.find(
+					(recipient) => recipient.id === recipientsTmp[index].id
+				) &&
+				recipientsTmp[index].recipientKey
+			) {
+				changeRecipient.push(recipientsTmp[index]);
+				setChangeRecipient(changeRecipient);
+			}
+		} else {
+		}
 	};
 	const handleChangePosition = (e: any, index: number) => {
 		let recipientsTmp = [...recipients];
 		recipientsTmp[index].position = e;
 		setRecipients(recipientsTmp);
+		if (
+			!changeRecipient.find(
+				(recipient) => recipient.id === recipientsTmp[index].id
+			) &&
+			recipientsTmp[index].recipientKey
+		) {
+			changeRecipient.push(recipientsTmp[index]);
+			setChangeRecipient(changeRecipient);
+		}
+	};
+	const saveRecipient = async () => {
+		if (changeRecipient.length > 0) {
+			for (let index = 0; index < changeRecipient.length; index++) {
+				const recipientFind = recipients.find(
+					(recipient) => recipient.id === changeRecipient[index].id
+				);
+				if (recipientFind) {
+					const body = {
+						data: {
+							action: Action.UPDATE,
+							clientKey: clientKey,
+							userKey: userKey,
+							contractKey: contractKey,
+							recipient: {
+								recipientKey: recipientFind.recipientKey,
+								fullname: recipientFind.fullname,
+								email: recipientFind.email,
+							},
+						},
+					};
+					await axios
+						.post(BASE_URL + ApiEntity.RECIPIENT, body, {
+							headers: {
+								Accept: 'application/vnd.api+json',
+								'Content-Type': 'application/vnd.api+json',
+								'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+							},
+							responseType: 'json',
+						})
+						.then((payload) => {});
+				}
+			}
+		}
+		if (deleteRecipient.length > 0) {
+			for (let index = 0; index < deleteRecipient.length; index++) {
+				const body = {
+					data: {
+						action: Action.DELETE,
+						clientKey: clientKey,
+						userKey: userKey,
+						contractKey: contractKey,
+						recipient: {
+							recipientKey: deleteRecipient[index].recipientKey,
+						},
+					},
+				};
+				await axios
+					.post(BASE_URL + ApiEntity.RECIPIENT, body, {
+						headers: {
+							Accept: 'application/vnd.api+json',
+							'Content-Type': 'application/vnd.api+json',
+							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+						},
+						responseType: 'json',
+					})
+					.then((payload) => {});
+			}
+		}
+		if (insertRecipient.length > 0) {
+			for (let index = 0; index < insertRecipient.length; index++) {
+				const recipientFind = recipients.find(
+					(recipient) => recipient.id === insertRecipient[index].id
+				);
+				if (recipientFind) {
+					const body = {
+						data: {
+							action: Action.CREATE,
+							clientKey: clientKey,
+							userKey: userKey,
+							contractKey: contractKey,
+							recipient: {
+								id: recipientFind.id,
+								fullname: recipientFind.fullname,
+								email: recipientFind.email,
+								customMessage: recipientFind.customMessage,
+								position: recipientFind.position,
+								action: recipientFind.action,
+							},
+						},
+					};
+					await axios
+						.post(BASE_URL + ApiEntity.RECIPIENT, body, {
+							headers: {
+								Accept: 'application/vnd.api+json',
+								'Content-Type': 'application/vnd.api+json',
+								'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+							},
+							responseType: 'json',
+						})
+						.then((payload) => {});
+				}
+			}
+		}
 	};
 	const handleCancel = () => {
 		setRecipients([
@@ -132,17 +330,35 @@ export const SendModal = () => {
 				action: ShareLinkViewText.SIGN,
 			},
 		]);
+		saveRecipient();
 		setSendModal(false);
 	};
 	const handleDelete = (index: number) => {
 		let recipientsTmp = [...recipients];
+		if (recipientsTmp[index].recipientKey) {
+			deleteRecipient.push(recipients[index]);
+			setDeleteRecipient(deleteRecipient);
+		}
+
 		recipientsTmp.splice(index, 1);
 		setRecipients(recipientsTmp);
 	};
 	const handleInsert = () => {
 		let recipientsTmp = [...recipients];
-		recipientsTmp.push({ position: 1, action: ShareLinkViewText.SIGN });
+		let idTmp = id + 1;
+		setId(idTmp);
+		recipientsTmp.push({
+			id: idTmp,
+			position: 1,
+			action: ShareLinkViewText.SIGN,
+		});
 		setRecipients(recipientsTmp);
+		insertRecipient.push({
+			id: idTmp,
+			position: 1,
+			action: ShareLinkViewText.SIGN,
+		});
+		setInsertRecipient(insertRecipient);
 	};
 	return (
 		<Modal
@@ -156,16 +372,18 @@ export const SendModal = () => {
 					<Button key='back' onClick={handleCancel}>
 						Cancel
 					</Button>
-					<Button
-						key='submit'
-						type='primary'
-						loading={sendLoad}
-						onClick={handleSend}
-					>
-						{`Send to ${recipients.length} recipient${
-							recipients.length === 1 ? '' : 's'
-						}`}
-					</Button>
+					{recipientInit && (
+						<Button
+							key='submit'
+							type='primary'
+							loading={sendLoad}
+							onClick={handleSend}
+						>
+							{`Send to ${recipients.length} recipient${
+								recipients.length === 1 ? '' : 's'
+							}`}
+						</Button>
+					)}
 				</>
 			}
 		>
@@ -178,7 +396,7 @@ export const SendModal = () => {
 					recipients.length > 0 &&
 					recipients.map((recipient, index) => {
 						return (
-							<Card>
+							<Card loading={dataLoad}>
 								<Space
 									direction='vertical'
 									size={16}
@@ -243,7 +461,7 @@ export const SendModal = () => {
 							</Card>
 						);
 					})}
-				<Button type='dashed' block onClick={handleInsert}>
+				<Button loading={dataLoad} type='dashed' block onClick={handleInsert}>
 					Add recipient
 				</Button>
 			</Space>

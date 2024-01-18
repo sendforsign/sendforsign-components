@@ -40,6 +40,8 @@ export type TContractEditorContextType = {
 	setRefreshEvent: (refreshEvent: number) => void;
 	refreshShareLink: number;
 	setRefreshShareLink: (refreshShareLink: number) => void;
+	refreshRecipients: number;
+	setRefreshRecipients: (refreshRecipients: number) => void;
 	isPdf: boolean;
 	setIsPdf: (isPdf: boolean) => void;
 	continueDisable: boolean;
@@ -48,6 +50,12 @@ export type TContractEditorContextType = {
 	setContinueLoad: (continueDisable: boolean) => void;
 	editorVisible: boolean;
 	setEditorVisible: (editorVisible: boolean) => void;
+	readonly: boolean;
+	setReadonly: (readonly: boolean) => void;
+	signCount: number;
+	setSignCount: (signCount: number) => void;
+	pdfDownload: boolean;
+	setPdfDownload: (pdfDownload: boolean) => void;
 };
 export const ContractEditorContext = createContext<
 	TContractEditorContextType | undefined
