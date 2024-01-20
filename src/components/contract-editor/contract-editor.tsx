@@ -5,24 +5,24 @@ import { ContractEditorProps } from './contract-editor.types';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
 import {
-  Action,
-  ApiEntity,
-  ContractType,
-  ContractTypeText,
-} from "../../config/enum";
-import useSaveArrayBuffer from "../../hooks/use-save-array-buffer";
-import { ContractSign } from "../../config/types";
-import { ContractEditorContext } from "./contract-editor-context";
-import { ApproveModal } from "./approve-modal/approve-modal";
-import { SignModal } from "./sign-modal/sign-modal";
-import { SendModal } from "./send-modal/send-modal";
-import { ResultModal } from "./result-modal/result-modal";
-import { HtmlBlock } from "./html-block/html-block";
-import { PdfBlock } from "./pdf-block/pdf-block";
-import { Notification } from "./notification/notification";
-import { DocumentTimilineBlock } from "./document-timeline-block/document-timeline-block";
-import { ChooseContractType } from "./choose-contract-type/choose-contract-type";
-import { ShareLinkBlock } from "./share-link-block/share-link-block";
+	Action,
+	ApiEntity,
+	ContractType,
+	ContractTypeText,
+} from '../../config/enum';
+import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
+import { ContractSign } from '../../config/types';
+import { ContractEditorContext } from './contract-editor-context';
+import { ApproveModal } from './approve-modal/approve-modal';
+import { SignModal } from './sign-modal/sign-modal';
+import { SendModal } from './send-modal/send-modal';
+import { ResultModal } from './result-modal/result-modal';
+import { HtmlBlock } from './html-block/html-block';
+import { PdfBlock } from './pdf-block/pdf-block';
+import { Notification } from './notification/notification';
+import { DocumentTimilineBlock } from './document-timeline-block/document-timeline-block';
+import { ChooseContractType } from './choose-contract-type/choose-contract-type';
+import { ShareLinkBlock } from './share-link-block/share-link-block';
 //env.config();
 
 export const ContractEditor: FC<ContractEditorProps> = ({
@@ -93,7 +93,6 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		if (contractKeyRef.current) {
 			setIsNew(false);
 			setEditorVisible(true);
-			setContinueLoad(true);
 			setRefreshEvent(refreshEvent + 1);
 			setRefreshShareLink(refreshShareLink + 1);
 			setRefreshSign(refreshSign + 1);
@@ -152,12 +151,13 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			// debugger;
 			setContractValue('<div></div>');
 			setReadonly(false);
+			setContinueLoad(false);
 		}
 	}, [contractKey]);
 
 	useEffect(() => {
 		const handleContinue = async () => {
-			// debugger;
+			debugger;
 			setContinueLoad(true);
 			let body = {
 				data: {
