@@ -6,6 +6,7 @@ import { useContractEditorContext } from '../contract-editor-context';
 import axios from 'axios';
 import { BASE_URL } from '../../../config/config';
 import {
+  faObjectUngroup,
 	faPaperPlane,
 	faPlane,
 	faSignature,
@@ -223,6 +224,21 @@ export const ShareLinkBlock = () => {
 								Approve
 							</Button>
 						</Tooltip>
+            <Tooltip title="Manage reusable fields.">
+              <Button
+                id="ManagePlaceholder"
+                type="default"
+                icon={<FontAwesomeIcon icon={faObjectUngroup} />}
+                onClick={() => {
+                  setSendModal(true);
+                }}
+                // disabled={approveDisable}
+                // loading={approveSpin}
+                // disabled={disableSign}
+              >
+                Placeholders
+              </Button>
+            </Tooltip>
 						<Tooltip title='Add another link to this contract.'>
 							<Button
 								icon={<FontAwesomeIcon icon={faSquarePlus} />}
