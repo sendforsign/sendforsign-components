@@ -314,7 +314,7 @@ export const ChooseContractType = () => {
 
   const steps = [
     {
-      title: "First",
+      title: 'First',
       content: (
         <Card>
           <Space direction="vertical" style={{ display: "flex" }}>
@@ -328,7 +328,7 @@ export const ChooseContractType = () => {
       ),
     },
     {
-      title: "Second",
+      title: 'Second',
       content: (
         <Card>
           <Space direction="vertical" style={{ display: "flex" }}>
