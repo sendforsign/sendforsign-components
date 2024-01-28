@@ -26,6 +26,7 @@ export const enum ApiEntity {
 	CONTRACT_EVENT = 'contract_event',
 	EVENT_STATUS = 'event_status',
 	CHECK_CONTRACT_VALUE = 'check_contract_value',
+	PLACEHOLDER = 'placeholder',
 }
 export const enum Action {
 	READ = 'read',
@@ -45,9 +46,16 @@ export const enum ContractTypeText {
 	PDF = 'pdf',
 	EMPTY = 'empty',
 }
-
 export const enum ContractAction {
 	SIGN = 'sign',
 	APPROVE = 'approve',
 	SEND = 'send',
+}
+export const enum PlaceholderType {
+	INTERNAL = '1',
+	EXTERNAL = '2',
+}
+export const enum PlaceholderTypeText {
+	INTERNAL = 'internal',
+	EXTERNAL = 'external',
 }

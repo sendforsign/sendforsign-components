@@ -161,3 +161,13 @@ export type Recipient = {
 	recipientKey?: string;
 	isDone?: boolean;
 };
+export type Placeholder = {
+	templateKey?: string;
+	contractKey?: string;
+	// id?: number;
+	createtime?: Date;
+	name?: string;
+	value?: string;
+	type?: string;
+	placeholderKey?: string;
+};

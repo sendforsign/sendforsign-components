@@ -1,15 +1,14 @@
-import React, { useEffect, useRef } from "react";
-import "quill/dist/quill.bubble.css";
-import QuillNamespace, { Quill } from "quill";
-import QuillBetterTable from "quill-better-table";
-import { useDebouncedCallback } from "use-debounce";
-import { Space, Card, Typography } from "antd";
-import axios from "axios";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import { useTemplateEditorContext } from "../template-editor-context";
-import { BASE_URL } from "../../../config/config";
-import { Action, ApiEntity } from "../../../config/enum";
+import React, { useEffect, useRef } from 'react';
+import 'quill/dist/quill.bubble.css';
+import QuillNamespace, { Quill } from 'quill';
+import QuillBetterTable from 'quill-better-table';
+import { useDebouncedCallback } from 'use-debounce';
+import axios from 'axios';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import { useTemplateEditorContext } from '../template-editor-context';
+import { BASE_URL } from '../../../config/config';
+import { Action, ApiEntity } from '../../../config/enum';
 //env.config();
 type Props = {
   value: string;
@@ -23,9 +22,8 @@ QuillNamespace.register(
 );
 export const HtmlBlock = ({ value }: Props) => {
   dayjs.extend(utc);
-  const { templateKey, clientKey, userKey, setContinueLoad } =
+  const { templateKey, clientKey, userKey } =
     useTemplateEditorContext();
-  const { Title, Text } = Typography;
   const quillRef = useRef<Quill>();
   useEffect(() => {
     quillRef.current = new QuillNamespace("#editor-container", {

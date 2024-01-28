@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { ContractSign } from '../../config/types';
+import { ContractSign, Placeholder } from '../../config/types';
 
 export type TContractEditorContextType = {
 	signModal: boolean;
@@ -42,6 +42,10 @@ export type TContractEditorContextType = {
 	setRefreshShareLink: (refreshShareLink: number) => void;
 	refreshRecipients: number;
 	setRefreshRecipients: (refreshRecipients: number) => void;
+	refreshPlaceholders: number;
+	setRefreshPlaceholders: (refreshPlaceholders: number) => void;
+	placeholder: Placeholder[];
+	setPlaceholder: (placeholder: Placeholder[]) => void;
 	isPdf: boolean;
 	setIsPdf: (isPdf: boolean) => void;
 	continueDisable: boolean;
