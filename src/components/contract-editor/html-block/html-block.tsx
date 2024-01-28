@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import 'quill/dist/quill.bubble.css';
 import QuillNamespace, { Quill } from 'quill';
 import QuillBetterTable from 'quill-better-table';
@@ -45,23 +45,13 @@ export const HtmlBlock = ({ value }: Props) => {
 	const { Title, Text } = Typography;
 	const quillRef = useRef<Quill>();
 	const container = document.querySelector('#contract-editor-container');
+	const [currentValue, setCurrentValue] = useState('');
 	// console.log(
 	// 	'container1',
 	// 	document.querySelector('#contract-editor-container'),
 	// 	quillRef
 	// );
 	useEffect(() => {
-		if (placeholder && placeholder.length > 0) {
-			let Inline = QuillNamespace.import('blots/inline');
-			class PlaceholderBlot extends Inline {}
-			for (let index = 0; index < placeholder.length; index++) {
-				PlaceholderBlot.className = `customclass1`;
-				PlaceholderBlot.blotName = `placeholder_${placeholder[index].placeholderKey}`;
-				PlaceholderBlot.tagName = `placeholder_${placeholder[index].placeholderKey}`;
-				QuillNamespace.register(PlaceholderBlot);
-			}
-		}
-
 		if (document.querySelector('#contract-editor-container')) {
 			quillRef.current = new QuillNamespace('#contract-editor-container', {
 				modules: {
@@ -126,6 +116,9 @@ export const HtmlBlock = ({ value }: Props) => {
 				quillRef.current.on(
 					'text-change',
 					function (delta: any, oldDelta: any, source: any) {
+						setCurrentValue(
+							quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
+						);
 						if (source === 'user') {
 							handleChangeText(
 								quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
@@ -140,11 +133,8 @@ export const HtmlBlock = ({ value }: Props) => {
 		if (value && quillRef?.current) {
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(value);
 			setContinueLoad(false);
-			// console.log(
-			// 	'quillRef?.current?.root.innerHTML',
-			// 	quillRef?.current?.root.innerHTML,
-			// 	document.querySelector('ql-code-block-container')
-			// );
+			setRefreshPlaceholders(refreshPlaceholders + 1);
+			setCurrentValue(value);
 		}
 	}, [value]);
 	useEffect(() => {
@@ -306,6 +296,7 @@ export const HtmlBlock = ({ value }: Props) => {
 					<PlaceholderBlock
 						quillRef={quillRef.current}
 						handleChangeText={handleChangeText}
+						valueText={currentValue}
 					/>
 				</Space>
 			</Col>

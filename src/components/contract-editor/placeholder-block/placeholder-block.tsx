@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
-import SignatureCanvas from 'react-signature-canvas';
+import React, { useEffect, useState } from 'react';
 import {
 	Space,
 	Card,
@@ -18,15 +17,8 @@ import {
 import QuillNamespace from 'quill';
 import { useContractEditorContext } from '../contract-editor-context';
 import { BASE_URL } from '../../../config/config';
-import {
-	Action,
-	ApiEntity,
-	ContractAction,
-	PlaceholderType,
-	PlaceholderTypeText,
-} from '../../../config/enum';
+import { Action, ApiEntity, PlaceholderTypeText } from '../../../config/enum';
 import axios from 'axios';
-import env from 'dotenv';
 import { Placeholder } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGlobe, faLeftLong, faUser } from '@fortawesome/free-solid-svg-icons';
@@ -34,8 +26,13 @@ import { faGlobe, faLeftLong, faUser } from '@fortawesome/free-solid-svg-icons';
 type Props = {
 	quillRef: QuillNamespace | undefined;
 	handleChangeText: any;
+	valueText: string;
 };
-export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
+export const PlaceholderBlock = ({
+	quillRef,
+	handleChangeText,
+	valueText,
+}: Props) => {
 	const {
 		contractKey,
 		clientKey,
@@ -48,9 +45,9 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
 
 	const { Title, Text } = Typography;
-
 	useEffect(() => {
 		const getPlaceholders = async () => {
+			console.log('PlaceholderBlock');
 			setPlaceholderLoad(true);
 			const body = {
 				data: {
@@ -70,17 +67,37 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 				})
 				.then((payload) => {
 					console.log('getPlaceholders read', payload);
+					// console.log('PlaceholderBlot', placeholder);
+					// if (placeholder && placeholder.length > 0) {
+					// 	let Inline = QuillNamespace.import('blots/inline');
+					// 	class PlaceholderBlot extends Inline {}
+					// 	for (let index = 0; index < placeholder.length; index++) {
+					// 		console.log('PlaceholderBlot', index, placeholder);
+					// 		PlaceholderBlot.className = `customclass1`;
+					// 		PlaceholderBlot.blotName = `placeholder_${placeholder[index].placeholderKey}`;
+					// 		PlaceholderBlot.tagName = `placeholder_${placeholder[index].placeholderKey}`;
+					// 		QuillNamespace.register(PlaceholderBlot);
+					// 	}
+					// }
 					if (
 						payload.data.placeholders &&
 						payload.data.placeholders.length > 0
 					) {
+						let Inline = QuillNamespace.import('blots/inline');
 						let placeholderTmp: Placeholder[] = [];
 						for (
 							let index = 0;
 							index < payload.data.placeholders.length;
 							index++
 						) {
+							class PlaceholderBlot extends Inline {}
 							placeholderTmp.push(payload.data.placeholders[index]);
+							// const NewBlot = Blot(Inline);
+							// const placeholderBlot = new NewBlot();
+							PlaceholderBlot.className = `customclass1`;
+							PlaceholderBlot.blotName = `placeholder_${payload.data.placeholders[index].placeholderKey}`;
+							PlaceholderBlot.tagName = `placeholder_${payload.data.placeholders[index].placeholderKey}`;
+							QuillNamespace.register(PlaceholderBlot);
 						}
 
 						setPlaceholder(placeholderTmp);
@@ -137,15 +154,15 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 		// 	'<placeholder1 className={customclass1}>New text </placeholder1>',
 		// 	'api'
 		// );
-
+		const empty = placeholder[index].value
+			? placeholder[index].value?.replace(/\s/g, '')
+			: '';
 		quillRef?.clipboard.dangerouslyPasteHTML(
 			position ? position?.index : 0,
 			`<placeholder_${
 				placeholder[index].placeholderKey
 			} className={customclass1}>${
-				placeholder[index].value
-					? placeholder[index].value
-					: `{{{${placeholder[index].name}}}}`
+				empty ? placeholder[index].value : `{{{${placeholder[index].name}}}}`
 			}</placeholder_${placeholder[index].placeholderKey}>`
 		);
 		handleChangeText(quillRef?.root.innerHTML);
@@ -204,7 +221,44 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 		}
 		setPlaceholder(placeholderTmp);
 	};
-	const changeValueInTag = (placeholderKey: string, value: string) => {};
+	const changeValueInTag = (placeholderKey: string, value: string) => {
+		let text = valueText;
+		let array = text?.split(`</placeholder_${placeholderKey}>`);
+		let resultText = '';
+		if (array) {
+			for (let i = 0; i < array.length; i++) {
+				let elArray = array[i].split(`<placeholder_${placeholderKey} class=`);
+				if (elArray.length > 1) {
+					for (let j = 0; j < elArray.length; j++) {
+						switch (j) {
+							case 0:
+								resultText += `${elArray[j]}<placeholder_${placeholderKey} class=`;
+								break;
+
+							case 1:
+								let elelArray = elArray[j].split('>');
+								for (let k = 0; k < elelArray.length; k++) {
+									switch (k) {
+										case 0:
+											resultText += `${elelArray[k]}>`;
+											break;
+
+										case 1:
+											resultText += `${value}</placeholder_${placeholderKey}>`;
+											break;
+									}
+								}
+								break;
+						}
+					}
+				} else {
+					resultText += elArray;
+				}
+			}
+			quillRef?.clipboard.dangerouslyPasteHTML(resultText);
+			handleChangeText(resultText, false);
+		}
+	};
 	const handleBlur = async (e: any, index: number) => {
 		let placeholdersTmp = [...placeholder];
 		let body = {};
@@ -233,7 +287,7 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 					.then((payload) => {
 						console.log('PLACEHOLDER read', payload);
 
-						setRefreshPlaceholders(refreshPlaceholders + 1);
+						// setRefreshPlaceholders(refreshPlaceholders + 1);
 					});
 				break;
 
@@ -261,7 +315,7 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 					.then((payload) => {
 						console.log('PLACEHOLDER read', payload);
 
-						setRefreshPlaceholders(refreshPlaceholders + 1);
+						// setRefreshPlaceholders(refreshPlaceholders + 1);
 					});
 				break;
 		}
