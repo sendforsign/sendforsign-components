@@ -164,7 +164,7 @@ export type Recipient = {
 export type Placeholder = {
 	templateKey?: string;
 	contractKey?: string;
-	// id?: number;
+	id?: number;
 	createtime?: Date;
 	name?: string;
 	value?: string;

@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import './template-editor.css';
-import { Card, Space, Typography } from 'antd';
+import { Card, Col, Row, Space, Typography } from 'antd';
 import { TemplateEditorProps } from './template-editor.types';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
@@ -10,8 +10,9 @@ import { TemplateEditorContext } from './template-editor-context';
 import { HtmlBlock } from './html-block/html-block';
 import { PdfBlock } from './pdf-block/pdf-block';
 import { ChooseTemplateType } from './choose-template-type/choose-template-type';
-import { Template } from '../../config/types';
+import { Placeholder, Template } from '../../config/types';
 import { PdfViewer } from './pdf-viewer/pdf-viewer';
+import { PlaceholderBlock } from './placeholder-block/placeholder-block';
 
 export const TemplateEditor: FC<TemplateEditorProps> = ({
 	templateKey,
@@ -44,6 +45,8 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
+	const [refreshPlaceholders, setRefreshPlaceholders] = useState(0);
+	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
 	const templateKeyRef = useRef(templateKey);
 	const { Title, Text } = Typography;
 
@@ -202,28 +205,53 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 				setCreateTemplate,
 				continueLoad,
 				setContinueLoad,
+				refreshPlaceholders,
+				setRefreshPlaceholders,
+				placeholder,
+				setPlaceholder,
 			}}
 		>
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 				{isNew && <ChooseTemplateType />}
 				{editorVisible && (
-					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-						<Card loading={continueLoad}>
+					<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }}>
+						<Col flex='auto'>
 							<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-								<Space direction='vertical' size={2}>
-									<Title level={4} style={{ margin: '0 0 0 0' }}>
-										Review your template
-									</Title>
-									<Text type='secondary'>Highlight text to see options.</Text>
-								</Space>
-								{!isPdf ? (
-									<>{templateValue && <HtmlBlock value={templateValue} />}</>
-								) : (
-									<PdfViewer />
-								)}
+								<Card loading={continueLoad}>
+									<Space
+										direction='vertical'
+										size={16}
+										style={{ display: 'flex' }}
+									>
+										<Space direction='vertical' size={2}>
+											<Title level={4} style={{ margin: '0 0 0 0' }}>
+												Review your template
+											</Title>
+											<Text type='secondary'>
+												Highlight text to see options.
+											</Text>
+										</Space>
+										{!isPdf ? (
+											<>
+												{templateValue && <HtmlBlock value={templateValue} />}
+											</>
+										) : (
+											<PdfViewer />
+										)}
+									</Space>
+								</Card>
 							</Space>
-						</Card>
-					</Space>
+							<Col flex='300px' style={{ display: 'block' }}>
+								<Space direction='vertical' style={{ display: 'flex' }}>
+									{/* <PlaceholderBlock
+										quillRef={quillRef.current}
+										handleChangeText={handleChangeText}
+										// valueText={currentValue}
+									/> */}
+								</Space>
+							</Col>
+						</Col>
+					</Row>
 				)}
 			</Space>
 		</TemplateEditorContext.Provider>

@@ -11,6 +11,8 @@ import { useContractEditorContext } from '../contract-editor-context';
 import { BASE_URL } from '../../../config/config';
 import { Action, ApiEntity } from '../../../config/enum';
 import { PlaceholderBlock } from '../placeholder-block/placeholder-block';
+import { Placeholder } from '../../../config/types';
+import { addBlotClass } from '../../../utils';
 
 //env.config();
 type Props = {
@@ -22,6 +24,9 @@ QuillNamespace.register(
 	},
 	true
 );
+for (let index = 1; index <= 40; index++) {
+	addBlotClass(index);
+}
 export const HtmlBlock = ({ value }: Props) => {
 	dayjs.extend(utc);
 	const {
@@ -34,13 +39,13 @@ export const HtmlBlock = ({ value }: Props) => {
 		setContractSign,
 		setContinueLoad,
 		setNotification,
+		placeholder,
 		readonly,
 		refreshSign,
 		setReadonly,
 		setSignCount,
 		refreshPlaceholders,
 		setRefreshPlaceholders,
-		placeholder,
 	} = useContractEditorContext();
 	const { Title, Text } = Typography;
 	const quillRef = useRef<Quill>();
@@ -116,9 +121,11 @@ export const HtmlBlock = ({ value }: Props) => {
 				quillRef.current.on(
 					'text-change',
 					function (delta: any, oldDelta: any, source: any) {
-						setCurrentValue(
-							quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
-						);
+						console.log('text-change', source, delta);
+						// setCurrentValue(
+						// 	quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
+						// );
+						// console.log('source', source, quillRef?.current?.root?.innerHTML);
 						if (source === 'user') {
 							handleChangeText(
 								quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
@@ -126,6 +133,21 @@ export const HtmlBlock = ({ value }: Props) => {
 						}
 					}
 				);
+				// quillRef.current.on(
+				// 	'editor-change',
+				// 	function (eventName: any, ...args: any) {
+				// 		console.log('editor-change', eventName, args);
+				// 		// setCurrentValue(
+				// 		// 	quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
+				// 		// );
+				// 		// console.log('source', source, quillRef?.current?.root?.innerHTML);
+				// 		// if (source === 'user') {
+				// 		// 	handleChangeText(
+				// 		// 		quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
+				// 		// 	);
+				// 		// }
+				// 	}
+				// );
 			}
 		}
 	}, [container]);
@@ -187,6 +209,9 @@ export const HtmlBlock = ({ value }: Props) => {
 		};
 		getSigns();
 	}, [refreshSign]);
+	// useEffect(() => {
+	// 	quillRef?.current?.clipboard.dangerouslyPasteHTML(currentValue);
+	// }, [currentValue]);
 
 	const addTable = () => {
 		(quillRef.current as QuillNamespace)
@@ -296,7 +321,7 @@ export const HtmlBlock = ({ value }: Props) => {
 					<PlaceholderBlock
 						quillRef={quillRef.current}
 						handleChangeText={handleChangeText}
-						valueText={currentValue}
+						// valueText={currentValue}
 					/>
 				</Space>
 			</Col>

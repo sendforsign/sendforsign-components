@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { ContractSign, ContractType } from '../../config/types';
+import { ContractSign, ContractType, Placeholder } from '../../config/types';
 
 export type TTemplateEditorContextType = {
 	resultModal: { open: boolean; action: string };
@@ -26,6 +26,10 @@ export type TTemplateEditorContextType = {
 	setCreateTemplate: (createTemplate: boolean) => void;
 	continueLoad: boolean;
 	setContinueLoad: (continueDisable: boolean) => void;
+	refreshPlaceholders: number;
+	setRefreshPlaceholders: (refreshPlaceholders: number) => void;
+	placeholder: Placeholder[];
+	setPlaceholder: (placeholder: Placeholder[]) => void;
 };
 export const TemplateEditorContext = createContext<
 	TTemplateEditorContextType | undefined

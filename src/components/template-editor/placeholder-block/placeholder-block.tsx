@@ -15,8 +15,6 @@ import {
 	Segmented,
 } from 'antd';
 import QuillNamespace from 'quill';
-import Delta from 'quill-delta';
-import { useContractEditorContext } from '../contract-editor-context';
 import { BASE_URL } from '../../../config/config';
 import { Action, ApiEntity, PlaceholderTypeText } from '../../../config/enum';
 import axios from 'axios';
@@ -24,6 +22,7 @@ import { Placeholder } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGlobe, faLeftLong, faUser } from '@fortawesome/free-solid-svg-icons';
 import { addBlotClass } from '../../../utils';
+import { useTemplateEditorContext } from '../template-editor-context';
 //env.config();
 type Props = {
 	quillRef: QuillNamespace | undefined;
@@ -31,60 +30,15 @@ type Props = {
 	// valueText: string;
 };
 
-// type Constructor = new (...args: any[]) => {};
-// function createNamedSubclassWithMixedInBehavior(
-// 	className = 'UnnamedType',
-// 	baseClass = Object
-// 	// mixinConfig = {}
-// ) {
-// 	// const { compose: instanceLevelMixins = [], inherit: classLevelMixins = [] } =
-// 	// 	mixinConfig;
-// 	const subClass = {
-// 		[className]: class extends baseClass {
-// 			className = '';
-// 			blotName = '';
-// 			tagName = '';
-// 			constructor(...args: any) {
-// 				super(...args);
-// 			}
-// 			setClassName(className: string) {
-// 				this.className = className;
-// 			}
-// 			setBlotName(blotName: string) {
-// 				this.blotName = blotName;
-// 			}
-// 			setTagName(tagName: string) {
-// 				this.tagName = tagName;
-// 			}
-// 		},
-// 	}[className];
-
-// 	return subClass;
-// }
-// export function someMixin<T>(base?: Constructor<T> = class {} as T) {
-// 	return class extends base {
-// 		constructor(args: any[]) {
-// 			super(...args);
-
-// 			const config = args.find((arg) => arg instanceof MixinConfig);
-// 			if (!config) {
-// 				// handle the case where the mixin didn't receive it's config.
-// 			}
-
-// 			Object.assign(this, config);
-// 		}
-// 	};
-// }
-
 export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 	const {
-		contractKey,
+		templateKey,
 		clientKey,
 		placeholder,
 		setPlaceholder,
 		refreshPlaceholders,
 		setRefreshPlaceholders,
-	} = useContractEditorContext();
+	} = useTemplateEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
 
@@ -97,7 +51,7 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 				data: {
 					action: Action.LIST,
 					clientKey: clientKey,
-					contractKey: contractKey,
+					templateKey: templateKey,
 				},
 			};
 			await axios
@@ -130,7 +84,7 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 					setPlaceholderLoad(false);
 				});
 		};
-		if (contractKey && clientKey && currPlaceholder !== refreshPlaceholders) {
+		if (templateKey && clientKey && currPlaceholder !== refreshPlaceholders) {
 			setCurrPlaceholder(refreshPlaceholders);
 			getPlaceholders();
 		}
@@ -149,7 +103,7 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 			data: {
 				action: Action.CREATE,
 				clientKey: clientKey,
-				contractKey: contractKey,
+				templateKey: templateKey,
 				placeholder: {
 					name: 'Name',
 					value: '',
@@ -173,15 +127,14 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 	};
 	const handleInsertPlaceholder = (index: number) => {
 		const position = quillRef?.getSelection();
-		console.log('position', position, quillRef);
+		console.log('position', position);
 
 		const empty = placeholder[index].value
 			? placeholder[index].value?.replace(/\s/g, '')
 			: '';
-
 		quillRef?.clipboard.dangerouslyPasteHTML(
 			position ? position?.index : 0,
-			`<placeholder${index + 1} className={placeholderClass${index + 1}}>${
+			`<placeholder${index + 1} className={customClass}>${
 				empty ? placeholder[index].value : `{{{${placeholder[index].name}}}}`
 			}</placeholder${index + 1}>`
 		);
@@ -195,7 +148,7 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 			data: {
 				action: Action.DELETE,
 				clientKey: clientKey,
-				contractKey: contractKey,
+				templateKey: templateKey,
 				placeholder: {
 					placeholderKey: placeholdersTmp[index].placeholderKey,
 				},
@@ -241,26 +194,9 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 		setPlaceholder(placeholderTmp);
 	};
 	const changeValueInTag = (id: number, value: string) => {
-		// let contents = quillRef?.getContents();
-		// console.log('contents', contents, id, value);
-		// contents?.map((content) => {
-		// 	if (content.attributes) {
-		// 		for (let prop in content.attributes) {
-		// 			if (prop === `placeholder${id}` && content.attributes[prop]) {
-		// 				content.insert = value;
-		// 			}
-		// 		}
-		// 	}
-		// 	return content;
-		// });
-		// if (contents) {
-		// 	contents = quillRef?.updateContents(contents, 'api');
-		// 	quillRef?.update();
-		// }
 		let text = quillRef?.root.innerHTML;
 		let tag = `<placeholder${id}`;
-		// contents = quillRef?.getContents();
-		// console.log('contents 1', contents);
+
 		let array = text?.split(tag);
 		let resultText = '';
 		if (array) {
@@ -274,11 +210,11 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 						const lineArr = array[i].split(tag);
 						for (let j = 0; j < lineArr.length; j++) {
 							if (j === 0) {
-								tag = `"placeholderClass${id}">`;
+								tag = `"customclass${id}">`;
 								const elArray = lineArr[j].split(tag);
 								for (let k = 0; k < elArray.length; k++) {
 									if (k === 0) {
-										resultText += `${elArray[k]}"placeholderClass${id}">`;
+										resultText += `${elArray[k]}"customclass${id}">`;
 									} else {
 										resultText += `${value}</placeholder${id}>`;
 									}
@@ -294,7 +230,6 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 			}
 			quillRef?.clipboard.dangerouslyPasteHTML(resultText);
 			handleChangeText(resultText, false);
-			quillRef?.blur();
 		}
 		console.log('changeValueInTag', quillRef?.root.innerHTML);
 	};
@@ -307,7 +242,7 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 					data: {
 						action: Action.UPDATE,
 						clientKey: clientKey,
-						contractKey: contractKey,
+						templateKey: templateKey,
 						placeholder: {
 							placeholderKey: placeholdersTmp[index].placeholderKey,
 							name: placeholdersTmp[index].name,
@@ -335,7 +270,7 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 					data: {
 						action: Action.UPDATE,
 						clientKey: clientKey,
-						contractKey: contractKey,
+						templateKey: templateKey,
 						placeholder: {
 							placeholderKey: placeholdersTmp[index].placeholderKey,
 							value: placeholdersTmp[index].value,
@@ -374,7 +309,7 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 					<Text type='secondary'>Add reusable text to the content.</Text>
 				</Space>
 				{placeholder &&
-					placeholder.map((holder, index) => {
+					placeholder.map((holder: any, index: number) => {
 						return (
 							<div draggable id={holder.placeholderKey}>
 								<Space
