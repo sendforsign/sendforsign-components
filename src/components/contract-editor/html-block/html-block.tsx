@@ -1,22 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 import 'quill/dist/quill.bubble.css';
-import QuillNamespace, { Quill } from 'quill';
+import QuillNamespace from 'quill';
 import QuillBetterTable from 'quill-better-table';
 import { useDebouncedCallback } from 'use-debounce';
-import { Space, Card, Typography, Row, Col } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { useContractEditorContext } from '../contract-editor-context';
 import { BASE_URL } from '../../../config/config';
 import { Action, ApiEntity } from '../../../config/enum';
-import { PlaceholderBlock } from '../placeholder-block/placeholder-block';
-import { Placeholder } from '../../../config/types';
 import { addBlotClass } from '../../../utils';
 
 //env.config();
 type Props = {
 	value: string;
+	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
 };
 QuillNamespace.register(
 	{
@@ -27,7 +25,7 @@ QuillNamespace.register(
 for (let index = 1; index <= 40; index++) {
 	addBlotClass(index);
 }
-export const HtmlBlock = ({ value }: Props) => {
+export const HtmlBlock = ({ value, quillRef }: Props) => {
 	dayjs.extend(utc);
 	const {
 		contractKey,
@@ -39,7 +37,6 @@ export const HtmlBlock = ({ value }: Props) => {
 		setContractSign,
 		setContinueLoad,
 		setNotification,
-		placeholder,
 		readonly,
 		refreshSign,
 		setReadonly,
@@ -47,15 +44,8 @@ export const HtmlBlock = ({ value }: Props) => {
 		refreshPlaceholders,
 		setRefreshPlaceholders,
 	} = useContractEditorContext();
-	const { Title, Text } = Typography;
-	const quillRef = useRef<Quill>();
 	const container = document.querySelector('#contract-editor-container');
-	const [currentValue, setCurrentValue] = useState('');
-	// console.log(
-	// 	'container1',
-	// 	document.querySelector('#contract-editor-container'),
-	// 	quillRef
-	// );
+
 	useEffect(() => {
 		if (document.querySelector('#contract-editor-container')) {
 			quillRef.current = new QuillNamespace('#contract-editor-container', {
@@ -154,9 +144,7 @@ export const HtmlBlock = ({ value }: Props) => {
 	useEffect(() => {
 		if (value && quillRef?.current) {
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(value);
-			setContinueLoad(false);
 			setRefreshPlaceholders(refreshPlaceholders + 1);
-			setCurrentValue(value);
 		}
 	}, [value]);
 	useEffect(() => {
@@ -209,9 +197,6 @@ export const HtmlBlock = ({ value }: Props) => {
 		};
 		getSigns();
 	}, [refreshSign]);
-	// useEffect(() => {
-	// 	quillRef?.current?.clipboard.dangerouslyPasteHTML(currentValue);
-	// }, [currentValue]);
 
 	const addTable = () => {
 		(quillRef.current as QuillNamespace)
@@ -298,33 +283,8 @@ export const HtmlBlock = ({ value }: Props) => {
 			});
 	};
 	return (
-		<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }}>
-			<Col flex='auto'>
-				<Space direction='vertical' style={{ display: 'flex' }}>
-					<Card>
-						<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-							<Space direction='vertical' size={2}>
-								<Title level={4} style={{ margin: '0 0 0 0' }}>
-									Review your document
-								</Title>
-								<Text type='secondary'>Highlight text to see options.</Text>
-							</Space>
-							<div id='scroll-container'>
-								<div id='contract-editor-container' />
-							</div>
-						</Space>
-					</Card>
-				</Space>
-			</Col>
-			<Col flex='300px' style={{ display: 'block' }}>
-				<Space direction='vertical' style={{ display: 'flex' }}>
-					<PlaceholderBlock
-						quillRef={quillRef.current}
-						handleChangeText={handleChangeText}
-						// valueText={currentValue}
-					/>
-				</Space>
-			</Col>
-		</Row>
+		<div id='scroll-container'>
+			<div id='contract-editor-container' />
+		</div>
 	);
 };

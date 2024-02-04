@@ -13,6 +13,7 @@ import { ChooseTemplateType } from './choose-template-type/choose-template-type'
 import { Placeholder, Template } from '../../config/types';
 import { PdfViewer } from './pdf-viewer/pdf-viewer';
 import { PlaceholderBlock } from './placeholder-block/placeholder-block';
+import Quill from 'quill';
 
 export const TemplateEditor: FC<TemplateEditorProps> = ({
 	templateKey,
@@ -49,6 +50,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
 	const templateKeyRef = useRef(templateKey);
 	const { Title, Text } = Typography;
+	const quillRef = useRef<Quill>();
 
 	useEffect(() => {
 		setCurrClientKey(clientKey);
@@ -233,7 +235,12 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 										</Space>
 										{!isPdf ? (
 											<>
-												{templateValue && <HtmlBlock value={templateValue} />}
+												{templateValue && (
+													<HtmlBlock
+														value={templateValue}
+														quillRef={quillRef}
+													/>
+												)}
 											</>
 										) : (
 											<PdfViewer />
@@ -241,16 +248,14 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 									</Space>
 								</Card>
 							</Space>
+						</Col>
+						{!isPdf && (
 							<Col flex='300px' style={{ display: 'block' }}>
 								<Space direction='vertical' style={{ display: 'flex' }}>
-									{/* <PlaceholderBlock
-										quillRef={quillRef.current}
-										handleChangeText={handleChangeText}
-										// valueText={currentValue}
-									/> */}
+									<PlaceholderBlock quillRef={quillRef} />
 								</Space>
 							</Col>
-						</Col>
+						)}
 					</Row>
 				)}
 			</Space>

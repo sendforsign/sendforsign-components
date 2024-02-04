@@ -40,7 +40,7 @@ export const ContractList: FC<ContractListProps> = ({
 	const { Title } = Typography;
 
 	const chooseContract = (text: string) => {
-		debugger;
+		// debugger;
 		setCurrContractKey(text);
 		setParam('contractKey', text);
 		if (isModal) {
@@ -125,16 +125,11 @@ export const ContractList: FC<ContractListProps> = ({
 						}
 					);
 					setData(array);
-					// setValue(payload.data.contract.value);
 				});
 		};
 		getContracts();
 	}, [refreshContracts]);
-	// useEffect(() => {
-	// 	if (!getParam('openModal')) {
-	// 		setContractModal(false);
-	// 	}
-	// }, [getParam('openModal')]);
+
 	return (
 		<ContractListContext.Provider
 			value={{

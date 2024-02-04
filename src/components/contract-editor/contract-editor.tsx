@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import './contract-editor.css';
-import { Card, Space, Typography } from 'antd';
+import { Card, Col, Row, Space, Typography } from 'antd';
 import { ContractEditorProps } from './contract-editor.types';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
@@ -23,6 +23,9 @@ import { Notification } from './notification/notification';
 import { DocumentTimilineBlock } from './document-timeline-block/document-timeline-block';
 import { ChooseContractType } from './choose-contract-type/choose-contract-type';
 import { ShareLinkBlock } from './share-link-block/share-link-block';
+import Quill from 'quill';
+import { PlaceholderBlock } from './placeholder-block/placeholder-block';
+import { useDebouncedCallback } from 'use-debounce';
 //env.config();
 
 export const ContractEditor: FC<ContractEditorProps> = ({
@@ -71,8 +74,9 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [notification, setNotification] = useState<{
 		text: string | React.ReactNode;
 	}>({ text: '' });
+	const quillRef = useRef<Quill>();
 	const contractKeyRef = useRef(contractKey);
-	const { Title } = Typography;
+	const { Title, Text } = Typography;
 	console.log('contractKey', contractKey, currClientKey);
 	// useEffect(() => {
 	// 	debugger;
@@ -137,12 +141,14 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 							setPdfDownload(true);
 							// setPdfData(response.data);
 							setPdfFileLoad(pdfFileLoad + 1);
+							setContinueLoad(false);
 						});
 				} else {
 					// debugger;
 					setContractValue(
 						contractTmp.value ? (contractTmp.value as string) : '<div></div>'
 					);
+					setContinueLoad(false);
 				}
 			};
 			getContract();
@@ -151,7 +157,6 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			setPdfDownload(false);
 			setContractName('');
 			setContractType('');
-			// debugger;
 			setContractValue('<div></div>');
 			setReadonly(false);
 			setContinueLoad(false);
@@ -220,7 +225,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		}
 	}, [createContract]);
 
-	console.log('editorVisible', continueLoad);
+	// console.log('editorVisible', continueLoad);
 	return (
 		<ContractEditorContext.Provider
 			value={{
@@ -289,13 +294,53 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				{!isNew && (
 					<>
 						{editorVisible && (
-							<>
-								{!isPdf ? (
-									<>{contractValue && <HtmlBlock value={contractValue} />}</>
-								) : (
-									<PdfBlock />
+							<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }}>
+								<Col flex='auto'>
+									<Space direction='vertical' style={{ display: 'flex' }}>
+										<Card loading={continueLoad}>
+											<Space
+												direction='vertical'
+												size={16}
+												style={{ display: 'flex' }}
+											>
+												<Space
+													direction='vertical'
+													size={2}
+													className='SharingDocHeader'
+												>
+													<Title level={4} style={{ margin: '0 0 0 0' }}>
+														Review your document
+													</Title>
+													{!isPdf && (
+														<Text type='secondary'>
+															Highlight text to see options.
+														</Text>
+													)}
+												</Space>
+												{!isPdf ? (
+													<>
+														{contractValue && (
+															<HtmlBlock
+																value={contractValue}
+																quillRef={quillRef}
+															/>
+														)}
+													</>
+												) : (
+													<PdfBlock />
+												)}
+											</Space>
+										</Card>
+									</Space>
+								</Col>
+								{!isPdf && (
+									<Col flex='300px' style={{ display: 'block' }}>
+										<Space direction='vertical' style={{ display: 'flex' }}>
+											<PlaceholderBlock quillRef={quillRef} />
+										</Space>
+									</Col>
 								)}
-							</>
+							</Row>
 						)}
 						<ShareLinkBlock />
 					</>

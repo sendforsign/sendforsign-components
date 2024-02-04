@@ -15,7 +15,6 @@ import {
 	Segmented,
 } from 'antd';
 import QuillNamespace from 'quill';
-import Delta from 'quill-delta';
 import { useContractEditorContext } from '../contract-editor-context';
 import { BASE_URL } from '../../../config/config';
 import { Action, ApiEntity, PlaceholderTypeText } from '../../../config/enum';
@@ -23,64 +22,17 @@ import axios from 'axios';
 import { Placeholder } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGlobe, faLeftLong, faUser } from '@fortawesome/free-solid-svg-icons';
-import { addBlotClass } from '../../../utils';
-//env.config();
+
 type Props = {
-	quillRef: QuillNamespace | undefined;
-	handleChangeText: any;
-	// valueText: string;
+	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
 };
 
-// type Constructor = new (...args: any[]) => {};
-// function createNamedSubclassWithMixedInBehavior(
-// 	className = 'UnnamedType',
-// 	baseClass = Object
-// 	// mixinConfig = {}
-// ) {
-// 	// const { compose: instanceLevelMixins = [], inherit: classLevelMixins = [] } =
-// 	// 	mixinConfig;
-// 	const subClass = {
-// 		[className]: class extends baseClass {
-// 			className = '';
-// 			blotName = '';
-// 			tagName = '';
-// 			constructor(...args: any) {
-// 				super(...args);
-// 			}
-// 			setClassName(className: string) {
-// 				this.className = className;
-// 			}
-// 			setBlotName(blotName: string) {
-// 				this.blotName = blotName;
-// 			}
-// 			setTagName(tagName: string) {
-// 				this.tagName = tagName;
-// 			}
-// 		},
-// 	}[className];
-
-// 	return subClass;
-// }
-// export function someMixin<T>(base?: Constructor<T> = class {} as T) {
-// 	return class extends base {
-// 		constructor(args: any[]) {
-// 			super(...args);
-
-// 			const config = args.find((arg) => arg instanceof MixinConfig);
-// 			if (!config) {
-// 				// handle the case where the mixin didn't receive it's config.
-// 			}
-
-// 			Object.assign(this, config);
-// 		}
-// 	};
-// }
-
-export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
+export const PlaceholderBlock = ({ quillRef }: Props) => {
 	const {
 		contractKey,
 		clientKey,
 		placeholder,
+		continueLoad,
 		setPlaceholder,
 		refreshPlaceholders,
 		setRefreshPlaceholders,
@@ -89,47 +41,49 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
 
 	const { Title, Text } = Typography;
-	useEffect(() => {
-		const getPlaceholders = async () => {
-			console.log('PlaceholderBlock');
+
+	const getPlaceholders = async (load = true) => {
+		console.log('PlaceholderBlock');
+		if (load) {
 			setPlaceholderLoad(true);
-			const body = {
-				data: {
-					action: Action.LIST,
-					clientKey: clientKey,
-					contractKey: contractKey,
-				},
-			};
-			await axios
-				.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-					headers: {
-						Accept: 'application/vnd.api+json',
-						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
-					},
-					responseType: 'json',
-				})
-				.then((payload) => {
-					console.log('getPlaceholders read', payload);
-
-					if (
-						payload.data.placeholders &&
-						payload.data.placeholders.length > 0
-					) {
-						let placeholderTmp: Placeholder[] = [];
-						for (
-							let index = 0;
-							index < payload.data.placeholders.length;
-							index++
-						) {
-							placeholderTmp.push(payload.data.placeholders[index]);
-						}
-
-						setPlaceholder(placeholderTmp);
-					}
-					setPlaceholderLoad(false);
-				});
+		}
+		const body = {
+			data: {
+				action: Action.LIST,
+				clientKey: clientKey,
+				contractKey: contractKey,
+			},
 		};
+		await axios
+			.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
+				headers: {
+					Accept: 'application/vnd.api+json',
+					'Content-Type': 'application/vnd.api+json',
+					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+				},
+				responseType: 'json',
+			})
+			.then((payload) => {
+				console.log('getPlaceholders read', payload);
+
+				if (payload.data.placeholders && payload.data.placeholders.length > 0) {
+					let placeholderTmp: Placeholder[] = [];
+					for (
+						let index = 0;
+						index < payload.data.placeholders.length;
+						index++
+					) {
+						placeholderTmp.push(payload.data.placeholders[index]);
+					}
+
+					setPlaceholder(placeholderTmp);
+				}
+				if (load) {
+					setPlaceholderLoad(false);
+				}
+			});
+	};
+	useEffect(() => {
 		if (contractKey && clientKey && currPlaceholder !== refreshPlaceholders) {
 			setCurrPlaceholder(refreshPlaceholders);
 			getPlaceholders();
@@ -168,25 +122,27 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 			})
 			.then((payload) => {
 				console.log('PLACEHOLDER read', payload);
-				setRefreshPlaceholders(refreshPlaceholders + 1);
+				// setRefreshPlaceholders(refreshPlaceholders + 1);
+				getPlaceholders(false);
 			});
 	};
 	const handleInsertPlaceholder = (index: number) => {
-		const position = quillRef?.getSelection();
+		const position = quillRef?.current?.getSelection();
 		console.log('position', position, quillRef);
 
 		const empty = placeholder[index].value
 			? placeholder[index].value?.replace(/\s/g, '')
 			: '';
 
-		quillRef?.clipboard.dangerouslyPasteHTML(
+		quillRef?.current?.clipboard.dangerouslyPasteHTML(
 			position ? position?.index : 0,
 			`<placeholder${index + 1} className={placeholderClass${index + 1}}>${
 				empty ? placeholder[index].value : `{{{${placeholder[index].name}}}}`
-			}</placeholder${index + 1}>`
+			}</placeholder${index + 1}>`,
+			'user'
 		);
-		handleChangeText(quillRef?.root.innerHTML);
-		console.log('handleInsertPlaceholder', quillRef?.root.innerHTML);
+		// handleChangeText(quillRef?.root.innerHTML);
+		console.log('handleInsertPlaceholder', quillRef?.current?.root.innerHTML);
 	};
 	const handleDeletePlaceholder = async (index: number) => {
 		let placeholdersTmp = [...placeholder];
@@ -215,7 +171,8 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 
 				placeholdersTmp.splice(index, 1);
 				setPlaceholder(placeholdersTmp);
-				setRefreshPlaceholders(refreshPlaceholders + 1);
+				// setRefreshPlaceholders(refreshPlaceholders + 1);
+				getPlaceholders(false);
 			});
 	};
 	const handleChange = (e: any, index: number) => {
@@ -257,7 +214,7 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 		// 	contents = quillRef?.updateContents(contents, 'api');
 		// 	quillRef?.update();
 		// }
-		let text = quillRef?.root.innerHTML;
+		let text = quillRef?.current?.root.innerHTML;
 		let tag = `<placeholder${id}`;
 		// contents = quillRef?.getContents();
 		// console.log('contents 1', contents);
@@ -292,11 +249,11 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 					resultText = array[i];
 				}
 			}
-			quillRef?.clipboard.dangerouslyPasteHTML(resultText);
-			handleChangeText(resultText, false);
-			quillRef?.blur();
+			quillRef?.current?.clipboard.dangerouslyPasteHTML(resultText, 'user');
+			// handleChangeText(resultText, false);
+			quillRef?.current?.blur();
 		}
-		console.log('changeValueInTag', quillRef?.root.innerHTML);
+		console.log('changeValueInTag', quillRef?.current?.root.innerHTML);
 	};
 	const handleBlur = async (e: any, index: number) => {
 		let placeholdersTmp = [...placeholder];
@@ -365,7 +322,7 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 		setPlaceholder(placeholderTmp);
 	};
 	return (
-		<Card loading={placeholderLoad}>
+		<Card loading={placeholderLoad || continueLoad}>
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 				<Space direction='vertical' size={2}>
 					<Title level={4} style={{ margin: '0 0 0 0' }}>

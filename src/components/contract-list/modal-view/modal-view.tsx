@@ -17,11 +17,10 @@ export const ModalView: FC<ModalViewProps> = ({
 		setContractModal,
 		refreshContracts,
 		setRefreshContracts,
-	} = useContractListContext();
-	const { Title, Text } = Typography;
+	} = useContractListContext(); 
 
 	const handleCancel = () => {
-		debugger;
+		// debugger;
 		setContractKey('');
 		setContractModal(false);
 		setRefreshContracts(refreshContracts + 1);

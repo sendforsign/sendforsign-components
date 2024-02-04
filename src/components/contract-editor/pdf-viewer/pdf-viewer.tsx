@@ -21,8 +21,7 @@ export const PdfViewer = () => {
 			const arrayBuffer: ArrayBuffer = (await getArrayBuffer(
 				'pdfFile'
 			)) as ArrayBuffer;
-			setPdfData(arrayBuffer);
-			// debugger;
+			setPdfData(arrayBuffer); 
 			setContinueLoad(false);
 		};
 		getValue();

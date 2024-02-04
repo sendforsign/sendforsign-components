@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react';
 import { ContractSign, Placeholder } from '../../config/types';
+import Quill from 'quill';
 
 export type TContractEditorContextType = {
 	signModal: boolean;

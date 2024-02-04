@@ -21,20 +21,18 @@ import axios from 'axios';
 import { Placeholder } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGlobe, faLeftLong, faUser } from '@fortawesome/free-solid-svg-icons';
-import { addBlotClass } from '../../../utils';
 import { useTemplateEditorContext } from '../template-editor-context';
-//env.config();
+
 type Props = {
-	quillRef: QuillNamespace | undefined;
-	handleChangeText: any;
-	// valueText: string;
+	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
 };
 
-export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
+export const PlaceholderBlock = ({ quillRef }: Props) => {
 	const {
 		templateKey,
 		clientKey,
 		placeholder,
+		continueLoad,
 		setPlaceholder,
 		refreshPlaceholders,
 		setRefreshPlaceholders,
@@ -43,47 +41,49 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
 
 	const { Title, Text } = Typography;
-	useEffect(() => {
-		const getPlaceholders = async () => {
-			console.log('PlaceholderBlock');
+
+	const getPlaceholders = async (load = true) => {
+		console.log('PlaceholderBlock');
+		if (load) {
 			setPlaceholderLoad(true);
-			const body = {
-				data: {
-					action: Action.LIST,
-					clientKey: clientKey,
-					templateKey: templateKey,
-				},
-			};
-			await axios
-				.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-					headers: {
-						Accept: 'application/vnd.api+json',
-						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
-					},
-					responseType: 'json',
-				})
-				.then((payload) => {
-					console.log('getPlaceholders read', payload);
-
-					if (
-						payload.data.placeholders &&
-						payload.data.placeholders.length > 0
-					) {
-						let placeholderTmp: Placeholder[] = [];
-						for (
-							let index = 0;
-							index < payload.data.placeholders.length;
-							index++
-						) {
-							placeholderTmp.push(payload.data.placeholders[index]);
-						}
-
-						setPlaceholder(placeholderTmp);
-					}
-					setPlaceholderLoad(false);
-				});
+		}
+		const body = {
+			data: {
+				action: Action.LIST,
+				clientKey: clientKey,
+				templateKey: templateKey,
+			},
 		};
+		await axios
+			.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
+				headers: {
+					Accept: 'application/vnd.api+json',
+					'Content-Type': 'application/vnd.api+json',
+					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+				},
+				responseType: 'json',
+			})
+			.then((payload) => {
+				console.log('getPlaceholders read', payload);
+
+				if (payload.data.placeholders && payload.data.placeholders.length > 0) {
+					let placeholderTmp: Placeholder[] = [];
+					for (
+						let index = 0;
+						index < payload.data.placeholders.length;
+						index++
+					) {
+						placeholderTmp.push(payload.data.placeholders[index]);
+					}
+
+					setPlaceholder(placeholderTmp);
+				}
+				if (load) {
+					setPlaceholderLoad(false);
+				}
+			});
+	};
+	useEffect(() => {
 		if (templateKey && clientKey && currPlaceholder !== refreshPlaceholders) {
 			setCurrPlaceholder(refreshPlaceholders);
 			getPlaceholders();
@@ -122,24 +122,27 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 			})
 			.then((payload) => {
 				console.log('PLACEHOLDER read', payload);
-				setRefreshPlaceholders(refreshPlaceholders + 1);
+				// setRefreshPlaceholders(refreshPlaceholders + 1);
+				getPlaceholders(false);
 			});
 	};
 	const handleInsertPlaceholder = (index: number) => {
-		const position = quillRef?.getSelection();
-		console.log('position', position);
+		const position = quillRef?.current?.getSelection();
+		console.log('position', position, quillRef);
 
 		const empty = placeholder[index].value
 			? placeholder[index].value?.replace(/\s/g, '')
 			: '';
-		quillRef?.clipboard.dangerouslyPasteHTML(
+
+		quillRef?.current?.clipboard.dangerouslyPasteHTML(
 			position ? position?.index : 0,
-			`<placeholder${index + 1} className={customClass}>${
+			`<placeholder${index + 1} className={placeholderClass${index + 1}}>${
 				empty ? placeholder[index].value : `{{{${placeholder[index].name}}}}`
-			}</placeholder${index + 1}>`
+			}</placeholder${index + 1}>`,
+			'user'
 		);
-		handleChangeText(quillRef?.root.innerHTML);
-		console.log('handleInsertPlaceholder', quillRef?.root.innerHTML);
+		// handleChangeText(quillRef?.root.innerHTML);
+		console.log('handleInsertPlaceholder', quillRef?.current?.root.innerHTML);
 	};
 	const handleDeletePlaceholder = async (index: number) => {
 		let placeholdersTmp = [...placeholder];
@@ -168,7 +171,8 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 
 				placeholdersTmp.splice(index, 1);
 				setPlaceholder(placeholdersTmp);
-				setRefreshPlaceholders(refreshPlaceholders + 1);
+				// setRefreshPlaceholders(refreshPlaceholders + 1);
+				getPlaceholders(false);
 			});
 	};
 	const handleChange = (e: any, index: number) => {
@@ -194,9 +198,26 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 		setPlaceholder(placeholderTmp);
 	};
 	const changeValueInTag = (id: number, value: string) => {
-		let text = quillRef?.root.innerHTML;
+		// let contents = quillRef?.getContents();
+		// console.log('contents', contents, id, value);
+		// contents?.map((content) => {
+		// 	if (content.attributes) {
+		// 		for (let prop in content.attributes) {
+		// 			if (prop === `placeholder${id}` && content.attributes[prop]) {
+		// 				content.insert = value;
+		// 			}
+		// 		}
+		// 	}
+		// 	return content;
+		// });
+		// if (contents) {
+		// 	contents = quillRef?.updateContents(contents, 'api');
+		// 	quillRef?.update();
+		// }
+		let text = quillRef?.current?.root.innerHTML;
 		let tag = `<placeholder${id}`;
-
+		// contents = quillRef?.getContents();
+		// console.log('contents 1', contents);
 		let array = text?.split(tag);
 		let resultText = '';
 		if (array) {
@@ -210,11 +231,11 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 						const lineArr = array[i].split(tag);
 						for (let j = 0; j < lineArr.length; j++) {
 							if (j === 0) {
-								tag = `"customclass${id}">`;
+								tag = `"placeholderClass${id}">`;
 								const elArray = lineArr[j].split(tag);
 								for (let k = 0; k < elArray.length; k++) {
 									if (k === 0) {
-										resultText += `${elArray[k]}"customclass${id}">`;
+										resultText += `${elArray[k]}"placeholderClass${id}">`;
 									} else {
 										resultText += `${value}</placeholder${id}>`;
 									}
@@ -228,10 +249,11 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 					resultText = array[i];
 				}
 			}
-			quillRef?.clipboard.dangerouslyPasteHTML(resultText);
-			handleChangeText(resultText, false);
+			quillRef?.current?.clipboard.dangerouslyPasteHTML(resultText, 'user');
+			// handleChangeText(resultText, false);
+			quillRef?.current?.blur();
 		}
-		console.log('changeValueInTag', quillRef?.root.innerHTML);
+		console.log('changeValueInTag', quillRef?.current?.root.innerHTML);
 	};
 	const handleBlur = async (e: any, index: number) => {
 		let placeholdersTmp = [...placeholder];
@@ -300,7 +322,7 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 		setPlaceholder(placeholderTmp);
 	};
 	return (
-		<Card loading={placeholderLoad}>
+		<Card loading={placeholderLoad || continueLoad}>
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 				<Space direction='vertical' size={2}>
 					<Title level={4} style={{ margin: '0 0 0 0' }}>
@@ -309,7 +331,7 @@ export const PlaceholderBlock = ({ quillRef, handleChangeText }: Props) => {
 					<Text type='secondary'>Add reusable text to the content.</Text>
 				</Space>
 				{placeholder &&
-					placeholder.map((holder: any, index: number) => {
+					placeholder.map((holder, index) => {
 						return (
 							<div draggable id={holder.placeholderKey}>
 								<Space
