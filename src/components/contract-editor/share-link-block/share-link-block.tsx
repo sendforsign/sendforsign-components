@@ -229,9 +229,6 @@ export const ShareLinkBlock = () => {
                 id="ManagePlaceholder"
                 type="default"
                 icon={<FontAwesomeIcon icon={faObjectUngroup} />}
-                onClick={() => {
-                  setSendModal(true);
-                }}
                 // disabled={approveDisable}
                 // loading={approveSpin}
                 // disabled={disableSign}

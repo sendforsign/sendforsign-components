@@ -17,10 +17,10 @@ type Props = {
 	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
 };
 QuillNamespace.register(
-	{
-		'modules/better-table': QuillBetterTable,
-	},
-	true
+  {
+    "modules/better-table": QuillBetterTable,
+  },
+  true
 );
 for (let index = 1; index <= 40; index++) {
 	addBlotClass(index);
@@ -53,60 +53,60 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					toolbar: {
 						container: [
 							['bold', 'italic', 'underline', 'strike'], // toggled buttons
-							['blockquote', 'code-block'],
+							['blockquote'],
 
-							[{ list: 'ordered' }, { list: 'bullet' }],
-							[{ script: 'sub' }, { script: 'super' }], // superscript/subscript
-							[{ indent: '-1' }, { indent: '+1' }], // outdent/indent
-							[{ direction: 'rtl' }], // text direction
+              [{ list: "ordered" }, { list: "bullet" }],
+              [{ script: "sub" }, { script: "super" }], // superscript/subscript
+              [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
+              [{ direction: "rtl" }], // text direction
 
-							[{ size: ['small', false, 'large', 'huge'] }], // custom dropdown
+              [{ size: ["small", false, "large", "huge"] }], // custom dropdown
 
-							[{ color: [] }, { background: [] }], // dropdown with defaults from theme
-							[{ font: [] }],
-							[{ align: [] }],
+              [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+              [{ font: [] }],
+              [{ align: [] }],
 
-							['clean'],
-						],
-						handlers: {
-							table: addTable,
-						},
-					},
-					table: false, // disable table module
-					'better-table': {
-						operationMenu: {
-							items: {
-								unmergeCells: {
-									text: 'Unmerge',
-								},
-							},
-						},
-					},
-					keyboard: {
-						bindings: QuillBetterTable.keyboardBindings,
-					},
-					history: {
-						delay: 5000,
-						maxStack: 5000,
-						userOnly: true,
-					},
-				},
-				scrollingContainer: 'body',
-				theme: 'bubble',
-			});
-			if (quillRef.current) {
-				quillRef.current
-					.getModule('toolbar')
-					.container.addEventListener(
-						'mousedown',
-						(e: {
-							preventDefault: () => void;
-							stopPropagation: () => void;
-						}) => {
-							e.preventDefault();
-							e.stopPropagation();
-						}
-					);
+              ["clean"],
+            ],
+            handlers: {
+              table: addTable,
+            },
+          },
+          table: false, // disable table module
+          "better-table": {
+            operationMenu: {
+              items: {
+                unmergeCells: {
+                  text: "Unmerge",
+                },
+              },
+            },
+          },
+          keyboard: {
+            bindings: QuillBetterTable.keyboardBindings,
+          },
+          history: {
+            delay: 5000,
+            maxStack: 5000,
+            userOnly: true,
+          },
+        },
+        scrollingContainer: "body",
+        theme: "bubble",
+      });
+      if (quillRef.current) {
+        quillRef.current
+          .getModule("toolbar")
+          .container.addEventListener(
+            "mousedown",
+            (e: {
+              preventDefault: () => void;
+              stopPropagation: () => void;
+            }) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          );
 
 				quillRef.current.on(
 					'text-change',
