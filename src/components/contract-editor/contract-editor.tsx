@@ -62,6 +62,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [createContract, setCreateContract] = useState(false);
 	const [readonly, setReadonly] = useState(false);
 	const [pdfDownload, setPdfDownload] = useState(false);
+	const [placeholderVisible, setPlaceholderVisible] = useState(true);
 	const [sign, setSign] = useState('');
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
 	const [refreshSign, setRefreshSign] = useState(0);
@@ -269,6 +270,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setRefreshPlaceholders,
 				placeholder,
 				setPlaceholder,
+				placeholderVisible,
+				setPlaceholderVisible,
 				contractValue,
 				setContractValue,
 				createContract,
@@ -333,7 +336,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 										</Card>
 									</Space>
 								</Col>
-								{!isPdf && (
+								{!isPdf && placeholderVisible && (
 									<Col flex='300px' style={{ display: 'block' }}>
 										<Space direction='vertical' style={{ display: 'flex' }}>
 											<PlaceholderBlock quillRef={quillRef} />
