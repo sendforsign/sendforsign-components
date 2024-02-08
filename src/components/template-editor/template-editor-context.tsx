@@ -30,6 +30,8 @@ export type TTemplateEditorContextType = {
 	setRefreshPlaceholders: (refreshPlaceholders: number) => void;
 	placeholder: Placeholder[];
 	setPlaceholder: (placeholder: Placeholder[]) => void;
+	placeholderVisible: boolean;
+	setPlaceholderVisible: (placeholderVisible: boolean) => void;
 };
 export const TemplateEditorContext = createContext<
 	TTemplateEditorContextType | undefined

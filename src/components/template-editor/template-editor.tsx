@@ -41,6 +41,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const [editorVisible, setEditorVisible] = useState(
 		templateKey ? true : false
 	);
+	const [placeholderVisible, setPlaceholderVisible] = useState(true);
 	const [templateType, setTemplateType] = useState('');
 	const [currTemplateKey, setCurrTemplateKey] = useState(templateKey);
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
@@ -211,6 +212,8 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 				setRefreshPlaceholders,
 				placeholder,
 				setPlaceholder,
+				placeholderVisible,
+				setPlaceholderVisible,
 			}}
 		>
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
