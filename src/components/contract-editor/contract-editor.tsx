@@ -297,7 +297,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				{!isNew && (
 					<>
 						{editorVisible && (
-							<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }}>
+							<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false}>
 								<Col flex='auto'>
 									<Space direction='vertical' style={{ display: 'flex' }}>
 										<Card loading={continueLoad}>
@@ -338,7 +338,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 								</Col>
 								{!isPdf && placeholderVisible && (
 									<Col flex='300px' style={{ display: 'block' }}>
-										<Space direction='vertical' style={{ display: 'flex' }}>
+										<Space direction='vertical' style={{ display: 'flex', top: 10, position: 'sticky' }}>
 											<PlaceholderBlock quillRef={quillRef} />
 										</Space>
 									</Col>

@@ -340,7 +340,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 									size={2}
 									style={{ display: 'flex' }}
 								>
-									<Row>
+									<Row wrap={false} align={"middle"}>
 										<Col>
 											<Tooltip title='Click to insert this placeholder into the text.'>
 												<Button
@@ -401,7 +401,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 											</Tooltip>
 										</Col>
 										<Col flex={'auto'} />
-										<Col>
+										<Col flex='55px'>
 											<Tooltip title='Set who fills in this field: the user when creating a draft or the external signer when signing.'>
 												<Segmented
 													size='small'

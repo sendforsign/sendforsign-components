@@ -216,7 +216,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 				{isNew && <ChooseTemplateType />}
 				{editorVisible && (
-					<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }}>
+					<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false}>
 						<Col flex='auto'>
 							<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 								<Card loading={continueLoad}>
@@ -251,7 +251,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 						</Col>
 						{!isPdf && (
 							<Col flex='300px' style={{ display: 'block' }}>
-								<Space direction='vertical' style={{ display: 'flex' }}>
+								<Space direction='vertical' style={{ display: 'flex', top: 10, position: 'sticky' }}>
 									<PlaceholderBlock quillRef={quillRef} />
 								</Space>
 							</Col>
