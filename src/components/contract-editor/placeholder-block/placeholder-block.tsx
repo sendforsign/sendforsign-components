@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
 	Space,
 	Card,
@@ -36,6 +36,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		setPlaceholder,
 		refreshPlaceholders,
 		setRefreshPlaceholders,
+		placeholderVisible,
 	} = useContractEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
@@ -84,20 +85,24 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 			});
 	};
 	useEffect(() => {
-		if (contractKey && clientKey && currPlaceholder !== refreshPlaceholders) {
+		if (
+			contractKey &&
+			clientKey &&
+			(currPlaceholder !== refreshPlaceholders || placeholderVisible)
+		) {
 			setCurrPlaceholder(refreshPlaceholders);
 			getPlaceholders();
 		}
-	}, [refreshPlaceholders]);
+	}, [refreshPlaceholders, placeholderVisible]);
 
-  const handleAddPlaceholder = async () => {
-    let placeholdersTmp = [...placeholder];
-    placeholdersTmp.push({
-      name: `Name${placeholdersTmp.length}`,
-      value: "",
-      type: PlaceholderTypeText.INTERNAL,
-    });
-    setPlaceholder(placeholdersTmp);
+	const handleAddPlaceholder = async () => {
+		let placeholdersTmp = [...placeholder];
+		placeholdersTmp.push({
+			name: `Name${placeholdersTmp.length}`,
+			value: '',
+			type: PlaceholderTypeText.INTERNAL,
+		});
+		setPlaceholder(placeholdersTmp);
 
 		let body = {
 			data: {
@@ -130,9 +135,9 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		const position = quillRef?.current?.getSelection();
 		console.log('position', position, quillRef);
 
-    const empty = placeholder[index].value
-      ? placeholder[index].value?.replace(/\s/g, "")
-      : "";
+		const empty = placeholder[index].value
+			? placeholder[index].value?.replace(/\s/g, '')
+			: '';
 
 		quillRef?.current?.clipboard.dangerouslyPasteHTML(
 			position ? position?.index : 0,
@@ -147,27 +152,27 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 	const handleDeletePlaceholder = async (index: number) => {
 		let placeholdersTmp = [...placeholder];
 
-    let body = {
-      data: {
-        action: Action.DELETE,
-        clientKey: clientKey,
-        contractKey: contractKey,
-        placeholder: {
-          placeholderKey: placeholdersTmp[index].placeholderKey,
-        },
-      },
-    };
-    await axios
-      .post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-        headers: {
-          Accept: "application/vnd.api+json",
-          "Content-Type": "application/vnd.api+json",
-          "x-sendforsign-key": "re_api_key", //process.env.SENDFORSIGN_API_KEY,
-        },
-        responseType: "json",
-      })
-      .then((payload) => {
-        console.log("PLACEHOLDER read", payload);
+		let body = {
+			data: {
+				action: Action.DELETE,
+				clientKey: clientKey,
+				contractKey: contractKey,
+				placeholder: {
+					placeholderKey: placeholdersTmp[index].placeholderKey,
+				},
+			},
+		};
+		await axios
+			.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
+				headers: {
+					Accept: 'application/vnd.api+json',
+					'Content-Type': 'application/vnd.api+json',
+					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+				},
+				responseType: 'json',
+			})
+			.then((payload) => {
+				console.log('PLACEHOLDER read', payload);
 
 				placeholdersTmp.splice(index, 1);
 				setPlaceholder(placeholdersTmp);
@@ -181,7 +186,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 			case 'PlaceholderName':
 				placeholderTmp[index].name = e.target.value;
 
-        break;
+				break;
 
 			case 'PlaceholderValue':
 				placeholderTmp[index].value = e.target.value;
@@ -190,9 +195,9 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		}
 		setPlaceholder(placeholderTmp);
 	};
-	const changeValueInTag = (id: number, value: string) => { 
+	const changeValueInTag = (id: number, value: string) => {
 		let text = quillRef?.current?.root.innerHTML;
-		let tag = `<placeholder${id}`; 
+		let tag = `<placeholder${id}`;
 		let array = text?.split(tag);
 		let resultText = '';
 		if (array) {
@@ -257,9 +262,9 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 					.then((payload) => {
 						console.log('PLACEHOLDER read', payload);
 
-            // setRefreshPlaceholders(refreshPlaceholders + 1);
-          });
-        break;
+						// setRefreshPlaceholders(refreshPlaceholders + 1);
+					});
+				break;
 
 			case 'PlaceholderValue':
 				changeValue(index);
@@ -330,7 +335,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 									size={2}
 									style={{ display: 'flex' }}
 								>
-									<Row wrap={false} align={"middle"}>
+									<Row wrap={false} align={'middle'}>
 										<Col>
 											<Tooltip title='Click to insert this placeholder into the text.'>
 												<Button
@@ -426,12 +431,12 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 						);
 					})}
 
-        <Space direction="vertical" size={2} style={{ display: "flex" }}>
-          <Button block type="dashed" onClick={handleAddPlaceholder}>
-            Add placeholder
-          </Button>
-        </Space>
-      </Space>
-    </Card>
-  );
+				<Space direction='vertical' size={2} style={{ display: 'flex' }}>
+					<Button block type='dashed' onClick={handleAddPlaceholder}>
+						Add placeholder
+					</Button>
+				</Space>
+			</Space>
+		</Card>
+	);
 };
