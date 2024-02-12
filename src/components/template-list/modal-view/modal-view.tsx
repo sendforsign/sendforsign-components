@@ -6,6 +6,7 @@ import { TemplateEditor } from '../../template-editor';
 
 export const ModalView = () => {
 	const {
+		apiKey,
 		templateKey,
 		setTemplateKey,
 		clientKey,
@@ -37,6 +38,7 @@ export const ModalView = () => {
 		>
 			<Space direction='vertical' size='large' style={{ display: 'flex' }}>
 				<TemplateEditor
+					apiKey={apiKey}
 					clientKey={clientKey}
 					userKey={userKey}
 					templateKey={templateKey}

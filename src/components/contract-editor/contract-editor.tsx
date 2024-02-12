@@ -25,10 +25,10 @@ import { ChooseContractType } from './choose-contract-type/choose-contract-type'
 import { ShareLinkBlock } from './share-link-block/share-link-block';
 import Quill from 'quill';
 import { PlaceholderBlock } from './placeholder-block/placeholder-block';
-import { useDebouncedCallback } from 'use-debounce';
 //env.config();
 
 export const ContractEditor: FC<ContractEditorProps> = ({
+	apiKey,
 	contractKey,
 	clientKey,
 	userKey,
@@ -58,6 +58,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [currContractKey, setCurrContractKey] = useState(contractKey);
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
+	const [currApiKey, setCurrApiKey] = useState(apiKey);
 	const [continueLoad, setContinueLoad] = useState(false);
 	const [createContract, setCreateContract] = useState(false);
 	const [readonly, setReadonly] = useState(false);
@@ -83,7 +84,9 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	// 	debugger;
 	// 	setEditorVisible(false);
 	// }, []);
-
+	useEffect(() => {
+		setCurrApiKey(apiKey);
+	}, [apiKey]);
 	useEffect(() => {
 		setCurrClientKey(clientKey);
 	}, [clientKey]);
@@ -122,7 +125,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 						headers: {
 							Accept: 'application/vnd.api+json',
 							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 						},
 						responseType: 'json',
 					})
@@ -187,7 +190,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 					},
 					responseType: 'json',
 				})
@@ -206,7 +209,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				await axios
 					.post(url, formData, {
 						headers: {
-							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 						},
 						responseType: 'json',
 					})
@@ -290,6 +293,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setSignCount,
 				pdfDownload,
 				setPdfDownload,
+				apiKey: currApiKey,
+				setApiKey: setCurrApiKey,
 			}}
 		>
 			<Space id={id} direction='vertical' size={16} style={{ display: 'flex' }}>
@@ -338,7 +343,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 								</Col>
 								{!isPdf && placeholderVisible && (
 									<Col flex='300px' style={{ display: 'block' }}>
-										<Space direction='vertical' style={{ display: 'flex', top: 10, position: 'sticky' }}>
+										<Space
+											direction='vertical'
+											style={{ display: 'flex', top: 10, position: 'sticky' }}
+										>
 											<PlaceholderBlock quillRef={quillRef} />
 										</Space>
 									</Col>

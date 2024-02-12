@@ -5,19 +5,18 @@ import { useContractListContext } from '../contract-list-context';
 import { ContractEditor } from '../../contract-editor';
 import { ModalViewProps } from './modal-view.types';
 
-export const ModalView: FC<ModalViewProps> = ({
-	isOpen,
-	clientKey,
-	userKey,
-	contractKey,
-	id,
-}) => {
+export const ModalView: FC<ModalViewProps> = ({ id }) => {
 	const {
+		contractKey,
+		contractModal,
+		apiKey,
+		clientKey,
+		userKey,
 		setContractKey,
 		setContractModal,
 		refreshContracts,
 		setRefreshContracts,
-	} = useContractListContext(); 
+	} = useContractListContext();
 
 	const handleCancel = () => {
 		// debugger;
@@ -27,7 +26,7 @@ export const ModalView: FC<ModalViewProps> = ({
 	};
 	return (
 		<Modal
-			open={isOpen}
+			open={contractModal}
 			centered
 			onCancel={handleCancel}
 			closable={true}
@@ -35,30 +34,13 @@ export const ModalView: FC<ModalViewProps> = ({
 			width={1200}
 		>
 			<Space direction='vertical' size='large' style={{ display: 'flex' }}>
-				{/* {visibleSpin ? (
-					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-						<Card loading={true}>
-							<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-								<Space direction='vertical' size={2}>
-									<Title level={4} style={{ margin: '0 0 0 0' }}>
-										Review your document, highlight text to see options
-									</Title>
-									<Text type='secondary'>
-										The green text is where you may want to replace it with your
-										own text.
-									</Text>
-								</Space>
-							</Space>
-						</Card>
-					</Space>
-				) : ( */}
 				<ContractEditor
 					id={id}
+					apiKey={apiKey}
 					clientKey={clientKey}
 					userKey={userKey}
 					contractKey={contractKey}
 				/>
-				{/* )} */}
 			</Space>
 		</Modal>
 	);

@@ -17,7 +17,7 @@ import { BASE_URL } from '../../../config/config';
 import { EventStatus } from '../../../config/types';
 
 export const DocumentTimilineBlock = () => {
-	const { contractKey, clientKey, refreshEvent, continueLoad } =
+	const { apiKey, contractKey, clientKey, refreshEvent, continueLoad } =
 		useContractEditorContext();
 	const [timelines, setTimelines] = useState<TimelineItemProps[]>([]);
 	const { Title, Text } = Typography;
@@ -30,7 +30,7 @@ export const DocumentTimilineBlock = () => {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 					},
 					responseType: 'json',
 				})
@@ -44,7 +44,7 @@ export const DocumentTimilineBlock = () => {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 					},
 					responseType: 'json',
 				})

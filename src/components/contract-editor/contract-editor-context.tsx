@@ -63,6 +63,8 @@ export type TContractEditorContextType = {
 	setSignCount: (signCount: number) => void;
 	pdfDownload: boolean;
 	setPdfDownload: (pdfDownload: boolean) => void;
+	apiKey: string | undefined;
+	setApiKey: (apiKey: string) => void;
 };
 export const ContractEditorContext = createContext<
 	TContractEditorContextType | undefined

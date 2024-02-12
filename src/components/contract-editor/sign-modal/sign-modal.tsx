@@ -30,6 +30,7 @@ export const SignModal = () => {
 		setRefreshSign,
 		setContractSign,
 		setRefreshEvent,
+		apiKey,
 	} = useContractEditorContext();
 	const [signLoad, setSignLoad] = useState(false);
 	const [fullName, setFullName] = useState('');
@@ -55,7 +56,7 @@ export const SignModal = () => {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 					},
 					responseType: 'json',
 				})
@@ -64,7 +65,7 @@ export const SignModal = () => {
 					setContractSign(payload.data);
 					setSign(canvas);
 					setSignLoad(false);
-					handleCancel(); 
+					handleCancel();
 					setResultModal({ open: true, action: ContractAction.SIGN });
 					setRefreshSign(refreshSign + 1);
 					setRefreshEvent(refreshEvent + 1);
@@ -95,7 +96,7 @@ export const SignModal = () => {
 		handleClear();
 		setSignModal(false);
 	};
-	
+
 	const items = [
 		{
 			key: '1',

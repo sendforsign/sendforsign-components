@@ -29,6 +29,7 @@ type Props = {
 
 export const PlaceholderBlock = ({ quillRef }: Props) => {
 	const {
+		apiKey,
 		contractKey,
 		clientKey,
 		placeholder,
@@ -60,7 +61,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 				},
 				responseType: 'json',
 			})
@@ -110,7 +111,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				clientKey: clientKey,
 				contractKey: contractKey,
 				placeholder: {
-					name: 'Name',
+					name: `Name${placeholdersTmp.length}`,
 					value: '',
 					type: PlaceholderTypeText.INTERNAL,
 				},
@@ -121,7 +122,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 				},
 				responseType: 'json',
 			})
@@ -167,7 +168,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 				},
 				responseType: 'json',
 			})
@@ -255,7 +256,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 						headers: {
 							Accept: 'application/vnd.api+json',
 							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 						},
 						responseType: 'json',
 					})
@@ -298,7 +299,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 				},
 				responseType: 'json',
 			})

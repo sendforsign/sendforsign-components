@@ -10,6 +10,7 @@ import env from 'dotenv';
 
 export const ApproveModal = () => {
 	const {
+		apiKey,
 		approveModal,
 		setApproveModal,
 		contractKey,
@@ -36,7 +37,7 @@ export const ApproveModal = () => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 				},
 				responseType: 'json',
 			})
@@ -75,7 +76,7 @@ export const ApproveModal = () => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 				},
 				responseType: 'json',
 			})

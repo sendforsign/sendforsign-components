@@ -16,6 +16,7 @@ import { PlaceholderBlock } from './placeholder-block/placeholder-block';
 import Quill from 'quill';
 
 export const TemplateEditor: FC<TemplateEditorProps> = ({
+	apiKey,
 	templateKey,
 	clientKey,
 	userKey,
@@ -46,13 +47,16 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const [currTemplateKey, setCurrTemplateKey] = useState(templateKey);
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
+	const [currApiKey, setCurrApiKey] = useState(apiKey);
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
 	const [refreshPlaceholders, setRefreshPlaceholders] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
 	const templateKeyRef = useRef(templateKey);
 	const { Title, Text } = Typography;
 	const quillRef = useRef<Quill>();
-
+	useEffect(() => {
+		setCurrApiKey(apiKey);
+	}, [apiKey]);
 	useEffect(() => {
 		setCurrClientKey(clientKey);
 	}, [clientKey]);
@@ -85,7 +89,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 						headers: {
 							Accept: 'application/vnd.api+json',
 							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 						},
 						responseType: 'json',
 					})
@@ -143,7 +147,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 					},
 					responseType: 'json',
 				})
@@ -165,7 +169,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 				await axios
 					.post(url, formData, {
 						headers: {
-							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 						},
 						responseType: 'json',
 					})
@@ -214,6 +218,8 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 				setPlaceholder,
 				placeholderVisible,
 				setPlaceholderVisible,
+				apiKey: currApiKey,
+				setApiKey: setCurrApiKey,
 			}}
 		>
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
@@ -254,7 +260,10 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 						</Col>
 						{!isPdf && (
 							<Col flex='300px' style={{ display: 'block' }}>
-								<Space direction='vertical' style={{ display: 'flex', top: 10, position: 'sticky' }}>
+								<Space
+									direction='vertical'
+									style={{ display: 'flex', top: 10, position: 'sticky' }}
+								>
 									<PlaceholderBlock quillRef={quillRef} />
 								</Space>
 							</Col>

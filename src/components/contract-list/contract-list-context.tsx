@@ -14,6 +14,8 @@ export type TContractListContextType = {
 	setRefreshContracts: (refreshContracts: number) => void;
 	needUpdate: boolean;
 	setNeedUpdate: (needUpdate: boolean) => void;
+	apiKey: string | undefined;
+	setApiKey: (apiKey: string) => void;
 };
 export const ContractListContext = createContext<
 	TContractListContextType | undefined

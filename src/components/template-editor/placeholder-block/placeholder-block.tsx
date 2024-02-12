@@ -35,7 +35,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		continueLoad,
 		setPlaceholder,
 		refreshPlaceholders,
-		setRefreshPlaceholders,
+		apiKey,
 	} = useTemplateEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
@@ -59,7 +59,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 				},
 				responseType: 'json',
 			})
@@ -116,7 +116,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 				},
 				responseType: 'json',
 			})
@@ -162,7 +162,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 				},
 				responseType: 'json',
 			})
@@ -276,7 +276,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 						headers: {
 							Accept: 'application/vnd.api+json',
 							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 						},
 						responseType: 'json',
 					})
@@ -304,7 +304,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 						headers: {
 							Accept: 'application/vnd.api+json',
 							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 						},
 						responseType: 'json',
 					})
@@ -340,7 +340,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 									size={2}
 									style={{ display: 'flex' }}
 								>
-									<Row wrap={false} align={"middle"}>
+									<Row wrap={false} align={'middle'}>
 										<Col>
 											<Tooltip title='Click to insert this placeholder into the text.'>
 												<Button

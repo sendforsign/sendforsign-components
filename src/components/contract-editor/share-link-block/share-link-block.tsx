@@ -18,6 +18,7 @@ import { ContractShareLink } from '../../../config/types';
 
 export const ShareLinkBlock = () => {
 	const {
+		apiKey,
 		contractKey,
 		clientKey,
 		userKey,
@@ -66,7 +67,7 @@ export const ShareLinkBlock = () => {
 						headers: {
 							Accept: 'application/vnd.api+json',
 							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 						},
 						responseType: 'json',
 					})
@@ -90,7 +91,7 @@ export const ShareLinkBlock = () => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 				},
 				responseType: 'json',
 			})
@@ -113,7 +114,7 @@ export const ShareLinkBlock = () => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 				},
 				responseType: 'json',
 			})

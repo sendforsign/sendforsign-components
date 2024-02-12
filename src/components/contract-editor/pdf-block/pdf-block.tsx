@@ -19,6 +19,7 @@ import { useResizeDetector } from 'react-resize-detector';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 export const PdfBlock = () => {
 	const {
+		apiKey,
 		refreshSign,
 		sign,
 		setSign,
@@ -35,7 +36,6 @@ export const PdfBlock = () => {
 	const [scale, setScale] = useState(1);
 	const [pdfData, setPdfData] = useState<ArrayBuffer>();
 	const { getArrayBuffer, setArrayBuffer } = useSaveArrayBuffer();
-	const { Title } = Typography;
 
 	const { width, ref } = useResizeDetector();
 	console.log('PdfBlock');
@@ -47,7 +47,7 @@ export const PdfBlock = () => {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 					},
 					responseType: 'json',
 				})
@@ -84,7 +84,7 @@ export const PdfBlock = () => {
 				await axios
 					.post(url, formData, {
 						headers: {
-							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 						},
 						responseType: 'json',
 					})

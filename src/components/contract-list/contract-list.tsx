@@ -20,6 +20,7 @@ interface DataType {
 }
 
 export const ContractList: FC<ContractListProps> = ({
+	apiKey,
 	clientKey,
 	isModal,
 	userKey,
@@ -33,6 +34,7 @@ export const ContractList: FC<ContractListProps> = ({
 	const [currContractKey, setCurrContractKey] = useState('');
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
+	const [currApiKey, setCurrApiKey] = useState(apiKey);
 	const [contractModal, setContractModal] = useState(false);
 	const [needUpdate, setNeedUpdate] = useState(false);
 	const [refreshContracts, setRefreshContracts] = useState(0);
@@ -93,6 +95,9 @@ export const ContractList: FC<ContractListProps> = ({
 	];
 
 	useEffect(() => {
+		setCurrApiKey(apiKey);
+	}, [apiKey]);
+	useEffect(() => {
 		let body = {
 			data: {
 				action: Action.LIST,
@@ -106,7 +111,7 @@ export const ContractList: FC<ContractListProps> = ({
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 					},
 					responseType: 'json',
 				})
@@ -145,6 +150,8 @@ export const ContractList: FC<ContractListProps> = ({
 				setRefreshContracts,
 				needUpdate,
 				setNeedUpdate,
+				apiKey: currApiKey,
+				setApiKey: setCurrApiKey,
 			}}
 		>
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
@@ -183,13 +190,7 @@ export const ContractList: FC<ContractListProps> = ({
 					/>
 				</Card>
 			</Space>
-			<ModalView
-				id={currContractKey ? currContractKey : 'New contract'}
-				isOpen={contractModal}
-				clientKey={clientKey}
-				userKey={userKey}
-				contractKey={currContractKey}
-			/>
+			<ModalView id={currContractKey ? currContractKey : 'New contract'} />
 		</ContractListContext.Provider>
 	);
 };

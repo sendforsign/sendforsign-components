@@ -12,6 +12,8 @@ export type TTemplateListContextType = {
 	setUserKey: (userKey: string) => void;
 	refreshTemplate: number;
 	setRefreshTemplate: (refreshTemplate: number) => void;
+	apiKey: string | undefined;
+	setApiKey: (apiKey: string) => void;
 };
 export const TemplateListContext = createContext<
 	TTemplateListContextType | undefined

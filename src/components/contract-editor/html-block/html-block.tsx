@@ -17,10 +17,10 @@ type Props = {
 	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
 };
 QuillNamespace.register(
-  {
-    "modules/better-table": QuillBetterTable,
-  },
-  true
+	{
+		'modules/better-table': QuillBetterTable,
+	},
+	true
 );
 for (let index = 1; index <= 40; index++) {
 	addBlotClass(index);
@@ -28,6 +28,7 @@ for (let index = 1; index <= 40; index++) {
 export const HtmlBlock = ({ value, quillRef }: Props) => {
 	dayjs.extend(utc);
 	const {
+		apiKey,
 		contractKey,
 		clientKey,
 		userKey,
@@ -55,58 +56,58 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 							['bold', 'italic', 'underline', 'strike'], // toggled buttons
 							['blockquote'],
 
-              [{ list: "ordered" }, { list: "bullet" }],
-              [{ script: "sub" }, { script: "super" }], // superscript/subscript
-              [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
-              [{ direction: "rtl" }], // text direction
+							[{ list: 'ordered' }, { list: 'bullet' }],
+							[{ script: 'sub' }, { script: 'super' }], // superscript/subscript
+							[{ indent: '-1' }, { indent: '+1' }], // outdent/indent
+							[{ direction: 'rtl' }], // text direction
 
-              [{ size: ["small", false, "large", "huge"] }], // custom dropdown
+							[{ size: ['small', false, 'large', 'huge'] }], // custom dropdown
 
-              [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-              [{ font: [] }],
-              [{ align: [] }],
+							[{ color: [] }, { background: [] }], // dropdown with defaults from theme
+							[{ font: [] }],
+							[{ align: [] }],
 
-              ["clean"],
-            ],
-            handlers: {
-              table: addTable,
-            },
-          },
-          table: false, // disable table module
-          "better-table": {
-            operationMenu: {
-              items: {
-                unmergeCells: {
-                  text: "Unmerge",
-                },
-              },
-            },
-          },
-          keyboard: {
-            bindings: QuillBetterTable.keyboardBindings,
-          },
-          history: {
-            delay: 5000,
-            maxStack: 5000,
-            userOnly: true,
-          },
-        },
-        scrollingContainer: "body",
-        theme: "bubble",
-      });
-      if (quillRef.current) {
-        quillRef.current
-          .getModule("toolbar")
-          .container.addEventListener(
-            "mousedown",
-            (e: {
-              preventDefault: () => void;
-              stopPropagation: () => void;
-            }) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }
-          );
+							['clean'],
+						],
+						handlers: {
+							table: addTable,
+						},
+					},
+					table: false, // disable table module
+					'better-table': {
+						operationMenu: {
+							items: {
+								unmergeCells: {
+									text: 'Unmerge',
+								},
+							},
+						},
+					},
+					keyboard: {
+						bindings: QuillBetterTable.keyboardBindings,
+					},
+					history: {
+						delay: 5000,
+						maxStack: 5000,
+						userOnly: true,
+					},
+				},
+				scrollingContainer: 'body',
+				theme: 'bubble',
+			});
+			if (quillRef.current) {
+				quillRef.current
+					.getModule('toolbar')
+					.container.addEventListener(
+						'mousedown',
+						(e: {
+							preventDefault: () => void;
+							stopPropagation: () => void;
+						}) => {
+							e.preventDefault();
+							e.stopPropagation();
+						}
+					);
 
 				quillRef.current.on(
 					'text-change',
@@ -183,7 +184,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 					},
 					responseType: 'json',
 				})
@@ -219,7 +220,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						headers: {
 							Accept: 'application/vnd.api+json',
 							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 						},
 						responseType: 'json',
 					})
@@ -243,7 +244,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						headers: {
 							Accept: 'application/vnd.api+json',
 							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 						},
 						responseType: 'json',
 					})
@@ -274,7 +275,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': 're_api_key', //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
 				},
 				responseType: 'json',
 			})

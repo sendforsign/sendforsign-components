@@ -16,8 +16,8 @@ export const Primary: Story = (args) => (
 	<TemplateList data-testId='InputField-id' {...args} />
 );
 Primary.args = {
+	apiKey: 're_api_key',
 	clientKey: 'b817e635-ee26-40f9-ba82-f4612077a2f4',
 	userKey: '',
 	isModal: true,
 };
- 
