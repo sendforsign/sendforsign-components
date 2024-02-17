@@ -34,12 +34,9 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	userKey,
 	id,
 }) => {
-	// if (!process.env.SENDFORSIGN_API_KEY) {
-	// 	console.log(
-	// 		'process.env.SENDFORSIGN_API_KEY',
-	// 		process.env.SENDFORSIGN_API_KEY
-	// 	);
-	// }
+	if (!apiKey && !process.env.REACT_APP_SENDFORSIGN_KEY) {
+		throw new Error('Missing Publishable Key');
+	}
 	const { setArrayBuffer, getArrayBuffer, clearArrayBuffer } =
 		useSaveArrayBuffer();
 	const [signModal, setSignModal] = useState(false);
@@ -80,10 +77,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const contractKeyRef = useRef(contractKey);
 	const { Title, Text } = Typography;
 	console.log('contractKey', contractKey, currClientKey);
-	// useEffect(() => {
-	// 	debugger;
-	// 	setEditorVisible(false);
-	// }, []);
+ 
 	useEffect(() => {
 		setCurrApiKey(apiKey);
 	}, [apiKey]);

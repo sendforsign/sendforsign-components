@@ -27,12 +27,10 @@ export const TemplateList: FC<TemplateListProps> = ({
 	isModal,
 	userKey,
 }) => {
+	if (!apiKey && !process.env.REACT_APP_SENDFORSIGN_KEY) {
+		throw new Error('Missing Publishable Key');
+	}
 	const { setParam, getParam } = useSaveParams();
-	// if (!process.env.SENDFORSIGN_API_KEY) {
-	//  TO DO
-	// }
-	// dayjs.extend(utc);
-
 	const [currTemplateKey, setCurrTemplateKey] = useState('');
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);

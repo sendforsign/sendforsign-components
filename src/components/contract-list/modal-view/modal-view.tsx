@@ -1,6 +1,6 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC } from 'react';
 
-import { Space, Modal, Card, Typography } from 'antd';
+import { Space, Modal } from 'antd';
 import { useContractListContext } from '../contract-list-context';
 import { ContractEditor } from '../../contract-editor';
 import { ModalViewProps } from './modal-view.types';

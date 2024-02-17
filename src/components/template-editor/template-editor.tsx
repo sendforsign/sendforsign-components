@@ -7,8 +7,7 @@ import { BASE_URL } from '../../config/config';
 import { Action, ApiEntity } from '../../config/enum';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
 import { TemplateEditorContext } from './template-editor-context';
-import { HtmlBlock } from './html-block/html-block';
-import { PdfBlock } from './pdf-block/pdf-block';
+import { HtmlBlock } from './html-block/html-block'; 
 import { ChooseTemplateType } from './choose-template-type/choose-template-type';
 import { Placeholder, Template } from '../../config/types';
 import { PdfViewer } from './pdf-viewer/pdf-viewer';
@@ -21,14 +20,9 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	clientKey,
 	userKey,
 }) => {
-	// if (!process.env.SENDFORSIGN_API_KEY) {
-	// 	console.log(
-	// 		'process.env.SENDFORSIGN_API_KEY',
-	// 		process.env.SENDFORSIGN_API_KEY
-	// 	);
-	// }
-	// const { setSignModal } = useContractEditorContext();
-
+	if (!apiKey && !process.env.REACT_APP_SENDFORSIGN_KEY) {
+		throw new Error('Missing Publishable Key');
+	}
 	const { getArrayBuffer, setArrayBuffer, clearArrayBuffer } =
 		useSaveArrayBuffer();
 
