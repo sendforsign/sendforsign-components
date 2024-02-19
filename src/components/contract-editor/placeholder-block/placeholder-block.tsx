@@ -36,7 +36,6 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		continueLoad,
 		setPlaceholder,
 		refreshPlaceholders,
-		setRefreshPlaceholders,
 		placeholderVisible,
 	} = useContractEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
@@ -237,9 +236,9 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		console.log('changeValueInTag', quillRef?.current?.root.innerHTML);
 	};
 	const handleBlur = async (e: any, index: number) => {
-		let placeholdersTmp = [...placeholder];
 		switch (e.target.id) {
 			case 'PlaceholderName':
+				let placeholdersTmp = [...placeholder];
 				let body = {
 					data: {
 						action: Action.UPDATE,

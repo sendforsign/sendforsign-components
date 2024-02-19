@@ -8,7 +8,7 @@ import { SegmentedLabeledOption } from 'antd/es/segmented';
 import { ApiEntity, ShareLinkView } from '../../../config/enum';
 import { useContractEditorContext } from '../contract-editor-context';
 import axios from 'axios';
-import { BASE_URL } from '../../../config/config';
+import { BASE_URL, SHARE_URL } from '../../../config/config';
 import env from 'dotenv';
 //env.config();
 
@@ -38,7 +38,7 @@ export const ShareLinkLine = ({ controlLink, id, shareLink, view }: Props) => {
 	];
 	const [changeSpin, setChangeSpin] = useState(false);
 	const [deleteSpin, setDeleteSpin] = useState(false);
-	const shareLinkFull = `${window.location.origin}/sharing/${shareLink}`;
+	const shareLinkFull = `${SHARE_URL}/sharing/${shareLink}`;
 
 	const handleClick = () => {
 		setNotification({

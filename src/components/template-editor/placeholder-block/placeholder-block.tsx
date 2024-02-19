@@ -105,7 +105,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				clientKey: clientKey,
 				templateKey: templateKey,
 				placeholder: {
-					name: 'Name',
+					name: `Name${placeholdersTmp.length}`,
 					value: '',
 					type: PlaceholderTypeText.INTERNAL,
 				},
@@ -185,39 +185,14 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 
 			case 'PlaceholderValue':
 				placeholderTmp[index].value = e.target.value;
-				if (placeholderTmp[index].name) {
-					changeValueInTag(
-						placeholderTmp[index].id ? (placeholderTmp[index].id as number) : 0,
-						placeholderTmp[index].value
-							? (placeholderTmp[index].value as string)
-							: `{{{${placeholderTmp[index].name as string}}}}`
-					);
-				}
+
 				break;
 		}
 		setPlaceholder(placeholderTmp);
 	};
 	const changeValueInTag = (id: number, value: string) => {
-		// let contents = quillRef?.getContents();
-		// console.log('contents', contents, id, value);
-		// contents?.map((content) => {
-		// 	if (content.attributes) {
-		// 		for (let prop in content.attributes) {
-		// 			if (prop === `placeholder${id}` && content.attributes[prop]) {
-		// 				content.insert = value;
-		// 			}
-		// 		}
-		// 	}
-		// 	return content;
-		// });
-		// if (contents) {
-		// 	contents = quillRef?.updateContents(contents, 'api');
-		// 	quillRef?.update();
-		// }
 		let text = quillRef?.current?.root.innerHTML;
 		let tag = `<placeholder${id}`;
-		// contents = quillRef?.getContents();
-		// console.log('contents 1', contents);
 		let array = text?.split(tag);
 		let resultText = '';
 		if (array) {
@@ -256,11 +231,10 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		console.log('changeValueInTag', quillRef?.current?.root.innerHTML);
 	};
 	const handleBlur = async (e: any, index: number) => {
-		let placeholdersTmp = [...placeholder];
-		let body = {};
 		switch (e.target.id) {
 			case 'PlaceholderName':
-				body = {
+				let placeholdersTmp = [...placeholder];
+				let body = {
 					data: {
 						action: Action.UPDATE,
 						clientKey: clientKey,
@@ -288,38 +262,52 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				break;
 
 			case 'PlaceholderValue':
-				body = {
-					data: {
-						action: Action.UPDATE,
-						clientKey: clientKey,
-						templateKey: templateKey,
-						placeholder: {
-							placeholderKey: placeholdersTmp[index].placeholderKey,
-							value: placeholdersTmp[index].value,
-						},
-					},
-				};
-				await axios
-					.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-						headers: {
-							Accept: 'application/vnd.api+json',
-							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
-						},
-						responseType: 'json',
-					})
-					.then((payload) => {
-						console.log('PLACEHOLDER read', payload);
-
-						// setRefreshPlaceholders(refreshPlaceholders + 1);
-					});
+				changeValue(index);
 				break;
 		}
+	};
+	const changeValue = async (index: number) => {
+		let placeholdersTmp = [...placeholder];
+		if (placeholdersTmp[index].name) {
+			changeValueInTag(
+				placeholdersTmp[index].id ? (placeholdersTmp[index].id as number) : 0,
+				placeholdersTmp[index].value
+					? (placeholdersTmp[index].value as string)
+					: `{{{${placeholdersTmp[index].name as string}}}}`
+			);
+		}
+
+		let body = {
+			data: {
+				action: Action.UPDATE,
+				clientKey: clientKey,
+				templateKey: templateKey,
+				placeholder: {
+					placeholderKey: placeholdersTmp[index].placeholderKey,
+					value: placeholdersTmp[index].value,
+				},
+			},
+		};
+		await axios
+			.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
+				headers: {
+					Accept: 'application/vnd.api+json',
+					'Content-Type': 'application/vnd.api+json',
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+				},
+				responseType: 'json',
+			})
+			.then((payload) => {
+				console.log('PLACEHOLDER read', payload);
+			});
 	};
 	const handleClick = (e: any, index: number) => {
 		let placeholderTmp = [...placeholder];
 		placeholderTmp[index].type = e;
 		setPlaceholder(placeholderTmp);
+	};
+	const handleEnter = (index: number) => {
+		changeValue(index);
 	};
 	return (
 		<Card loading={placeholderLoad || continueLoad}>
@@ -429,6 +417,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 										value={holder.value}
 										onChange={(e: any) => handleChange(e, index)}
 										onBlur={(e: any) => handleBlur(e, index)}
+										onPressEnter={() => handleEnter(index)}
 									/>
 								</Space>
 							</div>

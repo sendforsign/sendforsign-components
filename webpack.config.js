@@ -5,7 +5,7 @@ module.exports = {
     plugins: [
         new webpack.DefinePlugin({
             'process.env': {
-                'SENDFORSIGN_API_KEY': 're_api_key'
+                'REACT_APP_SENDFORSIGN_API_KEY': 're_api_key'
             }
         })
     ]
