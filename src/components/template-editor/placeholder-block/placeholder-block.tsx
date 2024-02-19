@@ -342,7 +342,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 								>
 									<Row wrap={false} align={'middle'}>
 										<Col>
-											<Tooltip title='Click to insert this placeholder into the text.'>
+											<Tooltip title='Click to insert the placeholder at the current cursor position in the text.'>
 												<Button
 													size='small'
 													type='text'

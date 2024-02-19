@@ -87,7 +87,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 			dataIndex: 'createdAt',
 		},
 		{
-			title: 'Changed at',
+			title: 'Modified at',
 			dataIndex: 'changedAt',
 		},
 		{
