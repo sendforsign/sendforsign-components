@@ -415,6 +415,7 @@ export const ChooseContractType = () => {
 						>
 							Continue
 						</Button>
+						<div style={{display: 'none'}}>
 						<Steps current={current} items={items} size='small' />
 						<div style={contentStyle}>{steps[current].content}</div>
 						<div style={{ marginTop: 24 }}>
@@ -431,6 +432,7 @@ export const ChooseContractType = () => {
 									Previous
 								</Button>
 							)}
+						</div>
 						</div>
 					</Space>
 				</Card>
