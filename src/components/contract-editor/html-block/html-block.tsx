@@ -67,6 +67,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 							[{ font: [] }],
 							[{ align: [] }],
 
+							['link', 'image', 'table'],
+
 							['clean'],
 						],
 						handlers: {
