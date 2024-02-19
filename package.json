@@ -1,5 +1,5 @@
 {
-	"name": "@cat-unicorn/sendforsign-components",
+	"name": "@sendforsign/sendforsign-components",
 	"version": "1.0.2",
 	"description": "Sendforsign components",
 	"main": "./cjs/index.js",
@@ -15,14 +15,14 @@
 	"publishConfig": {
 		"access": "public",
 		"directory": "dist",
-		"registry": "https://npm.pkg.github.com/cat-unicorn"
+		"registry": "https://npm.pkg.github.com/sendforsign"
 	},
 	"keywords": [
 		"sendforsign"
 	],
 	"author": "Pavel Zhukov",
 	"license": "MIT",
-	"devDependencies": {
+	"dependencies": {
 		"@fortawesome/fontawesome-svg-core": "^6.4.2",
 		"@fortawesome/free-solid-svg-icons": "^6.4.2",
 		"@fortawesome/react-fontawesome": "^0.2.0",
@@ -41,13 +41,12 @@
 		"@storybook/test": "^7.6.4",
 		"@types/quill": "^2.0.14",
 		"@types/react": "^18.2.42",
+		"@react-pdf/renderer": "^3.1.14",
 		"antd": "^5.12.1",
 		"jest-environment-jsdom": "^29.7.0",
 		"mammoth": "^1.6.0",
 		"quill": "^2.0.0-dev.4",
 		"quill-better-table": "^1.2.10",
-		"react": "^16.14.0",
-		"react-dom": "^16.14.0",
 		"react-redux": "8.0.2",
 		"redux": "^4.2.0",
 		"rollup": "^4.6.1",
@@ -57,10 +56,7 @@
 		"tslib": "^2.6.2",
 		"typescript": "^5.3.2",
 		"use-debounce": "^9.0.4",
-		"vite": "^5.0.6"
-	},
-	"dependencies": {
-		"@react-pdf/renderer": "^3.1.14",
+		"vite": "^5.0.6",
 		"@rollup/plugin-babel": "^6.0.4",
 		"@rollup/plugin-json": "^6.0.1",
 		"axios": "^1.6.2",
@@ -74,7 +70,20 @@
 		"rollup-plugin-postcss": "^4.0.2",
 		"webpack": "^5.89.0"
 	},
+	"peerDependencies": {
+		"react": "^16.14.0",
+		"react-dom": "^16.14.0"
+	},
 	"files": [
 		"dist"
-	]
+	],
+	"devDependencies": {},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/sendforsign/sendforsign-components.git"
+	},
+	"bugs": {
+		"url": "https://github.com/sendforsign/sendforsign-components/issues"
+	},
+	"homepage": "https://github.com/sendforsign/sendforsign-components#readme"
 }
