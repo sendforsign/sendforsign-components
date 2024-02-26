@@ -1,20 +1,30 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Typography, Tag, Card, Space, Row, Col, Button } from 'antd';
+import {
+	Typography,
+	Tag,
+	Card,
+	Space,
+	Row,
+	Col,
+	Button,
+	TableColumnsType,
+} from 'antd';
 import { ContractListProps } from './contract-list.types';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
 import { Action, ApiEntity } from '../../config/enum';
-import Table, { ColumnsType } from 'antd/es/table';
+import Table, { ColumnsType, TableProps } from 'antd/es/table';
 import useSaveParams from '../../hooks/use-save-params';
 import { ContractListContext } from './contract-list-context';
 import { ModalView } from './modal-view/modal-view';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { EventStatus } from '../../config/types';
 
 interface DataType {
 	key: string;
 	name?: string;
-	status?: string[];
+	status?: string;
 	createdAt?: string;
 	createdBy?: string;
 }
@@ -37,6 +47,7 @@ export const ContractList: FC<ContractListProps> = ({
 	const [needUpdate, setNeedUpdate] = useState(false);
 	const [refreshContracts, setRefreshContracts] = useState(0);
 	const [data, setData] = useState<DataType[]>([]);
+	const [eventStatus, setEventStatus] = useState<EventStatus[]>([]);
 	const { Title } = Typography;
 
 	const chooseContract = (text: string) => {
@@ -48,39 +59,38 @@ export const ContractList: FC<ContractListProps> = ({
 			setParam('openModal', true);
 		}
 	};
-	const columns: ColumnsType<DataType> = [
+	const columns: TableColumnsType<DataType> = [
 		{
 			title: 'Document name',
 			dataIndex: 'name',
-			render: (_, { key, name }) => (
+			render: (_: any, record: DataType) => (
 				<Button
 					type='link'
 					onClick={() => {
-						chooseContract(key ? key : '');
+						debugger;
+						chooseContract(record.key ? record.key : '');
 					}}
 				>
-					{name}
+					{record.name}
 				</Button>
 			),
 		},
 		{
 			title: 'Status',
 			dataIndex: 'status',
-			render: (_, { status }) => (
-				<>
-					{status?.map((tag) => {
-						let color = 'purple';
-						if (tag === 'Signed') {
-							color = 'green';
-						}
-						return (
-							<Tag color={color} key={tag}>
-								{tag}
-							</Tag>
-						);
-					})}
-				</>
-			),
+			render: (_: any, record: DataType) => {
+				let statusFind = eventStatus.find(
+					(status) => status.name === record.status
+				);
+				return (
+					<Tag
+						color={statusFind && statusFind.color ? statusFind.color : 'purple'}
+						key={record.status ? record.status : 'Draft'}
+					>
+						{record.status ? record.status : 'Draft'}
+					</Tag>
+				);
+			},
 		},
 		{
 			title: 'Created at',
@@ -104,6 +114,21 @@ export const ContractList: FC<ContractListProps> = ({
 			},
 		};
 		const getContracts = async () => {
+			let eventStatusTmp: EventStatus[] = [];
+			await axios
+				.get(BASE_URL + ApiEntity.EVENT_STATUS, {
+					headers: {
+						Accept: 'application/vnd.api+json',
+						'Content-Type': 'application/vnd.api+json',
+						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+					},
+					responseType: 'json',
+				})
+				.then((payload: any) => {
+					console.log('getEventStatus read', payload);
+					eventStatusTmp = payload.data;
+					setEventStatus(eventStatusTmp);
+				});
 			await axios
 				.post(BASE_URL + ApiEntity.CONTRACT, body, {
 					headers: {
@@ -113,14 +138,14 @@ export const ContractList: FC<ContractListProps> = ({
 					},
 					responseType: 'json',
 				})
-				.then((payload) => {
+				.then((payload: any) => {
 					console.log('editor list', payload);
 					let array: DataType[] = payload.data.contracts.map(
 						(contract: any) => {
 							return {
 								key: contract.contractKey,
 								name: contract.name ? contract.name : 'Empty name',
-								status: ['Draft'],
+								status: contract.status,
 								createdAt: contract.createTime
 									? contract.createTime.toString()
 									: new Date().toString(),

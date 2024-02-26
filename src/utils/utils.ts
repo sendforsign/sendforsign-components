@@ -1,5 +1,7 @@
 import * as Mammoth from 'mammoth/mammoth.browser';
 import QuillNamespace from 'quill';
+import Inline from 'quill/blots/inline';
+// const Inline = QuillNamespace.import('blots/inline');
 
 export const docx2html = (content: ArrayBuffer, callback?: any) => {
 	Mammoth.convertToHtml({ arrayBuffer: content })
@@ -12,10 +14,14 @@ export const docx2html = (content: ArrayBuffer, callback?: any) => {
 		});
 };
 export const addBlotClass = (index: number) => {
-	let Inline = QuillNamespace.import('blots/inline');
 	switch (index) {
 		case 1:
-			class PlaceholderBlot1 extends Inline {}
+			class PlaceholderBlot1 extends Inline {
+				// static className: string;
+				// static blotName: string;
+				// static tagName: string;
+				// create(value?: any) {}
+			}
 			PlaceholderBlot1.className = `placeholderClass${index}`;
 			PlaceholderBlot1.blotName = `placeholder${index}`;
 			PlaceholderBlot1.tagName = `placeholder${index}`;

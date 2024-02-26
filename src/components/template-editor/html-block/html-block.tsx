@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import 'quill/dist/quill.bubble.css';
-import QuillNamespace, { Quill } from 'quill';
+import QuillNamespace from 'quill';
 import QuillBetterTable from 'quill-better-table';
 import { useDebouncedCallback } from 'use-debounce';
 import axios from 'axios';
@@ -84,7 +84,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						userOnly: true,
 					},
 				},
-				scrollingContainer: 'body',
+				// scrollingContainer: 'body',
 				theme: 'bubble',
 			});
 
@@ -147,7 +147,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					},
 					responseType: 'json',
 				})
-				.then((payload) => {
+				.then((payload: any) => {
 					console.log('editor read', payload);
 				});
 		},

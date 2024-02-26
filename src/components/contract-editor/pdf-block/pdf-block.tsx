@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Spin, Typography } from 'antd';
+import { Spin } from 'antd';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import PDFMerger from 'pdf-merger-js/browser';
@@ -23,6 +23,7 @@ export const PdfBlock = () => {
 		refreshSign,
 		sign,
 		setSign,
+		setSigns,
 		contractKey,
 		clientKey,
 		pdfFileLoad,
@@ -31,7 +32,7 @@ export const PdfBlock = () => {
 		setContinueLoad,
 	} = useContractEditorContext();
 	dayjs.extend(utc);
-	const [signs, setSigns] = useState<ContractSign[]>([]);
+	const [contractSigns, setContractSigns] = useState<ContractSign[]>([]);
 	const [numPages, setNumPages] = useState(1);
 	const [scale, setScale] = useState(1);
 	const [pdfData, setPdfData] = useState<ArrayBuffer>();
@@ -51,27 +52,31 @@ export const PdfBlock = () => {
 					},
 					responseType: 'json',
 				})
-				.then((payload) => {
+				.then((payload: any) => {
 					console.log('getSigns read', payload);
-					setSigns(payload.data);
+					setContractSigns(payload.data);
 				});
 		};
 		getSigns();
 	}, [refreshSign]);
 	useEffect(() => {
 		const render = async () => {
-			const pdfFile = (await getArrayBuffer('pdfFileOriginal')) as ArrayBuffer;
-			if (!pdfFile || pdfFile.byteLength === 0) {
+			const pdfFile: any = await getArrayBuffer('pdfFileOriginal');
+			const pdfFileAB: ArrayBuffer = pdfFile as ArrayBuffer;
+			console.log('typeof', typeof pdfFileAB);
+			const byteLength = pdfFileAB.byteLength;
+			if (!pdfFile || (pdfFile && byteLength === 0)) {
 				return;
 			}
 			const merger = new PDFMerger();
 			let arrayBuffer = pdfFile;
-			await merger.add(arrayBuffer);
+			await merger.add(pdfFile);
 
 			debugger;
-			const blob = await pdf(<PdfSign signs={signs} />).toBlob();
+			setSigns(contractSigns);
+			const blob = await pdf(<PdfSign />).toBlob();
 			arrayBuffer = await blob.arrayBuffer();
-			await merger.add(arrayBuffer);
+			await merger.add(arrayBuffer as ArrayBuffer);
 
 			const mergedPdfBlob = await merger.saveAsBlob();
 			const mergedPdf = await mergedPdfBlob.arrayBuffer();
@@ -88,7 +93,7 @@ export const PdfBlock = () => {
 						},
 						responseType: 'json',
 					})
-					.then((payload) => {
+					.then((payload: any) => {
 						console.log('sign read', payload);
 						setSign('');
 						debugger;
@@ -96,10 +101,10 @@ export const PdfBlock = () => {
 					});
 			}
 		};
-		if (signs && signs.length > 0) {
+		if (contractSigns && contractSigns.length > 0) {
 			render();
 		}
-	}, [signs]);
+	}, [contractSigns]);
 	useEffect(() => {
 		const getValue = async () => {
 			const arrayBuffer: ArrayBuffer = (await getArrayBuffer(

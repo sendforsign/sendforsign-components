@@ -1,6 +1,5 @@
 import { createContext, useContext } from 'react';
 import { ContractSign, Placeholder } from '../../config/types';
-import Quill from 'quill';
 
 export type TContractEditorContextType = {
 	signModal: boolean;
@@ -10,9 +9,9 @@ export type TContractEditorContextType = {
 	approveModal: boolean;
 	setApproveModal: (approveModal: boolean) => void;
 	resultModal: { open: boolean; action: string };
-	setResultModal: ({ open }: { open: boolean; action: string }) => void;
-	notification: { text: string | React.ReactNode };
-	setNotification: ({ text }: { text: string | React.ReactNode }) => void;
+	setResultModal: ({ open, action }: { open: boolean; action: string }) => void;
+	notification: { text?: any };
+	setNotification: (text: any) => void;
 	contractKey: string;
 	setContractKey: (contractKey: string) => void;
 	contractValue: string;
@@ -31,6 +30,8 @@ export type TContractEditorContextType = {
 	setUserKey: (userKey: string) => void;
 	sign: string;
 	setSign: (sign: string) => void;
+	signs: ContractSign[];
+	setSigns: (signs: ContractSign[]) => void;
 	contractSign: ContractSign;
 	setContractSign: (contractSign: ContractSign) => void;
 	pdfFileLoad: number;
@@ -46,7 +47,7 @@ export type TContractEditorContextType = {
 	refreshPlaceholders: number;
 	setRefreshPlaceholders: (refreshPlaceholders: number) => void;
 	placeholder: Placeholder[];
-	setPlaceholder: (placeholder: Placeholder[]) => void;
+	setPlaceholder: (placeholder: any[]) => void;
 	placeholderVisible: boolean;
 	setPlaceholderVisible: (placeholderVisible: boolean) => void;
 	isPdf: boolean;

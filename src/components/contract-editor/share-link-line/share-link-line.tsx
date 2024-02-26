@@ -62,7 +62,7 @@ export const ShareLinkLine = ({ controlLink, id, shareLink, view }: Props) => {
 				},
 				responseType: 'json',
 			})
-			.then((payload) => {
+			.then((payload: any) => {
 				console.log('handleDelete read', payload);
 				setRefreshShareLink(refreshShareLink + 1);
 				setDeleteSpin(false);
@@ -86,7 +86,7 @@ export const ShareLinkLine = ({ controlLink, id, shareLink, view }: Props) => {
 				},
 				responseType: 'json',
 			})
-			.then((payload) => {
+			.then((payload: any) => {
 				console.log('handleChange read', payload);
 				setRefreshShareLink(refreshShareLink + 1);
 				setChangeSpin(false);

@@ -52,36 +52,36 @@ export const TemplateList: FC<TemplateListProps> = ({
 		{
 			title: 'Template name',
 			dataIndex: 'name',
-			render: (_, { key, name }) => (
+			render: (_: any, record: DataType) => (
 				<Button
 					type='link'
 					onClick={() => {
-						chooseTemplate(key ? key : '');
+						chooseTemplate(record.key ? record.key : '');
 					}}
 				>
-					{name}
+					{record.name}
 				</Button>
 			),
 		},
-		{
-			title: 'Status',
-			dataIndex: 'status',
-			render: (_, { status }) => (
-				<>
-					{status?.map((tag) => {
-						let color = 'purple';
-						if (tag === 'Signed') {
-							color = 'green';
-						}
-						return (
-							<Tag color={color} key={tag}>
-								{tag}
-							</Tag>
-						);
-					})}
-				</>
-			),
-		},
+		// {
+		// 	title: 'Status',
+		// 	dataIndex: 'status',
+		// 	render: (_: any, record: DataType) => (
+		// 		<>
+		// 			{record.status?.map((tag) => {
+		// 				let color = 'purple';
+		// 				if (tag === 'Signed') {
+		// 					color = 'green';
+		// 				}
+		// 				return (
+		// 					<Tag color={color} key={tag}>
+		// 						{tag}
+		// 					</Tag>
+		// 				);
+		// 			})}
+		// 		</>
+		// 	),
+		// },
 		{
 			title: 'Created at',
 			dataIndex: 'createdAt',
@@ -117,14 +117,14 @@ export const TemplateList: FC<TemplateListProps> = ({
 					},
 					responseType: 'json',
 				})
-				.then((payload) => {
+				.then((payload: any) => {
 					console.log('editor list', payload);
 					let array: DataType[] = payload.data.templates.map(
 						(template: any) => {
 							return {
 								key: template.templateKey,
 								name: template.name ? template.name : 'Empty name',
-								status: ['Draft'],
+								// status: ['Draft'],
 								createdAt: template.createTime
 									? template.createTime.toString()
 									: new Date().toString(),

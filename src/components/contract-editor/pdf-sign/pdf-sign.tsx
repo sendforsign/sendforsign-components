@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import {
+import React from 'react';
+import ReactPDF, {
 	Document,
 	Page,
 	Text,
@@ -11,24 +11,28 @@ import { pdfjs } from 'react-pdf';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { ContractSign } from '../../../config/types';
+import { useContractEditorContext } from '../contract-editor-context';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-type Props = {
-	signs: ContractSign[];
-};
-export const PdfSign = ({ signs }: Props) => {
+// interface Props extends ReactPDF.DocumentProps {
+// 	signs: ContractSign[];
+// }
+export const PdfSign = ({
+	...other
+}: ReactPDF.DocumentProps): React.ReactElement => {
+	const { signs } = useContractEditorContext();
 	dayjs.extend(utc);
-	const ref = useRef();
+	// const ref = useRef();
 
-	useEffect(() => {
-		if (ref) {
-			console.log(ref);
-		}
-	}, [ref]);
+	// useEffect(() => {
+	// 	if (ref) {
+	// 		console.log(ref);
+	// 	}
+	// }, [ref]);
 
-	if (signs && signs.length === 0) {
-		return;
-	}
+	// if (signs && signs.length === 0) {
+	// 	return <></>;
+	// }
 
 	// Create styles
 	const styles = StyleSheet.create({
@@ -72,11 +76,7 @@ export const PdfSign = ({ signs }: Props) => {
 											style={styles.image}
 											source={contractSignData.base64}
 										/>
-										{/* </View>
-                <View> */}
 										<Text>Name: {contractSignData.fullName}</Text>
-										{/* </View>
-                <View> */}
 										<Text>Email: {contractSignData.email}</Text>
 										<Text>
 											Timestamp:{' '}

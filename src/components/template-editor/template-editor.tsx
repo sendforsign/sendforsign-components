@@ -7,7 +7,7 @@ import { BASE_URL } from '../../config/config';
 import { Action, ApiEntity } from '../../config/enum';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
 import { TemplateEditorContext } from './template-editor-context';
-import { HtmlBlock } from './html-block/html-block'; 
+import { HtmlBlock } from './html-block/html-block';
 import { ChooseTemplateType } from './choose-template-type/choose-template-type';
 import { Placeholder, Template } from '../../config/types';
 import { PdfViewer } from './pdf-viewer/pdf-viewer';
@@ -77,7 +77,14 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 						},
 					},
 				};
-				let templateTmp: Template = {};
+				let templateTmp: Template = {
+					createTime: new Date(),
+					changeTime: new Date(),
+					templateKey: '',
+					value: '',
+					name: '',
+					isPdf: false,
+				};
 				await axios
 					.post(BASE_URL + ApiEntity.TEMPLATE, body, {
 						headers: {
@@ -87,7 +94,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 						},
 						responseType: 'json',
 					})
-					.then((payload) => {
+					.then((payload: any) => {
 						console.log('getTemplate read', payload);
 						templateTmp = payload.data.template;
 					});
@@ -135,7 +142,14 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 					},
 				},
 			};
-			let templateTmp: Template = {};
+			let templateTmp: Template = {
+				createTime: new Date(),
+				changeTime: new Date(),
+				templateKey: '',
+				value: '',
+				name: '',
+				isPdf: false,
+			};
 			await axios
 				.post(BASE_URL + ApiEntity.TEMPLATE, body, {
 					headers: {
@@ -145,7 +159,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 					},
 					responseType: 'json',
 				})
-				.then((payload) => {
+				.then((payload: any) => {
 					console.log('TEMPLATE editor read', payload);
 					setCurrTemplateKey(payload.data.template.templateKey);
 					templateTmp = payload.data.template;
@@ -167,7 +181,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 						},
 						responseType: 'json',
 					})
-					.then((payload) => {
+					.then((payload: any) => {
 						console.log('editor read', payload);
 					});
 			}

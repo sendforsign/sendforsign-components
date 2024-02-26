@@ -43,14 +43,17 @@ export const SendModal = () => {
 	const [insertRecipient, setInsertRecipient] = useState<Recipient[]>([]);
 	const [deleteRecipient, setDeleteRecipient] = useState<Recipient[]>([]);
 	const [id, setId] = useState(0);
+	const [newRecipients, setNewRecipients] = useState(true);
 	const [recipientInit, setRecipientInit] = useState(false);
 	const [recipients, setRecipients] = useState<Recipient[]>([
 		{
+			id: 0,
 			fullname: '',
 			email: '',
 			customMessage: '',
 			position: 1,
 			action: ShareLinkViewText.SIGN,
+			recipientKey: '',
 		},
 	]);
 	const options = [
@@ -88,9 +91,10 @@ export const SendModal = () => {
 						},
 						responseType: 'json',
 					})
-					.then((payload) => {
+					.then((payload: any) => {
 						console.log('getShareLinks read', payload);
 						if (payload.data.recipients && payload.data.recipients.length > 0) {
+							setNewRecipients(false);
 							setRecipientInit(false);
 							setRecipients(
 								payload.data.recipients.map((recipient: Recipient) => {
@@ -127,6 +131,7 @@ export const SendModal = () => {
 									customMessage: '',
 									position: 1,
 									action: ShareLinkViewText.SIGN,
+									recipientKey: '',
 								},
 							]);
 							setDataLoad(false);
@@ -162,7 +167,7 @@ export const SendModal = () => {
 					},
 					responseType: 'json',
 				})
-				.then((payload) => {
+				.then((payload: any) => {
 					setSendLoad(false);
 					handleCancel();
 					if (payload.data.result) {
@@ -256,7 +261,7 @@ export const SendModal = () => {
 							},
 							responseType: 'json',
 						})
-						.then((payload) => {});
+						.then((payload: any) => {});
 				}
 			}
 		}
@@ -282,7 +287,7 @@ export const SendModal = () => {
 						},
 						responseType: 'json',
 					})
-					.then((payload) => {});
+					.then((payload: any) => {});
 			}
 		}
 		if (insertRecipient.length > 0) {
@@ -304,6 +309,7 @@ export const SendModal = () => {
 								customMessage: recipientFind.customMessage,
 								position: recipientFind.position,
 								action: recipientFind.action,
+								recipientKey: '',
 							},
 						},
 					};
@@ -316,7 +322,7 @@ export const SendModal = () => {
 							},
 							responseType: 'json',
 						})
-						.then((payload) => {});
+						.then((payload: any) => {});
 				}
 			}
 		}
@@ -324,14 +330,18 @@ export const SendModal = () => {
 	const handleCancel = () => {
 		setRecipients([
 			{
+				id: 0,
 				fullname: '',
 				email: '',
 				customMessage: '',
 				position: 1,
 				action: ShareLinkViewText.SIGN,
+				recipientKey: '',
 			},
 		]);
-		saveRecipient();
+		if (newRecipients) {
+			saveRecipient();
+		}
 		setSendModal(false);
 	};
 	const handleDelete = (index: number) => {
@@ -345,6 +355,7 @@ export const SendModal = () => {
 		setRecipients(recipientsTmp);
 	};
 	const handleInsert = () => {
+		debugger;
 		let recipientsTmp = [...recipients];
 		let idTmp = id + 1;
 		setId(idTmp);
@@ -352,12 +363,20 @@ export const SendModal = () => {
 			id: idTmp,
 			position: 1,
 			action: ShareLinkViewText.SIGN,
+			recipientKey: '',
+			fullname: '',
+			email: '',
+			customMessage: '',
 		});
 		setRecipients(recipientsTmp);
 		insertRecipient.push({
 			id: idTmp,
 			position: 1,
 			action: ShareLinkViewText.SIGN,
+			recipientKey: '',
+			fullname: '',
+			email: '',
+			customMessage: '',
 		});
 		setInsertRecipient(insertRecipient);
 	};

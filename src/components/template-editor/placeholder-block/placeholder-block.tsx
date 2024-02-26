@@ -63,7 +63,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				},
 				responseType: 'json',
 			})
-			.then((payload) => {
+			.then((payload: any) => {
 				console.log('getPlaceholders read', payload);
 
 				if (payload.data.placeholders && payload.data.placeholders.length > 0) {
@@ -120,7 +120,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				},
 				responseType: 'json',
 			})
-			.then((payload) => {
+			.then((payload: any) => {
 				console.log('PLACEHOLDER read', payload);
 				// setRefreshPlaceholders(refreshPlaceholders + 1);
 				getPlaceholders(false);
@@ -166,7 +166,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				},
 				responseType: 'json',
 			})
-			.then((payload) => {
+			.then((payload: any) => {
 				console.log('PLACEHOLDER read', payload);
 
 				placeholdersTmp.splice(index, 1);
@@ -254,7 +254,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 						},
 						responseType: 'json',
 					})
-					.then((payload) => {
+					.then((payload: any) => {
 						console.log('PLACEHOLDER read', payload);
 
 						// setRefreshPlaceholders(refreshPlaceholders + 1);
@@ -297,7 +297,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				},
 				responseType: 'json',
 			})
-			.then((payload) => {
+			.then((payload: any) => {
 				console.log('PLACEHOLDER read', payload);
 			});
 	};

@@ -77,7 +77,7 @@ export const ChooseContractType = () => {
 					},
 					responseType: 'json',
 				})
-				.then((payload) => {
+				.then((payload: any) => {
 					console.log('editor read', payload);
 					let array: SegmentedLabeledOption[] = [];
 					array.push({
@@ -241,7 +241,14 @@ export const ChooseContractType = () => {
 					template: { templateKey },
 				},
 			};
-			let template: Template = {};
+			let template: Template = {
+				createTime: new Date(),
+				changeTime: new Date(),
+				templateKey: '',
+				value: '',
+				name: '',
+				isPdf: false,
+			};
 			await axios
 				.post(BASE_URL + ApiEntity.TEMPLATE, body, {
 					headers: {
@@ -251,7 +258,7 @@ export const ChooseContractType = () => {
 					},
 					responseType: 'json',
 				})
-				.then((payload) => {
+				.then((payload: any) => {
 					template = payload.data.template;
 				});
 			if (template.isPdf) {
@@ -415,24 +422,24 @@ export const ChooseContractType = () => {
 						>
 							Continue
 						</Button>
-						<div style={{display: 'none'}}>
-						<Steps current={current} items={items} size='small' />
-						<div style={contentStyle}>{steps[current].content}</div>
-						<div style={{ marginTop: 24 }}>
-							{current < steps.length - 1 && (
-								<Button type='primary' onClick={() => next()}>
-									Next
-								</Button>
-							)}
-							{current === steps.length - 1 && (
-								<Button type='primary'>Done</Button>
-							)}
-							{current > 0 && (
-								<Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-									Previous
-								</Button>
-							)}
-						</div>
+						<div style={{ display: 'none' }}>
+							<Steps current={current} items={items} size='small' />
+							<div style={contentStyle}>{steps[current].content}</div>
+							<div style={{ marginTop: 24 }}>
+								{current < steps.length - 1 && (
+									<Button type='primary' onClick={() => next()}>
+										Next
+									</Button>
+								)}
+								{current === steps.length - 1 && (
+									<Button type='primary'>Done</Button>
+								)}
+								{current > 0 && (
+									<Button style={{ margin: '0 8px' }} onClick={() => prev()}>
+										Previous
+									</Button>
+								)}
+							</div>
 						</div>
 					</Space>
 				</Card>

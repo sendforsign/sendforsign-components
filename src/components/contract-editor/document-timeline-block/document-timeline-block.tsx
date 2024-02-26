@@ -34,7 +34,7 @@ export const DocumentTimilineBlock = () => {
 					},
 					responseType: 'json',
 				})
-				.then((payload) => {
+				.then((payload: any) => {
 					console.log('getEventStatus read', payload);
 					eventStatusTmp = payload.data;
 				});
@@ -48,7 +48,7 @@ export const DocumentTimilineBlock = () => {
 					},
 					responseType: 'json',
 				})
-				.then((payload) => {
+				.then((payload: any) => {
 					console.log('getEventStatus read', payload);
 					const timelinesTmp: TimelineItemProps[] = payload.data.map(
 						(contractEventData: {

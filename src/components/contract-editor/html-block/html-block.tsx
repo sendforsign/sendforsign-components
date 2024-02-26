@@ -94,7 +94,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						userOnly: true,
 					},
 				},
-				scrollingContainer: 'body',
+				// scrollingContainer: 'body',
 				theme: 'bubble',
 			});
 			if (quillRef.current) {
@@ -190,7 +190,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					},
 					responseType: 'json',
 				})
-				.then((payload) => {
+				.then((payload: any) => {
 					console.log('getSigns read', payload);
 					setSignCount(payload.data.length);
 					if (payload.data.length > 0) {
@@ -226,7 +226,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						},
 						responseType: 'json',
 					})
-					.then((payload) => {
+					.then((payload: any) => {
 						console.log('CHECK_CONTRACT_VALUE read', payload);
 						changed = payload.data.changed;
 						contractValueTmp = payload.data.contractValue;
@@ -250,7 +250,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						},
 						responseType: 'json',
 					})
-					.then((payload) => {
+					.then((payload: any) => {
 						console.log('editor read', payload);
 					});
 			} else {
@@ -281,7 +281,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				},
 				responseType: 'json',
 			})
-			.then((payload) => {
+			.then((payload: any) => {
 				console.log('editor read', payload);
 			});
 	};

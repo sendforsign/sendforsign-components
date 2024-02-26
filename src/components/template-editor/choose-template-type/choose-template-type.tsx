@@ -95,7 +95,7 @@ export const ChooseTemplateType = () => {
 	}, []);
 
 	const handleCreate = async () => {
-		let input = null;
+		let input: HTMLInputElement;
 		switch (templateType) {
 			case ContractType.DOCX.toString():
 				input = document.createElement('input');

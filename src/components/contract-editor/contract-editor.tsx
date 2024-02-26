@@ -28,10 +28,10 @@ import { PlaceholderBlock } from './placeholder-block/placeholder-block';
 //env.config();
 
 export const ContractEditor: FC<ContractEditorProps> = ({
-	apiKey,
-	contractKey,
-	clientKey,
-	userKey,
+	apiKey = '',
+	contractKey = '',
+	clientKey = '',
+	userKey = '',
 	id,
 }) => {
 	if (!apiKey && !process.env.REACT_APP_SENDFORSIGN_KEY) {
@@ -42,10 +42,14 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [signModal, setSignModal] = useState(false);
 	const [sendModal, setSendModal] = useState(false);
 	const [approveModal, setApproveModal] = useState(false);
-	const [resultModal, setResultModal] = useState({ open: false, action: '' });
+	const [resultModal, setResultModal] = useState<{
+		open: boolean;
+		action: string;
+	}>({ open: false, action: '' });
 	const [contractName, setContractName] = useState('');
 	const [contractValue, setContractValue] = useState('');
 	const [contractSign, setContractSign] = useState<ContractSign>({});
+	const [signs, setSigns] = useState<ContractSign[]>([]);
 	const [isPdf, setIsPdf] = useState(false);
 	const [isNew, setIsNew] = useState(false);
 	const [continueDisable, setContinueDisable] = useState(true);
@@ -55,7 +59,9 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [currContractKey, setCurrContractKey] = useState(contractKey);
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
-	const [currApiKey, setCurrApiKey] = useState(apiKey);
+	const [currApiKey, setCurrApiKey] = useState(
+		apiKey ? apiKey : process.env.REACT_APP_SENDFORSIGN_KEY
+	);
 	const [continueLoad, setContinueLoad] = useState(false);
 	const [createContract, setCreateContract] = useState(false);
 	const [readonly, setReadonly] = useState(false);
@@ -69,17 +75,15 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [refreshRecipients, setRefreshRecipients] = useState(0);
 	const [refreshPlaceholders, setRefreshPlaceholders] = useState(0);
 	const [signCount, setSignCount] = useState(0);
-	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
-	const [notification, setNotification] = useState<{
-		text: string | React.ReactNode;
-	}>({ text: '' });
+	const [placeholder, setPlaceholder] = useState<Placeholder[]>([{}]);
+	const [notification, setNotification] = useState({});
 	const quillRef = useRef<Quill>();
 	const contractKeyRef = useRef(contractKey);
 	const { Title, Text } = Typography;
 	console.log('contractKey', contractKey, currClientKey);
- 
+
 	useEffect(() => {
-		setCurrApiKey(apiKey);
+		setCurrApiKey(apiKey ? apiKey : process.env.REACT_APP_SENDFORSIGN_KEY);
 	}, [apiKey]);
 	useEffect(() => {
 		setCurrClientKey(clientKey);
@@ -88,68 +92,69 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		setCurrUserKey(userKey);
 	}, [userKey]);
 	useEffect(() => {
-		// debugger;
+		async function getContract() {
+			let contractTmp: { contractType?: number; value?: string } = {
+				contractType: 0,
+				value: '',
+			};
+			let body = {
+				data: {
+					action: Action.READ,
+					clientKey: currClientKey ? currClientKey : '',
+					userKey: currUserKey ? currUserKey : '',
+					contract: {
+						contractKey: contractKeyRef.current,
+					},
+				},
+			};
+			const url: string = BASE_URL + ApiEntity.CONTRACT || '';
+
+			const result = await axios.post(url, body, {
+				headers: {
+					Accept: 'application/vnd.api+json',
+					'Content-Type': 'application/vnd.api+json',
+					'x-sendforsign-key': currApiKey ? currApiKey : '', //process.env.SENDFORSIGN_API_KEY,
+				},
+				responseType: 'json',
+			});
+			contractTmp = result.data.contract;
+			if (
+				contractTmp &&
+				contractTmp.contractType &&
+				contractTmp.contractType.toString() === ContractType.PDF.toString()
+			) {
+				const response = await axios.get(contractTmp.value as string, {
+					responseType: 'arraybuffer',
+				});
+				// .then(async function (response) {
+				setIsPdf(true);
+				await setArrayBuffer('pdfFile', response.data);
+				await setArrayBuffer('pdfFileOriginal', response.data);
+				setPdfDownload(true);
+				// setPdfData(response.data);
+				setPdfFileLoad(pdfFileLoad + 1);
+				setContinueLoad(false);
+				// });
+			} else {
+				// debugger;
+				setContractValue(contractTmp.value ? contractTmp.value : '<div></div>');
+				setContinueLoad(false);
+			}
+		}
+
 		clearArrayBuffer();
 		setEditorVisible(false);
 		setContinueLoad(true);
 		contractKeyRef.current = contractKey;
 		setCurrContractKey(contractKey);
-		let body = {};
 		if (contractKeyRef.current) {
 			setIsNew(false);
 			setEditorVisible(true);
 			setRefreshEvent(refreshEvent + 1);
 			setRefreshShareLink(refreshShareLink + 1);
 			setRefreshSign(refreshSign + 1);
-			body = {
-				data: {
-					action: Action.READ,
-					clientKey: clientKey,
-					userKey: userKey,
-					contract: {
-						contractKey: contractKeyRef.current,
-					},
-				},
-			};
 
-			const getContract = async () => {
-				let contractTmp: { contractType?: any; value?: string } = {};
-				await axios
-					.post(BASE_URL + ApiEntity.CONTRACT, body, {
-						headers: {
-							Accept: 'application/vnd.api+json',
-							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
-						},
-						responseType: 'json',
-					})
-					.then((payload) => {
-						console.log('getContract read', payload);
-						contractTmp = payload.data.contract;
-					});
-				if (contractTmp?.contractType === ContractType.PDF.toString()) {
-					await axios
-						.get(contractTmp.value as string, {
-							responseType: 'arraybuffer',
-						})
-						.then(async function (response) {
-							setIsPdf(true);
-							await setArrayBuffer('pdfFile', response.data);
-							await setArrayBuffer('pdfFileOriginal', response.data);
-							setPdfDownload(true);
-							// setPdfData(response.data);
-							setPdfFileLoad(pdfFileLoad + 1);
-							setContinueLoad(false);
-						});
-				} else {
-					// debugger;
-					setContractValue(
-						contractTmp.value ? (contractTmp.value as string) : '<div></div>'
-					);
-					setContinueLoad(false);
-				}
-			};
-			getContract();
+			getContract().catch(console.error);
 		} else {
 			setIsNew(true);
 			setPdfDownload(false);
@@ -163,13 +168,12 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 
 	useEffect(() => {
 		const handleContinue = async () => {
-			debugger;
 			setContinueLoad(true);
-			let body = {
+			let body: any = {
 				data: {
 					action: Action.CREATE,
-					clientKey: clientKey,
-					userKey: userKey,
+					clientKey: currClientKey ? currClientKey : '',
+					userKey: currUserKey ? currUserKey : '',
 					contract: {
 						name: contractName,
 						value: contractValue,
@@ -178,52 +182,54 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					},
 				},
 			};
-			let contractKeyTmp = '';
-			await axios
-				.post(BASE_URL + ApiEntity.CONTRACT, body, {
+			let contractKeyTmp: string = '';
+			const url: string = BASE_URL + ApiEntity.CONTRACT || '';
+
+			const response = await axios.post(url, body, {
+				headers: {
+					Accept: 'application/vnd.api+json',
+					'Content-Type': 'application/vnd.api+json',
+					'x-sendforsign-key': currApiKey ? currApiKey : '', //process.env.SENDFORSIGN_API_KEY,
+				},
+				responseType: 'json',
+			});
+			console.log('editor read', response);
+			if (response) {
+				setCurrContractKey(response.data.contract.contractKey);
+				contractKeyTmp = response.data.contract.contractKey;
+				setRefreshEvent(refreshEvent + 1);
+			}
+			if (contractType === ContractTypeText.PDF.toString() && !templateKey) {
+				const formData: FormData = new FormData();
+				const pdfFile: ArrayBuffer = await getArrayBuffer('pdfFile');
+				const pdfFileBlob = new Blob([pdfFile as BlobPart], {
+					type: 'application/pdf',
+				});
+				formData.append('pdf', pdfFileBlob);
+
+				const url = `${BASE_URL}${ApiEntity.UPLOAD_PDF}?contractKey=${
+					contractKeyTmp ? contractKeyTmp : ''
+				}&clientKey=${currClientKey ? currClientKey : ''}`;
+
+				const response = await axios.post(url, formData, {
 					headers: {
-						Accept: 'application/vnd.api+json',
-						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': currApiKey ? currApiKey : '',
 					},
 					responseType: 'json',
-				})
-				.then((payload) => {
-					console.log('editor read', payload);
-					setCurrContractKey(payload.data.contract.contractKey);
-					contractKeyTmp = payload.data.contract.contractKey;
-					setRefreshEvent(refreshEvent + 1);
 				});
-			if (contractType === ContractTypeText.PDF.toString() && !templateKey) {
-				const formData = new FormData();
-				const pdfFile = (await getArrayBuffer('pdfFile')) as ArrayBuffer;
-				const pdfFileBlob = new Blob([pdfFile], { type: 'application/pdf' });
-				formData.append('pdf', pdfFileBlob);
-				let url = `${BASE_URL}${ApiEntity.UPLOAD_PDF}?contractKey=${contractKeyTmp}&clientKey=${clientKey}`;
-				await axios
-					.post(url, formData, {
-						headers: {
-							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
-						},
-						responseType: 'json',
-					})
-					.then((payload) => {
-						console.log('editor read', payload);
-					});
 			}
 			setEditorVisible(true);
 			setContinueDisable(true);
-			// debugger;
 			setIsNew(false);
 			setContinueLoad(false);
+			return response;
 		};
 		if (createContract) {
-			handleContinue();
+			handleContinue().catch(console.error);
 			setCreateContract(false);
 		}
 	}, [createContract]);
 
-	// console.log('editorVisible', continueLoad);
 	return (
 		<ContractEditorContext.Provider
 			value={{
@@ -237,7 +243,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setResultModal,
 				notification,
 				setNotification,
-				contractKey: currContractKey as string,
+				contractKey: currContractKey,
 				setContractKey: setCurrContractKey,
 				contractName,
 				setContractName,
@@ -251,6 +257,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setUserKey: setCurrUserKey,
 				sign,
 				setSign,
+				signs,
+				setSigns,
 				contractSign,
 				setContractSign,
 				pdfFileLoad,

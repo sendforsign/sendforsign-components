@@ -1,37 +1,41 @@
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
+import typescript2 from "rollup-plugin-typescript2"; // For Typescript
 import postcss from "rollup-plugin-postcss";
 import dts from "rollup-plugin-dts";
-import json from "@rollup/plugin-json";
-// import { terser } from "@rollup/rollup-plugin-terser";
-// import peerDepsExternal from "rollup-plugin-peer-deps-external";
-
-import packageJson from "./package.json" assert { type: "json" };
+import babel from 'rollup-plugin-babel';
+import terser from '@rollup/plugin-terser';
 
 export default [
     {
         input: "src/index.ts",
         output: [
             {
-                file: packageJson.main,
-                format: "cjs",
-                sourcemap: true,
+                file: 'dist/index.js',
+                format: 'cjs',
             },
             {
-                file: packageJson.module,
-                format: "esm",
-                sourcemap: true,
-            },
+                file: 'dist/index.es.js',
+                format: 'es',
+                exports: 'named',
+            }
         ],
         plugins: [
-            json(),
-            resolve({ extensions: ['.js', '.ts'] }),
+            babel({
+                exclude: 'node_modules/**',
+                presets: ['@babel/preset-react']
+            }),
+            resolve(),
             commonjs(),
-            typescript({ tsconfig: "./tsconfig.json" }),
             postcss(),
+            terser(),
+            typescript(),
+            typescript2({
+                useTsconfigDeclarationDir: true, check: true
+            }),
         ],
-        external: ["react", "react-dom", "styled-components"],
+        external: ["react", "react-dom"],
     },
     {
         input: "dist/esm/types/index.d.ts",
