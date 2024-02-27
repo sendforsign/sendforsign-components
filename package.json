@@ -3,9 +3,7 @@
 	"version": "1.0.8",
 	"description": "Sendforsign components",
 	"private": true,
-	"scripts": {
-		"start": "react-scripts start",
-		"build": "react-scripts build",
+	"scripts": { 
 		"heroku-build": "build-storybook -s public",
 		"rollup": "npx rollup -c",
 		"storybook": "storybook dev -p 6006",
