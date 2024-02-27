@@ -2,9 +2,11 @@
 	"name": "@sendforsign/sendforsign-components",
 	"version": "1.0.8",
 	"description": "Sendforsign components",
+	"private": true,
 	"scripts": {
-		"start": "node src/app.js",
-		"dev": "nodemon src/app.js",
+		"start": "react-scripts start",
+		"build": "react-scripts build",
+		"heroku-build": "build-storybook -s public",
 		"rollup": "npx rollup -c",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build -s public"
