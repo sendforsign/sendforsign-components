@@ -1,2 +1,2 @@
 web:http-server storybook-static
-web:npx rollup -c
+web:npm run start
