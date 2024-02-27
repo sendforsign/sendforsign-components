@@ -4,7 +4,7 @@
 	"description": "Sendforsign components",
 	"private": true,
 	"scripts": {
-		"build": "serve -s storybook-static", 
+		"build": "http-server storybook-static", 
 		"heroku-build": "build-storybook -s public",
 		"rollup": "npx rollup -c",
 		"storybook": "storybook dev -p 6006",
