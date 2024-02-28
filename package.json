@@ -5,11 +5,10 @@
 	"private": true,
 	"scripts": { 
 		"heroku-build": "build-storybook -s public",
-		"rollup": "npx rollup -c",
-		"start": "node server.js",
-		"build": "start-storybook -p 6006 -s public",
+		"rollup": "npx rollup -c", 
+		"start": "start-storybook -p 6006 -s public",
 		"build-storybook": "build-storybook -s public",
-		"serve-storybook": "serve storybook-static" 
+		"build": "serve storybook-static" 
 	},
 	"publishConfig": {
 		"access": "public",
