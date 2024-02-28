@@ -3,12 +3,12 @@
 	"version": "1.0.8",
 	"description": "Sendforsign components",
 	"private": true,
-	"scripts": { 
+	"scripts": {
 		"heroku-build": "build-storybook -s public",
-		"rollup": "npx rollup -c", 
-		"start": "start-storybook -p 6006 -s public",
-		"build-storybook": "build-storybook -s public",
-		"build": "serve storybook-static" 
+		"rollup": "npx rollup -c",
+		"storybook": "storybook -p 9001 -c .storybook",
+		"build-storybook": "build-storybook -c .storybook -o storybook-static",
+		"heroku-postbuild": "npm run build-storybook"
 	},
 	"publishConfig": {
 		"access": "public",
