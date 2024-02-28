@@ -7,7 +7,7 @@
 		"heroku-build": "build-storybook -s public",
 		"rollup": "npx rollup -c",
 		"storybook": "storybook -p 9001 -c .storybook",
-		"build-storybook": "storybook -s storybook-static",
+		"build-storybook": "storybook -p 9001",
 		"heroku-postbuild": "npm run build-storybook"
 	},
 	"publishConfig": {
