@@ -6,9 +6,9 @@
 	"scripts": {
 		"heroku-build": "build-storybook -s public",
 		"rollup": "npx rollup -c",
-		"storybook": "storybook -p 9001 -c .storybook",
-		"build-storybook": "storybook -p 9001",
-		"heroku-postbuild": "npm run build-storybook"
+		"storybook": "start-storybook -p 6006",
+		"build-storybook": "build-storybook",
+		"serve-storybook": "serve storybook-static"
 	},
 	"publishConfig": {
 		"access": "public",
