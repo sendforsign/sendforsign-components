@@ -6,8 +6,8 @@
 	"scripts": {
 		"heroku-build": "build-storybook -s public",
 		"rollup": "npx rollup -c",
-		"storybook": "storybook dev -p 6006 -s public",
-		"build-storybook": "storybook build -s public",
+		"storybook": "storybook dev -p 6006",
+		"build-storybook": "storybook build",
 		"serve-storybook": "serve storybook-static"
 	},
 	"publishConfig": {
@@ -31,8 +31,8 @@
 		"@fortawesome/fontawesome-svg-core": "^6.4.2",
 		"@fortawesome/free-solid-svg-icons": "^6.4.2",
 		"@fortawesome/react-fontawesome": "^0.2.0",
-		"@react-pdf/layout": "^3.6.4",
-		"@react-pdf/renderer": "^3.1.14",
+		"@react-pdf/layout": "3.6.4",
+		"@react-pdf/renderer": "3.1.14",
 		"@reduxjs/toolkit": "^2.0.1",
 		"@rollup/plugin-babel": "^6.0.4",
 		"@rollup/plugin-commonjs": "^25.0.7",
@@ -88,7 +88,6 @@
 	"devDependencies": {
 		"@storybook/cli": "^7.6.17",
 		"@storybook/react": "^7.6.17",
-		"chromatic": "^11.0.0",
 		"react": "^16.14.0",
 		"react-dom": "^16.14.0"
 	},
