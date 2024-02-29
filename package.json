@@ -47,7 +47,6 @@
 		"@storybook/addon-onboarding": "^1.0.9",
 		"@storybook/addons": "^7.6.17",
 		"@storybook/blocks": "^7.6.4",
-		"@storybook/react": "^7.6.4",
 		"@storybook/react-vite": "^7.6.4",
 		"@storybook/test": "^7.6.4",
 		"@types/quill": "^2.0.14",
@@ -88,6 +87,7 @@
 	},
 	"devDependencies": {
 		"@storybook/cli": "^7.6.17",
+		"@storybook/react": "^7.6.17",
 		"chromatic": "^11.0.0",
 		"react": "^16.14.0",
 		"react-dom": "^16.14.0"
