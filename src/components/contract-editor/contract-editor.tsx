@@ -347,7 +347,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 									<Col flex='300px' style={{ display: 'block' }}>
 										<Space
 											direction='vertical'
-											style={{ display: 'flex', top: 10, position: 'sticky' }}
+											style={{ display: 'flex', top: 10, position: 'sticky', maxHeight: '90vh', overflow: 'auto' }}
 										>
 											<PlaceholderBlock quillRef={quillRef} />
 										</Space>

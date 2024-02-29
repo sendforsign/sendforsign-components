@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Tooltip, Card, Space, Typography } from 'antd';
+import { Button, Tooltip, Card, Space, Typography, FloatButton } from 'antd';
 import { ApiEntity, ShareLinkView } from '../../../config/enum';
 import { useContractEditorContext } from '../contract-editor-context';
 import axios from 'axios';

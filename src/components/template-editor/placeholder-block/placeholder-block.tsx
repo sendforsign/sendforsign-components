@@ -390,7 +390,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 										</Col>
 										<Col flex={'auto'} />
 										<Col flex='55px'>
-											<Tooltip title='Set who fills in this field: the user when creating a draft or the external signer when signing.'>
+											{/* <Tooltip title='Set who fills in this field: the user when creating a draft or the external signer when signing.'>
 												<Segmented
 													size='small'
 													options={[
@@ -408,7 +408,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 													value={holder.type}
 													onChange={(e: any) => handleClick(e, index)}
 												/>
-											</Tooltip>
+											</Tooltip> */}
 										</Col>
 									</Row>
 									<Input
