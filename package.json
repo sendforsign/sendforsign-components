@@ -91,9 +91,6 @@
 		"react": "^16.14.0",
 		"react-dom": "^16.14.0"
 	},
-	"optionalDependencies": {
-		"@rollup/rollup-linux-x64-gnu": "^4.9.6"
-	},
 	"files": [
 		"dist"
 	],
