@@ -84,17 +84,15 @@
 		"use-debounce": "^9.0.4",
 		"vite": "^5.0.6",
 		"webpack": "^5.89.0",
-		"yoga-layout": "^2.0.1"
+		"yoga-layout": "^2.0.1",
+		"@rollup/rollup-linux-x64-gnu": "4.6.1"
 	},
 	"devDependencies": {
 		"@storybook/cli": "^7.6.17",
 		"@storybook/react": "^7.6.17",
 		"react": "^16.14.0",
 		"react-dom": "^16.14.0"
-	},
-	"optionalDependencies": {
-		"@rollup/rollup-linux-x64-gnu": "4.6.1"
-	},
+	}, 
 	"files": [
 		"dist"
 	],
