@@ -7,7 +7,7 @@
 		"heroku-build": "build-storybook -s public",
 		"rollup": "npx rollup -c",
 		"storybook": "storybook dev -p 6006",
-		"build": "storybook build -s public",
+		"build": "storybook build",
 		"serve-storybook": "serve storybook-static"
 	},
 	"publishConfig": {
@@ -53,6 +53,7 @@
 		"@types/react": "^18.2.42",
 		"antd": "^5.12.1",
 		"axios": "^1.6.2",
+		"chromatic": "^11.0.0",
 		"dotenv": "^16.3.1",
 		"express": "^4.18.2",
 		"http-serve": "^1.0.1",
@@ -90,6 +91,9 @@
 		"@storybook/react": "^7.6.17",
 		"react": "^16.14.0",
 		"react-dom": "^16.14.0"
+	},
+	"optionalDependencies": {
+		"@rollup/rollup-linux-x64-gnu": "4.6.1"
 	},
 	"files": [
 		"dist"
