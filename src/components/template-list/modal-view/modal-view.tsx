@@ -22,11 +22,11 @@ export const ModalView = () => {
 		setTemplateModal(false);
 	};
 	//console.log(
-		'templateKey, clientKey, userKey',
-		templateKey,
-		clientKey,
-		userKey
-	);
+	// 	'templateKey, clientKey, userKey',
+	// 	templateKey,
+	// 	clientKey,
+	// 	userKey
+	// );
 	return (
 		<Modal
 			open={templateModal}
