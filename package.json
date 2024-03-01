@@ -9,7 +9,8 @@
     "storybook": "storybook dev -p 6006",
     "build": "storybook build",
     "serve-storybook": "serve storybook-static",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "start": "storybook dev -p 6006 --disable-telemetry"	
   },
   "publishConfig": {
     "access": "public",
