@@ -21,7 +21,7 @@ export const ChooseTemplateType = () => {
 		setContinueLoad,
 	} = useTemplateEditorContext();
 	// if (!process.env.SENDFORSIGN_API_KEY) {
-	// 	console.log(
+	// 	//console.log(
 	// 		'process.env.SENDFORSIGN_API_KEY',
 	// 		process.env.SENDFORSIGN_API_KEY
 	// 	);

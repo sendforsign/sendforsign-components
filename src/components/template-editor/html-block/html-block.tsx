@@ -148,7 +148,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					console.log('editor read', payload);
+					//console.log('editor read', payload);
 				});
 		},
 		5000,

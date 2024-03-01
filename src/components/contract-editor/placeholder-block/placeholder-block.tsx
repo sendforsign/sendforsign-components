@@ -44,7 +44,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 	const { Title, Text } = Typography;
 
 	const getPlaceholders = async (load = true) => {
-		console.log('PlaceholderBlock');
+		//console.log('PlaceholderBlock');
 		if (load) {
 			setPlaceholderLoad(true);
 		}
@@ -65,7 +65,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				responseType: 'json',
 			})
 			.then((payload: any) => {
-				console.log('getPlaceholders read', payload);
+				//console.log('getPlaceholders read', payload);
 
 				if (payload.data.placeholders && payload.data.placeholders.length > 0) {
 					let placeholderTmp: Placeholder[] = [];
@@ -126,14 +126,14 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				responseType: 'json',
 			})
 			.then((payload: any) => {
-				console.log('PLACEHOLDER read', payload);
+				//console.log('PLACEHOLDER read', payload);
 				// setRefreshPlaceholders(refreshPlaceholders + 1);
 				getPlaceholders(false);
 			});
 	};
 	const handleInsertPlaceholder = (index: number) => {
 		const position = quillRef?.current?.getSelection();
-		console.log('position', position, quillRef);
+		//console.log('position', position, quillRef);
 
 		const empty = placeholder[index].value
 			? placeholder[index].value?.replace(/\s/g, '')
@@ -147,7 +147,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 			'user'
 		);
 		// handleChangeText(quillRef?.root.innerHTML);
-		console.log('handleInsertPlaceholder', quillRef?.current?.root.innerHTML);
+		//console.log('handleInsertPlaceholder', quillRef?.current?.root.innerHTML);
 	};
 	const handleDeletePlaceholder = async (index: number) => {
 		let placeholdersTmp = [...placeholder];
@@ -172,7 +172,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				responseType: 'json',
 			})
 			.then((payload: any) => {
-				console.log('PLACEHOLDER read', payload);
+				//console.log('PLACEHOLDER read', payload);
 
 				placeholdersTmp.splice(index, 1);
 				setPlaceholder(placeholdersTmp);
@@ -233,7 +233,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 			// handleChangeText(resultText, false);
 			quillRef?.current?.blur();
 		}
-		console.log('changeValueInTag', quillRef?.current?.root.innerHTML);
+		//console.log('changeValueInTag', quillRef?.current?.root.innerHTML);
 	};
 	const handleBlur = async (e: any, index: number) => {
 		switch (e.target.id) {
@@ -260,7 +260,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 						responseType: 'json',
 					})
 					.then((payload: any) => {
-						console.log('PLACEHOLDER read', payload);
+						//console.log('PLACEHOLDER read', payload);
 
 						// setRefreshPlaceholders(refreshPlaceholders + 1);
 					});
@@ -303,7 +303,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				responseType: 'json',
 			})
 			.then((payload: any) => {
-				console.log('PLACEHOLDER read', payload);
+				//console.log('PLACEHOLDER read', payload);
 
 				// setRefreshPlaceholders(refreshPlaceholders + 1);
 			});

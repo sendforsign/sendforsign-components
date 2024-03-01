@@ -42,7 +42,7 @@ export const ApproveModal = () => {
 				responseType: 'json',
 			})
 			.then((payload: any) => {
-				console.log('getContract read', payload);
+				//console.log('getContract read', payload);
 				setSpinLoad(false);
 				setRefreshEvent(refreshEvent + 1);
 				handleCancel();
@@ -81,7 +81,7 @@ export const ApproveModal = () => {
 				responseType: 'json',
 			})
 			.then((payload: any) => {
-				console.log('editor read', payload);
+				//console.log('editor read', payload);
 			});
 	};
 	return (

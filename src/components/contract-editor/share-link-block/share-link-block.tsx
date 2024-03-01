@@ -39,7 +39,7 @@ export const ShareLinkBlock = () => {
 		setPlaceholderVisible,
 	} = useContractEditorContext();
 	// if (!process.env.SENDFORSIGN_API_KEY) {
-	// 	console.log(
+	// 	//console.log(
 	// 		'process.env.SENDFORSIGN_API_KEY',
 	// 		process.env.SENDFORSIGN_API_KEY
 	// 	);
@@ -72,7 +72,7 @@ export const ShareLinkBlock = () => {
 						responseType: 'json',
 					})
 					.then((payload: any) => {
-						console.log('getShareLinks read', payload);
+						//console.log('getShareLinks read', payload);
 						setShareLinks(payload.data);
 					});
 			};
@@ -96,7 +96,7 @@ export const ShareLinkBlock = () => {
 				responseType: 'json',
 			})
 			.then((payload: any) => {
-				console.log('handleAddShareLink read', payload);
+				//console.log('handleAddShareLink read', payload);
 				setRefreshShareLink(refreshShareLink + 1);
 				setAddBtnSpin(false);
 			});
@@ -119,7 +119,7 @@ export const ShareLinkBlock = () => {
 				responseType: 'json',
 			})
 			.then((payload: any) => {
-				console.log('CHECK_CONTRACT_VALUE read', payload);
+				//console.log('CHECK_CONTRACT_VALUE read', payload);
 				if (payload.data.changed && payload.data.contractValue) {
 					changed = payload.data.changed;
 					setContractValue(payload.data.contractValue);

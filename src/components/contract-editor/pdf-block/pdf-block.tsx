@@ -39,7 +39,7 @@ export const PdfBlock = () => {
 	const { getArrayBuffer, setArrayBuffer } = useSaveArrayBuffer();
 
 	const { width, ref } = useResizeDetector();
-	console.log('PdfBlock');
+	//console.log('PdfBlock');
 	useEffect(() => {
 		const getSigns = async () => {
 			let url = `${BASE_URL}${ApiEntity.CONTRACT_SIGN}?contractKey=${contractKey}&clientKey=${clientKey}`;
@@ -53,7 +53,7 @@ export const PdfBlock = () => {
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					console.log('getSigns read', payload);
+					//console.log('getSigns read', payload);
 					setContractSigns(payload.data);
 				});
 		};
@@ -63,7 +63,7 @@ export const PdfBlock = () => {
 		const render = async () => {
 			const pdfFile: any = await getArrayBuffer('pdfFileOriginal');
 			const pdfFileAB: ArrayBuffer = pdfFile as ArrayBuffer;
-			console.log('typeof', typeof pdfFileAB);
+			//console.log('typeof', typeof pdfFileAB);
 			const byteLength = pdfFileAB.byteLength;
 			if (!pdfFile || (pdfFile && byteLength === 0)) {
 				return;
@@ -94,7 +94,7 @@ export const PdfBlock = () => {
 						responseType: 'json',
 					})
 					.then((payload: any) => {
-						console.log('sign read', payload);
+						//console.log('sign read', payload);
 						setSign('');
 						debugger;
 						setContinueLoad(false);
@@ -125,13 +125,13 @@ export const PdfBlock = () => {
 					setNumPages(numPages);
 				}}
 				onSourceError={() => {
-					console.log('PdfViewer onSourceError');
+					//console.log('PdfViewer onSourceError');
 				}}
 				onLoadError={() => {
-					console.log('PdfViewer onLoadError');
+					//console.log('PdfViewer onLoadError');
 				}}
 				onError={() => {
-					console.log('PdfViewer error');
+					//console.log('PdfViewer error');
 				}}
 			>
 				{new Array(numPages).fill(0).map((_, i) => {

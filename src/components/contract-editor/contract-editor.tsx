@@ -33,8 +33,12 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	clientKey = '',
 	userKey = '',
 	id,
-}) => {
-	if (!apiKey && !process.env.REACT_APP_SENDFORSIGN_KEY) {
+}) => { 
+	if (
+		!apiKey &&
+		!process.env.REACT_APP_SENDFORSIGN_KEY &&
+		!window.location.href.includes('story')
+	) {
 		throw new Error('Missing Publishable Key');
 	}
 	const { setArrayBuffer, getArrayBuffer, clearArrayBuffer } =
@@ -80,7 +84,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const quillRef = useRef<Quill>();
 	const contractKeyRef = useRef(contractKey);
 	const { Title, Text } = Typography;
-	console.log('contractKey', contractKey, currClientKey);
+	//console.log('contractKey', contractKey, currClientKey);
 
 	useEffect(() => {
 		setCurrApiKey(apiKey ? apiKey : process.env.REACT_APP_SENDFORSIGN_KEY);
@@ -141,28 +145,31 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setContinueLoad(false);
 			}
 		}
+		if (currApiKey) {
+			clearArrayBuffer();
+			setEditorVisible(false);
+			setContinueLoad(true);
+			contractKeyRef.current = contractKey;
+			setCurrContractKey(contractKey);
+			if (contractKeyRef.current) {
+				setIsNew(false);
+				setEditorVisible(true);
+				setRefreshEvent(refreshEvent + 1);
+				setRefreshShareLink(refreshShareLink + 1);
+				setRefreshSign(refreshSign + 1);
 
-		clearArrayBuffer();
-		setEditorVisible(false);
-		setContinueLoad(true);
-		contractKeyRef.current = contractKey;
-		setCurrContractKey(contractKey);
-		if (contractKeyRef.current) {
-			setIsNew(false);
-			setEditorVisible(true);
-			setRefreshEvent(refreshEvent + 1);
-			setRefreshShareLink(refreshShareLink + 1);
-			setRefreshSign(refreshSign + 1);
-
-			getContract().catch(console.error);
+				getContract().catch(console.error);
+			} else {
+				setIsNew(true);
+				setPdfDownload(false);
+				setContractName('');
+				setContractType('');
+				setContractValue('<div></div>');
+				setReadonly(false);
+				setContinueLoad(false);
+			}
 		} else {
-			setIsNew(true);
-			setPdfDownload(false);
-			setContractName('');
-			setContractType('');
-			setContractValue('<div></div>');
-			setReadonly(false);
-			setContinueLoad(false);
+			setContinueLoad(true);
 		}
 	}, [contractKey]);
 
@@ -193,7 +200,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				},
 				responseType: 'json',
 			});
-			console.log('editor read', response);
+			//console.log('editor read', response);
 			if (response) {
 				setCurrContractKey(response.data.contract.contractKey);
 				contractKeyTmp = response.data.contract.contractKey;
@@ -347,7 +354,13 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 									<Col flex='300px' style={{ display: 'block' }}>
 										<Space
 											direction='vertical'
-											style={{ display: 'flex', top: 10, position: 'sticky', maxHeight: '90vh', overflow: 'auto' }}
+											style={{
+												display: 'flex',
+												top: 10,
+												position: 'sticky',
+												maxHeight: '90vh',
+												overflow: 'auto',
+											}}
 										>
 											<PlaceholderBlock quillRef={quillRef} />
 										</Space>

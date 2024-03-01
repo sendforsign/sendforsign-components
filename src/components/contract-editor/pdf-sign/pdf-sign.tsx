@@ -26,7 +26,7 @@ export const PdfSign = ({
 
 	// useEffect(() => {
 	// 	if (ref) {
-	// 		console.log(ref);
+	// 		//console.log(ref);
 	// 	}
 	// }, [ref]);
 

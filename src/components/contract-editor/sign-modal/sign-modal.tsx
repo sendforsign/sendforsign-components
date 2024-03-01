@@ -61,7 +61,7 @@ export const SignModal = () => {
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					console.log('getContract read', payload);
+					//console.log('getContract read', payload);
 					setContractSign(payload.data);
 					setSign(canvas);
 					setSignLoad(false);

@@ -92,7 +92,7 @@ export const SendModal = () => {
 						responseType: 'json',
 					})
 					.then((payload: any) => {
-						console.log('getShareLinks read', payload);
+						//console.log('getShareLinks read', payload);
 						if (payload.data.recipients && payload.data.recipients.length > 0) {
 							setNewRecipients(false);
 							setRecipientInit(false);

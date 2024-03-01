@@ -35,7 +35,11 @@ export const ContractList: FC<ContractListProps> = ({
 	isModal,
 	userKey,
 }) => {
-	if (!apiKey && !process.env.REACT_APP_SENDFORSIGN_KEY) {
+	if (
+		!apiKey &&
+		!process.env.REACT_APP_SENDFORSIGN_KEY &&
+		!window.location.href.includes('story')
+	) {
 		throw new Error('Missing Publishable Key');
 	}
 	const { setParam } = useSaveParams();
@@ -125,7 +129,7 @@ export const ContractList: FC<ContractListProps> = ({
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					console.log('getEventStatus read', payload);
+					//console.log('getEventStatus read', payload);
 					eventStatusTmp = payload.data;
 					setEventStatus(eventStatusTmp);
 				});
@@ -139,7 +143,7 @@ export const ContractList: FC<ContractListProps> = ({
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					console.log('editor list', payload);
+					//console.log('editor list', payload);
 					let array: DataType[] = payload.data.contracts.map(
 						(contract: any) => {
 							return {
@@ -155,7 +159,9 @@ export const ContractList: FC<ContractListProps> = ({
 					setData(array);
 				});
 		};
-		getContracts();
+		if (currApiKey) {
+			getContracts();
+		}
 	}, [refreshContracts]);
 
 	return (

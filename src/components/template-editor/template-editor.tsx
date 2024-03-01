@@ -20,7 +20,11 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	clientKey,
 	userKey,
 }) => {
-	if (!apiKey && !process.env.REACT_APP_SENDFORSIGN_KEY) {
+	if (
+		!apiKey &&
+		!process.env.REACT_APP_SENDFORSIGN_KEY &&
+		!window.location.href.includes('story')
+	) {
 		throw new Error('Missing Publishable Key');
 	}
 	const { getArrayBuffer, setArrayBuffer, clearArrayBuffer } =
@@ -95,7 +99,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 						responseType: 'json',
 					})
 					.then((payload: any) => {
-						console.log('getTemplate read', payload);
+						//console.log('getTemplate read', payload);
 						templateTmp = payload.data.template;
 					});
 				if (templateTmp.isPdf) {
@@ -160,7 +164,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					console.log('TEMPLATE editor read', payload);
+					//console.log('TEMPLATE editor read', payload);
 					setCurrTemplateKey(payload.data.template.templateKey);
 					templateTmp = payload.data.template;
 					setIsNew(false);
@@ -182,7 +186,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 						responseType: 'json',
 					})
 					.then((payload: any) => {
-						console.log('editor read', payload);
+						//console.log('editor read', payload);
 					});
 			}
 			setContinueLoad(false);
@@ -270,7 +274,13 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 							<Col flex='300px' style={{ display: 'block' }}>
 								<Space
 									direction='vertical'
-									style={{ display: 'flex', top: 10, position: 'sticky', maxHeight: '90vh', overflow: 'auto' }}
+									style={{
+										display: 'flex',
+										top: 10,
+										position: 'sticky',
+										maxHeight: '90vh',
+										overflow: 'auto',
+									}}
 								>
 									<PlaceholderBlock quillRef={quillRef} />
 								</Space>

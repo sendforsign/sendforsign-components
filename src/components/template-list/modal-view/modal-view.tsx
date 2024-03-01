@@ -21,7 +21,7 @@ export const ModalView = () => {
 		setRefreshTemplate(refreshTemplate + 1);
 		setTemplateModal(false);
 	};
-	console.log(
+	//console.log(
 		'templateKey, clientKey, userKey',
 		templateKey,
 		clientKey,

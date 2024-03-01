@@ -33,13 +33,13 @@ export const PdfViewer = () => {
 					setNumPages(numPages);
 				}}
 				onSourceError={() => {
-					console.log('PdfViewer onSourceError');
+					//console.log('PdfViewer onSourceError');
 				}}
 				onLoadError={() => {
-					console.log('PdfViewer onLoadError');
+					//console.log('PdfViewer onLoadError');
 				}}
 				onError={() => {
-					console.log('PdfViewer error');
+					//console.log('PdfViewer error');
 				}}
 			>
 				{new Array(numPages).fill(0).map((_, i) => {

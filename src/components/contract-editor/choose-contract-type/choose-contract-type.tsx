@@ -39,7 +39,7 @@ export const ChooseContractType = () => {
 		setPdfDownload,
 	} = useContractEditorContext();
 	// if (!process.env.SENDFORSIGN_API_KEY) {
-	// 	console.log(
+	// 	//console.log(
 	// 		'process.env.SENDFORSIGN_API_KEY',
 	// 		process.env.SENDFORSIGN_API_KEY
 	// 	);
@@ -78,7 +78,7 @@ export const ChooseContractType = () => {
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					console.log('editor read', payload);
+					//console.log('editor read', payload);
 					let array: SegmentedLabeledOption[] = [];
 					array.push({
 						label: (

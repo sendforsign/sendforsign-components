@@ -14,7 +14,7 @@ export default function useSaveArrayBuffer() {
 		if (valueTmp) {
 			await localforage.removeItem(key);
 		}
-		// console.log('pdfFile saveArrayBuffer', value);
+		// //console.log('pdfFile saveArrayBuffer', value);
 		await localforage.setItem<ArrayBuffer>(key, value);
 	};
 	const clearArrayBuffer = async () => {

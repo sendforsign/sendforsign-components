@@ -114,11 +114,11 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				quillRef.current.on(
 					'text-change',
 					function (delta: any, oldDelta: any, source: any) {
-						console.log('text-change', source, delta);
+						//console.log('text-change', source, delta);
 						// setCurrentValue(
 						// 	quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
 						// );
-						// console.log('source', source, quillRef?.current?.root?.innerHTML);
+						// //console.log('source', source, quillRef?.current?.root?.innerHTML);
 						if (source === 'user') {
 							handleChangeText(
 								quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
@@ -129,11 +129,11 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				// quillRef.current.on(
 				// 	'editor-change',
 				// 	function (eventName: any, ...args: any) {
-				// 		console.log('editor-change', eventName, args);
+				// 		//console.log('editor-change', eventName, args);
 				// 		// setCurrentValue(
 				// 		// 	quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
 				// 		// );
-				// 		// console.log('source', source, quillRef?.current?.root?.innerHTML);
+				// 		// //console.log('source', source, quillRef?.current?.root?.innerHTML);
 				// 		// if (source === 'user') {
 				// 		// 	handleChangeText(
 				// 		// 		quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
@@ -191,7 +191,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					console.log('getSigns read', payload);
+					//console.log('getSigns read', payload);
 					setSignCount(payload.data.length);
 					if (payload.data.length > 0) {
 						setReadonly(true);
@@ -227,7 +227,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						responseType: 'json',
 					})
 					.then((payload: any) => {
-						console.log('CHECK_CONTRACT_VALUE read', payload);
+						//console.log('CHECK_CONTRACT_VALUE read', payload);
 						changed = payload.data.changed;
 						contractValueTmp = payload.data.contractValue;
 					});
@@ -251,7 +251,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						responseType: 'json',
 					})
 					.then((payload: any) => {
-						console.log('editor read', payload);
+						//console.log('editor read', payload);
 					});
 			} else {
 				setReadonly(true);
@@ -282,7 +282,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				responseType: 'json',
 			})
 			.then((payload: any) => {
-				console.log('editor read', payload);
+				//console.log('editor read', payload);
 			});
 	};
 	return (

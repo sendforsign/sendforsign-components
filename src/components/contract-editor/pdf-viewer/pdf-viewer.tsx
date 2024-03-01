@@ -15,7 +15,7 @@ export const PdfViewer = () => {
 	const { getArrayBuffer } = useSaveArrayBuffer();
 
 	const { width, ref } = useResizeDetector();
-	console.log('PdfViewer');
+	//console.log('PdfViewer');
 	useEffect(() => {
 		const getValue = async () => {
 			const arrayBuffer: ArrayBuffer = (await getArrayBuffer(
@@ -35,13 +35,13 @@ export const PdfViewer = () => {
 					setNumPages(numPages);
 				}}
 				onSourceError={() => {
-					console.log('PdfViewer onSourceError');
+					//console.log('PdfViewer onSourceError');
 				}}
 				onLoadError={() => {
-					console.log('PdfViewer onLoadError');
+					//console.log('PdfViewer onLoadError');
 				}}
 				onError={() => {
-					console.log('PdfViewer error');
+					//console.log('PdfViewer error');
 				}}
 			>
 				{new Array(numPages).fill(0).map((_, i) => {

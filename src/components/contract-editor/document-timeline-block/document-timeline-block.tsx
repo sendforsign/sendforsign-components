@@ -35,7 +35,7 @@ export const DocumentTimilineBlock = () => {
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					console.log('getEventStatus read', payload);
+					//console.log('getEventStatus read', payload);
 					eventStatusTmp = payload.data;
 				});
 			const url = `${BASE_URL}${ApiEntity.CONTRACT_EVENT}?contractKey=${contractKey}&clientKey=${clientKey}`;
@@ -49,7 +49,7 @@ export const DocumentTimilineBlock = () => {
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					console.log('getEventStatus read', payload);
+					//console.log('getEventStatus read', payload);
 					const timelinesTmp: TimelineItemProps[] = payload.data.map(
 						(contractEventData: {
 							status: { toString: () => string | undefined };
@@ -134,7 +134,9 @@ export const DocumentTimilineBlock = () => {
 					setTimelines(timelinesTmp);
 				});
 		};
-		getContractEvents();
+		if (apiKey) {
+			getContractEvents();
+		}
 	}, [refreshEvent]);
 	return (
 		<Space direction='vertical' size={16} style={{ display: 'flex' }}>

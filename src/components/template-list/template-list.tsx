@@ -27,7 +27,11 @@ export const TemplateList: FC<TemplateListProps> = ({
 	isModal,
 	userKey,
 }) => {
-	if (!apiKey && !process.env.REACT_APP_SENDFORSIGN_KEY) {
+	if (
+		!apiKey &&
+		!process.env.REACT_APP_SENDFORSIGN_KEY &&
+		!window.location.href.includes('story')
+	) {
 		throw new Error('Missing Publishable Key');
 	}
 	const { setParam, getParam } = useSaveParams();
@@ -118,7 +122,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					console.log('editor list', payload);
+					//console.log('editor list', payload);
 					let array: DataType[] = payload.data.templates.map(
 						(template: any) => {
 							return {
@@ -138,7 +142,9 @@ export const TemplateList: FC<TemplateListProps> = ({
 					// setValue(payload.data.contract.value);
 				});
 		};
-		getTemplate();
+		if (currApiKey) {
+			getTemplate();
+		}
 	}, [refreshTemplate]);
 	// useEffect(() => {
 	// 	if (!getParam('openModalTemplate')) {
