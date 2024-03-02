@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Typography, Tag, Card, Space, Row, Col, Button } from 'antd';
+import { Typography, Tag, Card, Space, Row, Col, Button, Spin } from 'antd';
 import { TemplateListProps } from './template-list.types';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
@@ -41,6 +41,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 	const [currApiKey, setCurrApiKey] = useState(apiKey);
 	const [templateModal, setTemplateModal] = useState(false);
 	const [refreshTemplate, setRefreshTemplate] = useState(0);
+	const [spinLoad, setSpinLoad] = useState(false);
 	const [data, setData] = useState<DataType[]>([]);
 	const { Title } = Typography;
 	const chooseTemplate = (text: string) => {
@@ -143,7 +144,10 @@ export const TemplateList: FC<TemplateListProps> = ({
 				});
 		};
 		if (currApiKey) {
+			setSpinLoad(false);
 			getTemplate();
+		} else {
+			setSpinLoad(true);
 		}
 	}, [refreshTemplate]);
 	// useEffect(() => {
@@ -168,42 +172,46 @@ export const TemplateList: FC<TemplateListProps> = ({
 				setApiKey: setCurrApiKey,
 			}}
 		>
-			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-				<Card>
-					<Table
-						columns={columns}
-						dataSource={data}
-						title={() => (
-							<Row>
-								<Col>
-									<Title
-										level={3}
-										style={{
-											margin: '0',
-											display: 'flex',
-											textAlign: 'center',
-										}}
-									>
-										Templates
-									</Title>
-								</Col>
-								<Col flex={'auto'}></Col>
-								<Col>
-									<Button
-										type='primary'
-										icon={<FontAwesomeIcon icon={faPlus} />}
-										onClick={() => {
-											chooseTemplate('');
-										}}
-									>
-										Add template
-									</Button>
-								</Col>
-							</Row>
-						)}
-					/>
-				</Card>
-			</Space>
+			{spinLoad ? (
+				<Spin spinning={spinLoad} fullscreen />
+			) : (
+				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
+					<Card>
+						<Table
+							columns={columns}
+							dataSource={data}
+							title={() => (
+								<Row>
+									<Col>
+										<Title
+											level={3}
+											style={{
+												margin: '0',
+												display: 'flex',
+												textAlign: 'center',
+											}}
+										>
+											Templates
+										</Title>
+									</Col>
+									<Col flex={'auto'}></Col>
+									<Col>
+										<Button
+											type='primary'
+											icon={<FontAwesomeIcon icon={faPlus} />}
+											onClick={() => {
+												chooseTemplate('');
+											}}
+										>
+											Add template
+										</Button>
+									</Col>
+								</Row>
+							)}
+						/>
+					</Card>
+				</Space>
+			)}
 			<ModalView />
 		</TemplateListContext.Provider>
 	);

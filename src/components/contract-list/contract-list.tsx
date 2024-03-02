@@ -8,12 +8,13 @@ import {
 	Col,
 	Button,
 	TableColumnsType,
+	Spin,
 } from 'antd';
 import { ContractListProps } from './contract-list.types';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
 import { Action, ApiEntity } from '../../config/enum';
-import Table, { ColumnsType, TableProps } from 'antd/es/table';
+import Table from 'antd/es/table';
 import useSaveParams from '../../hooks/use-save-params';
 import { ContractListContext } from './contract-list-context';
 import { ModalView } from './modal-view/modal-view';
@@ -52,6 +53,7 @@ export const ContractList: FC<ContractListProps> = ({
 	const [refreshContracts, setRefreshContracts] = useState(0);
 	const [data, setData] = useState<DataType[]>([]);
 	const [eventStatus, setEventStatus] = useState<EventStatus[]>([]);
+	const [spinLoad, setSpinLoad] = useState(false);
 	const { Title } = Typography;
 
 	const chooseContract = (text: string) => {
@@ -160,7 +162,10 @@ export const ContractList: FC<ContractListProps> = ({
 				});
 		};
 		if (currApiKey) {
+			setSpinLoad(false);
 			getContracts();
+		} else {
+			setSpinLoad(true);
 		}
 	}, [refreshContracts]);
 
@@ -183,42 +188,46 @@ export const ContractList: FC<ContractListProps> = ({
 				setApiKey: setCurrApiKey,
 			}}
 		>
-			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-				<Card>
-					<Table
-						columns={columns}
-						dataSource={data}
-						title={() => (
-							<Row>
-								<Col>
-									<Title
-										level={3}
-										style={{
-											margin: '0',
-											display: 'flex',
-											textAlign: 'center',
-										}}
-									>
-										Documents
-									</Title>
-								</Col>
-								<Col flex={'auto'}></Col>
-								<Col>
-									<Button
-										type='primary'
-										icon={<FontAwesomeIcon icon={faPlus} />}
-										onClick={() => {
-											chooseContract('');
-										}}
-									>
-										Add document
-									</Button>
-								</Col>
-							</Row>
-						)}
-					/>
-				</Card>
-			</Space>
+			{spinLoad ? (
+				<Spin spinning={spinLoad} fullscreen />
+			) : (
+				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
+					<Card>
+						<Table
+							columns={columns}
+							dataSource={data}
+							title={() => (
+								<Row>
+									<Col>
+										<Title
+											level={3}
+											style={{
+												margin: '0',
+												display: 'flex',
+												textAlign: 'center',
+											}}
+										>
+											Documents
+										</Title>
+									</Col>
+									<Col flex={'auto'}></Col>
+									<Col>
+										<Button
+											type='primary'
+											icon={<FontAwesomeIcon icon={faPlus} />}
+											onClick={() => {
+												chooseContract('');
+											}}
+										>
+											Add document
+										</Button>
+									</Col>
+								</Row>
+							)}
+						/>
+					</Card>
+				</Space>
+			)}
 			<ModalView id={currContractKey ? currContractKey : 'New contract'} />
 		</ContractListContext.Provider>
 	);

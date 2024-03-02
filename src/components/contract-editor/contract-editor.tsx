@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import './contract-editor.css';
-import { Card, Col, Row, Space, Typography } from 'antd';
+import { Card, Col, Row, Space, Spin, Typography } from 'antd';
 import { ContractEditorProps } from './contract-editor.types';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
@@ -33,7 +33,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	clientKey = '',
 	userKey = '',
 	id,
-}) => { 
+}) => {
 	if (
 		!apiKey &&
 		!process.env.REACT_APP_SENDFORSIGN_KEY &&
@@ -60,6 +60,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [editorVisible, setEditorVisible] = useState(false);
 	const [contractType, setContractType] = useState('');
 	const [templateKey, setTemplateKey] = useState('');
+	const [spinLoad, setSpinLoad] = useState(false);
 	const [currContractKey, setCurrContractKey] = useState(contractKey);
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
@@ -146,6 +147,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			}
 		}
 		if (currApiKey) {
+			setSpinLoad(false);
 			clearArrayBuffer();
 			setEditorVisible(false);
 			setContinueLoad(true);
@@ -169,7 +171,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setContinueLoad(false);
 			}
 		} else {
-			setContinueLoad(true);
+			setSpinLoad(true);
 		}
 	}, [contractKey]);
 
@@ -306,72 +308,81 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setApiKey: setCurrApiKey,
 			}}
 		>
-			<Space id={id} direction='vertical' size={16} style={{ display: 'flex' }}>
-				{isNew ? <ChooseContractType /> : <DocumentTimilineBlock />}
-				{!isNew && (
-					<>
-						{editorVisible && (
-							<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false}>
-								<Col flex='auto'>
-									<Space direction='vertical' style={{ display: 'flex' }}>
-										<Card loading={continueLoad}>
-											<Space
-												direction='vertical'
-												size={16}
-												style={{ display: 'flex' }}
-											>
+			{spinLoad ? (
+				<Spin spinning={spinLoad} fullscreen />
+			) : (
+				<Space
+					id={id}
+					direction='vertical'
+					size={16}
+					style={{ display: 'flex' }}
+				>
+					{isNew ? <ChooseContractType /> : <DocumentTimilineBlock />}
+					{!isNew && (
+						<>
+							{editorVisible && (
+								<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false}>
+									<Col flex='auto'>
+										<Space direction='vertical' style={{ display: 'flex' }}>
+											<Card loading={continueLoad}>
 												<Space
 													direction='vertical'
-													size={2}
-													className='SharingDocHeader'
+													size={16}
+													style={{ display: 'flex' }}
 												>
-													<Title level={4} style={{ margin: '0 0 0 0' }}>
-														Review your document
-													</Title>
-													{!isPdf && (
-														<Text type='secondary'>
-															Highlight text to see options.
-														</Text>
+													<Space
+														direction='vertical'
+														size={2}
+														className='SharingDocHeader'
+													>
+														<Title level={4} style={{ margin: '0 0 0 0' }}>
+															Review your document
+														</Title>
+														{!isPdf && (
+															<Text type='secondary'>
+																Highlight text to see options.
+															</Text>
+														)}
+													</Space>
+													{!isPdf ? (
+														<>
+															{contractValue && (
+																<HtmlBlock
+																	value={contractValue}
+																	quillRef={quillRef}
+																/>
+															)}
+														</>
+													) : (
+														<PdfBlock />
 													)}
 												</Space>
-												{!isPdf ? (
-													<>
-														{contractValue && (
-															<HtmlBlock
-																value={contractValue}
-																quillRef={quillRef}
-															/>
-														)}
-													</>
-												) : (
-													<PdfBlock />
-												)}
-											</Space>
-										</Card>
-									</Space>
-								</Col>
-								{!isPdf && placeholderVisible && (
-									<Col flex='300px' style={{ display: 'block' }}>
-										<Space
-											direction='vertical'
-											style={{
-												display: 'flex',
-												top: 10,
-												position: 'sticky',
-												maxHeight: '90vh',
-												overflow: 'auto',
-											}}
-										>
-											<PlaceholderBlock quillRef={quillRef} />
+											</Card>
 										</Space>
 									</Col>
-								)}
-							</Row>
-						)}
-						<ShareLinkBlock />
-					</>
-				)}
-			</Space>
+									{!isPdf && placeholderVisible && (
+										<Col flex='300px' style={{ display: 'block' }}>
+											<Space
+												direction='vertical'
+												style={{
+													display: 'flex',
+													top: 10,
+													position: 'sticky',
+													maxHeight: '90vh',
+													overflow: 'auto',
+												}}
+											>
+												<PlaceholderBlock quillRef={quillRef} />
+											</Space>
+										</Col>
+									)}
+								</Row>
+							)}
+							<ShareLinkBlock />
+						</>
+					)}
+				</Space>
+			)}
 			<SignModal />
 			<SendModal />
 			<ApproveModal />

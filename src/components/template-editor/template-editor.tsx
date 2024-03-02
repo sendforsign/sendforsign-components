@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import './template-editor.css';
-import { Card, Col, Row, Space, Typography } from 'antd';
+import { Card, Col, Row, Space, Spin, Typography } from 'antd';
 import { TemplateEditorProps } from './template-editor.types';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
@@ -49,6 +49,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
 	const [refreshPlaceholders, setRefreshPlaceholders] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
+	const [spinLoad, setSpinLoad] = useState(false);
 	const templateKeyRef = useRef(templateKey);
 	const { Title, Text } = Typography;
 	const quillRef = useRef<Quill>();
@@ -63,72 +64,77 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	}, [userKey]);
 	useEffect(() => {
 		clearArrayBuffer();
-		templateKeyRef.current = templateKey;
-		let body = {};
-		if (templateKeyRef.current) {
-			setIsNew(false);
-			setIsPdf(false);
-			setContinueLoad(true);
-			setEditorVisible(true);
-			const getTemplate = async () => {
-				body = {
-					data: {
-						action: Action.READ,
-						clientKey: clientKey,
-						userKey: userKey,
-						template: {
-							templateKey: templateKeyRef.current,
+		if (currApiKey) {
+			setSpinLoad(false);
+			templateKeyRef.current = templateKey;
+			let body = {};
+			if (templateKeyRef.current) {
+				setIsNew(false);
+				setIsPdf(false);
+				setContinueLoad(true);
+				setEditorVisible(true);
+				const getTemplate = async () => {
+					body = {
+						data: {
+							action: Action.READ,
+							clientKey: clientKey,
+							userKey: userKey,
+							template: {
+								templateKey: templateKeyRef.current,
+							},
 						},
-					},
-				};
-				let templateTmp: Template = {
-					createTime: new Date(),
-					changeTime: new Date(),
-					templateKey: '',
-					value: '',
-					name: '',
-					isPdf: false,
-				};
-				await axios
-					.post(BASE_URL + ApiEntity.TEMPLATE, body, {
-						headers: {
-							Accept: 'application/vnd.api+json',
-							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
-						},
-						responseType: 'json',
-					})
-					.then((payload: any) => {
-						//console.log('getTemplate read', payload);
-						templateTmp = payload.data.template;
-					});
-				if (templateTmp.isPdf) {
+					};
+					let templateTmp: Template = {
+						createTime: new Date(),
+						changeTime: new Date(),
+						templateKey: '',
+						value: '',
+						name: '',
+						isPdf: false,
+					};
 					await axios
-						.get(templateTmp.value as string, {
-							responseType: 'arraybuffer',
+						.post(BASE_URL + ApiEntity.TEMPLATE, body, {
+							headers: {
+								Accept: 'application/vnd.api+json',
+								'Content-Type': 'application/vnd.api+json',
+								'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+							},
+							responseType: 'json',
 						})
-						.then(async function (response) {
-							setIsPdf(true);
-							await setArrayBuffer('pdfFileTemplate', response.data);
-							setPdfFileLoad(pdfFileLoad + 1);
-							setContinueLoad(false);
+						.then((payload: any) => {
+							//console.log('getTemplate read', payload);
+							templateTmp = payload.data.template;
 						});
-				} else {
-					setTemplateValue(
-						templateTmp.value ? (templateTmp.value as string) : '<div></div>'
-					);
-					setContinueLoad(false);
-				}
-			};
-			getTemplate();
+					if (templateTmp.isPdf) {
+						await axios
+							.get(templateTmp.value as string, {
+								responseType: 'arraybuffer',
+							})
+							.then(async function (response) {
+								setIsPdf(true);
+								await setArrayBuffer('pdfFileTemplate', response.data);
+								setPdfFileLoad(pdfFileLoad + 1);
+								setContinueLoad(false);
+							});
+					} else {
+						setTemplateValue(
+							templateTmp.value ? (templateTmp.value as string) : '<div></div>'
+						);
+						setContinueLoad(false);
+					}
+				};
+				getTemplate();
+			} else {
+				setIsNew(true);
+				setEditorVisible(false);
+				setIsPdf(false);
+				setTemplateName('');
+				setTemplateType('');
+				setTemplateValue('<div></div>');
+				setContinueLoad(false);
+			}
 		} else {
-			setIsNew(true);
-			setEditorVisible(false);
-			setIsPdf(false);
-			setTemplateName('');
-			setTemplateType('');
-			setTemplateValue('<div></div>');
-			setContinueLoad(false);
+			setSpinLoad(true);
 		}
 	}, [templateKey]);
 	useEffect(() => {
@@ -234,61 +240,69 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 				setApiKey: setCurrApiKey,
 			}}
 		>
-			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-				{isNew && <ChooseTemplateType />}
-				{editorVisible && (
-					<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false}>
-						<Col flex='auto'>
-							<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-								<Card loading={continueLoad}>
-									<Space
-										direction='vertical'
-										size={16}
-										style={{ display: 'flex' }}
-									>
-										<Space direction='vertical' size={2}>
-											<Title level={4} style={{ margin: '0 0 0 0' }}>
-												Review your template
-											</Title>
-											<Text type='secondary'>
-												Highlight text to see options.
-											</Text>
-										</Space>
-										{!isPdf ? (
-											<>
-												{templateValue && (
-													<HtmlBlock
-														value={templateValue}
-														quillRef={quillRef}
-													/>
-												)}
-											</>
-										) : (
-											<PdfViewer />
-										)}
-									</Space>
-								</Card>
-							</Space>
-						</Col>
-						{!isPdf && (
-							<Col flex='300px' style={{ display: 'block' }}>
+			{spinLoad ? (
+				<Spin spinning={spinLoad} fullscreen />
+			) : (
+				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
+					{isNew && <ChooseTemplateType />}
+					{editorVisible && (
+						<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false}>
+							<Col flex='auto'>
 								<Space
 									direction='vertical'
-									style={{
-										display: 'flex',
-										top: 10,
-										position: 'sticky',
-										maxHeight: '90vh',
-										overflow: 'auto',
-									}}
+									size={16}
+									style={{ display: 'flex' }}
 								>
-									<PlaceholderBlock quillRef={quillRef} />
+									<Card loading={continueLoad}>
+										<Space
+											direction='vertical'
+											size={16}
+											style={{ display: 'flex' }}
+										>
+											<Space direction='vertical' size={2}>
+												<Title level={4} style={{ margin: '0 0 0 0' }}>
+													Review your template
+												</Title>
+												<Text type='secondary'>
+													Highlight text to see options.
+												</Text>
+											</Space>
+											{!isPdf ? (
+												<>
+													{templateValue && (
+														<HtmlBlock
+															value={templateValue}
+															quillRef={quillRef}
+														/>
+													)}
+												</>
+											) : (
+												<PdfViewer />
+											)}
+										</Space>
+									</Card>
 								</Space>
 							</Col>
-						)}
-					</Row>
-				)}
-			</Space>
+							{!isPdf && (
+								<Col flex='300px' style={{ display: 'block' }}>
+									<Space
+										direction='vertical'
+										style={{
+											display: 'flex',
+											top: 10,
+											position: 'sticky',
+											maxHeight: '90vh',
+											overflow: 'auto',
+										}}
+									>
+										<PlaceholderBlock quillRef={quillRef} />
+									</Space>
+								</Col>
+							)}
+						</Row>
+					)}
+				</Space>
+			)}
 		</TemplateEditorContext.Provider>
 	);
 };
