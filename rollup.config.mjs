@@ -1,6 +1,7 @@
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
+import json from '@rollup/plugin-json';
 import typescript2 from "rollup-plugin-typescript2"; // For Typescript
 import postcss from "rollup-plugin-postcss";
 import dts from "rollup-plugin-dts";
@@ -30,6 +31,9 @@ export default [
             commonjs(),
             postcss(),
             terser(),
+            json({
+                compact: true
+            }),
             typescript(),
             typescript2({
                 useTsconfigDeclarationDir: true, check: true
@@ -38,7 +42,7 @@ export default [
         external: ["react", "react-dom"],
     },
     {
-        input: "dist/esm/types/index.d.ts",
+        input: "src/index.ts",
         output: [{ file: "dist/index.d.ts", format: "esm" }],
         plugins: [dts()],
         external: [/\.(css|less|scss)$/],

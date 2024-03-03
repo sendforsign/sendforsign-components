@@ -21,7 +21,7 @@ import { Action, ApiEntity, PlaceholderTypeText } from '../../../config/enum';
 import axios from 'axios';
 import { Placeholder } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGlobe, faLeftLong, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faLeftLong } from '@fortawesome/free-solid-svg-icons';
 
 type Props = {
 	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
@@ -261,7 +261,6 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 					})
 					.then((payload: any) => {
 						//console.log('PLACEHOLDER read', payload);
-
 						// setRefreshPlaceholders(refreshPlaceholders + 1);
 					});
 				break;
@@ -304,7 +303,6 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 			})
 			.then((payload: any) => {
 				//console.log('PLACEHOLDER read', payload);
-
 				// setRefreshPlaceholders(refreshPlaceholders + 1);
 			});
 	};
