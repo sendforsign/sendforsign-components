@@ -181,7 +181,7 @@ export const ChooseContractType = () => {
 								docx2html(
 									readerEvent?.target?.result as ArrayBuffer,
 									(payload: any) => {
-										debugger;
+										// debugger;
 										setContractValue(payload);
 										setFieldBlockVisible(true);
 										setCreateDisable(true);
@@ -226,7 +226,7 @@ export const ChooseContractType = () => {
 				case ContractTypeText.EMPTY.toString():
 					setFieldBlockVisible(true);
 					setCreateDisable(true);
-					debugger;
+					// debugger;
 					setContractValue('<div></div>');
 					break;
 				default:
@@ -262,7 +262,7 @@ export const ChooseContractType = () => {
 					template = payload.data.template;
 				});
 			if (template.isPdf) {
-				debugger;
+				// debugger;
 				await axios
 					.get(template.value as string, {
 						responseType: 'arraybuffer',
@@ -279,7 +279,7 @@ export const ChooseContractType = () => {
 						setCreateDisable(true);
 					});
 			} else {
-				debugger;
+				// debugger;
 				setContractValue(template.value as string);
 				setFieldBlockVisible(true);
 				setCreateDisable(true);

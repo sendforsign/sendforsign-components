@@ -112,6 +112,7 @@ export const ContractList: FC<ContractListProps> = ({
 		setCurrApiKey(apiKey);
 	}, [apiKey]);
 	useEffect(() => {
+		let isMounted = true;
 		let body = {
 			data: {
 				action: Action.LIST,
@@ -132,8 +133,10 @@ export const ContractList: FC<ContractListProps> = ({
 				})
 				.then((payload: any) => {
 					//console.log('getEventStatus read', payload);
-					eventStatusTmp = payload.data;
-					setEventStatus(eventStatusTmp);
+					if (isMounted) {
+						eventStatusTmp = payload.data;
+						setEventStatus(eventStatusTmp);
+					}
 				});
 			await axios
 				.post(BASE_URL + ApiEntity.CONTRACT, body, {
@@ -146,19 +149,21 @@ export const ContractList: FC<ContractListProps> = ({
 				})
 				.then((payload: any) => {
 					//console.log('editor list', payload);
-					let array: DataType[] = payload.data.contracts.map(
-						(contract: any) => {
-							return {
-								key: contract.contractKey,
-								name: contract.name ? contract.name : 'Empty name',
-								status: contract.status,
-								createdAt: contract.createTime
-									? contract.createTime.toString()
-									: new Date().toString(),
-							};
-						}
-					);
-					setData(array);
+					if (isMounted) {
+						let array: DataType[] = payload.data.contracts.map(
+							(contract: any) => {
+								return {
+									key: contract.contractKey,
+									name: contract.name ? contract.name : 'Empty name',
+									status: contract.status,
+									createdAt: contract.createTime
+										? contract.createTime.toString()
+										: new Date().toString(),
+								};
+							}
+						);
+						setData(array);
+					}
 				});
 		};
 		if (currApiKey) {
@@ -167,6 +172,9 @@ export const ContractList: FC<ContractListProps> = ({
 		} else {
 			setSpinLoad(true);
 		}
+		return () => {
+			isMounted = false;
+		};
 	}, [refreshContracts]);
 
 	return (
