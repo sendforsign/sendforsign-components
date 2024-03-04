@@ -1,8 +1,7 @@
 {
   "name": "@sendforsign/sendforsign-components",
-  "version": "1.0.8",
-  "description": "Sendforsign components",
-  "private": true,
+  "version": "1.0.9",
+  "description": "Sendforsign components", 
   "scripts": {
     "heroku-build": "storybook build",
     "rollup": "npx rollup -c",
@@ -87,6 +86,7 @@
     "@storybook/test": "^7.6.17",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
+    "rollup-plugin-natives": "^0.7.8",
     "storybook": "^7.6.17"
   },
   "files": [

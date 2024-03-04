@@ -27,7 +27,7 @@ export default [
                 exclude: 'node_modules/**',
                 presets: ['@babel/preset-react']
             }),
-            resolve(),
+            resolve({ browser: true }),
             commonjs(),
             postcss(),
             terser(),
