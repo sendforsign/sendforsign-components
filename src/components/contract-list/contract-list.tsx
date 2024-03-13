@@ -200,8 +200,9 @@ export const ContractList: FC<ContractListProps> = ({
 				<Spin spinning={spinLoad} fullscreen />
 			) : (
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-					<Card>
+					<Card style={{overflow: 'auto'}}>
 						<Table
+							style={{minWidth: 600}}
 							columns={columns}
 							dataSource={data}
 							title={() => (
