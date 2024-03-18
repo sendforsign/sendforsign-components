@@ -146,7 +146,7 @@ export const ChooseContractType = () => {
 									}}
 								>
 									<Tag style={{ margin: '4px 0' }} color={'cyan'}>
-										User
+										Template
 									</Tag>
 									<div style={{ padding: '4px 0' }}>{template.name}</div>
 								</div>
