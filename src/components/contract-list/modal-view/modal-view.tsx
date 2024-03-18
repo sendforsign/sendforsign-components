@@ -39,7 +39,6 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 		>
 			<Space direction='vertical' size='large' style={{ display: 'flex' }}>
 				<ContractEditor
-					id={id}
 					apiKey={apiKey}
 					clientKey={clientKey}
 					userKey={userKey}
