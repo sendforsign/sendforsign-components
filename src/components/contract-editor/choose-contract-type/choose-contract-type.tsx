@@ -125,7 +125,7 @@ export const ChooseContractType = ({ pdf }: Props) => {
 									}}
 								>
 									<Tag style={{ margin: '4px 0' }} color={'geekblue'}>
-										Template
+										Empty
 									</Tag>
 									<div style={{ padding: '4px 0' }}>Draft from scratch</div>
 								</div>
@@ -144,7 +144,7 @@ export const ChooseContractType = ({ pdf }: Props) => {
 										}}
 									>
 										<Tag style={{ margin: '4px 0' }} color={'cyan'}>
-											User
+											Template
 										</Tag>
 										<div style={{ padding: '4px 0' }}>{template.name}</div>
 									</div>
