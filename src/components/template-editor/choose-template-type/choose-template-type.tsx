@@ -198,7 +198,7 @@ export const ChooseTemplateType = () => {
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 					<Space direction='vertical' size={2}>
 						<Title level={4} style={{ margin: '0' }}>
-							Draft from scratch or upload a file
+							Create a template from scratch or upload a file
 						</Title>
 						<Text type='secondary'>
 							This will speed up the drafting process.
