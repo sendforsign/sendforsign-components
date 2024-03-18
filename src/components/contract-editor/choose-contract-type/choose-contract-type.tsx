@@ -145,7 +145,7 @@ export const ChooseContractType = () => {
 										lineHeight: '20px',
 									}}
 								>
-									<Tag style={{ margin: '4px 0' }} color={'cyan'}>
+									<Tag style={{ margin: '4px 0' }} color={'geekblue'}>
 										Template
 									</Tag>
 									<div style={{ padding: '4px 0' }}>{template.name}</div>
