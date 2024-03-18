@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import 'quill/dist/quill.bubble.css';
+import React, { useEffect } from 'react';
+import './html-block.css';
 import QuillNamespace from 'quill';
 import QuillBetterTable from 'quill-better-table';
 import { useDebouncedCallback } from 'use-debounce';
@@ -13,7 +13,7 @@ import { addBlotClass } from '../../../utils';
 //env.config();
 type Props = {
 	value: string;
-	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
+	quillRef: React.MutableRefObject<any>;
 };
 
 QuillNamespace.register(
@@ -89,8 +89,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			});
 
 			if (quillRef.current) {
-				quillRef.current
-					.getModule('toolbar')
+				quillRef?.current
+					?.getModule('toolbar')
 					.container.addEventListener(
 						'mousedown',
 						(e: {
@@ -123,10 +123,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	}, [value]);
 
 	const addTable = () => {
-		debugger;
-		(quillRef.current as QuillNamespace)
-			.getModule('better-table')
-			.insertTable(3, 3);
+		quillRef?.current?.getModule('better-table').insertTable(3, 3);
 	};
 	const handleChangeText = useDebouncedCallback(
 		async (content: string) => {

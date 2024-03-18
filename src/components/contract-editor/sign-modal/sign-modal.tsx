@@ -37,7 +37,7 @@ export const SignModal = () => {
 	const [email, setEmail] = useState('');
 	const [signDisable, setSignDisable] = useState(true);
 	const { Title, Text } = Typography;
-	const padRef = useRef(null);
+	const padRef = useRef<any>(null);
 
 	const handleOk = async () => {
 		if (fullName && email) {

@@ -17,9 +17,12 @@ import { Action, ApiEntity, ContractTypeText } from '../../../config/enum';
 import { BASE_URL } from '../../../config/config';
 import { docx2html } from '../../../utils';
 import { Template } from '../../../config/types';
-import TextArea from 'antd/es/input/TextArea';
 
-export const ChooseContractType = () => {
+type Props = {
+	pdf: boolean;
+};
+
+export const ChooseContractType = ({ pdf }: Props) => {
 	const {
 		apiKey,
 		continueDisable,
@@ -37,15 +40,8 @@ export const ChooseContractType = () => {
 		templateKey,
 		continueLoad,
 		setPdfDownload,
+		beforeCreated,
 	} = useContractEditorContext();
-	// if (!process.env.SENDFORSIGN_API_KEY) {
-	// 	//console.log(
-	// 		'process.env.SENDFORSIGN_API_KEY',
-	// 		process.env.SENDFORSIGN_API_KEY
-	// 	);
-	// }
-
-	// const [contractSign, setContractSign] = useState<ContractSign>({});
 	const [options, setOptions] = useState<SegmentedLabeledOption[]>([]);
 
 	const [createDisable, setCreateDisable] = useState(true);
@@ -57,8 +53,7 @@ export const ChooseContractType = () => {
 	const { Title, Text } = Typography;
 	const { setArrayBuffer } = useSaveArrayBuffer();
 	useEffect(() => {
-		// clearArrayBuffer();
-
+		let isMounted = true;
 		const getTemplates = async () => {
 			setLoadSegmented(true);
 			let body = {
@@ -80,61 +75,45 @@ export const ChooseContractType = () => {
 				.then((payload: any) => {
 					//console.log('editor read', payload);
 					let array: SegmentedLabeledOption[] = [];
-					array.push({
-						label: (
-							<div
-								style={{
-									paddingTop: '8px',
-									width: 100,
-									whiteSpace: 'normal',
-									lineHeight: '20px',
-								}}
-							>
-								<Tag style={{ margin: '4px 0' }} color={'magenta'}>
-									File
-								</Tag>
-								<div style={{ padding: '4px 0' }}>Upload your DOCX file</div>
-							</div>
-						),
-						value: `template_${ContractTypeText.DOCX}`,
-					});
-					array.push({
-						label: (
-							<div
-								style={{
-									paddingTop: '8px',
-									width: 100,
-									whiteSpace: 'normal',
-									lineHeight: '20px',
-								}}
-							>
-								<Tag style={{ margin: '4px 0' }} color={'magenta'}>
-									File
-								</Tag>
-								<div style={{ padding: '4px 0' }}>Upload your PDF file</div>
-							</div>
-						),
-						value: `template_${ContractTypeText.PDF}`,
-					});
-					array.push({
-						label: (
-							<div
-								style={{
-									paddingTop: '8px',
-									width: 100,
-									whiteSpace: 'normal',
-									lineHeight: '20px',
-								}}
-							>
-								<Tag style={{ margin: '4px 0' }} color={'cyan'}>
-									Empty
-								</Tag>
-								<div style={{ padding: '4px 0' }}>Draft from scratch</div>
-							</div>
-						),
-						value: `template_${ContractTypeText.EMPTY}`,
-					});
-					payload.data.templates.forEach((template: any) => {
+					if (isMounted) {
+						array.push({
+							label: (
+								<div
+									style={{
+										paddingTop: '8px',
+										width: 100,
+										whiteSpace: 'normal',
+										lineHeight: '20px',
+									}}
+								>
+									<Tag style={{ margin: '4px 0' }} color={'magenta'}>
+										File
+									</Tag>
+									<div style={{ padding: '4px 0' }}>Upload your DOCX file</div>
+								</div>
+							),
+							value: `template_${ContractTypeText.DOCX}`,
+						});
+						if (pdf) {
+							array.push({
+								label: (
+									<div
+										style={{
+											paddingTop: '8px',
+											width: 100,
+											whiteSpace: 'normal',
+											lineHeight: '20px',
+										}}
+									>
+										<Tag style={{ margin: '4px 0' }} color={'magenta'}>
+											File
+										</Tag>
+										<div style={{ padding: '4px 0' }}>Upload your PDF file</div>
+									</div>
+								),
+								value: `template_${ContractTypeText.PDF}`,
+							});
+						}
 						array.push({
 							label: (
 								<div
@@ -148,21 +127,45 @@ export const ChooseContractType = () => {
 									<Tag style={{ margin: '4px 0' }} color={'geekblue'}>
 										Template
 									</Tag>
-									<div style={{ padding: '4px 0' }}>{template.name}</div>
+									<div style={{ padding: '4px 0' }}>Draft from scratch</div>
 								</div>
 							),
-							value: template.templateKey,
+							value: `template_${ContractTypeText.EMPTY}`,
 						});
-					});
-					setOptions(array);
-					setLoadSegmented(false);
+						payload.data.templates.forEach((template: any) => {
+							array.push({
+								label: (
+									<div
+										style={{
+											paddingTop: '8px',
+											width: 100,
+											whiteSpace: 'normal',
+											lineHeight: '20px',
+										}}
+									>
+										<Tag style={{ margin: '4px 0' }} color={'cyan'}>
+											User
+										</Tag>
+										<div style={{ padding: '4px 0' }}>{template.name}</div>
+									</div>
+								),
+								value: template.templateKey,
+							});
+						});
+						setOptions(array);
+						setLoadSegmented(false);
+					}
 				});
 		};
 		getTemplates();
+		return () => {
+			isMounted = false;
+		};
 	}, []);
 
 	const handleCreate = async () => {
-		if (contractType) {
+		// debugger;
+		if (contractType && !templateKey) {
 			let input = null;
 			switch (contractType) {
 				case ContractTypeText.DOCX.toString():
@@ -285,8 +288,11 @@ export const ChooseContractType = () => {
 				setCreateDisable(true);
 			}
 		}
+		if (beforeCreated && contractName) {
+			setContinueDisable(false);
+		}
 	};
-	const handleContinue = async () => {
+	const handleContinue = () => {
 		setCreateContract(true);
 	};
 	const handleChange = (e: any) => {
@@ -302,6 +308,7 @@ export const ChooseContractType = () => {
 		}
 	};
 	const handleChoose = async (e: any) => {
+		// debugger;
 		let contractTypeTmp = e.toString().split('_');
 		if (
 			contractTypeTmp[1] === ContractTypeText.DOCX.toString() ||
@@ -313,8 +320,10 @@ export const ChooseContractType = () => {
 		}
 		if (contractTypeTmp[1]) {
 			setContractType(contractTypeTmp[1]);
+			setTemplateKey('');
 		} else {
 			setTemplateKey(e);
+			setContractType('');
 		}
 		setSegmentedValue(e);
 		setCreateDisable(false);

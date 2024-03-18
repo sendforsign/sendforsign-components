@@ -1,5 +1,6 @@
+export { ModalView } from './modal-view/modal-view';
+
 export { ContractList } from './contract-list';
-export type { ContractListProps } from './contract-list.types';
 export {
 	ContractListContext,
 	useContractListContext,

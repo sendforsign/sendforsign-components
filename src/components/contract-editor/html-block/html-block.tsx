@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import 'quill/dist/quill.bubble.css';
+import './html-block.css';
 import QuillNamespace from 'quill';
 import QuillBetterTable from 'quill-better-table';
 import { useDebouncedCallback } from 'use-debounce';
@@ -14,7 +14,7 @@ import { addBlotClass } from '../../../utils';
 //env.config();
 type Props = {
 	value: string;
-	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
+	quillRef: React.MutableRefObject<any>;
 };
 QuillNamespace.register(
 	{
@@ -114,11 +114,6 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				quillRef.current.on(
 					'text-change',
 					function (delta: any, oldDelta: any, source: any) {
-						//console.log('text-change', source, delta);
-						// setCurrentValue(
-						// 	quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
-						// );
-						// //console.log('source', source, quillRef?.current?.root?.innerHTML);
 						if (source === 'user') {
 							handleChangeText(
 								quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
@@ -126,21 +121,6 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						}
 					}
 				);
-				// quillRef.current.on(
-				// 	'editor-change',
-				// 	function (eventName: any, ...args: any) {
-				// 		//console.log('editor-change', eventName, args);
-				// 		// setCurrentValue(
-				// 		// 	quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
-				// 		// );
-				// 		// //console.log('source', source, quillRef?.current?.root?.innerHTML);
-				// 		// if (source === 'user') {
-				// 		// 	handleChangeText(
-				// 		// 		quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
-				// 		// 	);
-				// 		// }
-				// 	}
-				// );
 			}
 		}
 	}, [container]);
@@ -179,6 +159,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		}
 	}, [sign, contractSign]);
 	useEffect(() => {
+		let isMounted = true;
 		const getSigns = async () => {
 			let url = `${BASE_URL}${ApiEntity.CONTRACT_SIGN}?contractKey=${contractKey}&clientKey=${clientKey}`;
 			await axios
@@ -192,19 +173,22 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				})
 				.then((payload: any) => {
 					//console.log('getSigns read', payload);
-					setSignCount(payload.data.length);
-					if (payload.data.length > 0) {
-						setReadonly(true);
+					if (isMounted) {
+						setSignCount(payload.data.length);
+						if (payload.data.length > 0) {
+							setReadonly(true);
+						}
 					}
 				});
 		};
 		getSigns();
+		return () => {
+			isMounted = false;
+		};
 	}, [refreshSign]);
 
 	const addTable = () => {
-		(quillRef.current as QuillNamespace)
-			.getModule('better-table')
-			.insertTable(3, 3);
+		quillRef?.current?.getModule('better-table').insertTable(3, 3);
 	};
 	const handleChangeText = useDebouncedCallback(
 		async (content: string, needCheck: boolean = true) => {

@@ -10,29 +10,15 @@ import ReactPDF, {
 import { pdfjs } from 'react-pdf';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { ContractSign } from '../../../config/types';
 import { useContractEditorContext } from '../contract-editor-context';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-// interface Props extends ReactPDF.DocumentProps {
-// 	signs: ContractSign[];
-// }
+
 export const PdfSign = ({
 	...other
 }: ReactPDF.DocumentProps): React.ReactElement => {
 	const { signs } = useContractEditorContext();
 	dayjs.extend(utc);
-	// const ref = useRef();
-
-	// useEffect(() => {
-	// 	if (ref) {
-	// 		//console.log(ref);
-	// 	}
-	// }, [ref]);
-
-	// if (signs && signs.length === 0) {
-	// 	return <></>;
-	// }
 
 	// Create styles
 	const styles = StyleSheet.create({

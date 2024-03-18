@@ -85,6 +85,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 			});
 	};
 	useEffect(() => {
+		let isMounted = true;
 		if (
 			contractKey &&
 			clientKey &&
@@ -93,6 +94,9 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 			setCurrPlaceholder(refreshPlaceholders);
 			getPlaceholders();
 		}
+		return () => {
+			isMounted = false;
+		};
 	}, [refreshPlaceholders, placeholderVisible]);
 
 	const handleAddPlaceholder = async () => {
@@ -336,61 +340,67 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 									<Row wrap={false} align={'middle'}>
 										<Col>
 											<Tooltip title='Click to insert the placeholder at the current cursor position in the text.'>
-												<Button
-													size='small'
-													type='text'
-													icon={
-														<FontAwesomeIcon
-															icon={faLeftLong}
-															size='sm'
-															onClick={() => {
-																handleInsertPlaceholder(index);
-															}}
-														/>
-													}
-												/>
+												<div>
+													<Button
+														size='small'
+														type='text'
+														icon={
+															<FontAwesomeIcon
+																icon={faLeftLong}
+																size='sm'
+																onClick={() => {
+																	handleInsertPlaceholder(index);
+																}}
+															/>
+														}
+													/>
+												</div>
 											</Tooltip>
 										</Col>
 										<Col>
 											<Tooltip title='Click to see more options.'>
-												<Popover
-													content={
-														<Space
-															direction='vertical'
-															style={{ display: 'flex' }}
-														>
-															<Button
-																block
-																type='text'
-																onClick={() => {
-																	handleInsertPlaceholder(index);
-																}}
+												<div>
+													<Popover
+														content={
+															<Space
+																direction='vertical'
+																style={{ display: 'flex' }}
 															>
-																Insert into the text
-															</Button>
-															<Button
-																block
-																danger
-																type='text'
-																onClick={() => {
-																	handleDeletePlaceholder(index);
-																}}
-															>
-																Delete
-															</Button>
-														</Space>
-													}
-													trigger='click'
-												>
-													<Input
-														id='PlaceholderName'
-														placeholder='Enter placeholder name'
-														bordered={false}
-														value={holder.name}
-														onChange={(e: any) => handleChange(e, index)}
-														onBlur={(e: any) => handleBlur(e, index)}
-													/>
-												</Popover>
+																<Button
+																	block
+																	type='text'
+																	onClick={() => {
+																		handleInsertPlaceholder(index);
+																	}}
+																>
+																	Insert into the text
+																</Button>
+																<Button
+																	block
+																	danger
+																	type='text'
+																	onClick={() => {
+																		handleDeletePlaceholder(index);
+																	}}
+																>
+																	Delete
+																</Button>
+															</Space>
+														}
+														trigger='click'
+													>
+														<div>
+															<Input
+																id='PlaceholderName'
+																placeholder='Enter placeholder name'
+																bordered={false}
+																value={holder.name}
+																onChange={(e: any) => handleChange(e, index)}
+																onBlur={(e: any) => handleBlur(e, index)}
+															/>{' '}
+														</div>
+													</Popover>
+												</div>
 											</Tooltip>
 										</Col>
 										<Col flex={'auto'} />

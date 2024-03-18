@@ -10,8 +10,8 @@ import {
 	TableColumnsType,
 	Spin,
 } from 'antd';
-import { ContractListProps } from './contract-list.types';
 import axios from 'axios';
+import dayjs from 'dayjs';
 import { BASE_URL } from '../../config/config';
 import { Action, ApiEntity } from '../../config/enum';
 import Table from 'antd/es/table';
@@ -29,6 +29,12 @@ interface DataType {
 	createdAt?: string;
 	createdBy?: string;
 }
+export interface ContractListProps {
+	apiKey?: string;
+	clientKey?: string;
+	userKey?: string;
+	isModal?: boolean;
+}
 
 export const ContractList: FC<ContractListProps> = ({
 	apiKey,
@@ -43,7 +49,7 @@ export const ContractList: FC<ContractListProps> = ({
 	) {
 		throw new Error('Missing Publishable Key');
 	}
-	const { setParam } = useSaveParams();
+	const { setParam, getParam, clearParams } = useSaveParams();
 	const [currContractKey, setCurrContractKey] = useState('');
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
@@ -58,8 +64,10 @@ export const ContractList: FC<ContractListProps> = ({
 
 	const chooseContract = (text: string) => {
 		// debugger;
+		clearParams();
 		setCurrContractKey(text);
 		setParam('contractKey', text);
+		console.log('contractKey 1', text);
 		if (isModal) {
 			setContractModal(true);
 			setParam('openModal', true);
@@ -73,7 +81,7 @@ export const ContractList: FC<ContractListProps> = ({
 				<Button
 					type='link'
 					onClick={() => {
-						debugger;
+						// debugger;
 						chooseContract(record.key ? record.key : '');
 					}}
 				>
@@ -102,10 +110,10 @@ export const ContractList: FC<ContractListProps> = ({
 			title: 'Created at',
 			dataIndex: 'createdAt',
 		},
-		{
-			title: 'Created by',
-			dataIndex: 'createdBy',
-		},
+		// {
+		// 	title: 'Created by',
+		// 	dataIndex: 'createdBy',
+		// },
 	];
 
 	useEffect(() => {
@@ -156,9 +164,11 @@ export const ContractList: FC<ContractListProps> = ({
 									key: contract.contractKey,
 									name: contract.name ? contract.name : 'Empty name',
 									status: contract.status,
-									createdAt: contract.createTime
-										? contract.createTime.toString()
-										: new Date().toString(),
+									createdAt: dayjs(
+										contract.createTime
+											? contract.createTime.toString()
+											: new Date().toString()
+									).format('YYYY-MM-DD HH:mm:ss'),
 								};
 							}
 						);
@@ -177,6 +187,7 @@ export const ContractList: FC<ContractListProps> = ({
 		};
 	}, [refreshContracts]);
 
+	console.log('contractKey 2', currContractKey);
 	return (
 		<ContractListContext.Provider
 			value={{
@@ -200,9 +211,9 @@ export const ContractList: FC<ContractListProps> = ({
 				<Spin spinning={spinLoad} fullscreen />
 			) : (
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-					<Card style={{overflow: 'auto'}}>
+					<Card style={{ overflow: 'auto' }}>
 						<Table
-							style={{minWidth: 600}}
+							style={{ minWidth: 600 }}
 							columns={columns}
 							dataSource={data}
 							title={() => (

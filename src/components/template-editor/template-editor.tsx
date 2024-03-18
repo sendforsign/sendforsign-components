@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import './template-editor.css';
 import { Card, Col, Row, Space, Spin, Typography } from 'antd';
-import { TemplateEditorProps } from './template-editor.types';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
 import { Action, ApiEntity } from '../../config/enum';
@@ -12,8 +11,12 @@ import { ChooseTemplateType } from './choose-template-type/choose-template-type'
 import { Placeholder, Template } from '../../config/types';
 import { PdfViewer } from './pdf-viewer/pdf-viewer';
 import { PlaceholderBlock } from './placeholder-block/placeholder-block';
-import Quill from 'quill';
-
+export interface TemplateEditorProps {
+	apiKey?: string;
+	clientKey?: string;
+	userKey?: string;
+	templateKey?: string;
+}
 export const TemplateEditor: FC<TemplateEditorProps> = ({
 	apiKey,
 	templateKey,
@@ -52,7 +55,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const [spinLoad, setSpinLoad] = useState(false);
 	const templateKeyRef = useRef(templateKey);
 	const { Title, Text } = Typography;
-	const quillRef = useRef<Quill>();
+	const quillRef = useRef<any>();
 	useEffect(() => {
 		setCurrApiKey(apiKey);
 	}, [apiKey]);
@@ -63,7 +66,10 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 		setCurrUserKey(userKey);
 	}, [userKey]);
 	useEffect(() => {
+		let isMounted = true;
 		clearArrayBuffer();
+		setPlaceholder([]);
+
 		if (currApiKey) {
 			setSpinLoad(false);
 			templateKeyRef.current = templateKey;
@@ -102,8 +108,9 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 							responseType: 'json',
 						})
 						.then((payload: any) => {
-							//console.log('getTemplate read', payload);
-							templateTmp = payload.data.template;
+							if (isMounted) {
+								templateTmp = payload.data.template;
+							}
 						});
 					if (templateTmp.isPdf) {
 						await axios
@@ -136,8 +143,12 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 		} else {
 			setSpinLoad(true);
 		}
+		return () => {
+			isMounted = false;
+		};
 	}, [templateKey]);
 	useEffect(() => {
+		let isMounted = true;
 		const handleContinue = async () => {
 			// setLoadEditor(true);
 			let body = {
@@ -170,7 +181,9 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					//console.log('TEMPLATE editor read', payload);
+					if (isMounted) {
+						console.log('TEMPLATE', isMounted, payload);
+					}
 					setCurrTemplateKey(payload.data.template.templateKey);
 					templateTmp = payload.data.template;
 					setIsNew(false);
@@ -201,6 +214,9 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 			setCreateTemplate(false);
 			handleContinue();
 		}
+		return () => {
+			isMounted = false;
+		};
 	}, [createTemplate]);
 
 	return (

@@ -20,4 +20,6 @@ Primary.args = {
 	clientKey: '',
 	userKey: '',
 	contractKey: '',
+	pdf: false,
+	сanReDraft: false,
 };

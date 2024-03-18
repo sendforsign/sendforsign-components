@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Spin } from 'antd';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
+import './pdf-block.css';
 import PDFMerger from 'pdf-merger-js/browser';
 import { pdf } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
@@ -38,9 +37,10 @@ export const PdfBlock = () => {
 	const [pdfData, setPdfData] = useState<ArrayBuffer>();
 	const { getArrayBuffer, setArrayBuffer } = useSaveArrayBuffer();
 
-	const { width, ref } = useResizeDetector();
+	const { width } = useResizeDetector();
 	//console.log('PdfBlock');
 	useEffect(() => {
+		let isMounted = true;
 		const getSigns = async () => {
 			let url = `${BASE_URL}${ApiEntity.CONTRACT_SIGN}?contractKey=${contractKey}&clientKey=${clientKey}`;
 			await axios
@@ -53,13 +53,18 @@ export const PdfBlock = () => {
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					//console.log('getSigns read', payload);
-					setContractSigns(payload.data);
+					if (isMounted) {
+						setContractSigns(payload.data);
+					}
 				});
 		};
 		getSigns();
+		return () => {
+			isMounted = false;
+		};
 	}, [refreshSign]);
 	useEffect(() => {
+		let isMounted = true;
 		const render = async () => {
 			const pdfFile: any = await getArrayBuffer('pdfFileOriginal');
 			const pdfFileAB: ArrayBuffer = pdfFile as ArrayBuffer;
@@ -94,58 +99,68 @@ export const PdfBlock = () => {
 						responseType: 'json',
 					})
 					.then((payload: any) => {
-						//console.log('sign read', payload);
-						setSign('');
-						debugger;
-						setContinueLoad(false);
+						if (isMounted) {
+							setSign('');
+							debugger;
+							setContinueLoad(false);
+						}
 					});
 			}
 		};
 		if (contractSigns && contractSigns.length > 0) {
 			render();
 		}
+		return () => {
+			isMounted = false;
+		};
 	}, [contractSigns]);
 	useEffect(() => {
+		let isMounted = true;
 		const getValue = async () => {
 			const arrayBuffer: ArrayBuffer = (await getArrayBuffer(
 				'pdfFile'
 			)) as ArrayBuffer;
-			setPdfData(arrayBuffer);
-			setContinueLoad(false);
+			if (isMounted) {
+				setPdfData(arrayBuffer);
+				setContinueLoad(false);
+			}
 		};
 		getValue();
+		return () => {
+			isMounted = false;
+		};
 	}, [pdfFileLoad]);
 
 	return (
-		<div ref={ref}>
-			<Document
-				loading={<Spin spinning={continueLoad} />}
-				file={pdfData}
-				onLoadSuccess={({ numPages }) => {
-					setNumPages(numPages);
-				}}
-				onSourceError={() => {
-					//console.log('PdfViewer onSourceError');
-				}}
-				onLoadError={() => {
-					//console.log('PdfViewer onLoadError');
-				}}
-				onError={() => {
-					//console.log('PdfViewer error');
-				}}
-			>
-				{new Array(numPages).fill(0).map((_, i) => {
-					return (
-						<Page
-							key={i}
-							width={width}
-							height={width ? 1.4 * width : width}
-							pageNumber={i + 1}
-							scale={scale}
-						/>
-					);
-				})}
-			</Document>
-		</div>
+		// <div ref={ref}>
+		<Document
+			loading={<Spin spinning={continueLoad} />}
+			file={pdfData}
+			onLoadSuccess={({ numPages }) => {
+				setNumPages(numPages);
+			}}
+			onSourceError={() => {
+				//console.log('PdfViewer onSourceError');
+			}}
+			onLoadError={() => {
+				//console.log('PdfViewer onLoadError');
+			}}
+			onError={() => {
+				//console.log('PdfViewer error');
+			}}
+		>
+			{new Array(numPages).fill(0).map((_, i) => {
+				return (
+					<Page
+						key={i}
+						width={width}
+						height={width ? 1.4 * width : width}
+						pageNumber={i + 1}
+						scale={scale}
+					/>
+				);
+			})}
+		</Document>
+		// </div>
 	);
 };

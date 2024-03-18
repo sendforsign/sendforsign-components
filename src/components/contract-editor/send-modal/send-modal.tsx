@@ -68,6 +68,7 @@ export const SendModal = () => {
 	const { Title, Text } = Typography;
 
 	useEffect(() => {
+		let isMounted = true;
 		if (contractKey) {
 			const body = {
 				data: {
@@ -140,6 +141,9 @@ export const SendModal = () => {
 			};
 			getRecipients();
 		}
+		return () => {
+			isMounted = false;
+		};
 	}, [refreshRecipients]);
 	const handleSend = async () => {
 		if (
@@ -169,6 +173,7 @@ export const SendModal = () => {
 				})
 				.then((payload: any) => {
 					setSendLoad(false);
+					setNewRecipients(false);
 					handleCancel();
 					if (payload.data.result) {
 						setResultModal({ open: true, action: ContractAction.SEND });
@@ -451,29 +456,35 @@ export const SendModal = () => {
 									<Space>
 										<Spin spinning={false}>
 											<Tooltip title="Set what recipient needs to do with the document or lock so they can't open it.">
-												<Segmented
-													id={`Segmented${index}`}
-													value={recipient.action}
-													options={options}
-													onChange={(e: any) => handleClick(e, index)}
-												/>
+												<div>
+													<Segmented
+														id={`Segmented${index}`}
+														value={recipient.action}
+														options={options}
+														onChange={(e: any) => handleClick(e, index)}
+													/>
+												</div>
 											</Tooltip>
 										</Spin>
 										<Tooltip title='Set signing order.'>
-											<InputNumber
-												min={1}
-												max={10}
-												value={recipient.position}
-												onChange={(e: any) => handleChangePosition(e, index)}
-											/>
+											<div>
+												<InputNumber
+													min={1}
+													max={10}
+													value={recipient.position}
+													onChange={(e: any) => handleChangePosition(e, index)}
+												/>
+											</div>
 										</Tooltip>
 										{index !== 0 && (
 											<Tooltip title='Delete recipient.'>
-												<Button
-													type='text'
-													icon={<FontAwesomeIcon icon={faTrash} />}
-													onClick={() => handleDelete(index)}
-												/>
+												<div>
+													<Button
+														type='text'
+														icon={<FontAwesomeIcon icon={faTrash} />}
+														onClick={() => handleDelete(index)}
+													/>
+												</div>
 											</Tooltip>
 										)}
 									</Space>

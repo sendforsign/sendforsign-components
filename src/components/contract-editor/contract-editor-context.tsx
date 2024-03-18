@@ -66,6 +66,8 @@ export type TContractEditorContextType = {
 	setPdfDownload: (pdfDownload: boolean) => void;
 	apiKey: string | undefined;
 	setApiKey: (apiKey: string) => void;
+	beforeCreated: boolean;
+	setBeforeCreated: (beforeCreated: boolean) => void;
 };
 export const ContractEditorContext = createContext<
 	TContractEditorContextType | undefined

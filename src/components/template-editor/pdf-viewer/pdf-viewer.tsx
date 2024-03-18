@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import './pdf-viewer.css';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useResizeDetector } from 'react-resize-detector';
 import { Spin } from 'antd';
@@ -16,13 +17,19 @@ export const PdfViewer = () => {
 	const { width, ref } = useResizeDetector();
 
 	useEffect(() => {
+		let isMounted = true;
 		const getValue = async () => {
 			const arrayBuffer: ArrayBuffer = (await getArrayBuffer(
 				'pdfFileTemplate'
 			)) as ArrayBuffer;
-			setPdfData(arrayBuffer);
+			if (isMounted) {
+				setPdfData(arrayBuffer);
+			}
 		};
 		getValue();
+		return () => {
+			isMounted = false;
+		};
 	}, [pdfFileLoad]);
 	return (
 		<div ref={ref}>

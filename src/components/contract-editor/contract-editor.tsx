@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
-import './contract-editor.css';
+// import './contract-editor.css';
 import { Card, Col, Row, Space, Spin, Typography } from 'antd';
-import { ContractEditorProps } from './contract-editor.types';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
 import {
@@ -23,16 +22,24 @@ import { Notification } from './notification/notification';
 import { DocumentTimilineBlock } from './document-timeline-block/document-timeline-block';
 import { ChooseContractType } from './choose-contract-type/choose-contract-type';
 import { ShareLinkBlock } from './share-link-block/share-link-block';
-import Quill from 'quill';
 import { PlaceholderBlock } from './placeholder-block/placeholder-block';
 //env.config();
+export interface ContractEditorProps {
+	apiKey?: string;
+	clientKey?: string;
+	userKey?: string;
+	contractKey?: string;
+	pdf?: boolean;
+	сanReDraft?: boolean;
+}
 
 export const ContractEditor: FC<ContractEditorProps> = ({
 	apiKey = '',
 	contractKey = '',
 	clientKey = '',
 	userKey = '',
-	id,
+	pdf = false,
+	сanReDraft = false,
 }) => {
 	if (
 		!apiKey &&
@@ -43,6 +50,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	}
 	const { setArrayBuffer, getArrayBuffer, clearArrayBuffer } =
 		useSaveArrayBuffer();
+	const [beforeCreated, setBeforeCreated] = useState(сanReDraft);
 	const [signModal, setSignModal] = useState(false);
 	const [sendModal, setSendModal] = useState(false);
 	const [approveModal, setApproveModal] = useState(false);
@@ -82,7 +90,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [signCount, setSignCount] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
 	const [notification, setNotification] = useState({});
-	const quillRef = useRef<Quill>();
+	const quillRef = useRef<any>();
 	const contractKeyRef = useRef(contractKey);
 	const { Title, Text } = Typography;
 	//console.log('contractKey', contractKey, currClientKey);
@@ -97,10 +105,18 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		setCurrUserKey(userKey);
 	}, [userKey]);
 	useEffect(() => {
+		let isMounted = true;
 		async function getContract() {
-			let contractTmp: { contractType?: number; value?: string } = {
+			let contractTmp: {
+				contractType?: number;
+				value?: string;
+				name?: string;
+				// preCreated?: boolean;
+			} = {
 				contractType: 0,
 				value: '',
+				name: '',
+				// preCreated: false,
 			};
 			let body = {
 				data: {
@@ -113,40 +129,59 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				},
 			};
 			const url: string = BASE_URL + ApiEntity.CONTRACT || '';
-
-			const result = await axios.post(url, body, {
-				headers: {
-					Accept: 'application/vnd.api+json',
-					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': currApiKey ? currApiKey : '', //process.env.SENDFORSIGN_API_KEY,
-				},
-				responseType: 'json',
-			});
-			contractTmp = result.data.contract;
-			if (
-				contractTmp &&
-				contractTmp.contractType &&
-				contractTmp.contractType.toString() === ContractType.PDF.toString()
-			) {
-				const response = await axios.get(contractTmp.value as string, {
-					responseType: 'arraybuffer',
+			await axios
+				.post(url, body, {
+					headers: {
+						Accept: 'application/vnd.api+json',
+						'Content-Type': 'application/vnd.api+json',
+						'x-sendforsign-key': currApiKey ? currApiKey : '', //process.env.SENDFORSIGN_API_KEY,
+					},
+					responseType: 'json',
+				})
+				.then((result) => {
+					if (isMounted) {
+						contractTmp = result.data.contract;
+					}
 				});
-				// .then(async function (response) {
-				setIsPdf(true);
-				await setArrayBuffer('pdfFile', response.data);
-				await setArrayBuffer('pdfFileOriginal', response.data);
-				setPdfDownload(true);
-				// setPdfData(response.data);
-				setPdfFileLoad(pdfFileLoad + 1);
+			if (beforeCreated) {
+				setContractName(contractTmp.name ? contractTmp.name : '');
+				setContractType(
+					contractTmp.contractType ? contractTmp.contractType.toString() : ''
+				);
+				// setContractValue(contractTmp.value ? contractTmp.value : '<div></div>');
+				setReadonly(false);
 				setContinueLoad(false);
-				// });
 			} else {
-				// debugger;
-				setContractValue(contractTmp.value ? contractTmp.value : '<div></div>');
-				setContinueLoad(false);
+				if (
+					contractTmp &&
+					contractTmp.contractType &&
+					contractTmp.contractType.toString() === ContractType.PDF.toString()
+				) {
+					const response = await axios.get(contractTmp.value as string, {
+						responseType: 'arraybuffer',
+					});
+					// .then(async function (response) {
+					setIsPdf(true);
+					await setArrayBuffer('pdfFile', response.data);
+					await setArrayBuffer('pdfFileOriginal', response.data);
+					setPdfDownload(true);
+					// setPdfData(response.data);
+					setPdfFileLoad(pdfFileLoad + 1);
+					setContinueLoad(false);
+					// });
+				} else {
+					// debugger;
+					setContractValue(
+						contractTmp.value ? contractTmp.value : '<div></div>'
+					);
+					setContinueLoad(false);
+				}
 			}
 		}
 		if (currApiKey) {
+			setContractSign({});
+			setSigns([]);
+			setPlaceholder([]);
 			setSpinLoad(false);
 			clearArrayBuffer();
 			setEditorVisible(false);
@@ -154,13 +189,17 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			contractKeyRef.current = contractKey;
 			setCurrContractKey(contractKey);
 			if (contractKeyRef.current) {
-				setIsNew(false);
-				setEditorVisible(true);
-				setRefreshEvent(refreshEvent + 1);
-				setRefreshShareLink(refreshShareLink + 1);
-				setRefreshSign(refreshSign + 1);
-
 				getContract().catch(console.error);
+				if (beforeCreated) {
+					setIsNew(false);
+					setPdfDownload(false);
+				} else {
+					setIsNew(false);
+					setEditorVisible(true);
+					setRefreshEvent(refreshEvent + 1);
+					setRefreshShareLink(refreshShareLink + 1);
+					setRefreshSign(refreshSign + 1);
+				}
 			} else {
 				setIsNew(true);
 				setPdfDownload(false);
@@ -173,24 +212,49 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		} else {
 			setSpinLoad(true);
 		}
+		return () => {
+			isMounted = false;
+		};
 	}, [contractKey]);
 
 	useEffect(() => {
+		// debugger;
+		// console.log('contractKey handleContinue', currContractKey);
+		let isMounted = true;
 		const handleContinue = async () => {
 			setContinueLoad(true);
-			let body: any = {
-				data: {
-					action: Action.CREATE,
-					clientKey: currClientKey ? currClientKey : '',
-					userKey: currUserKey ? currUserKey : '',
-					contract: {
-						name: contractName,
-						value: contractValue,
-						templateKey: templateKey,
-						contractType: contractType,
+			let body: any = {};
+			if (contractKeyRef.current && beforeCreated) {
+				body = {
+					data: {
+						action: Action.UPDATE,
+						clientKey: currClientKey ? currClientKey : '',
+						userKey: currUserKey ? currUserKey : '',
+						contract: {
+							contractKey: contractKeyRef.current,
+							name: contractName,
+							value: contractValue,
+							templateKey: templateKey,
+							contractType: templateKey ? '' : contractType,
+							// preCreated: true,
+						},
 					},
-				},
-			};
+				};
+			} else {
+				body = {
+					data: {
+						action: Action.CREATE,
+						clientKey: currClientKey ? currClientKey : '',
+						userKey: currUserKey ? currUserKey : '',
+						contract: {
+							name: contractName,
+							value: contractValue,
+							templateKey: templateKey,
+							contractType: contractType,
+						},
+					},
+				};
+			}
 			let contractKeyTmp: string = '';
 			const url: string = BASE_URL + ApiEntity.CONTRACT || '';
 
@@ -202,15 +266,22 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				},
 				responseType: 'json',
 			});
-			//console.log('editor read', response);
 			if (response) {
-				setCurrContractKey(response.data.contract.contractKey);
-				contractKeyTmp = response.data.contract.contractKey;
+				if (!beforeCreated) {
+					setCurrContractKey(response.data.contract.contractKey);
+					contractKeyTmp = response.data.contract.contractKey;
+				} else {
+					setContractValue(response.data.contract.contractValue);
+				}
+
+				setPlaceholder([]);
 				setRefreshEvent(refreshEvent + 1);
 			}
 			if (contractType === ContractTypeText.PDF.toString() && !templateKey) {
 				const formData: FormData = new FormData();
-				const pdfFile: ArrayBuffer = await getArrayBuffer('pdfFile');
+				const pdfFile: ArrayBuffer = (await getArrayBuffer(
+					'pdfFile'
+				)) as ArrayBuffer;
 				const pdfFileBlob = new Blob([pdfFile as BlobPart], {
 					type: 'application/pdf',
 				});
@@ -230,14 +301,20 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			setEditorVisible(true);
 			setContinueDisable(true);
 			setIsNew(false);
+			setBeforeCreated(false);
 			setContinueLoad(false);
 			return response;
 		};
 		if (createContract) {
+			// console.log('contractKey handleContinue', currContractKey);
 			handleContinue().catch(console.error);
 			setCreateContract(false);
 		}
+		return () => {
+			isMounted = false;
+		};
 	}, [createContract]);
+	// console.log('contractKey currContractKey', currContractKey);
 
 	return (
 		<ContractEditorContext.Provider
@@ -306,19 +383,20 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setPdfDownload,
 				apiKey: currApiKey,
 				setApiKey: setCurrApiKey,
+				beforeCreated,
+				setBeforeCreated,
 			}}
 		>
 			{spinLoad ? (
 				<Spin spinning={spinLoad} fullscreen />
 			) : (
-				<Space
-					id={id}
-					direction='vertical'
-					size={16}
-					style={{ display: 'flex' }}
-				>
-					{isNew ? <ChooseContractType /> : <DocumentTimilineBlock />}
-					{!isNew && (
+				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
+					{isNew || beforeCreated ? (
+						<ChooseContractType pdf={pdf} />
+					) : (
+						<DocumentTimilineBlock />
+					)}
+					{!isNew && !beforeCreated && (
 						<>
 							{editorVisible && (
 								<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false}>

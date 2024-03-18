@@ -9,7 +9,6 @@ import { ApiEntity, ShareLinkView } from '../../../config/enum';
 import { useContractEditorContext } from '../contract-editor-context';
 import axios from 'axios';
 import { BASE_URL, SHARE_URL } from '../../../config/config';
-import env from 'dotenv';
 //env.config();
 
 type Props = {
@@ -96,45 +95,57 @@ export const ShareLinkLine = ({ controlLink, id, shareLink, view }: Props) => {
 		<Row gutter={8} align='middle'>
 			<Col flex={'auto'}>
 				<Tooltip title='Copy and share this link with recipients.'>
-					<Input
-						id={`shareLink${id}`}
-						value={shareLinkFull}
-						readOnly={true}
-						suffix={
-							<>
-								{id.toString() !== '1' && (
-									<Tooltip title='Delete link.'>
-										<Button
-											type='text'
-											size='small'
-											icon={<FontAwesomeIcon icon={faTrash} />}
-											onClick={handleDelete}
-											loading={deleteSpin}
-										/>
-									</Tooltip>
-								)}
-								<CopyToClipboard
-									text={shareLinkFull}
-									children={
-										<Tooltip title='Copy to clipboard.'>
-											<Button
-												type='text'
-												size='small'
-												icon={<FontAwesomeIcon icon={faCopy} />}
-												onClick={handleClick}
-											/>
+					<div>
+						<Input
+							id={`shareLink${id}`}
+							value={shareLinkFull}
+							readOnly={true}
+							suffix={
+								<>
+									{id.toString() !== '1' && (
+										<Tooltip title='Delete link.'>
+											<div>
+												<Button
+													type='text'
+													size='small'
+													icon={<FontAwesomeIcon icon={faTrash} />}
+													onClick={handleDelete}
+													loading={deleteSpin}
+												/>
+											</div>
 										</Tooltip>
-									}
-								/>
-							</>
-						}
-					/>
+									)}
+									<CopyToClipboard
+										text={shareLinkFull}
+										children={
+											<Tooltip title='Copy to clipboard.'>
+												<div>
+													<Button
+														type='text'
+														size='small'
+														icon={<FontAwesomeIcon icon={faCopy} />}
+														onClick={handleClick}
+													/>
+												</div>
+											</Tooltip>
+										}
+									/>
+								</>
+							}
+						/>
+					</div>
 				</Tooltip>
 			</Col>
 			<Col>
 				<Spin spinning={changeSpin}>
 					<Tooltip title='Set what others can do via the link or lock so no one can open it.'>
-						<Segmented options={options} value={view} onChange={handleChange} />
+						<div>
+							<Segmented
+								options={options}
+								value={view}
+								onChange={handleChange}
+							/>
+						</div>
 					</Tooltip>
 				</Spin>
 			</Col>

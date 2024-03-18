@@ -2,15 +2,17 @@ import localforage from 'localforage';
 
 export default function useSaveArrayBuffer() {
 	const getArrayBuffer = async (key: string) => {
-		let value: ArrayBuffer;
+		let value: ArrayBuffer | undefined;
 		await localforage.getItem<ArrayBuffer>(key).then((getItemValue) => {
-			value = getItemValue;
+			value = getItemValue as ArrayBuffer;
 		});
-		return value as ArrayBuffer;
+		return value;
 	};
 
 	const saveArrayBuffer = async (key: string, value: ArrayBuffer) => {
-		const valueTmp: ArrayBuffer = await localforage.getItem<ArrayBuffer>(key);
+		const valueTmp: ArrayBuffer = (await localforage.getItem<ArrayBuffer>(
+			key
+		)) as ArrayBuffer;
 		if (valueTmp) {
 			await localforage.removeItem(key);
 		}

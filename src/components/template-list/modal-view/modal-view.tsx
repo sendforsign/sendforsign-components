@@ -3,8 +3,10 @@ import React from 'react';
 import { Space, Modal } from 'antd';
 import { useTemplateListContext } from '../template-list-context';
 import { TemplateEditor } from '../../template-editor';
+import useSaveParams from '../../../hooks/use-save-params';
 
 export const ModalView = () => {
+	const { clearParams } = useSaveParams();
 	const {
 		apiKey,
 		templateKey,
@@ -20,13 +22,8 @@ export const ModalView = () => {
 		setTemplateKey('');
 		setRefreshTemplate(refreshTemplate + 1);
 		setTemplateModal(false);
+		clearParams();
 	};
-	//console.log(
-	// 	'templateKey, clientKey, userKey',
-	// 	templateKey,
-	// 	clientKey,
-	// 	userKey
-	// );
 	return (
 		<Modal
 			open={templateModal}

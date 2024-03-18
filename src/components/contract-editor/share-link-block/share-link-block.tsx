@@ -38,15 +38,6 @@ export const ShareLinkBlock = () => {
 		placeholderVisible,
 		setPlaceholderVisible,
 	} = useContractEditorContext();
-	// if (!process.env.SENDFORSIGN_API_KEY) {
-	// 	//console.log(
-	// 		'process.env.SENDFORSIGN_API_KEY',
-	// 		process.env.SENDFORSIGN_API_KEY
-	// 	);
-	// }
-	// const { setSignModal } = useContractEditorContext();
-
-	// const { setSignModal } = useContext(EditorContext) as TEditorContextType;
 
 	const [shareLinks, setShareLinks] = useState([]);
 	const [addBtnSpin, setAddBtnSpin] = useState(false);
@@ -59,6 +50,7 @@ export const ShareLinkBlock = () => {
 		setShareLinks([]);
 	}, []);
 	useEffect(() => {
+		let isMounted = true;
 		if (contractKey) {
 			const getShareLinks = async () => {
 				let url = `${BASE_URL}${ApiEntity.CONTRACT_SHARE_LINK}?contractKey=${contractKey}&clientKey=${clientKey}`;
@@ -72,12 +64,16 @@ export const ShareLinkBlock = () => {
 						responseType: 'json',
 					})
 					.then((payload: any) => {
-						//console.log('getShareLinks read', payload);
-						setShareLinks(payload.data);
+						if (isMounted) {
+							setShareLinks(payload.data);
+						}
 					});
 			};
 			getShareLinks();
 		}
+		return () => {
+			isMounted = false;
+		};
 	}, [contractKey, refreshShareLink]);
 
 	const handleAddShareLink = async () => {
@@ -191,60 +187,67 @@ export const ShareLinkBlock = () => {
 
 					<Space>
 						<Tooltip title='Share the document with recipients.'>
-							<Button
-								id='SendContract'
-								type='default'
-								icon={<FontAwesomeIcon icon={faPaperPlane} />}
-								onClick={handleSendClick}
-								// disabled={signDisable}
-								loading={sendSpin}
-							>
-								Send
-							</Button>
+							<div>
+								<Button
+									id='SendContract'
+									type='default'
+									icon={<FontAwesomeIcon icon={faPaperPlane} />}
+									onClick={handleSendClick}
+									// disabled={signDisable}
+									loading={sendSpin}
+								>
+									Send
+								</Button>
+							</div>
 						</Tooltip>
 						<Tooltip title='Sign the document from your side.'>
-							<Button
-								id='SignContract'
-								type='default'
-								icon={<FontAwesomeIcon icon={faSignature} />}
-								onClick={handleSignClick}
-								// disabled={signDisable}
-								loading={signSpin}
-							>
-								Sign
-							</Button>
+							<div>
+								<Button
+									id='SignContract'
+									type='default'
+									icon={<FontAwesomeIcon icon={faSignature} />}
+									onClick={handleSignClick}
+									loading={signSpin}
+								>
+									Sign
+								</Button>
+							</div>
 						</Tooltip>
 						<Tooltip title='Approve the document from your side.'>
-							<Button
-								id='ApproveContract'
-								type='default'
-								icon={<FontAwesomeIcon icon={faStamp} />}
-								onClick={handleApproveClick}
-								// disabled={approveDisable}
-								loading={approveSpin}
-								// disabled={disableSign}
-							>
-								Approve
-							</Button>
+							<div>
+								<Button
+									id='ApproveContract'
+									type='default'
+									icon={<FontAwesomeIcon icon={faStamp} />}
+									onClick={handleApproveClick}
+									loading={approveSpin}
+								>
+									Approve
+								</Button>
+							</div>
 						</Tooltip>
 						<Tooltip title='Manage reusable fields.'>
-							<Button
-								id='ManagePlaceholder'
-								type='default'
-								icon={<FontAwesomeIcon icon={faObjectUngroup} />}
-								onClick={() => {
-									setPlaceholderVisible(!placeholderVisible);
-								}}
-							>
-								Placeholders
-							</Button>
+							<div>
+								<Button
+									id='ManagePlaceholder'
+									type='default'
+									icon={<FontAwesomeIcon icon={faObjectUngroup} />}
+									onClick={() => {
+										setPlaceholderVisible(!placeholderVisible);
+									}}
+								>
+									Placeholders
+								</Button>
+							</div>
 						</Tooltip>
 						<Tooltip title='Add another link to this contract.'>
-							<Button
-								icon={<FontAwesomeIcon icon={faSquarePlus} />}
-								onClick={handleAddShareLink}
-								loading={addBtnSpin}
-							></Button>
+							<div>
+								<Button
+									icon={<FontAwesomeIcon icon={faSquarePlus} />}
+									onClick={handleAddShareLink}
+									loading={addBtnSpin}
+								></Button>
+							</div>
 						</Tooltip>
 					</Space>
 				</Space>

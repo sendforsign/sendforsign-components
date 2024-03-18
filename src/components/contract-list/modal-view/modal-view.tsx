@@ -3,9 +3,12 @@ import React, { FC } from 'react';
 import { Space, Modal } from 'antd';
 import { useContractListContext } from '../contract-list-context';
 import { ContractEditor } from '../../contract-editor';
-import { ModalViewProps } from './modal-view.types';
-
+import useSaveParams from '../../../hooks/use-save-params';
+export interface ModalViewProps {
+	id?: string;
+}
 export const ModalView: FC<ModalViewProps> = ({ id }) => {
+	const { clearParams } = useSaveParams();
 	const {
 		contractKey,
 		contractModal,
@@ -23,6 +26,7 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 		setContractKey('');
 		setContractModal(false);
 		setRefreshContracts(refreshContracts + 1);
+		clearParams();
 	};
 	return (
 		<Modal

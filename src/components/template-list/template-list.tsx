@@ -1,11 +1,10 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Typography, Tag, Card, Space, Row, Col, Button, Spin } from 'antd';
-import { TemplateListProps } from './template-list.types';
+import { Typography, Card, Space, Row, Col, Button, Spin } from 'antd';
 import axios from 'axios';
+import dayjs from 'dayjs';
 import { BASE_URL } from '../../config/config';
 import { Action, ApiEntity } from '../../config/enum';
 import Table, { ColumnsType } from 'antd/es/table';
-import { Content } from 'antd/es/layout/layout';
 import useSaveParams from '../../hooks/use-save-params';
 import { TemplateListContext } from './template-list-context';
 import { ModalView } from './modal-view/modal-view';
@@ -20,7 +19,12 @@ interface DataType {
 	changedAt?: string;
 	createdBy?: string;
 }
-
+export interface TemplateListProps {
+	apiKey?: string;
+	clientKey?: string;
+	userKey?: string;
+	isModal?: boolean;
+}
 export const TemplateList: FC<TemplateListProps> = ({
 	apiKey,
 	clientKey,
@@ -34,7 +38,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 	) {
 		throw new Error('Missing Publishable Key');
 	}
-	const { setParam, getParam } = useSaveParams();
+	const { setParam, getParam, clearParams } = useSaveParams();
 	const [currTemplateKey, setCurrTemplateKey] = useState('');
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
@@ -45,7 +49,8 @@ export const TemplateList: FC<TemplateListProps> = ({
 	const [data, setData] = useState<DataType[]>([]);
 	const { Title } = Typography;
 	const chooseTemplate = (text: string) => {
-		debugger;
+		// debugger;
+		clearParams();
 		setCurrTemplateKey(text);
 		setParam('templateKey', text);
 		if (isModal) {
@@ -105,6 +110,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 		setCurrApiKey(apiKey);
 	}, [apiKey]);
 	useEffect(() => {
+		let isMounted = true;
 		let body = {
 			data: {
 				action: Action.LIST,
@@ -123,24 +129,28 @@ export const TemplateList: FC<TemplateListProps> = ({
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					//console.log('editor list', payload);
-					let array: DataType[] = payload.data.templates.map(
-						(template: any) => {
-							return {
-								key: template.templateKey,
-								name: template.name ? template.name : 'Empty name',
-								// status: ['Draft'],
-								createdAt: template.createTime
-									? template.createTime.toString()
-									: new Date().toString(),
-								changedAt: template.changeTime
-									? template.changeTime.toString()
-									: new Date().toString(),
-							};
-						}
-					);
-					setData(array);
-					// setValue(payload.data.contract.value);
+					if (isMounted) {
+						let array: DataType[] = payload.data.templates.map(
+							(template: any) => {
+								return {
+									key: template.templateKey,
+									name: template.name ? template.name : 'Empty name',
+									// status: ['Draft'],
+									createdAt: dayjs(
+										template.createTime
+											? template.createTime.toString()
+											: new Date().toString()
+									).format('YYYY-MM-DD HH:mm:ss'),
+									changedAt: dayjs(
+										template.changeTime
+											? template.changeTime.toString()
+											: new Date().toString()
+									).format('YYYY-MM-DD HH:mm:ss'),
+								};
+							}
+						);
+						setData(array);
+					}
 				});
 		};
 		if (currApiKey) {
@@ -149,12 +159,14 @@ export const TemplateList: FC<TemplateListProps> = ({
 		} else {
 			setSpinLoad(true);
 		}
+		return () => {
+			isMounted = false;
+		};
 	}, [refreshTemplate]);
-	// useEffect(() => {
-	// 	if (!getParam('openModalTemplate')) {
-	// 		setTemplateModal(false);
-	// 	}
-	// }, [getParam('openModalTemplate')]);
+
+	// if (!currTemplateKey) {
+	// 	setCurrTemplateKey(getParam('templateKey'));
+	// }
 	return (
 		<TemplateListContext.Provider
 			value={{
@@ -176,9 +188,9 @@ export const TemplateList: FC<TemplateListProps> = ({
 				<Spin spinning={spinLoad} fullscreen />
 			) : (
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-					<Card style={{overflow: 'auto'}}>
+					<Card style={{ overflow: 'auto' }}>
 						<Table
-							style={{minWidth: 600}}
+							style={{ minWidth: 600 }}
 							columns={columns}
 							dataSource={data}
 							title={() => (

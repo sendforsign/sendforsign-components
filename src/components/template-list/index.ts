@@ -1,5 +1,6 @@
+export { ModalView } from './modal-view/modal-view';
+
 export { TemplateList } from './template-list';
-export type { TemplateListProps } from './template-list.types';
 export {
 	TemplateListContext,
 	useTemplateListContext,
