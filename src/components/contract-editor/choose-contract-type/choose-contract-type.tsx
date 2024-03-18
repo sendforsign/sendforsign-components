@@ -19,10 +19,10 @@ import { docx2html } from '../../../utils';
 import { Template } from '../../../config/types';
 
 type Props = {
-	pdf: boolean;
+	allowPdf: boolean;
 };
 
-export const ChooseContractType = ({ pdf }: Props) => {
+export const ChooseContractType = ({ allowPdf }: Props) => {
 	const {
 		apiKey,
 		continueDisable,
@@ -94,7 +94,7 @@ export const ChooseContractType = ({ pdf }: Props) => {
 							),
 							value: `template_${ContractTypeText.DOCX}`,
 						});
-						if (pdf) {
+						if (allowPdf) {
 							array.push({
 								label: (
 									<div

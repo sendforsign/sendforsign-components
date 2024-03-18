@@ -28,7 +28,7 @@ export interface TemplateListProps {
 export const TemplateList: FC<TemplateListProps> = ({
 	apiKey,
 	clientKey,
-	isModal,
+	isModal = true,
 	userKey,
 }) => {
 	if (

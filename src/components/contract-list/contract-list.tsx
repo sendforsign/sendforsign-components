@@ -39,7 +39,7 @@ export interface ContractListProps {
 export const ContractList: FC<ContractListProps> = ({
 	apiKey,
 	clientKey,
-	isModal,
+	isModal = true,
 	userKey,
 }) => {
 	if (

@@ -38,7 +38,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	contractKey = '',
 	clientKey = '',
 	userKey = '',
-	pdf = false,
+	pdf = true,
 	сanReDraft = false,
 }) => {
 	if (
@@ -393,7 +393,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			) : (
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 					{isNew || beforeCreated ? (
-						<ChooseContractType pdf={pdf} />
+						<ChooseContractType allowPdf={pdf} />
 					) : (
 						<DocumentTimilineBlock />
 					)}
