@@ -52,7 +52,7 @@ export const ChooseContractType = () => {
 	const [fieldBlockVisible, setFieldBlockVisible] = useState(false);
 	const [loadSegmented, setLoadSegmented] = useState(false);
 	const [segmentedValue, setSegmentedValue] = useState('');
-	const [btnName, setBtnName] = useState('Create contract');
+	const [btnName, setBtnName] = useState('Create document');
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
 	const { Title, Text } = Typography;
 	const { setArrayBuffer } = useSaveArrayBuffer();
@@ -309,7 +309,7 @@ export const ChooseContractType = () => {
 		) {
 			setBtnName('Upload file');
 		} else {
-			setBtnName('Create contract');
+			setBtnName('Create document');
 		}
 		if (contractTypeTmp[1]) {
 			setContractType(contractTypeTmp[1]);
