@@ -201,6 +201,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					setRefreshSign(refreshSign + 1);
 				}
 			} else {
+				setBeforeCreated(false);
 				setIsNew(true);
 				setPdfDownload(false);
 				setContractName('');
