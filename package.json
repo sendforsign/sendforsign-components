@@ -1,6 +1,6 @@
 {
 	"name": "sendforsign",
-	"version": "1.0.41",
+	"version": "1.0.43",
 	"description": "Sendforsign components",
 	"main": "/dist/index",
 	"typings": "dist/index",
@@ -11,7 +11,7 @@
 		"serve-storybook": "serve storybook-static",
 		"build-storybook": "storybook build",
 		"webpackdev": "cross-env NODE_ENV=production webpack",
-		"webpack": "cross-env NODE_ENV=production GENERATE_SOURCEMAP=false webpack && npm publish"
+		"webpack": "cross-env NODE_ENV=development GENERATE_SOURCEMAP=false webpack && npm publish"
 	},
 	"keywords": [
 		"sendforsign"

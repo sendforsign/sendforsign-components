@@ -21,5 +21,5 @@ Primary.args = {
 	userKey: '',
 	contractKey: '',
 	pdf: true,
-	сanReDraft: false,
+	canReDraft: false,
 };

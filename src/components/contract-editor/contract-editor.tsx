@@ -30,7 +30,7 @@ export interface ContractEditorProps {
 	userKey?: string;
 	contractKey?: string;
 	pdf?: boolean;
-	сanReDraft?: boolean;
+	canReDraft?: boolean;
 }
 
 export const ContractEditor: FC<ContractEditorProps> = ({
@@ -39,7 +39,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	clientKey = '',
 	userKey = '',
 	pdf = true,
-	сanReDraft = false,
+	canReDraft = false,
 }) => {
 	if (
 		!apiKey &&
@@ -50,7 +50,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	}
 	const { setArrayBuffer, getArrayBuffer, clearArrayBuffer } =
 		useSaveArrayBuffer();
-	const [beforeCreated, setBeforeCreated] = useState(сanReDraft);
+	const [beforeCreated, setBeforeCreated] = useState(canReDraft);
 	const [signModal, setSignModal] = useState(false);
 	const [sendModal, setSendModal] = useState(false);
 	const [approveModal, setApproveModal] = useState(false);
