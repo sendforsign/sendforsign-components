@@ -115,10 +115,15 @@ export const ContractList: FC<ContractListProps> = ({
 		// 	dataIndex: 'createdBy',
 		// },
 	];
-
 	useEffect(() => {
-		setCurrApiKey(apiKey);
+		setCurrApiKey(apiKey ? apiKey : process.env.REACT_APP_SENDFORSIGN_KEY);
 	}, [apiKey]);
+	useEffect(() => {
+		setCurrClientKey(clientKey);
+	}, [clientKey]);
+	useEffect(() => {
+		setCurrUserKey(userKey);
+	}, [userKey]);
 	useEffect(() => {
 		let isMounted = true;
 		let body = {

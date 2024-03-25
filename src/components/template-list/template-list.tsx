@@ -110,6 +110,12 @@ export const TemplateList: FC<TemplateListProps> = ({
 		setCurrApiKey(apiKey);
 	}, [apiKey]);
 	useEffect(() => {
+		setCurrClientKey(clientKey);
+	}, [clientKey]);
+	useEffect(() => {
+		setCurrUserKey(userKey);
+	}, [userKey]);
+	useEffect(() => {
 		let isMounted = true;
 		let body = {
 			data: {
