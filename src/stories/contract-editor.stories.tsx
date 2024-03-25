@@ -22,4 +22,6 @@ Primary.args = {
 	contractKey: '',
 	pdf: true,
 	canReDraft: false,
+	showTimeline: false,
+	showActionsBar: false,
 };

@@ -44,6 +44,7 @@ export const ShareLinkBlock = () => {
 	const [sendSpin, setSendSpin] = useState(false);
 	const [signSpin, setSignSpin] = useState(false);
 	const [approveSpin, setApproveSpin] = useState(false);
+	const [downloadPdfSpin, setDownloadPdfSpin] = useState(false);
 	const { Title, Text } = Typography;
 
 	useEffect(() => {
@@ -161,6 +162,33 @@ export const ShareLinkBlock = () => {
 		}
 		setApproveSpin(false);
 	};
+	const handleDownloadClick = async () => {
+		setDownloadPdfSpin(true);
+		let url = `${BASE_URL}${ApiEntity.DOWNLOAD_PDF}?contractKey=${contractKey}&clientKey=${clientKey}`;
+
+		await axios
+			.get(url, {
+				headers: {
+					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+				},
+				responseType: 'arraybuffer',
+			})
+			.then((payload) => {
+				debugger;
+				const content = new Blob([payload.data as ArrayBuffer], {
+					type: payload.headers['content-type'],
+				});
+
+				const encodedUri = window.URL.createObjectURL(content);
+				const link = document.createElement('a');
+
+				link.setAttribute('href', encodedUri);
+				link.setAttribute('download', 'attachment.pdf');
+
+				link.click();
+				setDownloadPdfSpin(false);
+			});
+	};
 	return (
 		<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 			<Card loading={continueLoad}>
@@ -237,6 +265,19 @@ export const ShareLinkBlock = () => {
 									}}
 								>
 									Placeholders
+								</Button>
+							</div>
+						</Tooltip>
+						<Tooltip title='Download pdf.'>
+							<div>
+								<Button
+									id='DownloadPdf'
+									type='default'
+									loading={downloadPdfSpin}
+									icon={<FontAwesomeIcon icon={faObjectUngroup} />}
+									onClick={handleDownloadClick}
+								>
+									Download PDF
 								</Button>
 							</div>
 						</Tooltip>

@@ -31,6 +31,8 @@ export interface ContractEditorProps {
 	contractKey?: string;
 	pdf?: boolean;
 	canReDraft?: boolean;
+	showTimeline?: boolean;
+	showActionsBar?: boolean;
 }
 
 export const ContractEditor: FC<ContractEditorProps> = ({
@@ -40,6 +42,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	userKey = '',
 	pdf = true,
 	canReDraft = false,
+	showTimeline = false,
+	showActionsBar = false,
 }) => {
 	if (
 		!apiKey &&
@@ -79,7 +83,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [createContract, setCreateContract] = useState(false);
 	const [readonly, setReadonly] = useState(false);
 	const [pdfDownload, setPdfDownload] = useState(false);
-	const [placeholderVisible, setPlaceholderVisible] = useState(false);
+	const [placeholderVisible, setPlaceholderVisible] = useState(true);
 	const [sign, setSign] = useState('');
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
 	const [refreshSign, setRefreshSign] = useState(0);
@@ -395,7 +399,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					{isNew || beforeCreated ? (
 						<ChooseContractType allowPdf={pdf} />
 					) : (
-						<DocumentTimilineBlock />
+						<>{showTimeline && <DocumentTimilineBlock />}</>
 					)}
 					{!isNew && !beforeCreated && (
 						<>
@@ -457,7 +461,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 									)}
 								</Row>
 							)}
-							<ShareLinkBlock />
+							{showActionsBar && <ShareLinkBlock />}
 						</>
 					)}
 				</Space>
