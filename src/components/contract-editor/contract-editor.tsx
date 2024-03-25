@@ -42,8 +42,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	userKey = '',
 	pdf = true,
 	canReDraft = false,
-	showTimeline = false,
-	showActionsBar = false,
+	showTimeline = true,
+	showActionsBar = true,
 }) => {
 	if (
 		!apiKey &&

@@ -6,6 +6,7 @@ import { useContractEditorContext } from '../contract-editor-context';
 import axios from 'axios';
 import { BASE_URL } from '../../../config/config';
 import {
+	faDownload,
 	faObjectUngroup,
 	faPaperPlane,
 	faPlane,
@@ -268,13 +269,13 @@ export const ShareLinkBlock = () => {
 								</Button>
 							</div>
 						</Tooltip>
-						<Tooltip title='Download pdf.'>
+						<Tooltip title='Download PDF.'>
 							<div>
 								<Button
 									id='DownloadPdf'
 									type='default'
 									loading={downloadPdfSpin}
-									icon={<FontAwesomeIcon icon={faObjectUngroup} />}
+									icon={<FontAwesomeIcon icon={faDownload} />}
 									onClick={handleDownloadClick}
 								>
 									Download PDF
