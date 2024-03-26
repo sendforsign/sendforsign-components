@@ -192,17 +192,17 @@ export const ShareLinkBlock = () => {
 	};
 	return (
 		<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-			<Card loading={continueLoad}>
-				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-					<Space direction='vertical' size={2} style={{ maxWidth: '600px' }}>
+			<Card loading={continueLoad} style={{backdropFilter: 'blur(5px)', background: 'rgba(255, 255, 255, 0.8)'}}>
+				<Space direction='vertical' size={16} style={{ display: 'flex'}}  align='center'>
+					{/* <Space direction='vertical' size={2} style={{ maxWidth: '600px' }}>
 						<Title level={4} style={{ margin: '0 0 0 0' }}>
 							Share, sign, approve, and more
 						</Title>
 						<Text type='secondary'>
 							See what's possible to do with your document.
 						</Text>
-					</Space>
-					{shareLinks &&
+					</Space> */}
+					{/* {shareLinks &&
 						shareLinks.map((shareLine: ContractShareLink) => {
 							return (
 								<ShareLinkLine
@@ -212,9 +212,9 @@ export const ShareLinkBlock = () => {
 									view={shareLine.view ? shareLine.view : ShareLinkView.SIGN}
 								/>
 							);
-						})}
+						})} */}
 
-					<Space>
+					<Space wrap>
 						<Tooltip title='Share the document with recipients.'>
 							<div>
 								<Button
@@ -282,7 +282,7 @@ export const ShareLinkBlock = () => {
 								</Button>
 							</div>
 						</Tooltip>
-						<Tooltip title='Add another link to this contract.'>
+						{/* <Tooltip title='Add another link to this contract.'>
 							<div>
 								<Button
 									icon={<FontAwesomeIcon icon={faSquarePlus} />}
@@ -290,7 +290,7 @@ export const ShareLinkBlock = () => {
 									loading={addBtnSpin}
 								></Button>
 							</div>
-						</Tooltip>
+						</Tooltip> */}
 					</Space>
 				</Space>
 			</Card>

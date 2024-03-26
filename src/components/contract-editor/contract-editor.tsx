@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 // import './contract-editor.css';
-import { Card, Col, Row, Space, Spin, Typography } from 'antd';
+import { Card, Col, Row, Space, Spin, Typography, Anchor } from 'antd';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
 import {
@@ -404,7 +404,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					{!isNew && !beforeCreated && (
 						<>
 							{editorVisible && (
-								<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false}>
+								<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false} >
 									<Col flex='auto'>
 										<Space direction='vertical' style={{ display: 'flex' }}>
 											<Card loading={continueLoad}>
@@ -451,7 +451,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 													display: 'flex',
 													top: 10,
 													position: 'sticky',
-													maxHeight: '90vh',
+													maxHeight: '80vh',
 													overflow: 'auto',
 												}}
 											>
@@ -461,7 +461,9 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 									)}
 								</Row>
 							)}
+							<div id='contractActionsFooter'>
 							{showActionsBar && <ShareLinkBlock />}
+							</div>
 						</>
 					)}
 				</Space>
