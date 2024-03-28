@@ -624,6 +624,7 @@
 .ql-bubble .ql-tooltip {
 	position: absolute;
 	transform: translateY(10px);
+	z-index: 1;
 }
 .ql-bubble .ql-tooltip a {
 	cursor: pointer;
