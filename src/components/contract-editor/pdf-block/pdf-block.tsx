@@ -37,7 +37,7 @@ export const PdfBlock = () => {
 	const [pdfData, setPdfData] = useState<ArrayBuffer>();
 	const { getArrayBuffer, setArrayBuffer } = useSaveArrayBuffer();
 
-	const { width } = useResizeDetector();
+	const { width, ref } = useResizeDetector();
 	//console.log('PdfBlock');
 	useEffect(() => {
 		let isMounted = true;
@@ -132,7 +132,7 @@ export const PdfBlock = () => {
 	}, [pdfFileLoad]);
 
 	return (
-		// <div ref={ref}>
+		<div ref={ref}>
 		<Document
 			loading={<Spin spinning={continueLoad} />}
 			file={pdfData}
@@ -161,6 +161,6 @@ export const PdfBlock = () => {
 				);
 			})}
 		</Document>
-		// </div>
+		</div>
 	);
 };

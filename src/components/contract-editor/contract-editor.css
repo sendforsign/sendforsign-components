@@ -88,5 +88,6 @@ table.quill-better-table td {
 .ant-space-item:has(> #contractActionsFooter) {
 	bottom: 8px;
 	position: sticky;
+	z-index: 1000;
   }
   

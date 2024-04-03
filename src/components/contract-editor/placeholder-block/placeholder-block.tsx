@@ -21,7 +21,7 @@ import { Action, ApiEntity, PlaceholderTypeText } from '../../../config/enum';
 import axios from 'axios';
 import { Placeholder } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLeftLong } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faLeftLong, faUser } from '@fortawesome/free-solid-svg-icons';
 
 type Props = {
 	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
@@ -411,7 +411,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 													options={[
 														{
 															value: PlaceholderTypeText.INTERNAL,
-															icon: <FontAwesomeIcon icon={faUser} size='xs' />,
+															icon: <FontAwesomeIcon icon={faHouseUser} size='xs' />,
 														},
 														{
 															value: PlaceholderTypeText.EXTERNAL,

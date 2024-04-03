@@ -403,7 +403,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 													options={[
 														{
 															value: PlaceholderTypeText.INTERNAL,
-															icon: <FontAwesomeIcon icon={faUser} size='xs' />,
+															icon: <FontAwesomeIcon icon={faHouseUser} size='xs' />,
 														},
 														{
 															value: PlaceholderTypeText.EXTERNAL,

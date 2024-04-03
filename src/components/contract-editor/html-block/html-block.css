@@ -621,6 +621,7 @@
 .ql-bubble .ql-out-top {
 	visibility: hidden;
 }
+
 .ql-bubble .ql-tooltip {
 	position: absolute;
 	transform: translateY(10px);

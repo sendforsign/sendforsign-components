@@ -219,13 +219,13 @@ export const ShareLinkBlock = () => {
 							<div>
 								<Button
 									id='SendContract'
-									type='default'
+									type='primary'
 									icon={<FontAwesomeIcon icon={faPaperPlane} />}
 									onClick={handleSendClick}
 									// disabled={signDisable}
 									loading={sendSpin}
 								>
-									Send
+									Recipients
 								</Button>
 							</div>
 						</Tooltip>
