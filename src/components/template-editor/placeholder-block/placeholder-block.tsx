@@ -311,7 +311,10 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		changeValue(index);
 	};
 	return (
-		<Card loading={placeholderLoad || continueLoad}>
+		<Card
+			loading={placeholderLoad || continueLoad}
+			key={`PlaceholderBlock${templateKey}`}
+		>
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 				<Space direction='vertical' size={2}>
 					<Title level={4} style={{ margin: '0 0 0 0' }}>

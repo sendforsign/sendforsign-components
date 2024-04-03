@@ -1,8 +1,10 @@
 const path = require('path');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 module.exports = (args) => {
     return {
+        // plugins: [new BundleAnalyzerPlugin()],
         mode: isDevelopment ? 'development' : 'production',
         entry: './src/index.ts',
         devtool: 'eval-source-map',

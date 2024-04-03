@@ -60,3 +60,10 @@ export const enum PlaceholderTypeText {
 	INTERNAL = 'internal',
 	EXTERNAL = 'external',
 }
+export const enum EventStatus {
+	'SIGNED' = 5,
+	'APPROVED' = 4,
+	'SEEN' = 3,
+	'SENT' = 2,
+	'CREATED' = 1,
+}

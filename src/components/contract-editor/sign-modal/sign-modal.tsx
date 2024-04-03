@@ -31,6 +31,7 @@ export const SignModal = () => {
 		setContractSign,
 		setRefreshEvent,
 		apiKey,
+		ipInfo,
 	} = useContractEditorContext();
 	const [signLoad, setSignLoad] = useState(false);
 	const [fullName, setFullName] = useState('');
@@ -39,8 +40,10 @@ export const SignModal = () => {
 	const { Title, Text } = Typography;
 	const padRef = useRef<any>(null);
 
+	// console.log('contractKey 10');
 	const handleOk = async () => {
 		if (fullName && email) {
+			debugger;
 			setSignLoad(true);
 			let canvas: any = padRef?.current?.toDataURL();
 			const body = {
@@ -50,6 +53,7 @@ export const SignModal = () => {
 				email: email,
 				owner: false,
 				base64: canvas,
+				ipInfo: ipInfo,
 			};
 			await axios
 				.post(BASE_URL + ApiEntity.CONTRACT_SIGN, body, {
@@ -142,7 +146,7 @@ export const SignModal = () => {
 				direction='vertical'
 				style={{ display: 'flex', margin: '32px 0 0 0' }}
 			>
-				<Card>
+				<Card key={`SignModal${contractKey}`}>
 					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 						<Space direction='vertical' size={2}>
 							<Title level={5} style={{ margin: '0 0 0 0' }}>

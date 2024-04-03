@@ -157,6 +157,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					}
 				});
 		};
+		// console.log('contractKey 6');
 		getTemplates();
 		return () => {
 			isMounted = false;

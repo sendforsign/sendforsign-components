@@ -75,6 +75,9 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 							table: addTable,
 						},
 					},
+					clipboard: {
+						matchVisual: false,
+					},
 					table: false, // disable table module
 					'better-table': {
 						operationMenu: {

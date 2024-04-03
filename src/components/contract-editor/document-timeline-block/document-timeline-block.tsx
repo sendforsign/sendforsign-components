@@ -17,8 +17,14 @@ import { BASE_URL } from '../../../config/config';
 import { EventStatus } from '../../../config/types';
 
 export const DocumentTimilineBlock = () => {
-	const { apiKey, contractKey, clientKey, refreshEvent, continueLoad } =
-		useContractEditorContext();
+	const {
+		apiKey,
+		contractKey,
+		clientKey,
+		refreshEvent,
+		continueLoad,
+		setContractEvents,
+	} = useContractEditorContext();
 	const [timelines, setTimelines] = useState<TimelineItemProps[]>([]);
 	const { Title, Text } = Typography;
 
@@ -55,6 +61,7 @@ export const DocumentTimilineBlock = () => {
 					//console.log('getEventStatus read', payload);
 
 					if (isMounted) {
+						setContractEvents(payload.data);
 						const timelinesTmp: TimelineItemProps[] = payload.data.map(
 							(contractEventData: {
 								status: { toString: () => string | undefined };

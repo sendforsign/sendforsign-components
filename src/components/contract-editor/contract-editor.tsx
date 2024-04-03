@@ -23,7 +23,7 @@ import { DocumentTimilineBlock } from './document-timeline-block/document-timeli
 import { ChooseContractType } from './choose-contract-type/choose-contract-type';
 import { ShareLinkBlock } from './share-link-block/share-link-block';
 import { PlaceholderBlock } from './placeholder-block/placeholder-block';
-//env.config();
+
 export interface ContractEditorProps {
 	apiKey?: string;
 	clientKey?: string;
@@ -94,10 +94,12 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [signCount, setSignCount] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
 	const [notification, setNotification] = useState({});
+	const [ipInfo, setIpInfo] = useState('');
+	const [contractEvents, setContractEvents] = useState<Array<any>>([]);
 	const quillRef = useRef<any>();
 	const contractKeyRef = useRef(contractKey);
 	const { Title, Text } = Typography;
-	//console.log('contractKey', contractKey, currClientKey);
+	console.log('contractKey ContractEditor', contractKey, currClientKey);
 
 	useEffect(() => {
 		setCurrApiKey(apiKey ? apiKey : process.env.REACT_APP_SENDFORSIGN_KEY);
@@ -111,6 +113,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	useEffect(() => {
 		let isMounted = true;
 		async function getContract() {
+			// console.log('contractKey 4', currContractKey);
 			let contractTmp: {
 				contractType?: number;
 				value?: string;
@@ -183,6 +186,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			}
 		}
 		if (currApiKey) {
+			console.log('contractKey ContractEditor 1');
+
 			setContractSign({});
 			setSigns([]);
 			setPlaceholder([]);
@@ -192,6 +197,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			setContinueLoad(true);
 			contractKeyRef.current = contractKey;
 			setCurrContractKey(contractKey);
+			console.log('contractKey ContractEditor 4', contractKeyRef.current);
+
 			if (contractKeyRef.current) {
 				getContract().catch(console.error);
 				if (beforeCreated) {
@@ -213,8 +220,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setContractValue('<div></div>');
 				setReadonly(false);
 				setContinueLoad(false);
+				console.log('contractKey ContractEditor 3');
 			}
 		} else {
+			console.log('contractKey ContractEditor 2');
 			setSpinLoad(true);
 		}
 		return () => {
@@ -390,6 +399,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setApiKey: setCurrApiKey,
 				beforeCreated,
 				setBeforeCreated,
+				ipInfo,
+				setIpInfo,
+				contractEvents,
+				setContractEvents,
 			}}
 		>
 			{spinLoad ? (
@@ -404,7 +417,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					{!isNew && !beforeCreated && (
 						<>
 							{editorVisible && (
-								<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false} >
+								<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false}>
 									<Col flex='auto'>
 										<Space direction='vertical' style={{ display: 'flex' }}>
 											<Card loading={continueLoad}>
@@ -462,7 +475,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 								</Row>
 							)}
 							<div id='contractActionsFooter'>
-							{showActionsBar && <ShareLinkBlock />}
+								{showActionsBar && <ShareLinkBlock />}
 							</div>
 						</>
 					)}

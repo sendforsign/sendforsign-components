@@ -38,6 +38,7 @@ export const ShareLinkBlock = () => {
 		setRefreshSign,
 		placeholderVisible,
 		setPlaceholderVisible,
+		setIpInfo,
 	} = useContractEditorContext();
 
 	const [shareLinks, setShareLinks] = useState([]);
@@ -53,6 +54,7 @@ export const ShareLinkBlock = () => {
 	}, []);
 	useEffect(() => {
 		let isMounted = true;
+		// console.log('contractKey 7');
 		if (contractKey) {
 			const getShareLinks = async () => {
 				let url = `${BASE_URL}${ApiEntity.CONTRACT_SHARE_LINK}?contractKey=${contractKey}&clientKey=${clientKey}`;
@@ -77,7 +79,15 @@ export const ShareLinkBlock = () => {
 			isMounted = false;
 		};
 	}, [contractKey, refreshShareLink]);
-
+	const getSignIPInfo = async () => {
+		await axios
+			.get('https://ipapi.co/json', {
+				responseType: 'json',
+			})
+			.then((payload: any) => {
+				setIpInfo(JSON.stringify(payload.data));
+			});
+	};
 	const handleAddShareLink = async () => {
 		setAddBtnSpin(true);
 		const body = {
@@ -140,6 +150,7 @@ export const ShareLinkBlock = () => {
 		setSendSpin(false);
 	};
 	const handleSignClick = async () => {
+		getSignIPInfo();
 		setSignSpin(true);
 		const changed = await checkChangeContract();
 		if (changed) {
@@ -192,8 +203,19 @@ export const ShareLinkBlock = () => {
 	};
 	return (
 		<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-			<Card loading={continueLoad} style={{backdropFilter: 'blur(5px)', background: 'rgba(255, 255, 255, 0.8)'}}>
-				<Space direction='vertical' size={16} style={{ display: 'flex'}}  align='center'>
+			<Card
+				loading={continueLoad}
+				style={{
+					backdropFilter: 'blur(5px)',
+					background: 'rgba(255, 255, 255, 0.8)',
+				}}
+			>
+				<Space
+					direction='vertical'
+					size={16}
+					style={{ display: 'flex' }}
+					align='center'
+				>
 					{/* <Space direction='vertical' size={2} style={{ maxWidth: '600px' }}>
 						<Title level={4} style={{ margin: '0 0 0 0' }}>
 							Share, sign, approve, and more

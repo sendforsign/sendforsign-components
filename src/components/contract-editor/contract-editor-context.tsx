@@ -68,6 +68,10 @@ export type TContractEditorContextType = {
 	setApiKey: (apiKey: string) => void;
 	beforeCreated: boolean;
 	setBeforeCreated: (beforeCreated: boolean) => void;
+	ipInfo: string;
+	setIpInfo: (ipInfo: string) => void;
+	contractEvents: Array<any>;
+	setContractEvents: (contractEvents: Array<any>) => void;
 };
 export const ContractEditorContext = createContext<
 	TContractEditorContextType | undefined
