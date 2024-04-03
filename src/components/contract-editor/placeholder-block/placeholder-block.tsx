@@ -399,7 +399,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 																value={holder.name}
 																onChange={(e: any) => handleChange(e, index)}
 																onBlur={(e: any) => handleBlur(e, index)}
-															/>{' '}
+															/>
 														</div>
 													</Popover>
 												</div>
