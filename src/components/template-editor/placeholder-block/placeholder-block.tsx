@@ -325,9 +325,8 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				{placeholder &&
 					placeholder.map((holder, index) => {
 						return (
-							<div draggable id={holder.placeholderKey}>
+							<div draggable key={holder.placeholderKey}>
 								<Space
-									id={holder.placeholderKey}
 									direction='vertical'
 									size={2}
 									style={{ display: 'flex' }}
