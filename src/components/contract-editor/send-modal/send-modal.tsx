@@ -1,85 +1,85 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
-  Space,
-  Card,
-  Typography,
-  Button,
-  Input,
-  Modal,
-  Tooltip,
-  Spin,
-  Segmented,
-  InputNumber,
-  Row,
-  Col,
-  Switch,
-} from "antd";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+	Space,
+	Card,
+	Typography,
+	Button,
+	Input,
+	Modal,
+	Tooltip,
+	Spin,
+	Segmented,
+	InputNumber,
+	Row,
+	Col,
+	Switch,
+} from 'antd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faCheck,
-  faHouseUser,
-  faLink,
-  faLock,
-  faPaperPlane,
-  faSign,
-  faSignature,
-  faStamp,
-  faTrash,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
-import { useContractEditorContext } from "../contract-editor-context";
+	faCheck,
+	faHouseUser,
+	faLink,
+	faLock,
+	faPaperPlane,
+	faSign,
+	faSignature,
+	faStamp,
+	faTrash,
+	faUser,
+} from '@fortawesome/free-solid-svg-icons';
+import { useContractEditorContext } from '../contract-editor-context';
 import {
-  Action,
-  ApiEntity,
-  ContractAction,
-  ShareLinkViewText,
-} from "../../../config/enum";
-import axios from "axios";
-import { BASE_URL } from "../../../config/config";
-import { Recipient } from "../../../config/types";
+	Action,
+	ApiEntity,
+	ContractAction,
+	ShareLinkViewText,
+} from '../../../config/enum';
+import axios from 'axios';
+import { BASE_URL } from '../../../config/config';
+import { Recipient } from '../../../config/types';
 
 export const SendModal = () => {
-  const {
-    apiKey,
-    sendModal,
-    setSendModal,
-    contractKey,
-    clientKey,
-    userKey,
-    refreshEvent,
-    refreshRecipients,
-    setRefreshEvent,
-    setResultModal,
-  } = useContractEditorContext();
-  const [sendLoad, setSendLoad] = useState(false);
-  const [dataLoad, setDataLoad] = useState(false);
-  const [changeRecipient, setChangeRecipient] = useState<Recipient[]>([]);
-  const [insertRecipient, setInsertRecipient] = useState<Recipient[]>([]);
-  const [deleteRecipient, setDeleteRecipient] = useState<Recipient[]>([]);
-  const [id, setId] = useState(0);
-  const [newRecipients, setNewRecipients] = useState(true);
-  const [recipientInit, setRecipientInit] = useState(false);
-  const [recipients, setRecipients] = useState<Recipient[]>([
-    {
-      id: 0,
-      fullname: "",
-      email: "",
-      customMessage: "",
-      position: 1,
-      action: ShareLinkViewText.SIGN,
-      recipientKey: "",
-    },
-  ]);
-  const options = [
-    { label: "Sign", value: ShareLinkViewText.SIGN },
-    { label: "Approve", value: ShareLinkViewText.APPROVE },
-    { label: "View", value: ShareLinkViewText.VIEW },
-    {
-      value: ShareLinkViewText.LOCK,
-      icon: <FontAwesomeIcon icon={faLock} />,
-    },
-  ];
-  const { Title, Text } = Typography;
+	const {
+		apiKey,
+		sendModal,
+		setSendModal,
+		contractKey,
+		clientKey,
+		userKey,
+		refreshEvent,
+		refreshRecipients,
+		setRefreshEvent,
+		setResultModal,
+	} = useContractEditorContext();
+	const [sendLoad, setSendLoad] = useState(false);
+	const [dataLoad, setDataLoad] = useState(false);
+	const [changeRecipient, setChangeRecipient] = useState<Recipient[]>([]);
+	const [insertRecipient, setInsertRecipient] = useState<Recipient[]>([]);
+	const [deleteRecipient, setDeleteRecipient] = useState<Recipient[]>([]);
+	const [id, setId] = useState(0);
+	const [newRecipients, setNewRecipients] = useState(true);
+	const [recipientInit, setRecipientInit] = useState(false);
+	const [recipients, setRecipients] = useState<Recipient[]>([
+		{
+			id: 0,
+			fullname: '',
+			email: '',
+			customMessage: '',
+			position: 1,
+			action: ShareLinkViewText.SIGN,
+			recipientKey: '',
+		},
+	]);
+	const options = [
+		{ label: 'Sign', value: ShareLinkViewText.SIGN },
+		{ label: 'Approve', value: ShareLinkViewText.APPROVE },
+		{ label: 'View', value: ShareLinkViewText.VIEW },
+		{
+			value: ShareLinkViewText.LOCK,
+			icon: <FontAwesomeIcon icon={faLock} />,
+		},
+	];
+	const { Title, Text } = Typography;
 
 	// console.log('contractKey 8');
 	useEffect(() => {
@@ -92,7 +92,7 @@ export const SendModal = () => {
 					userKey: userKey,
 					contractKey: contractKey,
 				},
-			}; 
+			};
 			setDataLoad(true);
 			const getRecipients = async () => {
 				setChangeRecipient([]);
@@ -436,7 +436,10 @@ export const SendModal = () => {
 					recipients.length > 0 &&
 					recipients.map((recipient, index) => {
 						return (
-							<Card loading={dataLoad} key={`SendModal${contractKey}`}>
+							<Card
+								loading={dataLoad}
+								key={`SendModal${recipient.recipientKey}`}
+							>
 								<Space
 									direction='vertical'
 									size={16}

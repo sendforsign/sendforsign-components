@@ -6,13 +6,13 @@ export default function useSaveParams() {
 		if (valueString) {
 			value = JSON.parse(valueString);
 		}
-		console.log('getParam', value);
+		// console.log('getParam', value);
 		return value;
 	};
 
 	// const [param, setParam] = useState(getParam(''));
 	const setParam = (name: string, value: any) => {
-		console.log('setParam', value);
+		// console.log('setParam', value);
 		if (name && value) {
 			localStorage.setItem(name, JSON.stringify(value));
 		}

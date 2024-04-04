@@ -99,7 +99,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const quillRef = useRef<any>();
 	const contractKeyRef = useRef(contractKey);
 	const { Title, Text } = Typography;
-	console.log('contractKey ContractEditor', contractKey, currClientKey);
+	// console.log('contractKey ContractEditor', contractKey, currClientKey);
 
 	useEffect(() => {
 		setCurrApiKey(apiKey ? apiKey : process.env.REACT_APP_SENDFORSIGN_KEY);
@@ -186,7 +186,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			}
 		}
 		if (currApiKey) {
-			console.log('contractKey ContractEditor 1');
+			// console.log('contractKey ContractEditor 1');
 
 			setContractSign({});
 			setSigns([]);
@@ -197,7 +197,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			setContinueLoad(true);
 			contractKeyRef.current = contractKey;
 			setCurrContractKey(contractKey);
-			console.log('contractKey ContractEditor 4', contractKeyRef.current);
+			// console.log('contractKey ContractEditor 4', contractKeyRef.current);
 
 			if (contractKeyRef.current) {
 				getContract().catch(console.error);
@@ -220,10 +220,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setContractValue('<div></div>');
 				setReadonly(false);
 				setContinueLoad(false);
-				console.log('contractKey ContractEditor 3');
+				// console.log('contractKey ContractEditor 3');
 			}
 		} else {
-			console.log('contractKey ContractEditor 2');
+			// console.log('contractKey ContractEditor 2');
 			setSpinLoad(true);
 		}
 		return () => {

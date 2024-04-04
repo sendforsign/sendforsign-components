@@ -67,7 +67,7 @@ export const ContractList: FC<ContractListProps> = ({
 		clearParams();
 		setCurrContractKey(text);
 		setParam('contractKey', text);
-		console.log('contractKey 1', text);
+		// console.log('contractKey 1', text);
 		if (isModal) {
 			setContractModal(true);
 			setParam('openModal', true);
@@ -192,7 +192,7 @@ export const ContractList: FC<ContractListProps> = ({
 		};
 	}, [refreshContracts]);
 
-	console.log('contractKey 2', currContractKey);
+	// console.log('contractKey 2', currContractKey);
 	return (
 		<ContractListContext.Provider
 			value={{

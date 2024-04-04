@@ -11,13 +11,26 @@ module.exports = (args) => {
         output: {
             filename: 'index.js',
             path: path.resolve(__dirname, 'dist'),
-            libraryTarget: 'umd',
+            globalObject: 'this',
+            library: {
+                name: 'sendforsign',
+                type: 'umd',
+            },
             clean: true
         },
+        // optimization: {
+        //   runtimeChunk: true,
+        // },
         resolve: {
             extensions: [".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx", ".json", ".css"],
         },
         externals: {
+            lodash: {
+                commonjs: 'lodash',
+                commonjs2: 'lodash',
+                amd: 'lodash',
+                root: '_',
+            },
             react: 'react'
         },
         module: {
