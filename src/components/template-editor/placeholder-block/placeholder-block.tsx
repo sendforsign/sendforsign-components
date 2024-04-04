@@ -387,8 +387,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 															<Input
 																id='PlaceholderName'
 																placeholder='Enter placeholder name'
-																// bordered={false}
-																value={holder.name}
+																variant="borderless"																value={holder.name}
 																onChange={(e: any) => handleChange(e, index)}
 																onBlur={(e: any) => handleBlur(e, index)}
 															/>
