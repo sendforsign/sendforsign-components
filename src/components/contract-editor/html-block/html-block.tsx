@@ -147,9 +147,9 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			textTmp = textTmp + `<p>Email: ${contractSign.email}</p>`;
 			textTmp =
 				textTmp +
-				`<p>Timestamp: ${dayjs(contractSign.createTime).format(
-					'YYYY-MM-DD HH:mm:ss'
-				)} GMT</p>`;
+				`<p>Timestamp: ${dayjs(contractSign.createTime)
+					.utc()
+					.format('YYYY-MM-DD HH:mm:ss')} GMT</p>`;
 
 			handleChangeText(textTmp, false);
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(textTmp);

@@ -165,7 +165,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 	}, []);
 
 	const handleCreate = async () => {
-		// debugger;
+		debugger;
 		if (contractType && !templateKey) {
 			let input = null;
 			switch (contractType) {
@@ -187,8 +187,12 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 									(payload: any) => {
 										// debugger;
 										setContractValue(payload);
-										setFieldBlockVisible(true);
-										setCreateDisable(true);
+										if (beforeCreated && contractName) {
+											setCreateContract(true);
+										} else {
+											setFieldBlockVisible(true);
+											setCreateDisable(true);
+										}
 									}
 								);
 							}
@@ -220,18 +224,26 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 							await setArrayBuffer('pdfFileOriginal', arrayBuffer);
 							setPdfDownload(true);
 							setPdfFileLoad(pdfFileLoad + 1);
-							setFieldBlockVisible(true);
-							setCreateDisable(true);
+							if (beforeCreated && contractName) {
+								setCreateContract(true);
+							} else {
+								setFieldBlockVisible(true);
+								setCreateDisable(true);
+							}
 						};
 					};
 
 					input.click();
 					break;
 				case ContractTypeText.EMPTY.toString():
-					setFieldBlockVisible(true);
-					setCreateDisable(true);
-					// debugger;
 					setContractValue('<div></div>');
+					if (beforeCreated && contractName) {
+						setCreateContract(true);
+					} else {
+						setFieldBlockVisible(true);
+						setCreateDisable(true);
+					}
+					// debugger;
 					break;
 				default:
 					break;
@@ -285,13 +297,17 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 			} else {
 				// debugger;
 				setContractValue(template.value as string);
-				setFieldBlockVisible(true);
-				setCreateDisable(true);
+				if (beforeCreated && contractName) {
+					setCreateContract(true);
+				} else {
+					setFieldBlockVisible(true);
+					setCreateDisable(true);
+				}
 			}
 		}
-		if (beforeCreated && contractName) {
-			setContinueDisable(false);
-		}
+		// if (beforeCreated && contractName) {
+		// 	setContinueDisable(false);
+		// }
 	};
 	const handleContinue = () => {
 		setCreateContract(true);

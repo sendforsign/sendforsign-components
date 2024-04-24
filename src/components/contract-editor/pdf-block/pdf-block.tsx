@@ -67,8 +67,7 @@ export const PdfBlock = () => {
 		let isMounted = true;
 		const render = async () => {
 			const pdfFile: any = await getArrayBuffer('pdfFileOriginal');
-			const pdfFileAB: ArrayBuffer = pdfFile as ArrayBuffer;
-			//console.log('typeof', typeof pdfFileAB);
+			const pdfFileAB: ArrayBuffer = pdfFile as ArrayBuffer; 
 			const byteLength = pdfFileAB.byteLength;
 			if (!pdfFile || (pdfFile && byteLength === 0)) {
 				return;
@@ -77,9 +76,9 @@ export const PdfBlock = () => {
 			let arrayBuffer = pdfFile;
 			await merger.add(pdfFile);
 
-			debugger;
-			setSigns(contractSigns);
-			const blob = await pdf(<PdfSign />).toBlob();
+			debugger; 
+			// setSigns(contractSigns);
+			const blob = await pdf(<PdfSign signs={contractSigns} />).toBlob();
 			arrayBuffer = await blob.arrayBuffer();
 			await merger.add(arrayBuffer as ArrayBuffer);
 
@@ -133,34 +132,34 @@ export const PdfBlock = () => {
 
 	return (
 		<div ref={ref}>
-		<Document
-			loading={<Spin spinning={continueLoad} />}
-			file={pdfData}
-			onLoadSuccess={({ numPages }) => {
-				setNumPages(numPages);
-			}}
-			onSourceError={() => {
-				//console.log('PdfViewer onSourceError');
-			}}
-			onLoadError={() => {
-				//console.log('PdfViewer onLoadError');
-			}}
-			onError={() => {
-				//console.log('PdfViewer error');
-			}}
-		>
-			{new Array(numPages).fill(0).map((_, i) => {
-				return (
-					<Page
-						key={i}
-						width={width}
-						height={width ? 1.4 * width : width}
-						pageNumber={i + 1}
-						scale={scale}
-					/>
-				);
-			})}
-		</Document>
+			<Document
+				loading={<Spin spinning={continueLoad} />}
+				file={pdfData}
+				onLoadSuccess={({ numPages }) => {
+					setNumPages(numPages);
+				}}
+				onSourceError={() => {
+					//console.log('PdfViewer onSourceError');
+				}}
+				onLoadError={() => {
+					//console.log('PdfViewer onLoadError');
+				}}
+				onError={() => {
+					//console.log('PdfViewer error');
+				}}
+			>
+				{new Array(numPages).fill(0).map((_, i) => {
+					return (
+						<Page
+							key={i}
+							width={width}
+							height={width ? 1.4 * width : width}
+							pageNumber={i + 1}
+							scale={scale}
+						/>
+					);
+				})}
+			</Document>
 		</div>
 	);
 };
