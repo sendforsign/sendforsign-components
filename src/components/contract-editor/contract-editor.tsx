@@ -100,6 +100,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 
 	useEffect(() => {
 		setCurrToken(token);
+		setRefreshEvent(refreshEvent + 1);
 	}, [token]);
 	useEffect(() => {
 		setCurrApiKey(apiKey);

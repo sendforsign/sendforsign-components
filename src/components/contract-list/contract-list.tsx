@@ -112,6 +112,7 @@ export const ContractList: FC<ContractListProps> = ({
 	];
 	useEffect(() => {
 		setCurrToken(token);
+		setRefreshContracts(refreshContracts + 1);
 	}, [token]);
 	useEffect(() => {
 		setCurrApiKey(apiKey);

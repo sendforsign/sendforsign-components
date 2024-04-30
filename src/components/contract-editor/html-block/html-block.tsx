@@ -131,6 +131,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	useEffect(() => {
 		if (value && quillRef?.current) {
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(value);
+			debugger;
 			setRefreshPlaceholders(refreshPlaceholders + 1);
 		}
 	}, [value]);

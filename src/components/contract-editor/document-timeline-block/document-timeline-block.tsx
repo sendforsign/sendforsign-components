@@ -150,7 +150,7 @@ export const DocumentTimilineBlock = () => {
 					}
 				});
 		};
-		if (apiKey) {
+		if (apiKey || token) {
 			getContractEvents();
 		}
 		return () => {
