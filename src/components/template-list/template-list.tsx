@@ -22,27 +22,26 @@ interface DataType {
 export interface TemplateListProps {
 	apiKey?: string;
 	clientKey?: string;
+	token?: string;
 	userKey?: string;
 	isModal?: boolean;
 }
 export const TemplateList: FC<TemplateListProps> = ({
 	apiKey,
 	clientKey,
+	token,
 	isModal = true,
 	userKey,
 }) => {
-	if (
-		!apiKey &&
-		!process.env.REACT_APP_SENDFORSIGN_KEY &&
-		!window.location.href.includes('story')
-	) {
-		throw new Error('Missing Publishable Key');
+	if (!apiKey && !token && !window.location.href.includes('story')) {
+		throw new Error('Missing authority data');
 	}
 	const { setParam, getParam, clearParams } = useSaveParams();
 	const [currTemplateKey, setCurrTemplateKey] = useState('');
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
 	const [currApiKey, setCurrApiKey] = useState(apiKey);
+	const [currToken, setCurrToken] = useState(token);
 	const [templateModal, setTemplateModal] = useState(false);
 	const [refreshTemplate, setRefreshTemplate] = useState(0);
 	const [spinLoad, setSpinLoad] = useState(false);
@@ -107,6 +106,9 @@ export const TemplateList: FC<TemplateListProps> = ({
 	];
 
 	useEffect(() => {
+		setCurrToken(token);
+	}, [token]);
+	useEffect(() => {
 		setCurrApiKey(apiKey);
 	}, [apiKey]);
 	useEffect(() => {
@@ -130,7 +132,8 @@ export const TemplateList: FC<TemplateListProps> = ({
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': !currToken && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: currToken ? `Bearer ${currToken}` : undefined,
 					},
 					responseType: 'json',
 				})
@@ -159,7 +162,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 					}
 				});
 		};
-		if (currApiKey) {
+		if (currApiKey || currToken) {
 			setSpinLoad(false);
 			getTemplate();
 		} else {
@@ -170,9 +173,6 @@ export const TemplateList: FC<TemplateListProps> = ({
 		};
 	}, [refreshTemplate]);
 
-	// if (!currTemplateKey) {
-	// 	setCurrTemplateKey(getParam('templateKey'));
-	// }
 	return (
 		<TemplateListContext.Provider
 			value={{
@@ -188,6 +188,8 @@ export const TemplateList: FC<TemplateListProps> = ({
 				setRefreshTemplate,
 				apiKey: currApiKey,
 				setApiKey: setCurrApiKey,
+				token: currToken,
+				setToken: setCurrToken,
 			}}
 		>
 			{spinLoad ? (

@@ -27,6 +27,7 @@ import { PlaceholderBlock } from './placeholder-block/placeholder-block';
 export interface ContractEditorProps {
 	apiKey?: string;
 	clientKey?: string;
+	token?: string;
 	userKey?: string;
 	contractKey?: string;
 	pdf?: boolean;
@@ -37,20 +38,17 @@ export interface ContractEditorProps {
 
 export const ContractEditor: FC<ContractEditorProps> = ({
 	apiKey = '',
-	contractKey = '',
 	clientKey = '',
+	token = '',
+	contractKey = '',
 	userKey = '',
 	pdf = true,
 	canReDraft = false,
 	showTimeline = true,
 	showActionsBar = true,
 }) => {
-	if (
-		!apiKey &&
-		!process.env.REACT_APP_SENDFORSIGN_KEY &&
-		!window.location.href.includes('story')
-	) {
-		throw new Error('Missing Publishable Key');
+	if (!apiKey && !token && !window.location.href.includes('story')) {
+		throw new Error('Missing authority data');
 	}
 	const { setArrayBuffer, getArrayBuffer, clearArrayBuffer } =
 		useSaveArrayBuffer();
@@ -76,9 +74,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [currContractKey, setCurrContractKey] = useState(contractKey);
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
-	const [currApiKey, setCurrApiKey] = useState(
-		apiKey ? apiKey : process.env.REACT_APP_SENDFORSIGN_KEY
-	);
+	const [currApiKey, setCurrApiKey] = useState(apiKey);
+	const [currToken, setCurrToken] = useState(token);
 	const [continueLoad, setContinueLoad] = useState(false);
 	const [createContract, setCreateContract] = useState(false);
 	const [readonly, setReadonly] = useState(false);
@@ -102,7 +99,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	// console.log('contractKey ContractEditor', contractKey, currClientKey);
 
 	useEffect(() => {
-		setCurrApiKey(apiKey ? apiKey : process.env.REACT_APP_SENDFORSIGN_KEY);
+		setCurrToken(token);
+	}, [token]);
+	useEffect(() => {
+		setCurrApiKey(apiKey);
 	}, [apiKey]);
 	useEffect(() => {
 		setCurrClientKey(clientKey);
@@ -141,7 +141,9 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': currApiKey ? currApiKey : '', //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key':
+							!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: currToken ? `Bearer ${currToken}` : undefined,
 					},
 					responseType: 'json',
 				})
@@ -185,7 +187,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				}
 			}
 		}
-		if (currApiKey) {
+		debugger;
+		if (currApiKey || currToken) {
 			// console.log('contractKey ContractEditor 1');
 
 			setContractSign({});
@@ -276,7 +279,9 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': currApiKey ? currApiKey : '', //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key':
+						!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: currToken ? `Bearer ${currToken}` : undefined,
 				},
 				responseType: 'json',
 			});
@@ -301,13 +306,17 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				});
 				formData.append('pdf', pdfFileBlob);
 
-				const url = `${BASE_URL}${ApiEntity.UPLOAD_PDF}?contractKey=${
+				let url = `${BASE_URL}${ApiEntity.UPLOAD_PDF}?contractKey=${
 					contractKeyTmp ? contractKeyTmp : ''
-				}&clientKey=${currClientKey ? currClientKey : ''}`;
+				}`;
+				url =
+					!currToken && currApiKey ? `${url}&clientKey=${currClientKey}` : url;
 
 				const response = await axios.post(url, formData, {
 					headers: {
-						'x-sendforsign-key': currApiKey ? currApiKey : '',
+						'x-sendforsign-key':
+							!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: currToken ? `Bearer ${currToken}` : undefined,
 					},
 					responseType: 'json',
 				});
@@ -355,6 +364,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setClientKey: setCurrClientKey,
 				userKey: currUserKey,
 				setUserKey: setCurrUserKey,
+				token: currToken,
+				setToken: setCurrToken,
 				sign,
 				setSign,
 				signs,

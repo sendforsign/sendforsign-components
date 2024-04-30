@@ -14,21 +14,19 @@ import { PlaceholderBlock } from './placeholder-block/placeholder-block';
 export interface TemplateEditorProps {
 	apiKey?: string;
 	clientKey?: string;
+	token?: string;
 	userKey?: string;
 	templateKey?: string;
 }
 export const TemplateEditor: FC<TemplateEditorProps> = ({
 	apiKey,
 	templateKey,
+	token,
 	clientKey,
 	userKey,
 }) => {
-	if (
-		!apiKey &&
-		!process.env.REACT_APP_SENDFORSIGN_KEY &&
-		!window.location.href.includes('story')
-	) {
-		throw new Error('Missing Publishable Key');
+	if (!apiKey && !token && !window.location.href.includes('story')) {
+		throw new Error('Missing authority data');
 	}
 	const { getArrayBuffer, setArrayBuffer, clearArrayBuffer } =
 		useSaveArrayBuffer();
@@ -49,6 +47,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
 	const [currApiKey, setCurrApiKey] = useState(apiKey);
+	const [currToken, setCurrToken] = useState(token);
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
 	const [refreshPlaceholders, setRefreshPlaceholders] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
@@ -56,6 +55,10 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const templateKeyRef = useRef(templateKey);
 	const { Title, Text } = Typography;
 	const quillRef = useRef<any>();
+
+	useEffect(() => {
+		setCurrToken(token);
+	}, [token]);
 	useEffect(() => {
 		setCurrApiKey(apiKey);
 	}, [apiKey]);
@@ -70,7 +73,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 		clearArrayBuffer();
 		setPlaceholder([]);
 
-		if (currApiKey) {
+		if (currApiKey || currToken) {
 			setSpinLoad(false);
 			templateKeyRef.current = templateKey;
 			let body = {};
@@ -103,7 +106,8 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 							headers: {
 								Accept: 'application/vnd.api+json',
 								'Content-Type': 'application/vnd.api+json',
-								'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+								'x-sendforsign-key': !currToken && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+								Authorization: currToken ? `Bearer ${currToken}` : undefined,
 							},
 							responseType: 'json',
 						})
@@ -176,7 +180,8 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': !currToken && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: currToken ? `Bearer ${currToken}` : undefined,
 					},
 					responseType: 'json',
 				})
@@ -200,7 +205,8 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 				await axios
 					.post(url, formData, {
 						headers: {
-							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': !currToken && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+							Authorization: currToken ? `Bearer ${currToken}` : undefined,
 						},
 						responseType: 'json',
 					})
@@ -254,6 +260,8 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 				setPlaceholderVisible,
 				apiKey: currApiKey,
 				setApiKey: setCurrApiKey,
+				token: currToken,
+				setToken: setCurrToken,
 			}}
 		>
 			{spinLoad ? (

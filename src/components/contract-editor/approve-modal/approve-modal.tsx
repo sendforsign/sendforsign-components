@@ -5,10 +5,10 @@ import { useContractEditorContext } from '../contract-editor-context';
 import axios from 'axios';
 import { BASE_URL } from '../../../config/config';
 import { ApiEntity, ContractAction } from '../../../config/enum';
-import env from 'dotenv';
-//env.config();
-
-export const ApproveModal = () => {
+type Props = {
+	token?: string;
+};
+export const ApproveModal = ({ token }: Props) => {
 	const {
 		apiKey,
 		approveModal,
@@ -38,7 +38,8 @@ export const ApproveModal = () => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: token ? `Bearer ${token}` : undefined,
 				},
 				responseType: 'json',
 			})
@@ -77,7 +78,8 @@ export const ApproveModal = () => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: token ? `Bearer ${token}` : undefined,
 				},
 				responseType: 'json',
 			})

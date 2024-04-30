@@ -14,8 +14,6 @@ import { useContractEditorContext } from '../contract-editor-context';
 import { BASE_URL } from '../../../config/config';
 import { ApiEntity, ContractAction } from '../../../config/enum';
 import axios from 'axios';
-import env from 'dotenv';
-//env.config();
 
 export const SignModal = () => {
 	const {
@@ -31,6 +29,7 @@ export const SignModal = () => {
 		setContractSign,
 		setRefreshEvent,
 		apiKey,
+		token,
 		ipInfo,
 	} = useContractEditorContext();
 	const [signLoad, setSignLoad] = useState(false);
@@ -60,7 +59,8 @@ export const SignModal = () => {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: token ? `Bearer ${token}` : undefined,
 					},
 					responseType: 'json',
 				})

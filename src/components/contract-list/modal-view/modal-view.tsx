@@ -15,6 +15,7 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 		apiKey,
 		clientKey,
 		userKey,
+		token,
 		setContractKey,
 		setContractModal,
 		refreshContracts,
@@ -41,6 +42,7 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 				<ContractEditor
 					apiKey={apiKey}
 					clientKey={clientKey}
+					token={token}
 					userKey={userKey}
 					contractKey={contractKey}
 				/>

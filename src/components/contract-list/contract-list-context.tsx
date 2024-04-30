@@ -10,6 +10,8 @@ export type TContractListContextType = {
 	setClientKey: (clientKey: string) => void;
 	userKey: string | undefined;
 	setUserKey: (userKey: string) => void;
+	token: string | undefined;
+	setToken: (token: string) => void;
 	refreshContracts: number;
 	setRefreshContracts: (refreshContracts: number) => void;
 	needUpdate: boolean;

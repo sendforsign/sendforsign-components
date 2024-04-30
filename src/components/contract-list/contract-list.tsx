@@ -32,6 +32,7 @@ interface DataType {
 export interface ContractListProps {
 	apiKey?: string;
 	clientKey?: string;
+	token?: string;
 	userKey?: string;
 	isModal?: boolean;
 }
@@ -39,21 +40,19 @@ export interface ContractListProps {
 export const ContractList: FC<ContractListProps> = ({
 	apiKey,
 	clientKey,
+	token,
 	isModal = true,
 	userKey,
 }) => {
-	if (
-		!apiKey &&
-		!process.env.REACT_APP_SENDFORSIGN_KEY &&
-		!window.location.href.includes('story')
-	) {
-		throw new Error('Missing Publishable Key');
+	if (!apiKey && !token && !window.location.href.includes('story')) {
+		throw new Error('Missing authority data');
 	}
-	const { setParam, getParam, clearParams } = useSaveParams();
+	const { setParam, clearParams } = useSaveParams();
 	const [currContractKey, setCurrContractKey] = useState('');
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
 	const [currApiKey, setCurrApiKey] = useState(apiKey);
+	const [currToken, setCurrToken] = useState(token);
 	const [contractModal, setContractModal] = useState(false);
 	const [needUpdate, setNeedUpdate] = useState(false);
 	const [refreshContracts, setRefreshContracts] = useState(0);
@@ -110,13 +109,12 @@ export const ContractList: FC<ContractListProps> = ({
 			title: 'Created at',
 			dataIndex: 'createdAt',
 		},
-		// {
-		// 	title: 'Created by',
-		// 	dataIndex: 'createdBy',
-		// },
 	];
 	useEffect(() => {
-		setCurrApiKey(apiKey ? apiKey : process.env.REACT_APP_SENDFORSIGN_KEY);
+		setCurrToken(token);
+	}, [token]);
+	useEffect(() => {
+		setCurrApiKey(apiKey);
 	}, [apiKey]);
 	useEffect(() => {
 		setCurrClientKey(clientKey);
@@ -140,7 +138,8 @@ export const ContractList: FC<ContractListProps> = ({
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': !currToken && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: currToken ? `Bearer ${currToken}` : undefined,
 					},
 					responseType: 'json',
 				})
@@ -156,7 +155,8 @@ export const ContractList: FC<ContractListProps> = ({
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': !currToken && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: currToken ? `Bearer ${currToken}` : undefined,
 					},
 					responseType: 'json',
 				})
@@ -181,7 +181,7 @@ export const ContractList: FC<ContractListProps> = ({
 					}
 				});
 		};
-		if (currApiKey) {
+		if (currApiKey || currToken) {
 			setSpinLoad(false);
 			getContracts();
 		} else {
@@ -204,6 +204,8 @@ export const ContractList: FC<ContractListProps> = ({
 				setClientKey: setCurrClientKey,
 				userKey: currUserKey,
 				setUserKey: setCurrUserKey,
+				token: currToken,
+				setToken: setCurrToken,
 				refreshContracts,
 				setRefreshContracts,
 				needUpdate,

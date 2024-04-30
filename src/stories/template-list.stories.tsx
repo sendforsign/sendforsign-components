@@ -18,6 +18,7 @@ export const Primary: Story = (args) => (
 Primary.args = {
 	apiKey: '',
 	clientKey: '',
+	token: '',
 	userKey: '',
 	isModal: true,
 };

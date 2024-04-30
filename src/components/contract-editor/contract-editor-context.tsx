@@ -28,6 +28,8 @@ export type TContractEditorContextType = {
 	setClientKey: (clientKey: string) => void;
 	userKey: string | undefined;
 	setUserKey: (userKey: string) => void;
+	token: string | undefined;
+	setToken: (token: string) => void;
 	sign: string;
 	setSign: (sign: string) => void;
 	signs: ContractSign[];

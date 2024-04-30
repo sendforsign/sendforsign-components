@@ -29,6 +29,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	dayjs.extend(utc);
 	const {
 		apiKey,
+		token,
 		templateKey,
 		clientKey,
 		userKey,
@@ -140,7 +141,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: token ? `Bearer ${token}` : undefined,
 					},
 					responseType: 'json',
 				})

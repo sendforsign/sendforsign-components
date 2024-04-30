@@ -20,6 +20,7 @@ import { ContractShareLink } from '../../../config/types';
 export const ShareLinkBlock = () => {
 	const {
 		apiKey,
+		token,
 		contractKey,
 		clientKey,
 		userKey,
@@ -63,7 +64,8 @@ export const ShareLinkBlock = () => {
 						headers: {
 							Accept: 'application/vnd.api+json',
 							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+							Authorization: token ? `Bearer ${token}` : undefined,
 						},
 						responseType: 'json',
 					})
@@ -99,7 +101,8 @@ export const ShareLinkBlock = () => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: token ? `Bearer ${token}` : undefined,
 				},
 				responseType: 'json',
 			})
@@ -122,7 +125,8 @@ export const ShareLinkBlock = () => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: token ? `Bearer ${token}` : undefined,
 				},
 				responseType: 'json',
 			})
@@ -181,7 +185,8 @@ export const ShareLinkBlock = () => {
 		await axios
 			.get(url, {
 				headers: {
-					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: token ? `Bearer ${token}` : undefined,
 				},
 				responseType: 'blob',
 			})

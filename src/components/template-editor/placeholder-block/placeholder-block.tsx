@@ -32,6 +32,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		setPlaceholder,
 		refreshPlaceholders,
 		apiKey,
+		token,
 	} = useTemplateEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
@@ -55,7 +56,8 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: token ? `Bearer ${token}` : undefined,
 				},
 				responseType: 'json',
 			})
@@ -118,7 +120,8 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: token ? `Bearer ${token}` : undefined,
 				},
 				responseType: 'json',
 			})
@@ -164,7 +167,8 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: token ? `Bearer ${token}` : undefined,
 				},
 				responseType: 'json',
 			})
@@ -252,7 +256,8 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 						headers: {
 							Accept: 'application/vnd.api+json',
 							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+							Authorization: token ? `Bearer ${token}` : undefined,
 						},
 						responseType: 'json',
 					})
@@ -294,7 +299,8 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: token ? `Bearer ${token}` : undefined,
 				},
 				responseType: 'json',
 			})
@@ -387,7 +393,8 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 															<Input
 																id='PlaceholderName'
 																placeholder='Enter placeholder name'
-																variant="borderless"																value={holder.name}
+																variant='borderless'
+																value={holder.name}
 																onChange={(e: any) => handleChange(e, index)}
 																onBlur={(e: any) => handleBlur(e, index)}
 															/>

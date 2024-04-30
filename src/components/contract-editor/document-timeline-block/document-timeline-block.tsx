@@ -21,6 +21,7 @@ export const DocumentTimilineBlock = () => {
 		apiKey,
 		contractKey,
 		clientKey,
+		token,
 		refreshEvent,
 		continueLoad,
 		setContractEvents,
@@ -37,7 +38,8 @@ export const DocumentTimilineBlock = () => {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: token ? `Bearer ${token}` : undefined,
 					},
 					responseType: 'json',
 				})
@@ -53,7 +55,8 @@ export const DocumentTimilineBlock = () => {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: token ? `Bearer ${token}` : undefined,
 					},
 					responseType: 'json',
 				})

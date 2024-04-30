@@ -19,6 +19,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 export const PdfBlock = () => {
 	const {
 		apiKey,
+		token,
 		refreshSign,
 		sign,
 		setSign,
@@ -48,7 +49,8 @@ export const PdfBlock = () => {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: token ? `Bearer ${token}` : undefined,
 					},
 					responseType: 'json',
 				})
@@ -67,7 +69,7 @@ export const PdfBlock = () => {
 		let isMounted = true;
 		const render = async () => {
 			const pdfFile: any = await getArrayBuffer('pdfFileOriginal');
-			const pdfFileAB: ArrayBuffer = pdfFile as ArrayBuffer; 
+			const pdfFileAB: ArrayBuffer = pdfFile as ArrayBuffer;
 			const byteLength = pdfFileAB.byteLength;
 			if (!pdfFile || (pdfFile && byteLength === 0)) {
 				return;
@@ -76,7 +78,7 @@ export const PdfBlock = () => {
 			let arrayBuffer = pdfFile;
 			await merger.add(pdfFile);
 
-			debugger; 
+			debugger;
 			// setSigns(contractSigns);
 			const blob = await pdf(<PdfSign signs={contractSigns} />).toBlob();
 			arrayBuffer = await blob.arrayBuffer();

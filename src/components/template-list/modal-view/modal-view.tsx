@@ -9,6 +9,7 @@ export const ModalView = () => {
 	const { clearParams } = useSaveParams();
 	const {
 		apiKey,
+		token,
 		templateKey,
 		setTemplateKey,
 		clientKey,
@@ -37,6 +38,7 @@ export const ModalView = () => {
 				<TemplateEditor
 					apiKey={apiKey}
 					clientKey={clientKey}
+					token={token}
 					userKey={userKey}
 					templateKey={templateKey}
 				/>

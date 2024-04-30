@@ -29,6 +29,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 		setContinueDisable,
 		clientKey,
 		userKey,
+		token: currToken,
 		setIsPdf,
 		setCreateContract,
 		contractName,
@@ -68,7 +69,8 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': !currToken && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: currToken ? `Bearer ${currToken}` : undefined,
 					},
 					responseType: 'json',
 				})
@@ -270,7 +272,8 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': !currToken && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: currToken ? `Bearer ${currToken}` : undefined,
 					},
 					responseType: 'json',
 				})
