@@ -131,7 +131,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	useEffect(() => {
 		if (value && quillRef?.current) {
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(value);
-			debugger;
+			// debugger;
 			setRefreshPlaceholders(refreshPlaceholders + 1);
 		}
 	}, [value]);
@@ -203,7 +203,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			let contractValueTmp = '';
 			if (needCheck) {
 				body = {
-					clientKey: clientKey,
+					clientKey: !token ? clientKey : undefined,
 					userKey: userKey,
 					contractKey: contractKey,
 				};
@@ -227,7 +227,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				body = {
 					data: {
 						action: Action.UPDATE,
-						clientKey: clientKey,
+						clientKey: !token ? clientKey : undefined,
 						userKey: userKey,
 						contract: { contractKey: contractKey, value: content },
 					},
@@ -261,7 +261,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	);
 	const sendEmail = async () => {
 		let body = {
-			clientKey: clientKey,
+			clientKey: !token ? clientKey : undefined,
 			contractKey: contractKey,
 		};
 		await axios

@@ -86,7 +86,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 					body = {
 						data: {
 							action: Action.READ,
-							clientKey: clientKey,
+							clientKey: !token ? clientKey : undefined,
 							userKey: userKey,
 							template: {
 								templateKey: templateKeyRef.current,
@@ -158,7 +158,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 			let body = {
 				data: {
 					action: Action.CREATE,
-					clientKey: clientKey,
+					clientKey: !token ? clientKey : undefined,
 					userKey: userKey,
 					template: {
 						name: templateName,

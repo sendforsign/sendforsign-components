@@ -5,12 +5,11 @@ import { useContractEditorContext } from '../contract-editor-context';
 import axios from 'axios';
 import { BASE_URL } from '../../../config/config';
 import { ApiEntity, ContractAction } from '../../../config/enum';
-type Props = {
-	token?: string;
-};
-export const ApproveModal = ({ token }: Props) => {
+
+export const ApproveModal = () => {
 	const {
 		apiKey,
+		token,
 		approveModal,
 		setApproveModal,
 		contractKey,
@@ -28,7 +27,7 @@ export const ApproveModal = ({ token }: Props) => {
 	const handleOk = async () => {
 		setSpinLoad(true);
 		const body = {
-			clientKey: clientKey,
+			clientKey: !token ? clientKey : undefined,
 			contractKey: contractKey,
 			fullName: fullName,
 			email: email,
@@ -70,7 +69,7 @@ export const ApproveModal = ({ token }: Props) => {
 	};
 	const sendEmail = async () => {
 		let body = {
-			clientKey: clientKey,
+			clientKey: !token ? clientKey : undefined,
 			contractKey: contractKey,
 		};
 		await axios

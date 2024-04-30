@@ -131,7 +131,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			let body = {
 				data: {
 					action: Action.UPDATE,
-					clientKey: clientKey,
+					clientKey: !token ? clientKey : undefined,
 					userKey: userKey,
 					template: { templateKey: templateKey, value: content },
 				},

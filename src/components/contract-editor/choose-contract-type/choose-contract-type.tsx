@@ -60,7 +60,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 			let body = {
 				data: {
 					action: Action.LIST,
-					clientKey: clientKey,
+					clientKey: !token ? clientKey : undefined,
 					userKey: userKey,
 				},
 			};
@@ -254,7 +254,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 			let body = {
 				data: {
 					action: Action.READ,
-					clientKey: clientKey,
+					clientKey: !token ? clientKey : undefined,
 					userKey: userKey,
 					template: { templateKey },
 				},

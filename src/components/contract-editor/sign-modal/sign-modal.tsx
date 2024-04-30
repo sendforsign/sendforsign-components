@@ -46,7 +46,7 @@ export const SignModal = () => {
 			setSignLoad(true);
 			let canvas: any = padRef?.current?.toDataURL();
 			const body = {
-				clientKey: clientKey,
+				clientKey: !token ? clientKey : undefined,
 				contractKey: contractKey,
 				fullName: fullName,
 				email: email,

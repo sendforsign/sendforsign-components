@@ -122,7 +122,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 		let body = {
 			data: {
 				action: Action.LIST,
-				clientKey: clientKey,
+				clientKey: !token ? clientKey : undefined,
 				userKey: userKey,
 			},
 		};

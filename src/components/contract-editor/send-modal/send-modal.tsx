@@ -89,7 +89,7 @@ export const SendModal = () => {
 			const body = {
 				data: {
 					action: Action.LIST,
-					clientKey: clientKey,
+					clientKey: !token ? clientKey : undefined,
 					userKey: userKey,
 					contractKey: contractKey,
 				},
@@ -173,7 +173,7 @@ export const SendModal = () => {
 			const body = {
 				data: {
 					action: Action.SEND,
-					clientKey: clientKey,
+					clientKey: !token ? clientKey : undefined,
 					userKey: userKey,
 					contractKey: contractKey,
 					recipients: recipients,
@@ -184,7 +184,8 @@ export const SendModal = () => {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: token ? `Bearer ${token}` : undefined,
 					},
 					responseType: 'json',
 				})
@@ -264,7 +265,7 @@ export const SendModal = () => {
 					const body = {
 						data: {
 							action: Action.UPDATE,
-							clientKey: clientKey,
+							clientKey: !token ? clientKey : undefined,
 							userKey: userKey,
 							contractKey: contractKey,
 							recipient: {
@@ -279,7 +280,8 @@ export const SendModal = () => {
 							headers: {
 								Accept: 'application/vnd.api+json',
 								'Content-Type': 'application/vnd.api+json',
-								'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+								'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+								Authorization: token ? `Bearer ${token}` : undefined,
 							},
 							responseType: 'json',
 						})
@@ -292,7 +294,7 @@ export const SendModal = () => {
 				const body = {
 					data: {
 						action: Action.DELETE,
-						clientKey: clientKey,
+						clientKey: !token ? clientKey : undefined,
 						userKey: userKey,
 						contractKey: contractKey,
 						recipient: {
@@ -305,7 +307,8 @@ export const SendModal = () => {
 						headers: {
 							Accept: 'application/vnd.api+json',
 							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+							Authorization: token ? `Bearer ${token}` : undefined,
 						},
 						responseType: 'json',
 					})
@@ -321,7 +324,7 @@ export const SendModal = () => {
 					const body = {
 						data: {
 							action: Action.CREATE,
-							clientKey: clientKey,
+							clientKey: !token ? clientKey : undefined,
 							userKey: userKey,
 							contractKey: contractKey,
 							recipient: {
@@ -340,7 +343,8 @@ export const SendModal = () => {
 							headers: {
 								Accept: 'application/vnd.api+json',
 								'Content-Type': 'application/vnd.api+json',
-								'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+								'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+								Authorization: token ? `Bearer ${token}` : undefined,
 							},
 							responseType: 'json',
 						})

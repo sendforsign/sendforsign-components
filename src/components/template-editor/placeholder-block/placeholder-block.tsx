@@ -47,7 +47,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		const body = {
 			data: {
 				action: Action.LIST,
-				clientKey: clientKey,
+				clientKey: !token ? clientKey : undefined,
 				templateKey: templateKey,
 			},
 		};
@@ -106,7 +106,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		let body = {
 			data: {
 				action: Action.CREATE,
-				clientKey: clientKey,
+				clientKey: !token ? clientKey : undefined,
 				templateKey: templateKey,
 				placeholder: {
 					name: `Name${placeholdersTmp.length}`,
@@ -155,7 +155,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		let body = {
 			data: {
 				action: Action.DELETE,
-				clientKey: clientKey,
+				clientKey: !token ? clientKey : undefined,
 				templateKey: templateKey,
 				placeholder: {
 					placeholderKey: placeholdersTmp[index].placeholderKey,
@@ -243,7 +243,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				let body = {
 					data: {
 						action: Action.UPDATE,
-						clientKey: clientKey,
+						clientKey: !token ? clientKey : undefined,
 						templateKey: templateKey,
 						placeholder: {
 							placeholderKey: placeholdersTmp[index].placeholderKey,
@@ -286,7 +286,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		let body = {
 			data: {
 				action: Action.UPDATE,
-				clientKey: clientKey,
+				clientKey: !token ? clientKey : undefined,
 				templateKey: templateKey,
 				placeholder: {
 					placeholderKey: placeholdersTmp[index].placeholderKey,

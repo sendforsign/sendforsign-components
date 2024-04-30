@@ -129,7 +129,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			let body = {
 				data: {
 					action: Action.READ,
-					clientKey: currClientKey ? currClientKey : '',
+					clientKey: !token ? currClientKey : undefined,
 					userKey: currUserKey ? currUserKey : '',
 					contract: {
 						contractKey: contractKeyRef.current,
@@ -262,7 +262,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				body = {
 					data: {
 						action: Action.CREATE,
-						clientKey: currClientKey ? currClientKey : '',
+						clientKey: !token ? currClientKey : undefined,
 						userKey: currUserKey ? currUserKey : '',
 						contract: {
 							name: contractName,

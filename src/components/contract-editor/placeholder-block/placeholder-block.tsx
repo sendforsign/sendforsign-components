@@ -52,7 +52,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		const body = {
 			data: {
 				action: Action.LIST,
-				clientKey: clientKey,
+				clientKey: !token ? clientKey : undefined,
 				contractKey: contractKey,
 			},
 		};
@@ -90,7 +90,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		let isMounted = true;
 		if (
 			contractKey &&
-			clientKey &&
+			(clientKey || token) &&
 			(currPlaceholder !== refreshPlaceholders || placeholderVisible)
 		) {
 			setCurrPlaceholder(refreshPlaceholders);
@@ -113,7 +113,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		let body = {
 			data: {
 				action: Action.CREATE,
-				clientKey: clientKey,
+				clientKey: !token ? clientKey : undefined,
 				contractKey: contractKey,
 				placeholder: {
 					name: `Name${placeholdersTmp.length}`,
@@ -162,7 +162,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		let body = {
 			data: {
 				action: Action.DELETE,
-				clientKey: clientKey,
+				clientKey: !token ? clientKey : undefined,
 				contractKey: contractKey,
 				placeholder: {
 					placeholderKey: placeholdersTmp[index].placeholderKey,
@@ -250,7 +250,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				let body = {
 					data: {
 						action: Action.UPDATE,
-						clientKey: clientKey,
+						clientKey: !token ? clientKey : undefined,
 						contractKey: contractKey,
 						placeholder: {
 							placeholderKey: placeholdersTmp[index].placeholderKey,
@@ -293,7 +293,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		let body = {
 			data: {
 				action: Action.UPDATE,
-				clientKey: clientKey,
+				clientKey: !token ? clientKey : undefined,
 				contractKey: contractKey,
 				placeholder: {
 					placeholderKey: placeholdersTmp[index].placeholderKey,

@@ -95,7 +95,8 @@ export const PdfBlock = () => {
 				await axios
 					.post(url, formData, {
 						headers: {
-							'x-sendforsign-key': apiKey, //process.env.SENDFORSIGN_API_KEY,
+							'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+							Authorization: token ? `Bearer ${token}` : undefined,
 						},
 						responseType: 'json',
 					})

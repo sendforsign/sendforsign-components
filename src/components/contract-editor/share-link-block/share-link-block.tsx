@@ -93,7 +93,7 @@ export const ShareLinkBlock = () => {
 	const handleAddShareLink = async () => {
 		setAddBtnSpin(true);
 		const body = {
-			clientKey: clientKey,
+			clientKey: !token ? clientKey : undefined,
 			contractKey: contractKey,
 		};
 		await axios
@@ -115,7 +115,7 @@ export const ShareLinkBlock = () => {
 	const checkChangeContract = async () => {
 		let changed = false;
 		let body = {
-			clientKey: clientKey,
+			clientKey: !token ? clientKey : undefined,
 			userKey: userKey,
 			contractKey: contractKey,
 			signCount: signCount,

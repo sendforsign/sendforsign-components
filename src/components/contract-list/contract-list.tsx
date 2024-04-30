@@ -128,7 +128,7 @@ export const ContractList: FC<ContractListProps> = ({
 		let body = {
 			data: {
 				action: Action.LIST,
-				clientKey: clientKey,
+				clientKey: !token ? clientKey : undefined,
 				userKey: userKey,
 			},
 		};
