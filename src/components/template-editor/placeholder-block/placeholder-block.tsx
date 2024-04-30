@@ -83,7 +83,11 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 	};
 	useEffect(() => {
 		let isMounted = true;
-		if (templateKey && clientKey && currPlaceholder !== refreshPlaceholders) {
+		if (
+			templateKey &&
+			(clientKey || token) &&
+			currPlaceholder !== refreshPlaceholders
+		) {
 			setCurrPlaceholder(refreshPlaceholders);
 			if (isMounted) {
 				getPlaceholders();
