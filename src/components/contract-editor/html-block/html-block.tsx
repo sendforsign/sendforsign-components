@@ -155,7 +155,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 
 			handleChangeText(textTmp, false);
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(textTmp);
-			debugger;
+			// debugger;
 			setContinueLoad(false);
 			setSign('');
 			setContractSign({});

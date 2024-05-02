@@ -113,7 +113,7 @@ export const ChooseTemplateType = () => {
 							docx2html(
 								readerEvent?.target?.result as ArrayBuffer,
 								(payload: any) => {
-									debugger;
+									// debugger;
 									setTemplateValue(payload);
 									setFieldBlockVisible(true);
 									setCreateDisable(true);
@@ -140,7 +140,7 @@ export const ChooseTemplateType = () => {
 					let reader = new FileReader();
 					reader.readAsArrayBuffer(file);
 					reader.onload = async (readerEvent) => {
-						debugger;
+						// debugger;
 						setIsPdf(true);
 						const arrayBuffer = readerEvent?.target?.result as ArrayBuffer;
 						await setArrayBuffer('pdfFileTemplate', arrayBuffer);

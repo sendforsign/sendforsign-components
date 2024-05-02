@@ -188,7 +188,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				}
 			}
 		}
-		debugger;
+		// debugger;
 		if (currApiKey || currToken) {
 			// console.log('contractKey ContractEditor 1');
 

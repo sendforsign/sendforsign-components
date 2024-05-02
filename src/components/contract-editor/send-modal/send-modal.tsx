@@ -381,7 +381,7 @@ export const SendModal = () => {
 		setRecipients(recipientsTmp);
 	};
 	const handleInsert = () => {
-		debugger;
+		// debugger;
 		let recipientsTmp = [...recipients];
 		let idTmp = id + 1;
 		setId(idTmp);

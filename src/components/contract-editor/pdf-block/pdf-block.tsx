@@ -78,7 +78,7 @@ export const PdfBlock = () => {
 			let arrayBuffer = pdfFile;
 			await merger.add(pdfFile);
 
-			debugger;
+			// debugger;
 			// setSigns(contractSigns);
 			const blob = await pdf(<PdfSign signs={contractSigns} />).toBlob();
 			arrayBuffer = await blob.arrayBuffer();
@@ -103,7 +103,7 @@ export const PdfBlock = () => {
 					.then((payload: any) => {
 						if (isMounted) {
 							setSign('');
-							debugger;
+							// debugger;
 							setContinueLoad(false);
 						}
 					});

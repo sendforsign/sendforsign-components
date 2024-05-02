@@ -42,7 +42,7 @@ export const SignModal = () => {
 	// console.log('contractKey 10');
 	const handleOk = async () => {
 		if (fullName && email) {
-			debugger;
+			// debugger;
 			setSignLoad(true);
 			let canvas: any = padRef?.current?.toDataURL();
 			const body = {

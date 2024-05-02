@@ -167,7 +167,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 	}, []);
 
 	const handleCreate = async () => {
-		debugger;
+		// debugger;
 		if (contractType && !templateKey) {
 			let input = null;
 			switch (contractType) {

@@ -191,7 +191,7 @@ export const ShareLinkBlock = () => {
 				responseType: 'blob',
 			})
 			.then((payload) => {
-				debugger;
+				// debugger;
 				// const content = new Blob([payload.data as ArrayBuffer], {
 				// 	type: payload.headers['content-type'],
 				// });
