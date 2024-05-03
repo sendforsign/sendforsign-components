@@ -74,6 +74,8 @@ export type TContractEditorContextType = {
 	setIpInfo: (ipInfo: string) => void;
 	contractEvents: Array<any>;
 	setContractEvents: (contractEvents: Array<any>) => void;
+	fillPlaceholder: boolean;
+	setFillPlaceholder: (fillPlaceholder: boolean) => void;
 };
 export const ContractEditorContext = createContext<
 	TContractEditorContextType | undefined

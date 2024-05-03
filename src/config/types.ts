@@ -170,4 +170,6 @@ export type Placeholder = {
 	value?: string;
 	type?: string;
 	placeholderKey?: string;
+	fillingType?: number;
+	externalRecipientKey?: string;
 };

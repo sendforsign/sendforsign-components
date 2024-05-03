@@ -9,15 +9,23 @@ import {
 	Tooltip,
 	Col,
 	Popover,
+	Radio,
+	Divider,
 } from 'antd';
 import QuillNamespace from 'quill';
 import { BASE_URL } from '../../../config/config';
-import { Action, ApiEntity, PlaceholderTypeText } from '../../../config/enum';
+import {
+	Action,
+	ApiEntity,
+	PlaceholderFill,
+	PlaceholderTypeText,
+} from '../../../config/enum';
 import axios from 'axios';
 import { Placeholder } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGlobe, faLeftLong, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faLeftLong } from '@fortawesome/free-solid-svg-icons';
 import { useTemplateEditorContext } from '../template-editor-context';
+import { SettingFilled } from '@ant-design/icons';
 
 type Props = {
 	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
@@ -81,6 +89,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				}
 			});
 	};
+
 	useEffect(() => {
 		let isMounted = true;
 		if (
@@ -104,6 +113,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 			name: `Name${placeholdersTmp.length}`,
 			value: '',
 			type: PlaceholderTypeText.INTERNAL,
+			fillingType: PlaceholderFill.NONE,
 		});
 		setPlaceholder(placeholdersTmp);
 
@@ -320,6 +330,38 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 	const handleEnter = (index: number) => {
 		changeValue(index);
 	};
+	const handleChangeFilling = async (e: any, index: number) => {
+		console.log('handleChangeFilling', e);
+		debugger;
+		let placeholderTmp = [...placeholder];
+		placeholderTmp[index].fillingType = e.target.value;
+		setPlaceholder(placeholderTmp);
+		let body = {
+			data: {
+				action: Action.UPDATE,
+				clientKey: !token ? clientKey : undefined,
+				templateKey: templateKey,
+				placeholder: {
+					placeholderKey: placeholderTmp[index].placeholderKey,
+					fillingType: e.target.value,
+				},
+			},
+		};
+		await axios
+			.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
+				headers: {
+					Accept: 'application/vnd.api+json',
+					'Content-Type': 'application/vnd.api+json',
+					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: token ? `Bearer ${token}` : undefined,
+				},
+				responseType: 'json',
+			})
+			.then((payload: any) => {
+				//console.log('PLACEHOLDER read', payload);
+				// setRefreshPlaceholders(refreshPlaceholders + 1);
+			});
+	};
 	return (
 		<Card
 			loading={placeholderLoad || continueLoad}
@@ -335,81 +377,102 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				{placeholder &&
 					placeholder.map((holder, index) => {
 						return (
-							<div draggable key={holder.placeholderKey}>
-								<Space
-									direction='vertical'
-									size={2}
-									style={{ display: 'flex' }}
-								>
-									<Row wrap={false} align={'middle'}>
-										<Col>
-											<Tooltip title='Click to insert the placeholder at the current cursor position in the text.'>
-												<div>
+							<Space
+								draggable
+								direction='vertical'
+								size={2}
+								style={{ display: 'flex' }}
+								key={holder.placeholderKey}
+							>
+								<Row wrap={false} align={'middle'}>
+									<Col>
+										<Tooltip title='Click to insert the placeholder at the current cursor position in the text.'>
+											<div>
+												<Button
+													size='small'
+													type='text'
+													icon={
+														<FontAwesomeIcon
+															icon={faLeftLong}
+															size='sm'
+															onClick={() => {
+																handleInsertPlaceholder(index);
+															}}
+														/>
+													}
+												/>
+											</div>
+										</Tooltip>
+									</Col>
+									<Col>
+										<Space direction='horizontal' style={{ display: 'flex' }}>
+											<Input
+												id='PlaceholderName'
+												placeholder='Enter placeholder name'
+												variant='borderless'
+												value={holder.name}
+												onChange={(e: any) => handleChange(e, index)}
+												onBlur={(e: any) => handleBlur(e, index)}
+											/>
+											<Tooltip title='Click to see more options.'>
+												<Popover
+													content={
+														<Space
+															direction='vertical'
+															style={{ display: 'flex' }}
+														>
+															<Text type='secondary'>
+																Who fills in this field:
+															</Text>
+															<Radio.Group
+																value={parseInt(
+																	holder.fillingType
+																		? holder.fillingType?.toString()
+																		: '1',
+																	10
+																)}
+																onChange={(e: any) =>
+																	handleChangeFilling(e, index)
+																}
+															>
+																<Space direction='vertical'>
+																	<Radio value={PlaceholderFill.NONE}>
+																		None
+																	</Radio>
+																	<Radio value={PlaceholderFill.CREATOR}>
+																		Contract creator
+																	</Radio>
+																	<Radio value={PlaceholderFill.ANY}>
+																		Any external recipient
+																	</Radio>
+																</Space>
+															</Radio.Group>
+															<Button
+																block
+																danger
+																type='text'
+																onClick={() => {
+																	handleDeletePlaceholder(index);
+																}}
+															>
+																Delete
+															</Button>
+														</Space>
+													}
+													trigger='click'
+												>
 													<Button
 														size='small'
 														type='text'
-														icon={
-															<FontAwesomeIcon
-																icon={faLeftLong}
-																size='sm'
-																onClick={() => {
-																	handleInsertPlaceholder(index);
-																}}
-															/>
-														}
+														icon={<SettingFilled />}
 													/>
-												</div>
+												</Popover>
 											</Tooltip>
-										</Col>
-										<Col>
-											<Tooltip title='Click to see more options.'>
-												<div>
-													<Popover
-														content={
-															<Space
-																direction='vertical'
-																style={{ display: 'flex' }}
-															>
-																<Button
-																	block
-																	type='text'
-																	onClick={() => {
-																		handleInsertPlaceholder(index);
-																	}}
-																>
-																	Insert into the text
-																</Button>
-																<Button
-																	block
-																	danger
-																	type='text'
-																	onClick={() => {
-																		handleDeletePlaceholder(index);
-																	}}
-																>
-																	Delete
-																</Button>
-															</Space>
-														}
-														trigger='click'
-													>
-														<div>
-															<Input
-																id='PlaceholderName'
-																placeholder='Enter placeholder name'
-																variant='borderless'
-																value={holder.name}
-																onChange={(e: any) => handleChange(e, index)}
-																onBlur={(e: any) => handleBlur(e, index)}
-															/>
-														</div>
-													</Popover>
-												</div>
-											</Tooltip>
-										</Col>
-										<Col flex={'auto'} />
-										<Col flex='55px'>
-											{/* <Tooltip title='Set who fills in this field: the user when creating a draft or the external signer when signing.'>
+										</Space>
+									</Col>
+									<Col flex={'auto'} />
+									<Col flex='55px'>
+										{/* <Tooltip title='Set who fills in this field: the user when creating a draft or the external signer when signing.'>
 												<Segmented
 													size='small'
 													options={[
@@ -428,18 +491,17 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 													onChange={(e: any) => handleClick(e, index)}
 												/>
 											</Tooltip> */}
-										</Col>
-									</Row>
-									<Input
-										id='PlaceholderValue'
-										placeholder='Enter value'
-										value={holder.value}
-										onChange={(e: any) => handleChange(e, index)}
-										onBlur={(e: any) => handleBlur(e, index)}
-										onPressEnter={() => handleEnter(index)}
-									/>
-								</Space>
-							</div>
+									</Col>
+								</Row>
+								<Input
+									id='PlaceholderValue'
+									placeholder='Enter value'
+									value={holder.value}
+									onChange={(e: any) => handleChange(e, index)}
+									onBlur={(e: any) => handleBlur(e, index)}
+									onPressEnter={() => handleEnter(index)}
+								/>
+							</Space>
 						);
 					})}
 
