@@ -258,12 +258,14 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 							// preCreated: true,
 						},
 						placeholders: fillPlaceholder
-							? placeholder.map((holder) => {
-									return {
-										placeholderKey: holder.placeholderKey,
-										value: holder.value,
-									};
-							  })
+							? placeholder
+									.filter((holder) => holder.value)
+									.map((holder) => {
+										return {
+											placeholderKey: holder.placeholderKey,
+											value: holder.value,
+										};
+									})
 							: undefined,
 					},
 				};
@@ -280,12 +282,14 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 							contractType: contractType,
 						},
 						placeholders: fillPlaceholder
-							? placeholder.map((holder) => {
-									return {
-										placeholderKey: holder.placeholderKey,
-										value: holder.value,
-									};
-							  })
+							? placeholder
+									.filter((holder) => holder.value)
+									.map((holder) => {
+										return {
+											placeholderKey: holder.placeholderKey,
+											value: holder.value,
+										};
+									})
 							: undefined,
 						returnValue: fillPlaceholder ? true : undefined,
 					},
