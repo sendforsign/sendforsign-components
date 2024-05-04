@@ -196,6 +196,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	const addTable = () => {
 		quillRef?.current?.getModule('better-table').insertTable(3, 3);
 	};
+
 	const handleChangeText = useDebouncedCallback(
 		async (content: string, needCheck: boolean = true) => {
 			let body = {};

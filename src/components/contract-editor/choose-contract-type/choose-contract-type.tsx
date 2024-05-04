@@ -56,16 +56,18 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 	const [options, setOptions] = useState<SegmentedLabeledOption[]>([]);
 	const currPlaceholder = useRef(placeholder);
 	const [createDisable, setCreateDisable] = useState(true);
-	const [load, setLoad] = useState(true);
+	const [load, setLoad] = useState(false);
 	const [fieldBlockVisible, setFieldBlockVisible] = useState(false);
 	const [loadSegmented, setLoadSegmented] = useState(false);
 	const [chooseTemplate, setChooseTemplate] = useState(false);
 	const [segmentedValue, setSegmentedValue] = useState('');
 	const [btnName, setBtnName] = useState('Create document');
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
-	const steps = useRef<
-		{ key: string; title: string; content: React.JSX.Element }[]
+	const [steps, setSteps] = useState<
+		{ key: string; name: string; value: string }[]
 	>([]);
+	const { token } = theme.useToken();
+	const [current, setCurrent] = useState(0);
 	const [items, setItems] = useState<
 		{
 			key: string;
@@ -329,79 +331,37 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 				}
 			}
 		}
-		// if (beforeCreated && contractName) {
-		// 	setContinueDisable(false);
-		// }
 	};
 
 	const handleContinue = async () => {
-		if (currPlaceholder.current.length > 0) {
-			setFillPlaceholder(true);
-		}
 		setCreateContract(true);
 	};
 	const handleChange = (e: any, placeholderKey: string) => {
-		// debugger;
-		if (!placeholderKey) {
-			switch (e.target.id) {
-				case 'ContractName':
-					setContractName(e.target.value);
-					steps.current[0].content = (
-						<Card>
-							<Space direction='vertical' style={{ display: 'flex' }}>
-								<Title level={4} style={{ margin: '0' }}>
-									Document name
-								</Title>
-								<Text type='secondary'>
-									Enter the value in the field below.
-								</Text>
-								<Input
-									id='ContractName'
-									placeholder='Enter your document name'
-									value={e.target.value}
-									onChange={(e) => handleChange(e, '')}
-								/>
-							</Space>
-						</Card>
-					);
-					if (e.target.value) {
-						setContinueDisable(false);
-					} else {
-						setContinueDisable(true);
-					}
-					break;
-			}
-		} else {
-			const index = currPlaceholder.current.findIndex(
-				(holder) => holder.placeholderKey === placeholderKey
-			);
-			currPlaceholder.current[index].value = e.target.value;
-			const stepIndex = steps.current.findIndex(
-				(step) => step.key === placeholderKey
-			);
-			steps.current[stepIndex].content = (
-				<Card>
-					<Space direction='vertical' style={{ display: 'flex' }}>
-						<Title level={4} style={{ margin: '0' }}>
-							{currPlaceholder.current[index].name}
-						</Title>
-						<Text type='secondary'>Enter the value in the field below.</Text>
-						<Input
-							id={currPlaceholder.current[index].placeholderKey}
-							placeholder={`Enter your ${currPlaceholder.current[index].name}`}
-							value={currPlaceholder.current[index].value}
-							onChange={(e) =>
-								handleChange(
-									e,
-									currPlaceholder.current[index].placeholderKey as string
-								)
-							}
-						/>
-					</Space>
-				</Card>
-			);
-			setPlaceholder(currPlaceholder.current);
+		let stepsTmp: { key: string; name: string; value: string }[] = [...steps];
+		switch (e.target.id) {
+			case 'ContractName':
+				setContractName(e.target.value);
+				stepsTmp[0].value = e.target.value;
+				if (e.target.value) {
+					setContinueDisable(false);
+				} else {
+					setContinueDisable(true);
+				}
+				break;
+			default:
+				const index = currPlaceholder.current.findIndex(
+					(holder) => holder.placeholderKey === placeholderKey
+				);
+				currPlaceholder.current[index].value = e.target.value;
+				const stepIndex = stepsTmp.findIndex(
+					(step) => step.key === placeholderKey
+				);
+				stepsTmp[stepIndex].value = currPlaceholder.current[index]
+					.value as string;
+				setPlaceholder(currPlaceholder.current);
+				break;
 		}
+		setSteps(stepsTmp);
 	};
 	const handleChoose = async (e: any) => {
 		// debugger;
@@ -448,27 +408,11 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 				})
 				.then((payload: any) => {
 					//console.log('getPlaceholders read', payload);
-					steps.current.push({
+					let stepsTmp: { key: string; name: string; value: string }[] = [];
+					stepsTmp.push({
 						key: 'ContractName',
-						title: '',
-						content: (
-							<Card>
-								<Space direction='vertical' style={{ display: 'flex' }}>
-									<Title level={4} style={{ margin: '0' }}>
-										Document name
-									</Title>
-									<Text type='secondary'>
-										Enter the value in the field below.
-									</Text>
-									<Input
-										id='ContractName'
-										placeholder='Enter your document name'
-										value={contractName}
-										onChange={(e) => handleChange(e, '')}
-									/>
-								</Space>
-							</Card>
-						),
+						name: 'Document name',
+						value: contractName,
 					});
 					if (
 						payload.data.placeholders &&
@@ -494,33 +438,21 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 									PlaceholderFill.CREATOR.toString()
 							)
 							.forEach((holder) => {
-								steps.current.push({
+								setFillPlaceholder(true);
+								stepsTmp.push({
 									key: holder.placeholderKey as string,
-									title: '',
-									content: (
-										<Card>
-											<Space direction='vertical' style={{ display: 'flex' }}>
-												<Title level={4} style={{ margin: '0' }}>
-													{holder.name}
-												</Title>
-												<Text type='secondary'>
-													Enter the value in the field below.
-												</Text>
-												<Input
-													id={holder.placeholderKey}
-													placeholder={`Enter your ${holder.name}`}
-													value={holder.value}
-													onChange={(e) =>
-														handleChange(e, holder.placeholderKey as string)
-													}
-												/>
-											</Space>
-										</Card>
-									),
+									name: holder.name as string,
+									value: holder.value as string,
 								});
 							});
-						setLoad(false);
 					}
+					setItems(
+						stepsTmp.map((step) => {
+							return { key: step.key, title: '' };
+						})
+					);
+					setSteps(stepsTmp);
+					setLoad(false);
 					setFieldBlockVisible(true);
 					setCreateDisable(true);
 				});
@@ -530,20 +462,6 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 		}
 	}, [chooseTemplate]);
 
-	useEffect(() => {
-		// debugger;
-		if (steps.current.length > 0) {
-			setItems(
-				steps.current.map((step) => {
-					return { key: step.key, title: step.title };
-				})
-			);
-		}
-	}, [steps.current, load]);
-
-	const { token } = theme.useToken();
-	const [current, setCurrent] = useState(0);
-
 	const next = () => {
 		setCurrent(current + 1);
 	};
@@ -552,14 +470,6 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 		setCurrent(current - 1);
 	};
 
-	const contentStyle: React.CSSProperties = {
-		lineHeight: '260px',
-		textAlign: 'center',
-		color: token.colorTextTertiary,
-		backgroundColor: token.colorFillAlter,
-		borderRadius: token.borderRadiusLG,
-		marginTop: 16,
-	};
 	return (
 		<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 			<Card loading={loadSegmented}>
@@ -595,50 +505,96 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 								Let's create your document
 							</Title>
 						</Space>
-						{/* <Input
-							id='ContractName'
-							placeholder='Enter your document name'
-							value={contractName}
-							onChange={handleChange}
-							// readOnly={!continueDisable}
-						/>
-						<Button
-							type='primary'
-							disabled={continueDisable}
-							onClick={handleContinue}
-							loading={continueLoad}
-						>
-							Continue
-						</Button> */}
-						<div>
-							<Steps current={current} items={items} size='small' />
-							<div style={contentStyle}>{steps.current[current].content}</div>
-							<div style={{ marginTop: 24 }}>
-								{current > 0 && (
-									<Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-										Previous
-									</Button>
-								)}
-								{current < steps.current.length - 1 && (
-									<Button
-										type='primary'
-										disabled={continueDisable}
-										onClick={() => next()}
-									>
-										Next
-									</Button>
-								)}
-								{current === steps.current.length - 1 && (
-									<Button
-										type='primary'
-										onClick={handleContinue}
-										loading={continueLoad}
-									>
-										Done
-									</Button>
-								)}
-							</div>
-						</div>
+						{steps.length > 1 ? (
+							<>
+								<Steps current={current} items={items} size='small' />
+								<Card
+									style={{
+										marginTop: 16,
+										textAlign: 'center',
+										color: token.colorTextTertiary,
+										backgroundColor: token.colorFillAlter,
+										borderRadius: token.borderRadiusLG,
+									}}
+								>
+									<Space direction='vertical' style={{ display: 'flex' }}>
+										<Title level={4} style={{ margin: '0' }}>
+											{steps[current].name}
+										</Title>
+										<Text type='secondary'>
+											Enter the value in the field below.
+										</Text>
+										<Input
+											id={steps[current].key}
+											placeholder={`Enter your ${steps[
+												current
+											].name.toLowerCase()}`}
+											value={steps[current].value}
+											onChange={(e) => handleChange(e, steps[current].key)}
+										/>
+									</Space>
+								</Card>
+								<div style={{ marginTop: 24 }}>
+									{current > 0 && (
+										<Button style={{ margin: '0 8px' }} onClick={() => prev()}>
+											Previous
+										</Button>
+									)}
+									{current < steps.length - 1 && (
+										<Button
+											type='primary'
+											disabled={continueDisable}
+											onClick={() => next()}
+										>
+											Next
+										</Button>
+									)}
+									{current === steps.length - 1 && (
+										<Button
+											type='primary'
+											onClick={handleContinue}
+											loading={continueLoad}
+										>
+											Done
+										</Button>
+									)}
+								</div>
+							</>
+						) : (
+							<>
+								<Card
+									style={{
+										marginTop: 16,
+										textAlign: 'center',
+										color: token.colorTextTertiary,
+										backgroundColor: token.colorFillAlter,
+										borderRadius: token.borderRadiusLG,
+									}}
+								>
+									<Space direction='vertical' style={{ display: 'flex' }}>
+										<Title level={4} style={{ margin: '0' }}>
+											Document name
+										</Title>
+										<Text type='secondary'>
+											Enter the value in the field below.
+										</Text>
+										<Input
+											id={'ContractName'}
+											placeholder='Enter your document name'
+											value={contractName}
+											onChange={(e) => handleChange(e, 'ContractName')}
+										/>
+									</Space>
+								</Card>
+								<Button
+									type='primary'
+									onClick={handleContinue}
+									loading={continueLoad}
+								>
+									Done
+								</Button>
+							</>
+						)}
 					</Space>
 				</Card>
 			)}

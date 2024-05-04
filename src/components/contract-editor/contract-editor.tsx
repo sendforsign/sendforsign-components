@@ -257,6 +257,14 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 							contractType: templateKey ? '' : contractType,
 							// preCreated: true,
 						},
+						placeholders: fillPlaceholder
+							? placeholder.map((holder) => {
+									return {
+										placeholderKey: holder.placeholderKey,
+										value: holder.value,
+									};
+							  })
+							: undefined,
 					},
 				};
 			} else {
@@ -271,6 +279,15 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 							templateKey: templateKey,
 							contractType: contractType,
 						},
+						placeholders: fillPlaceholder
+							? placeholder.map((holder) => {
+									return {
+										placeholderKey: holder.placeholderKey,
+										value: holder.value,
+									};
+							  })
+							: undefined,
+						returnValue: fillPlaceholder ? true : undefined,
 					},
 				};
 			}
@@ -291,8 +308,12 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				if (!beforeCreated) {
 					setCurrContractKey(response.data.contract.contractKey);
 					contractKeyTmp = response.data.contract.contractKey;
-					if (fillPlaceholder) {
-						updatePlaceholderValue();
+					if (
+						response.data &&
+						response.data.contract &&
+						response.data.contract.contractValue
+					) {
+						setContractValue(response.data.contract.contractValue);
 					}
 				} else {
 					setContractValue(response.data.contract.contractValue);
@@ -343,86 +364,6 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		};
 	}, [createContract]);
 	// console.log('contractKey currContractKey', currContractKey);
-
-	const changeValueInTag = (id: number, value: string) => {
-		let text = quillRef?.current?.root.innerHTML;
-		let tag = `<placeholder${id}`;
-		let array = text?.split(tag);
-		let resultText = '';
-		if (array) {
-			for (let i = 0; i < array.length; i++) {
-				if (array.length > 1) {
-					if (i === 0) {
-						resultText += array[i];
-					} else {
-						resultText += `<placeholder${id}`;
-						tag = `</placeholder${id}>`;
-						const lineArr = array[i].split(tag);
-						for (let j = 0; j < lineArr.length; j++) {
-							if (j === 0) {
-								tag = `"placeholderClass${id}">`;
-								const elArray = lineArr[j].split(tag);
-								for (let k = 0; k < elArray.length; k++) {
-									if (k === 0) {
-										resultText += `${elArray[k]}"placeholderClass${id}">`;
-									} else {
-										resultText += `${value}</placeholder${id}>`;
-									}
-								}
-							} else {
-								resultText += lineArr[j];
-							}
-						}
-					}
-				} else {
-					resultText = array[i];
-				}
-			}
-			quillRef?.current?.clipboard.dangerouslyPasteHTML(resultText, 'user');
-			// handleChangeText(resultText, false);
-			quillRef?.current?.blur();
-		}
-		//console.log('changeValueInTag', quillRef?.current?.root.innerHTML);
-	};
-
-	const updatePlaceholderValue = async () => {
-		// let placeholdersTmp = placeholder;
-		for (let index = 0; index < placeholder.length; index++) {
-			if (placeholder[index].name) {
-				changeValueInTag(
-					placeholder[index].id ? (placeholder[index].id as number) : 0,
-					placeholder[index].value
-						? (placeholder[index].value as string)
-						: `{{{${placeholder[index].name as string}}}}`
-				);
-			}
-			let body = {
-				data: {
-					action: Action.UPDATE,
-					clientKey: !token ? clientKey : undefined,
-					contractKey: contractKey,
-					placeholder: {
-						placeholderKey: placeholder[index].placeholderKey,
-						value: placeholder[index].value,
-					},
-				},
-			};
-			await axios
-				.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-					headers: {
-						Accept: 'application/vnd.api+json',
-						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-						Authorization: token ? `Bearer ${token}` : undefined,
-					},
-					responseType: 'json',
-				})
-				.then((payload: any) => {
-					//console.log('PLACEHOLDER read', payload);
-					// setRefreshPlaceholders(refreshPlaceholders + 1);
-				});
-		}
-	};
 
 	return (
 		<ContractEditorContext.Provider
