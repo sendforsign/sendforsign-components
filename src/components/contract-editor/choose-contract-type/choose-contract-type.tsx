@@ -341,7 +341,9 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 		switch (e.target.id) {
 			case 'ContractName':
 				setContractName(e.target.value);
-				stepsTmp[0].value = e.target.value;
+				if (stepsTmp.length > 0 && stepsTmp[0] && stepsTmp[0].value) {
+					stepsTmp[0].value = e.target.value;
+				}
 				if (e.target.value) {
 					setContinueDisable(false);
 				} else {
