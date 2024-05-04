@@ -23,7 +23,7 @@ import {
 import axios from 'axios';
 import { Placeholder } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGlobe, faLeftLong } from '@fortawesome/free-solid-svg-icons';
+import { faCircleQuestion, faGear, faGlobe, faLeftLong } from '@fortawesome/free-solid-svg-icons';
 import { useTemplateEditorContext } from '../template-editor-context';
 import { SettingFilled } from '@ant-design/icons';
 
@@ -405,7 +405,6 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 										</Tooltip>
 									</Col>
 									<Col>
-										<Space direction='horizontal' style={{ display: 'flex' }}>
 											<Input
 												id='PlaceholderName'
 												placeholder='Enter placeholder name'
@@ -414,17 +413,36 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 												onChange={(e: any) => handleChange(e, index)}
 												onBlur={(e: any) => handleBlur(e, index)}
 											/>
-											<Tooltip title='Click to see more options.'>
+									</Col>
+									<Col flex={'auto'}></Col>
+									<Col flex='24px'>
 												<Popover
 													content={
 														<Space
 															direction='vertical'
 															style={{ display: 'flex' }}
 														>
+															<Space>
 															<Text type='secondary'>
 																Who fills in this field:
 															</Text>
+															<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
+                                <div>
+                                  <Button
+                                    size='small'
+                                    icon={
+                                      <FontAwesomeIcon
+                                        icon={faCircleQuestion}
+                                        size='xs'
+                                      />
+                                    }
+                                    type='text'
+                                  ></Button>
+                                </div>
+                              </Tooltip>
+															</Space>
 															<Radio.Group
+															size='small'
 																value={parseInt(
 																	holder.fillingType
 																		? holder.fillingType?.toString()
@@ -440,13 +458,14 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 																		None
 																	</Radio>
 																	<Radio value={PlaceholderFill.CREATOR}>
-																		Contract creator
+																		Contract owner
 																	</Radio>
 																	<Radio value={PlaceholderFill.ANY}>
 																		Any external recipient
 																	</Radio>
 																</Space>
 															</Radio.Group>
+															<Divider style={{ margin: 0 }} />
 															<Button
 																block
 																danger
@@ -461,36 +480,14 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 													}
 													trigger='click'
 												>
+													<div>
 													<Button
 														size='small'
 														type='text'
-														icon={<SettingFilled />}
+														icon={<FontAwesomeIcon icon={faGear} size='xs' />}
 													/>
+													</div>
 												</Popover>
-											</Tooltip>
-										</Space>
-									</Col>
-									<Col flex={'auto'} />
-									<Col flex='55px'>
-										{/* <Tooltip title='Set who fills in this field: the user when creating a draft or the external signer when signing.'>
-												<Segmented
-													size='small'
-													options={[
-														{
-															value: PlaceholderTypeText.INTERNAL,
-															icon: <FontAwesomeIcon icon={faHouseUser} size='xs' />,
-														},
-														{
-															value: PlaceholderTypeText.EXTERNAL,
-															icon: (
-																<FontAwesomeIcon icon={faGlobe} size='xs' />
-															),
-														},
-													]}
-													value={holder.type}
-													onChange={(e: any) => handleClick(e, index)}
-												/>
-											</Tooltip> */}
 									</Col>
 								</Row>
 								<Input

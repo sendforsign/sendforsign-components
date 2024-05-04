@@ -413,7 +413,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					let stepsTmp: { key: string; name: string; value: string }[] = [];
 					stepsTmp.push({
 						key: 'ContractName',
-						name: 'Document name',
+						name: 'What is the name of your document?',
 						value: contractName,
 					});
 					if (
@@ -504,7 +504,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 						<Space direction='vertical' size={2}>
 							<Title level={4} style={{ margin: '0' }}>
-								Let's create your document
+								Answer the questions below to create your document						
 							</Title>
 						</Space>
 						{steps.length > 1 ? (
@@ -520,7 +520,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 									}}
 								>
 									<Space direction='vertical' style={{ display: 'flex' }}>
-										<Title level={4} style={{ margin: '0' }}>
+										<Title level={5} style={{ margin: '0' }}>
 											{steps[current].name}
 										</Title>
 										<Text type='secondary'>
@@ -528,9 +528,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 										</Text>
 										<Input
 											id={steps[current].key}
-											placeholder={`Enter your ${steps[
-												current
-											].name.toLowerCase()}`}
+											placeholder={`Type here`}
 											value={steps[current].value}
 											onChange={(e) => handleChange(e, steps[current].key)}
 										/>
@@ -574,15 +572,15 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 									}}
 								>
 									<Space direction='vertical' style={{ display: 'flex' }}>
-										<Title level={4} style={{ margin: '0' }}>
-											Document name
+										<Title level={5} style={{ margin: '0' }}>
+											What is the name of your document?
 										</Title>
 										<Text type='secondary'>
 											Enter the value in the field below.
 										</Text>
 										<Input
 											id={'ContractName'}
-											placeholder='Enter your document name'
+											placeholder='Type here'
 											value={contractName}
 											onChange={(e) => handleChange(e, 'ContractName')}
 										/>
