@@ -301,7 +301,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			const response = await axios.post(url, body, {
 				headers: {
 					Accept: 'application/vnd.api+json',
-					'Content-Type': 'application/vnd.api+json',
+					// 'Content-Type': 'application/vnd.api+json',
 					'x-sendforsign-key':
 						!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
 					Authorization: currToken ? `Bearer ${currToken}` : undefined,
