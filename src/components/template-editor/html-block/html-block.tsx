@@ -140,7 +140,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				.post(BASE_URL + ApiEntity.TEMPLATE, body, {
 					headers: {
 						Accept: 'application/vnd.api+json',
-						'Content-Type': 'application/vnd.api+json',
+						// 'Content-Type': 'application/vnd.api+json',
 						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
 						Authorization: token ? `Bearer ${token}` : undefined,
 					},
