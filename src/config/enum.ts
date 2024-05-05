@@ -27,6 +27,7 @@ export const enum ApiEntity {
 	CONTRACT_EVENT = 'contract_event',
 	EVENT_STATUS = 'event_status',
 	CHECK_CONTRACT_VALUE = 'check_contract_value',
+	UPDATE_CONTRACT_VALUE = 'update_contract_value',
 	PLACEHOLDER = 'placeholder',
 }
 export const enum Action {
