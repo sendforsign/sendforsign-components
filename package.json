@@ -1,6 +1,6 @@
 {
 	"name": "sendforsign",
-	"version": "1.0.68",
+	"version": "1.0.72",
 	"description": "Sendforsign components",
 	"main": "/dist/index",
 	"typings": "dist/index",
@@ -28,9 +28,7 @@
 		"@fortawesome/fontawesome-svg-core": "^6.4.2",
 		"@fortawesome/free-solid-svg-icons": "^6.4.2",
 		"@fortawesome/react-fontawesome": "^0.2.0",
-		"@react-pdf/layout": "3.6.4",
-		"@react-pdf/renderer": "3.1.14",
-		"@react-pdf/textkit": "^4.4.1",
+		"@react-pdf/renderer": "3.1.15",
 		"@types/quill": "^2.0.14",
 		"@types/react-pdf": "^7.0.0",
 		"antd": "^5.12.1",
@@ -86,21 +84,6 @@
 	"peerDependencies": {
 		"react": "*",
 		"react-dom": "*"
-	},
-	"resolutions": {
-		"@react-pdf/fns": "2.0.1",
-		"@react-pdf/font": "2.3.7",
-		"@react-pdf/image": "2.2.2",
-		"@react-pdf/layout": "3.6.3",
-		"@react-pdf/pdfkit": "3.0.2",
-		"@react-pdf/png-js": "2.2.0",
-		"@react-pdf/primitives": "3.0.1",
-		"@react-pdf/render": "3.2.7",
-		"@react-pdf/renderer": "3.1.14",
-		"@react-pdf/stylesheet": "4.1.8",
-		"@react-pdf/textkit": "4.2.0",
-		"@react-pdf/types": "2.3.4",
-		"@react-pdf/yoga": "4.1.2"
 	},
 	"files": [
 		"dist"
