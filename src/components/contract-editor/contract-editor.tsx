@@ -8,9 +8,10 @@ import {
 	ApiEntity,
 	ContractType,
 	ContractTypeText,
+	ContractSteps,
 } from '../../config/enum';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
-import { ContractSign, Placeholder } from '../../config/types';
+import { ContractSign, Placeholder, Recipient } from '../../config/types';
 import { ContractEditorContext } from './contract-editor-context';
 import { ApproveModal } from './approve-modal/approve-modal';
 import { SignModal } from './sign-modal/sign-modal';
@@ -24,6 +25,9 @@ import { ChooseContractType } from './choose-contract-type/choose-contract-type'
 import { ShareLinkBlock } from './share-link-block/share-link-block';
 import { PlaceholderBlock } from './placeholder-block/placeholder-block';
 
+// export interface StepChangeProps {
+// 	currentStep?: ContractSteps;
+// }
 export interface ContractEditorProps {
 	apiKey?: string;
 	clientKey?: string;
@@ -34,6 +38,7 @@ export interface ContractEditorProps {
 	canReDraft?: boolean;
 	showTimeline?: boolean;
 	showActionsBar?: boolean;
+	// onStepChange?: (data: StepChangeProps) => void;
 }
 
 export const ContractEditor: FC<ContractEditorProps> = ({
@@ -46,6 +51,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	canReDraft = false,
 	showTimeline = true,
 	showActionsBar = true,
+	// onStepChange,
 }) => {
 	if (!apiKey && !token && !window.location.href.includes('story')) {
 		throw new Error('Missing authority data');
@@ -89,10 +95,16 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [refreshShareLink, setRefreshShareLink] = useState(0);
 	const [refreshRecipients, setRefreshRecipients] = useState(0);
 	const [refreshPlaceholders, setRefreshPlaceholders] = useState(0);
+	const [refreshPlaceholderRecipients, setRefreshPlaceholderRecipients] =
+		useState(0);
 	const [signCount, setSignCount] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
+	const [recipients, setRecipients] = useState<Recipient[]>([]);
 	const [notification, setNotification] = useState({});
 	const [ipInfo, setIpInfo] = useState('');
+	const [currentData, setCurrentData] = useState<StepChangeProps>({
+		currentStep: ContractSteps.TYPE_CHOOSE_STEP,
+	});
 	const [contractEvents, setContractEvents] = useState<Array<any>>([]);
 	const quillRef = useRef<any>();
 	const contractKeyRef = useRef(contractKey);
@@ -154,8 +166,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 						contractTmp = result.data.contract;
 					}
 				});
+			setContractName(contractTmp.name ? contractTmp.name : '');
 			if (beforeCreated) {
-				setContractName(contractTmp.name ? contractTmp.name : '');
 				setContractType(
 					contractTmp.contractType ? contractTmp.contractType.toString() : ''
 				);
@@ -309,9 +321,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				responseType: 'json',
 			});
 			if (response) {
+				setCurrentData({ currentStep: ContractSteps.CONTRACT_EDITOR_STEP });
+				contractKeyTmp = response.data.contract.contractKey;
 				if (!beforeCreated) {
 					setCurrContractKey(response.data.contract.contractKey);
-					contractKeyTmp = response.data.contract.contractKey;
 					if (
 						response.data &&
 						response.data.contract &&
@@ -320,13 +333,20 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 						setContractValue(response.data.contract.contractValue);
 					}
 				} else {
-					setContractValue(response.data.contract.contractValue);
+					if (
+						response.data &&
+						response.data.contract &&
+						response.data.contract.contractValue
+					) {
+						setContractValue(response.data.contract.contractValue);
+					}
 				}
 
 				setPlaceholder([]);
 				setRefreshEvent(refreshEvent + 1);
 			}
 			if (contractType === ContractTypeText.PDF.toString() && !templateKey) {
+				// debugger;
 				const formData: FormData = new FormData();
 				const pdfFile: ArrayBuffer = (await getArrayBuffer(
 					'pdfFile'
@@ -368,7 +388,11 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		};
 	}, [createContract]);
 	// console.log('contractKey currContractKey', currContractKey);
-
+	// useEffect(() => {
+	// 	if (onStepChange) {
+	// 		onStepChange(currentData);
+	// 	}
+	// }, [currentData]);
 	return (
 		<ContractEditorContext.Provider
 			value={{
@@ -446,6 +470,12 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setContractEvents,
 				fillPlaceholder,
 				setFillPlaceholder,
+				recipients,
+				setRecipients,
+				refreshPlaceholderRecipients,
+				setRefreshPlaceholderRecipients,
+				currentData,
+				setCurrentData,
 			}}
 		>
 			{spinLoad ? (
