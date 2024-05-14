@@ -13,9 +13,9 @@ export default meta;
 
 type Story = StoryObj<typeof ContractEditor>;
 
-export const Primary: Story = (args: React.JSX.IntrinsicAttributes & ContractEditorProps) => (
-	<ContractEditor data-testId='InputField-id' {...args} />
-);
+export const Primary: Story = (
+	args: React.JSX.IntrinsicAttributes & ContractEditorProps
+) => <ContractEditor data-testId='InputField-id' {...args} />;
 Primary.args = {
 	apiKey: '',
 	clientKey: '',
@@ -26,4 +26,6 @@ Primary.args = {
 	canReDraft: false,
 	showTimeline: true,
 	showActionsBar: true,
+	onStepChange: () => {},
+	onDocumentSave: () => {},
 };

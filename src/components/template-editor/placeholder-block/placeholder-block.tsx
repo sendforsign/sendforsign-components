@@ -23,9 +23,12 @@ import {
 import axios from 'axios';
 import { Placeholder } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleQuestion, faGear, faGlobe, faLeftLong } from '@fortawesome/free-solid-svg-icons';
+import {
+	faCircleQuestion,
+	faGear,
+	faLeftLong,
+} from '@fortawesome/free-solid-svg-icons';
 import { useTemplateEditorContext } from '../template-editor-context';
-import { SettingFilled } from '@ant-design/icons';
 
 type Props = {
 	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
@@ -331,7 +334,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		changeValue(index);
 	};
 	const handleChangeFilling = async (e: any, index: number) => {
-		console.log('handleChangeFilling', e);
+		// console.log('handleChangeFilling', e);
 		debugger;
 		let placeholderTmp = [...placeholder];
 		placeholderTmp[index].fillingType = e.target.value;
@@ -405,89 +408,82 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 										</Tooltip>
 									</Col>
 									<Col>
-											<Input
-												id='PlaceholderName'
-												placeholder='Enter placeholder name'
-												variant='borderless'
-												value={holder.name}
-												onChange={(e: any) => handleChange(e, index)}
-												onBlur={(e: any) => handleBlur(e, index)}
-											/>
+										<Input
+											id='PlaceholderName'
+											placeholder='Enter placeholder name'
+											variant='borderless'
+											value={holder.name}
+											onChange={(e: any) => handleChange(e, index)}
+											onBlur={(e: any) => handleBlur(e, index)}
+										/>
 									</Col>
 									<Col flex={'auto'}></Col>
 									<Col flex='24px'>
-												<Popover
-													content={
-														<Space
-															direction='vertical'
-															style={{ display: 'flex' }}
-														>
-															<Space>
-															<Text type='secondary'>
-																Who fills in this field:
-															</Text>
-															<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
-                                <div>
-                                  <Button
-                                    size='small'
-                                    icon={
-                                      <FontAwesomeIcon
-                                        icon={faCircleQuestion}
-                                        size='xs'
-                                      />
-                                    }
-                                    type='text'
-                                  ></Button>
-                                </div>
-                              </Tooltip>
-															</Space>
-															<Radio.Group
-															size='small'
-																value={parseInt(
-																	holder.fillingType
-																		? holder.fillingType?.toString()
-																		: '1',
-																	10
-																)}
-																onChange={(e: any) =>
-																	handleChangeFilling(e, index)
-																}
-															>
-																<Space direction='vertical'>
-																	<Radio value={PlaceholderFill.NONE}>
-																		None
-																	</Radio>
-																	<Radio value={PlaceholderFill.CREATOR}>
-																		Contract owner
-																	</Radio>
-																	<Radio value={PlaceholderFill.ANY}>
-																		Any external recipient
-																	</Radio>
-																</Space>
-															</Radio.Group>
-															<Divider style={{ margin: 0 }} />
-															<Button
-																block
-																danger
-																type='text'
-																onClick={() => {
-																	handleDeletePlaceholder(index);
-																}}
-															>
-																Delete
-															</Button>
-														</Space>
-													}
-													trigger='click'
-												>
-													<div>
-													<Button
+										<Popover
+											content={
+												<Space direction='vertical' style={{ display: 'flex' }}>
+													<Space>
+														<Text type='secondary'>
+															Who fills in this field:
+														</Text>
+														<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
+															<div>
+																<Button
+																	size='small'
+																	icon={
+																		<FontAwesomeIcon
+																			icon={faCircleQuestion}
+																			size='xs'
+																		/>
+																	}
+																	type='text'
+																></Button>
+															</div>
+														</Tooltip>
+													</Space>
+													<Radio.Group
 														size='small'
+														value={parseInt(
+															holder.fillingType
+																? holder.fillingType?.toString()
+																: '1',
+															10
+														)}
+														onChange={(e: any) => handleChangeFilling(e, index)}
+													>
+														<Space direction='vertical'>
+															<Radio value={PlaceholderFill.NONE}>None</Radio>
+															<Radio value={PlaceholderFill.CREATOR}>
+																Contract owner
+															</Radio>
+															{/* <Radio value={PlaceholderFill.ANY}>
+																Any external recipient
+															</Radio> */}
+														</Space>
+													</Radio.Group>
+													<Divider style={{ margin: 0 }} />
+													<Button
+														block
+														danger
 														type='text'
-														icon={<FontAwesomeIcon icon={faGear} size='xs' />}
-													/>
-													</div>
-												</Popover>
+														onClick={() => {
+															handleDeletePlaceholder(index);
+														}}
+													>
+														Delete
+													</Button>
+												</Space>
+											}
+											trigger='click'
+										>
+											<div>
+												<Button
+													size='small'
+													type='text'
+													icon={<FontAwesomeIcon icon={faGear} size='xs' />}
+												/>
+											</div>
+										</Popover>
 									</Col>
 								</Row>
 								<Input

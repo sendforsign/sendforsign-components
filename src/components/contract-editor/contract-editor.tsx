@@ -28,6 +28,9 @@ import { PlaceholderBlock } from './placeholder-block/placeholder-block';
 export interface StepChangeProps {
 	currentStep?: ContractSteps;
 }
+export interface DocumentSaveProps {
+	documentSaved?: boolean;
+}
 export interface ContractEditorProps {
 	apiKey?: string;
 	clientKey?: string;
@@ -38,7 +41,8 @@ export interface ContractEditorProps {
 	canReDraft?: boolean;
 	showTimeline?: boolean;
 	showActionsBar?: boolean;
-	// onStepChange?: (data: StepChangeProps) => void;
+	onStepChange?: (data: StepChangeProps) => void;
+	onDocumentSave?: (data: DocumentSaveProps) => void;
 }
 
 export const ContractEditor: FC<ContractEditorProps> = ({
@@ -51,7 +55,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	canReDraft = false,
 	showTimeline = true,
 	showActionsBar = true,
-	// onStepChange,
+	onStepChange,
+	onDocumentSave,
 }) => {
 	if (!apiKey && !token && !window.location.href.includes('story')) {
 		throw new Error('Missing authority data');
@@ -106,6 +111,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		currentStep: ContractSteps.TYPE_CHOOSE_STEP,
 	});
 	const [contractEvents, setContractEvents] = useState<Array<any>>([]);
+	const [documentCurrentSaved, setDocumentCurrentSaved] = useState(false);
 	const quillRef = useRef<any>();
 	const contractKeyRef = useRef(contractKey);
 	const { Title, Text } = Typography;
@@ -210,6 +216,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					setContinueLoad(false);
 				}
 			}
+			setCurrentData({ currentStep: ContractSteps.CONTRACT_EDITOR_STEP });
 		}
 		// debugger;
 		if (currApiKey || currToken) {
@@ -342,7 +349,6 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					});
 				});
 			if (response) {
-				setCurrentData({ currentStep: ContractSteps.CONTRACT_EDITOR_STEP });
 				contractKeyTmp = response.data.contract.contractKey;
 				if (!beforeCreated) {
 					setCurrContractKey(response.data.contract.contractKey);
@@ -368,6 +374,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			}
 			if (contractType === ContractTypeText.PDF.toString() && !templateKey) {
 				// debugger;
+				setDocumentCurrentSaved(false);
 				const formData: FormData = new FormData();
 				const pdfFile: ArrayBuffer = (await getArrayBuffer(
 					'pdfFile'
@@ -402,7 +409,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 									: error.message,
 						});
 					});
+
+				setDocumentCurrentSaved(true);
 			}
+			setCurrentData({ currentStep: ContractSteps.CONTRACT_EDITOR_STEP });
 			setEditorVisible(true);
 			setContinueDisable(true);
 			setIsNew(false);
@@ -420,11 +430,16 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		};
 	}, [createContract]);
 	// console.log('contractKey currContractKey', currContractKey);
-	// useEffect(() => {
-	// 	if (onStepChange) {
-	// 		onStepChange(currentData);
-	// 	}
-	// }, [currentData]);
+	useEffect(() => {
+		if (onStepChange) {
+			onStepChange(currentData);
+		}
+	}, [currentData]);
+	useEffect(() => {
+		if (onDocumentSave) {
+			onDocumentSave({ documentSaved: documentCurrentSaved });
+		}
+	}, [documentCurrentSaved]);
 	return (
 		<ContractEditorContext.Provider
 			value={{
@@ -508,6 +523,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setRefreshPlaceholderRecipients,
 				currentData,
 				setCurrentData,
+				documentCurrentSaved,
+				setDocumentCurrentSaved,
 			}}
 		>
 			{spinLoad ? (

@@ -14,6 +14,7 @@ import {
 	Col,
 	Switch,
 } from 'antd';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faCheck,
@@ -21,11 +22,7 @@ import {
 	faLink,
 	faLock,
 	faPaperPlane,
-	faSign,
-	faSignature,
-	faStamp,
 	faTrash,
-	faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { useContractEditorContext } from '../contract-editor-context';
 import {
@@ -49,28 +46,21 @@ export const SendModal = () => {
 		userKey,
 		refreshEvent,
 		refreshRecipients,
+		recipients,
+		refreshPlaceholderRecipients,
+		setRecipients,
 		setRefreshEvent,
 		setResultModal,
+		setNotification,
+		setRefreshPlaceholderRecipients,
 	} = useContractEditorContext();
 	const [sendLoad, setSendLoad] = useState(false);
 	const [dataLoad, setDataLoad] = useState(false);
-	const [changeRecipient, setChangeRecipient] = useState<Recipient[]>([]);
 	const [insertRecipient, setInsertRecipient] = useState<Recipient[]>([]);
+	const [updateRecipient, setUpdateRecipient] = useState<Recipient[]>([]);
 	const [deleteRecipient, setDeleteRecipient] = useState<Recipient[]>([]);
 	const [id, setId] = useState(0);
-	const [newRecipients, setNewRecipients] = useState(true);
 	const [recipientInit, setRecipientInit] = useState(false);
-	const [recipients, setRecipients] = useState<Recipient[]>([
-		{
-			id: 0,
-			fullname: '',
-			email: '',
-			customMessage: '',
-			position: 1,
-			action: ShareLinkViewText.SIGN,
-			recipientKey: '',
-		},
-	]);
 	const options = [
 		{ label: 'Sign', value: ShareLinkViewText.SIGN },
 		{ label: 'Approve', value: ShareLinkViewText.APPROVE },
@@ -92,11 +82,12 @@ export const SendModal = () => {
 					clientKey: !token ? clientKey : undefined,
 					userKey: userKey,
 					contractKey: contractKey,
+					getShareLinks: true,
 				},
 			};
 			setDataLoad(true);
 			const getRecipients = async () => {
-				setChangeRecipient([]);
+				setUpdateRecipient([]);
 				setDeleteRecipient([]);
 				setInsertRecipient([]);
 				await axios
@@ -112,7 +103,6 @@ export const SendModal = () => {
 					.then((payload: any) => {
 						//console.log('getShareLinks read', payload);
 						if (payload.data.recipients && payload.data.recipients.length > 0) {
-							setNewRecipients(false);
 							setRecipientInit(false);
 							setRecipients(
 								payload.data.recipients.map((recipient: Recipient) => {
@@ -124,6 +114,7 @@ export const SendModal = () => {
 										position: recipient.position,
 										action: recipient.action,
 										recipientKey: recipient.recipientKey,
+										shareLink: recipient.shareLink,
 									};
 								})
 							);
@@ -154,6 +145,16 @@ export const SendModal = () => {
 							]);
 							setDataLoad(false);
 						}
+					})
+					.catch((error) => {
+						setNotification({
+							text:
+								error.response &&
+								error.response.data &&
+								error.response.data.message
+									? error.response.data.message
+									: error.message,
+						});
 					});
 			};
 			getRecipients();
@@ -191,14 +192,63 @@ export const SendModal = () => {
 				})
 				.then((payload: any) => {
 					setSendLoad(false);
-					setNewRecipients(false);
 					handleCancel();
 					if (payload.data.result) {
 						setResultModal({ open: true, action: ContractAction.SEND });
 						setRefreshEvent(refreshEvent + 1);
 					}
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
 				});
 		}
+	};
+	const handleSendOne = async (index: number) => {
+		debugger;
+		let recipientsTmp: Recipient[] = [];
+		recipientsTmp.push(recipients[index]);
+		const body = {
+			data: {
+				action: Action.SEND,
+				clientKey: !token ? clientKey : undefined,
+				userKey: userKey,
+				contractKey: contractKey,
+				recipients: recipientsTmp,
+			},
+		};
+		await axios
+			.post(BASE_URL + ApiEntity.RECIPIENT, body, {
+				headers: {
+					Accept: 'application/vnd.api+json',
+					'Content-Type': 'application/vnd.api+json',
+					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: token ? `Bearer ${token}` : undefined,
+				},
+				responseType: 'json',
+			})
+			.then((payload: any) => {
+				setSendLoad(false);
+				handleCancel();
+				if (payload.data.result) {
+					setResultModal({ open: true, action: ContractAction.SEND });
+					setRefreshEvent(refreshEvent + 1);
+				}
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
+			});
 	};
 	const handleChange = (e: any, index: number) => {
 		let recipientsTmp = [...recipients];
@@ -215,13 +265,13 @@ export const SendModal = () => {
 		}
 		setRecipients(recipientsTmp);
 		if (
-			!changeRecipient.find(
+			!updateRecipient.find(
 				(recipient) => recipient.id === recipientsTmp[index].id
 			) &&
 			recipientsTmp[index].recipientKey
 		) {
-			changeRecipient.push(recipientsTmp[index]);
-			setChangeRecipient(changeRecipient);
+			updateRecipient.push(recipientsTmp[index]);
+			setUpdateRecipient(updateRecipient);
 		}
 	};
 	const handleClick = (e: any, index: number) => {
@@ -230,13 +280,13 @@ export const SendModal = () => {
 		setRecipients(recipientsTmp);
 		if (recipientsTmp[index].recipientKey) {
 			if (
-				!changeRecipient.find(
+				!updateRecipient.find(
 					(recipient) => recipient.id === recipientsTmp[index].id
 				) &&
 				recipientsTmp[index].recipientKey
 			) {
-				changeRecipient.push(recipientsTmp[index]);
-				setChangeRecipient(changeRecipient);
+				updateRecipient.push(recipientsTmp[index]);
+				setUpdateRecipient(updateRecipient);
 			}
 		} else {
 		}
@@ -246,20 +296,20 @@ export const SendModal = () => {
 		recipientsTmp[index].position = e;
 		setRecipients(recipientsTmp);
 		if (
-			!changeRecipient.find(
+			!updateRecipient.find(
 				(recipient) => recipient.id === recipientsTmp[index].id
 			) &&
 			recipientsTmp[index].recipientKey
 		) {
-			changeRecipient.push(recipientsTmp[index]);
-			setChangeRecipient(changeRecipient);
+			updateRecipient.push(recipientsTmp[index]);
+			setUpdateRecipient(updateRecipient);
 		}
 	};
-	const saveRecipient = async () => {
-		if (changeRecipient.length > 0) {
-			for (let index = 0; index < changeRecipient.length; index++) {
+	const handleSaveAndClose = async () => {
+		if (updateRecipient.length > 0) {
+			for (let index = 0; index < updateRecipient.length; index++) {
 				const recipientFind = recipients.find(
-					(recipient) => recipient.id === changeRecipient[index].id
+					(recipient) => recipient.id === updateRecipient[index].id
 				);
 				if (recipientFind) {
 					const body = {
@@ -272,6 +322,9 @@ export const SendModal = () => {
 								recipientKey: recipientFind.recipientKey,
 								fullname: recipientFind.fullname,
 								email: recipientFind.email,
+								customMessage: recipientFind.customMessage,
+								action: recipientFind.action,
+								position: recipientFind.position,
 							},
 						},
 					};
@@ -285,7 +338,17 @@ export const SendModal = () => {
 							},
 							responseType: 'json',
 						})
-						.then((payload: any) => {});
+						.then((payload: any) => {})
+						.catch((error) => {
+							setNotification({
+								text:
+									error.response &&
+									error.response.data &&
+									error.response.data.message
+										? error.response.data.message
+										: error.message,
+							});
+						});
 				}
 			}
 		}
@@ -312,63 +375,110 @@ export const SendModal = () => {
 						},
 						responseType: 'json',
 					})
-					.then((payload: any) => {});
+					.then((payload: any) => {})
+					.catch((error) => {
+						setNotification({
+							text:
+								error.response &&
+								error.response.data &&
+								error.response.data.message
+									? error.response.data.message
+									: error.message,
+						});
+					});
 			}
 		}
 		if (insertRecipient.length > 0) {
+			let insertTmp: Recipient[] = [];
 			for (let index = 0; index < insertRecipient.length; index++) {
 				const recipientFind = recipients.find(
 					(recipient) => recipient.id === insertRecipient[index].id
 				);
 				if (recipientFind) {
-					const body = {
-						data: {
-							action: Action.CREATE,
-							clientKey: !token ? clientKey : undefined,
-							userKey: userKey,
-							contractKey: contractKey,
-							recipient: {
-								id: recipientFind.id,
-								fullname: recipientFind.fullname,
-								email: recipientFind.email,
-								customMessage: recipientFind.customMessage,
-								position: recipientFind.position,
-								action: recipientFind.action,
-								recipientKey: '',
-							},
-						},
-					};
-					await axios
-						.post(BASE_URL + ApiEntity.RECIPIENT, body, {
-							headers: {
-								Accept: 'application/vnd.api+json',
-								'Content-Type': 'application/vnd.api+json',
-								'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-								Authorization: token ? `Bearer ${token}` : undefined,
-							},
-							responseType: 'json',
-						})
-						.then((payload: any) => {});
+					insertTmp.push(recipientFind);
 				}
 			}
+			if (insertTmp.length > 0) {
+				const body = {
+					data: {
+						action: Action.CREATE,
+						clientKey: !token ? clientKey : undefined,
+						userKey: userKey,
+						contractKey: contractKey,
+						recipients: insertTmp,
+					},
+				};
+				await axios
+					.post(BASE_URL + ApiEntity.RECIPIENT, body, {
+						headers: {
+							Accept: 'application/vnd.api+json',
+							'Content-Type': 'application/vnd.api+json',
+							'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+							Authorization: token ? `Bearer ${token}` : undefined,
+						},
+						responseType: 'json',
+					})
+					.then((payload: any) => {})
+					.catch((error) => {
+						setNotification({
+							text:
+								error.response &&
+								error.response.data &&
+								error.response.data.message
+									? error.response.data.message
+									: error.message,
+						});
+					});
+			}
 		}
-	};
-	const handleCancel = () => {
-		setRecipients([
-			{
-				id: 0,
-				fullname: '',
-				email: '',
-				customMessage: '',
-				position: 1,
-				action: ShareLinkViewText.SIGN,
-				recipientKey: '',
-			},
-		]);
-		if (newRecipients) {
-			saveRecipient();
+		if (
+			recipients.length > 0 &&
+			updateRecipient.length === 0 &&
+			deleteRecipient.length === 0 &&
+			insertRecipient.length === 0
+		) {
+			const body = {
+				data: {
+					action: Action.CREATE,
+					clientKey: !token ? clientKey : undefined,
+					userKey: userKey,
+					contractKey: contractKey,
+					recipients: [
+						{
+							id: recipients[0].id,
+							fullname: recipients[0].fullname,
+							email: recipients[0].email,
+							customMessage: recipients[0].customMessage,
+							position: recipients[0].position,
+							action: recipients[0].action,
+							recipientKey: '',
+						},
+					],
+				},
+			};
+			await axios
+				.post(BASE_URL + ApiEntity.RECIPIENT, body, {
+					headers: {
+						Accept: 'application/vnd.api+json',
+						'Content-Type': 'application/vnd.api+json',
+						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: token ? `Bearer ${token}` : undefined,
+					},
+					responseType: 'json',
+				})
+				.then((payload: any) => {})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
+				});
 		}
-		setSendModal(false);
+		handleCancel();
 	};
 	const handleDelete = (index: number) => {
 		let recipientsTmp = [...recipients];
@@ -406,17 +516,39 @@ export const SendModal = () => {
 		});
 		setInsertRecipient(insertRecipient);
 	};
+	const handleCopyShareLink = () => {
+		setNotification({
+			text: 'Sharing link copied.',
+		});
+	};
+	const handleCancel = () => {
+		setRecipients([
+			{
+				id: 0,
+				fullname: '',
+				email: '',
+				customMessage: '',
+				position: 1,
+				action: ShareLinkViewText.SIGN,
+				recipientKey: '',
+			},
+		]);
+		setRefreshPlaceholderRecipients(refreshPlaceholderRecipients + 1);
+		setSendModal(false);
+	};
 	return (
 		<Modal
 			title='Send this document'
 			open={sendModal}
 			centered
-			onOk={handleSend}
 			onCancel={handleCancel}
 			footer={
 				<>
 					<Button key='back' onClick={handleCancel}>
 						Cancel
+					</Button>
+					<Button key='back' onClick={handleSaveAndClose}>
+						Save & Close
 					</Button>
 					{recipientInit && (
 						<Button
@@ -540,26 +672,37 @@ export const SendModal = () => {
 										</Spin>
 									</Col>
 									<Col flex='auto'></Col>
-									<Col flex='32px' hidden>
-										<Tooltip title='Send personal request.'>
-											<div>
-												<Button
-													type='text'
-													icon={<FontAwesomeIcon icon={faPaperPlane} />}
+									{recipient.shareLink && (
+										<>
+											<Col flex='32px'>
+												<Tooltip title='Send personal request.'>
+													<div>
+														<Button
+															type='text'
+															icon={<FontAwesomeIcon icon={faPaperPlane} />}
+															onClick={(e: any) => handleSendOne(index)}
+														/>
+													</div>
+												</Tooltip>
+											</Col>
+											<Col flex='32px'>
+												<CopyToClipboard
+													text={recipient.shareLink}
+													children={
+														<Tooltip title='Copy sharing link.'>
+															<div>
+																<Button
+																	type='text'
+																	icon={<FontAwesomeIcon icon={faLink} />}
+																	onClick={handleCopyShareLink}
+																/>
+															</div>
+														</Tooltip>
+													}
 												/>
-											</div>
-										</Tooltip>
-									</Col>
-									<Col flex='32px' hidden>
-										<Tooltip title='Copy sharing link.'>
-											<div>
-												<Button
-													type='text'
-													icon={<FontAwesomeIcon icon={faLink} />}
-												/>
-											</div>
-										</Tooltip>
-									</Col>
+											</Col>
+										</>
+									)}
 									{index !== 0 && (
 										<Col flex='32px'>
 											<Tooltip title='Delete recipient.'>

@@ -45,6 +45,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		setSignCount,
 		refreshPlaceholders,
 		setRefreshPlaceholders,
+		setDocumentCurrentSaved,
 	} = useContractEditorContext();
 	const container = document.querySelector('#contract-editor-container');
 
@@ -119,6 +120,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					'text-change',
 					function (delta: any, oldDelta: any, source: any) {
 						if (source === 'user') {
+							setDocumentCurrentSaved(false);
 							handleChangeText(
 								quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
 							);
@@ -265,6 +267,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					})
 					.then((payload: any) => {
 						//console.log('editor read', payload);
+
+						setDocumentCurrentSaved(true);
 					})
 					.catch((error) => {
 						setNotification({
