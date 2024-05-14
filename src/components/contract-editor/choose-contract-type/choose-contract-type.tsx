@@ -16,13 +16,13 @@ import useSaveArrayBuffer from '../../../hooks/use-save-array-buffer';
 import {
 	Action,
 	ApiEntity,
+	ContractSteps,
 	ContractTypeText,
 	PlaceholderFill,
 } from '../../../config/enum';
 import { BASE_URL } from '../../../config/config';
 import { docx2html } from '../../../utils';
 import { Placeholder, Template } from '../../../config/types';
-import { forEach } from 'lodash';
 
 type Props = {
 	allowPdf: boolean;
@@ -51,6 +51,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 		setPdfDownload,
 		beforeCreated,
 		setFillPlaceholder,
+		setCurrentData,
 	} = useContractEditorContext();
 	const { Title, Text } = Typography;
 	const [options, setOptions] = useState<SegmentedLabeledOption[]>([]);
@@ -100,6 +101,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					//console.log('editor read', payload);
 					let array: SegmentedLabeledOption[] = [];
 					if (isMounted) {
+						setCurrentData({ currentStep: ContractSteps.TYPE_CHOOSE_STEP });
 						array.push({
 							label: (
 								<div
@@ -194,6 +196,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 			let input = null;
 			switch (contractType) {
 				case ContractTypeText.DOCX.toString():
+					setLoad(true);
 					input = document.createElement('input');
 					input.type = 'file';
 					input.accept =
@@ -211,10 +214,12 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 									(payload: any) => {
 										// debugger;
 										setContractValue(payload);
+										setLoad(false);
 										if (beforeCreated && contractName) {
 											setCreateContract(true);
 										} else {
 											setFieldBlockVisible(true);
+											setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
 											setCreateDisable(true);
 										}
 									}
@@ -226,6 +231,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					input.click();
 					break;
 				case ContractTypeText.PDF.toString():
+					setLoad(true);
 					input = document.createElement('input');
 					input.type = 'file';
 					input.accept = 'application/pdf';
@@ -252,8 +258,10 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 								setCreateContract(true);
 							} else {
 								setFieldBlockVisible(true);
+								setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
 								setCreateDisable(true);
 							}
+							setLoad(false);
 						};
 					};
 
@@ -265,6 +273,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 						setCreateContract(true);
 					} else {
 						setFieldBlockVisible(true);
+						setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
 						setCreateDisable(true);
 					}
 					// debugger;
@@ -318,6 +327,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 						setPdfFileLoad(pdfFileLoad + 1);
 						setContractValue(template.value as string);
 						setFieldBlockVisible(true);
+						setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
 						setCreateDisable(true);
 					});
 				setLoad(false);
@@ -456,6 +466,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					setSteps(stepsTmp);
 					setLoad(false);
 					setFieldBlockVisible(true);
+					setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
 					setCreateDisable(true);
 				});
 		};
@@ -504,7 +515,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 						<Space direction='vertical' size={2}>
 							<Title level={4} style={{ margin: '0' }}>
-								Answer the questions below to create your document						
+								Answer the questions below to create your document
 							</Title>
 						</Space>
 						{steps.length > 1 ? (
