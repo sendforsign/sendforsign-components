@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react';
-import { ContractSign, Placeholder } from '../../config/types';
+import { ContractSign, Placeholder, Recipient } from '../../config/types';
+import { StepChangeProps } from './contract-editor';
 
 export type TContractEditorContextType = {
 	signModal: boolean;
@@ -76,6 +77,14 @@ export type TContractEditorContextType = {
 	setContractEvents: (contractEvents: Array<any>) => void;
 	fillPlaceholder: boolean;
 	setFillPlaceholder: (fillPlaceholder: boolean) => void;
+	recipients: Recipient[];
+	setRecipients: (recipients: Recipient[]) => void;
+	refreshPlaceholderRecipients: number;
+	setRefreshPlaceholderRecipients: (
+		refreshPlaceholderRecipients: number
+	) => void;
+	currentData: StepChangeProps;
+	setCurrentData: (currentData: StepChangeProps) => void;
 };
 export const ContractEditorContext = createContext<
 	TContractEditorContextType | undefined

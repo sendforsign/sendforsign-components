@@ -25,9 +25,9 @@ import { ChooseContractType } from './choose-contract-type/choose-contract-type'
 import { ShareLinkBlock } from './share-link-block/share-link-block';
 import { PlaceholderBlock } from './placeholder-block/placeholder-block';
 
-// export interface StepChangeProps {
-// 	currentStep?: ContractSteps;
-// }
+export interface StepChangeProps {
+	currentStep?: ContractSteps;
+}
 export interface ContractEditorProps {
 	apiKey?: string;
 	clientKey?: string;

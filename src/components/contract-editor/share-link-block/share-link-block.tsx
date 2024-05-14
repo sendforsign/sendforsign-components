@@ -40,6 +40,7 @@ export const ShareLinkBlock = () => {
 		placeholderVisible,
 		setPlaceholderVisible,
 		setIpInfo,
+		contractName,
 	} = useContractEditorContext();
 
 	const [shareLinks, setShareLinks] = useState([]);
@@ -191,16 +192,11 @@ export const ShareLinkBlock = () => {
 				responseType: 'blob',
 			})
 			.then((payload) => {
-				// debugger;
-				// const content = new Blob([payload.data as ArrayBuffer], {
-				// 	type: payload.headers['content-type'],
-				// });
-
 				const encodedUri = window.URL.createObjectURL(payload.data as Blob);
 				const link = document.createElement('a');
 
 				link.setAttribute('href', encodedUri);
-				link.setAttribute('download', 'attachment.pdf');
+				link.setAttribute('download', `${contractName}.pdf`);
 
 				link.click();
 				setDownloadPdfSpin(false);

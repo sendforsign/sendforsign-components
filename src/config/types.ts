@@ -160,6 +160,7 @@ export type Recipient = {
 	action?: ShareLinkViewText;
 	recipientKey?: string;
 	isDone?: boolean;
+	shareLink?: string;
 };
 export type Placeholder = {
 	templateKey?: string;

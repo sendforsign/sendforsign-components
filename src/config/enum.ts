@@ -74,3 +74,8 @@ export const enum EventStatus {
 	'SENT' = 2,
 	'CREATED' = 1,
 }
+export const enum ContractSteps {
+	TYPE_CHOOSE_STEP = 'TypeChooseStep',
+	QN_A_STEP = 'QnAStep',
+	CONTRACT_EDITOR_STEP = 'ContractEditorStep',
+}
