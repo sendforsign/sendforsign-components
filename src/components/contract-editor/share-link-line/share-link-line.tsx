@@ -65,6 +65,14 @@ export const ShareLinkLine = ({ controlLink, id, shareLink, view }: Props) => {
 				//console.log('handleDelete read', payload);
 				setRefreshShareLink(refreshShareLink + 1);
 				setDeleteSpin(false);
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
 			});
 	};
 	const handleChange = async (e: any) => {
@@ -89,6 +97,14 @@ export const ShareLinkLine = ({ controlLink, id, shareLink, view }: Props) => {
 				//console.log('handleChange read', payload);
 				setRefreshShareLink(refreshShareLink + 1);
 				setChangeSpin(false);
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
 			});
 	};
 	return (

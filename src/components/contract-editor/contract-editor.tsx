@@ -165,6 +165,16 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					if (isMounted) {
 						contractTmp = result.data.contract;
 					}
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
 				});
 			setContractName(contractTmp.name ? contractTmp.name : '');
 			if (beforeCreated) {
@@ -310,16 +320,27 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			let contractKeyTmp: string = '';
 			const url: string = BASE_URL + ApiEntity.CONTRACT || '';
 
-			const response = await axios.post(url, body, {
-				headers: {
-					Accept: 'application/vnd.api+json',
-					// 'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key':
-						!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-					Authorization: currToken ? `Bearer ${currToken}` : undefined,
-				},
-				responseType: 'json',
-			});
+			const response = await axios
+				.post(url, body, {
+					headers: {
+						Accept: 'application/vnd.api+json',
+						// 'Content-Type': 'application/vnd.api+json',
+						'x-sendforsign-key':
+							!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: currToken ? `Bearer ${currToken}` : undefined,
+					},
+					responseType: 'json',
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
+				});
 			if (response) {
 				setCurrentData({ currentStep: ContractSteps.CONTRACT_EDITOR_STEP });
 				contractKeyTmp = response.data.contract.contractKey;
@@ -362,14 +383,25 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				url =
 					!currToken && currApiKey ? `${url}&clientKey=${currClientKey}` : url;
 
-				const response = await axios.post(url, formData, {
-					headers: {
-						'x-sendforsign-key':
-							!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-						Authorization: currToken ? `Bearer ${currToken}` : undefined,
-					},
-					responseType: 'json',
-				});
+				const response = await axios
+					.post(url, formData, {
+						headers: {
+							'x-sendforsign-key':
+								!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+							Authorization: currToken ? `Bearer ${currToken}` : undefined,
+						},
+						responseType: 'json',
+					})
+					.catch((error) => {
+						setNotification({
+							text:
+								error.response &&
+								error.response.data &&
+								error.response.data.message
+									? error.response.data.message
+									: error.message,
+						});
+					});
 			}
 			setEditorVisible(true);
 			setContinueDisable(true);

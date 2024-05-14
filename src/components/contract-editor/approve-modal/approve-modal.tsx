@@ -17,6 +17,7 @@ export const ApproveModal = () => {
 		refreshEvent,
 		setResultModal,
 		setRefreshEvent,
+		setNotification,
 	} = useContractEditorContext();
 	const { Title, Text } = Typography;
 	const [fullName, setFullName] = useState('');
@@ -49,6 +50,14 @@ export const ApproveModal = () => {
 				handleCancel();
 				sendEmail();
 				setResultModal({ open: true, action: ContractAction.APPROVE });
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
 			});
 	};
 	const handleCancel = () => {
@@ -84,6 +93,14 @@ export const ApproveModal = () => {
 			})
 			.then((payload: any) => {
 				//console.log('editor read', payload);
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
 			});
 	};
 	return (

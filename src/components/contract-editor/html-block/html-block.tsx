@@ -185,6 +185,16 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 							setReadonly(true);
 						}
 					}
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
 				});
 		};
 		getSigns();
@@ -222,6 +232,16 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						//console.log('CHECK_CONTRACT_VALUE read', payload);
 						changed = payload.data.changed;
 						contractValueTmp = payload.data.contractValue;
+					})
+					.catch((error) => {
+						setNotification({
+							text:
+								error.response &&
+								error.response.data &&
+								error.response.data.message
+									? error.response.data.message
+									: error.message,
+						});
 					});
 			}
 			if (!changed) {
@@ -245,6 +265,16 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					})
 					.then((payload: any) => {
 						//console.log('editor read', payload);
+					})
+					.catch((error) => {
+						setNotification({
+							text:
+								error.response &&
+								error.response.data &&
+								error.response.data.message
+									? error.response.data.message
+									: error.message,
+						});
 					});
 			} else {
 				setReadonly(true);
@@ -277,6 +307,14 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			})
 			.then((payload: any) => {
 				//console.log('editor read', payload);
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
 			});
 	};
 	return (

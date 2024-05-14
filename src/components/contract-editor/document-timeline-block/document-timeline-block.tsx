@@ -25,6 +25,7 @@ export const DocumentTimilineBlock = () => {
 		refreshEvent,
 		continueLoad,
 		setContractEvents,
+		setNotification,
 	} = useContractEditorContext();
 	const [timelines, setTimelines] = useState<TimelineItemProps[]>([]);
 	const { Title, Text } = Typography;
@@ -48,6 +49,16 @@ export const DocumentTimilineBlock = () => {
 					if (isMounted) {
 						eventStatusTmp = payload.data;
 					}
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
 				});
 			const url = `${BASE_URL}${ApiEntity.CONTRACT_EVENT}?contractKey=${contractKey}&clientKey=${clientKey}`;
 			await axios
@@ -148,6 +159,16 @@ export const DocumentTimilineBlock = () => {
 						);
 						setTimelines(timelinesTmp);
 					}
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
 				});
 		};
 		if (apiKey || token) {

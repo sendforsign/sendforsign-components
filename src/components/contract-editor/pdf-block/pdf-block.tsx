@@ -30,6 +30,7 @@ export const PdfBlock = () => {
 		setPdfFileLoad,
 		continueLoad,
 		setContinueLoad,
+		setNotification,
 	} = useContractEditorContext();
 	dayjs.extend(utc);
 	const [contractSigns, setContractSigns] = useState<ContractSign[]>([]);
@@ -58,6 +59,16 @@ export const PdfBlock = () => {
 					if (isMounted) {
 						setContractSigns(payload.data);
 					}
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
 				});
 		};
 		getSigns();
@@ -106,6 +117,16 @@ export const PdfBlock = () => {
 							// debugger;
 							setContinueLoad(false);
 						}
+					})
+					.catch((error) => {
+						setNotification({
+							text:
+								error.response &&
+								error.response.data &&
+								error.response.data.message
+									? error.response.data.message
+									: error.message,
+						});
 					});
 			}
 		};

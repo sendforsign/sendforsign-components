@@ -52,6 +52,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 		beforeCreated,
 		setFillPlaceholder,
 		setCurrentData,
+		setNotification,
 	} = useContractEditorContext();
 	const { Title, Text } = Typography;
 	const [options, setOptions] = useState<SegmentedLabeledOption[]>([]);
@@ -181,6 +182,16 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 						setOptions(array);
 						setLoadSegmented(false);
 					}
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
 				});
 		};
 		// console.log('contractKey 6');
@@ -241,7 +252,11 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 						let file = e.target.files[0];
 						const fileSize = Math.round(file.size / 1048576);
 						if (fileSize > 15) {
-							alert('File too big, please select a file less than 15mb');
+							setNotification({
+								text: 'File too big, please select a file less than 15mb',
+							});
+							// alert('File too big, please select a file less than 15mb');
+							setLoad(false);
 							return;
 						}
 						let reader = new FileReader();
@@ -311,6 +326,16 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 				})
 				.then((payload: any) => {
 					template = payload.data.template;
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
 				});
 			if (template.isPdf) {
 				// debugger;
@@ -468,6 +493,16 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					setFieldBlockVisible(true);
 					setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
 					setCreateDisable(true);
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
 				});
 		};
 		if (chooseTemplate) {

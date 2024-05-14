@@ -74,6 +74,16 @@ export const ShareLinkBlock = () => {
 						if (isMounted) {
 							setShareLinks(payload.data);
 						}
+					})
+					.catch((error) => {
+						setNotification({
+							text:
+								error.response &&
+								error.response.data &&
+								error.response.data.message
+									? error.response.data.message
+									: error.message,
+						});
 					});
 			};
 			getShareLinks();
@@ -111,6 +121,14 @@ export const ShareLinkBlock = () => {
 				//console.log('handleAddShareLink read', payload);
 				setRefreshShareLink(refreshShareLink + 1);
 				setAddBtnSpin(false);
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
 			});
 	};
 	const checkChangeContract = async () => {
@@ -138,6 +156,14 @@ export const ShareLinkBlock = () => {
 					setContractValue(payload.data.contractValue);
 					setRefreshSign(refreshSign + 1);
 				}
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
 			});
 		return changed;
 	};
@@ -200,6 +226,14 @@ export const ShareLinkBlock = () => {
 
 				link.click();
 				setDownloadPdfSpin(false);
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
 			});
 	};
 	return (
