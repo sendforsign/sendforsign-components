@@ -29,9 +29,9 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 		setRefreshContracts(refreshContracts + 1);
 		clearParams();
 	};
-	// const handleStep = (e: any) => {
-	// 	console.log('handleStep', e);
-	// };
+	const handleStep = (e: any) => {
+		console.log('handleStep', e);
+	};
 	// const handleSave = (e: any) => {
 	// 	console.log('handleSave', e);
 	// };
@@ -51,7 +51,7 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 					token={token}
 					userKey={userKey}
 					contractKey={contractKey}
-					// onStepChange={handleStep}
+					onStepChange={handleStep}
 					// onDocumentSave={handleSave}
 				/>
 			</Space>

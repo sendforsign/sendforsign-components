@@ -403,7 +403,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 	};
 	const handleChoose = async (e: any) => {
 		// debugger;
-		let contractTypeTmp = e.toString().split('_');
+		let contractTypeTmp = e.toString().split('_'); 
 		if (
 			contractTypeTmp[1] === ContractTypeText.DOCX.toString() ||
 			contractTypeTmp[1] === ContractTypeText.PDF.toString()

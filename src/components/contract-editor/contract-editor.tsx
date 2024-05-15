@@ -112,7 +112,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		currentStep: ContractSteps.TYPE_CHOOSE_STEP,
 	});
 	const [contractEvents, setContractEvents] = useState<Array<any>>([]);
-	const [documentCurrentSaved, setDocumentCurrentSaved] = useState(false);
+	const [documentCurrentSaved, setDocumentCurrentSaved] = useState(true);
+	const [currentStep, setCurrentStep] = useState('');
 	const quillRef = useRef<any>();
 	const contractKeyRef = useRef(contractKey);
 	const { Title, Text } = Typography;
@@ -425,7 +426,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	// console.log('contractKey currContractKey', currContractKey);
 	useEffect(() => {
 		if (onStepChange) {
-			onStepChange(currentData);
+			if (currentData.currentStep !== currentStep) {
+				setCurrentStep(currentData.currentStep as string);
+				onStepChange(currentData);
+			}
 		}
 	}, [currentData]);
 	useEffect(() => {
