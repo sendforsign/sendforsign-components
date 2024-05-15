@@ -92,6 +92,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [createContract, setCreateContract] = useState(false);
 	const [readonly, setReadonly] = useState(false);
 	const [pdfDownload, setPdfDownload] = useState(false);
+	const [load, setLoad] = useState(false);
 	const [placeholderVisible, setPlaceholderVisible] = useState(true);
 	const [sign, setSign] = useState('');
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
@@ -190,6 +191,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				// setContractValue(contractTmp.value ? contractTmp.value : '<div></div>');
 				setReadonly(false);
 				setContinueLoad(false);
+				setCurrentData({ currentStep: ContractSteps.TYPE_CHOOSE_STEP });
 			} else {
 				if (
 					contractTmp &&
@@ -215,8 +217,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					);
 					setContinueLoad(false);
 				}
+				setCurrentData({ currentStep: ContractSteps.CONTRACT_EDITOR_STEP });
 			}
-			setCurrentData({ currentStep: ContractSteps.CONTRACT_EDITOR_STEP });
 		}
 		// debugger;
 		if (currApiKey || currToken) {
@@ -352,23 +354,14 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				contractKeyTmp = response.data.contract.contractKey;
 				if (!beforeCreated) {
 					setCurrContractKey(response.data.contract.contractKey);
-					if (
-						response.data &&
-						response.data.contract &&
-						response.data.contract.contractValue
-					) {
-						setContractValue(response.data.contract.contractValue);
-					}
-				} else {
-					if (
-						response.data &&
-						response.data.contract &&
-						response.data.contract.contractValue
-					) {
-						setContractValue(response.data.contract.contractValue);
-					}
 				}
-
+				if (
+					response.data &&
+					response.data.contract &&
+					response.data.contract.contractValue
+				) {
+					setContractValue(response.data.contract.contractValue);
+				}
 				setPlaceholder([]);
 				setRefreshEvent(refreshEvent + 1);
 			}
@@ -525,6 +518,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setCurrentData,
 				documentCurrentSaved,
 				setDocumentCurrentSaved,
+				load,
+				setLoad,
 			}}
 		>
 			{spinLoad ? (

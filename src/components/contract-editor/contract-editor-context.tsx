@@ -87,6 +87,8 @@ export type TContractEditorContextType = {
 	setCurrentData: (currentData: StepChangeProps) => void;
 	documentCurrentSaved: boolean;
 	setDocumentCurrentSaved: (documentCurrentSaved: boolean) => void;
+	load: boolean;
+	setLoad: (load: boolean) => void;
 };
 export const ContractEditorContext = createContext<
 	TContractEditorContextType | undefined

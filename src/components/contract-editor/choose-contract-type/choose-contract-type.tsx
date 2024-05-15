@@ -53,12 +53,13 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 		setFillPlaceholder,
 		setCurrentData,
 		setNotification,
+		load,
+		setLoad,
 	} = useContractEditorContext();
 	const { Title, Text } = Typography;
 	const [options, setOptions] = useState<SegmentedLabeledOption[]>([]);
 	const currPlaceholder = useRef(placeholder);
 	const [createDisable, setCreateDisable] = useState(true);
-	const [load, setLoad] = useState(false);
 	const [fieldBlockVisible, setFieldBlockVisible] = useState(false);
 	const [loadSegmented, setLoadSegmented] = useState(false);
 	const [chooseTemplate, setChooseTemplate] = useState(false);
@@ -225,13 +226,13 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 									(payload: any) => {
 										// debugger;
 										setContractValue(payload);
-										setLoad(false);
 										if (beforeCreated && contractName) {
 											setCreateContract(true);
 										} else {
 											setFieldBlockVisible(true);
 											setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
 											setCreateDisable(true);
+											setLoad(false);
 										}
 									}
 								);
@@ -275,8 +276,8 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 								setFieldBlockVisible(true);
 								setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
 								setCreateDisable(true);
+								setLoad(false);
 							}
-							setLoad(false);
 						};
 					};
 

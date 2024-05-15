@@ -23,7 +23,7 @@ export const PdfBlock = () => {
 		refreshSign,
 		sign,
 		setSign,
-		setSigns,
+		setLoad,
 		contractKey,
 		clientKey,
 		pdfFileLoad,
@@ -146,6 +146,7 @@ export const PdfBlock = () => {
 			if (isMounted) {
 				setPdfData(arrayBuffer);
 				setContinueLoad(false);
+				setLoad(false);
 			}
 		};
 		getValue();

@@ -44,6 +44,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		setReadonly,
 		setSignCount,
 		refreshPlaceholders,
+		setLoad,
 		setRefreshPlaceholders,
 		setDocumentCurrentSaved,
 	} = useContractEditorContext();
@@ -134,6 +135,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		if (value && quillRef?.current) {
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(value);
 			// debugger;
+			setLoad(false);
 			setRefreshPlaceholders(refreshPlaceholders + 1);
 		}
 	}, [value]);
