@@ -105,7 +105,6 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		useState(0);
 	const [signCount, setSignCount] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
-	const [recipients, setRecipients] = useState<Recipient[]>([]);
 	const [notification, setNotification] = useState({});
 	const [ipInfo, setIpInfo] = useState('');
 	const [currentData, setCurrentData] = useState<StepChangeProps>({
@@ -514,8 +513,6 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setContractEvents,
 				fillPlaceholder,
 				setFillPlaceholder,
-				recipients,
-				setRecipients,
 				refreshPlaceholderRecipients,
 				setRefreshPlaceholderRecipients,
 				currentData,

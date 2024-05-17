@@ -77,8 +77,6 @@ export type TContractEditorContextType = {
 	setContractEvents: (contractEvents: Array<any>) => void;
 	fillPlaceholder: boolean;
 	setFillPlaceholder: (fillPlaceholder: boolean) => void;
-	recipients: Recipient[];
-	setRecipients: (recipients: Recipient[]) => void;
 	refreshPlaceholderRecipients: number;
 	setRefreshPlaceholderRecipients: (
 		refreshPlaceholderRecipients: number
