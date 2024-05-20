@@ -62,7 +62,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 	const [createDisable, setCreateDisable] = useState(true);
 	const [fieldBlockVisible, setFieldBlockVisible] = useState(false);
 	const [loadSegmented, setLoadSegmented] = useState(false);
-	const [chooseTemplate, setChooseTemplate] = useState(false);
+	const [chooseTemplate, setChooseTemplate] = useState(0);
 	const [segmentedValue, setSegmentedValue] = useState('');
 	const [btnName, setBtnName] = useState('Create document');
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
@@ -363,7 +363,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 				if (beforeCreated && contractName) {
 					setCreateContract(true);
 				} else {
-					setChooseTemplate(true);
+					setChooseTemplate(chooseTemplate + 1);
 				}
 			}
 		}
@@ -403,7 +403,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 	};
 	const handleChoose = async (e: any) => {
 		// debugger;
-		let contractTypeTmp = e.toString().split('_'); 
+		let contractTypeTmp = e.toString().split('_');
 		if (
 			contractTypeTmp[1] === ContractTypeText.DOCX.toString() ||
 			contractTypeTmp[1] === ContractTypeText.PDF.toString()

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { Space, Modal } from 'antd';
+import { Space, Modal, Typography, Card } from 'antd';
 import { useTemplateListContext } from '../template-list-context';
 import { TemplateEditor } from '../../template-editor';
 import useSaveParams from '../../../hooks/use-save-params';
@@ -19,6 +19,21 @@ export const ModalView = () => {
 		refreshTemplate,
 		setRefreshTemplate,
 	} = useTemplateListContext();
+	const [currentKey, setCurrentKey] = useState('');
+	const [load, setLoad] = useState(false);
+	const { Title, Text } = Typography;
+
+	useEffect(() => {
+		if (templateModal) {
+			if (templateKey !== currentKey) {
+				setCurrentKey(templateKey);
+				setLoad(true);
+				setTimeout(() => {
+					setLoad(false);
+				}, 10);
+			}
+		}
+	}, [templateModal]);
 	const handleCancel = () => {
 		setTemplateKey('');
 		setRefreshTemplate(refreshTemplate + 1);
@@ -34,15 +49,32 @@ export const ModalView = () => {
 			footer={<></>}
 			width={1200}
 		>
-			<Space direction='vertical' size='large' style={{ display: 'flex' }}>
-				<TemplateEditor
-					apiKey={apiKey}
-					clientKey={clientKey}
-					token={token}
-					userKey={userKey}
-					templateKey={templateKey}
-				/>
-			</Space>
+			{load ? (
+				<Space direction='vertical' size='large' style={{ display: 'flex' }}>
+					<Card loading={load}>
+						<Space direction='vertical' size={16} style={{ display: 'flex' }}>
+							<Space direction='vertical' size={2}>
+								<Title level={4} style={{ margin: '0' }}>
+									Select a document type or upload a file
+								</Title>
+								<Text type='secondary'>
+									This will speed up the drafting process.
+								</Text>
+							</Space>
+						</Space>
+					</Card>
+				</Space>
+			) : (
+				<Space direction='vertical' size='large' style={{ display: 'flex' }}>
+					<TemplateEditor
+						apiKey={apiKey}
+						clientKey={clientKey}
+						token={token}
+						userKey={userKey}
+						templateKey={templateKey}
+					/>
+				</Space>
+			)}
 		</Modal>
 	);
 };

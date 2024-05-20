@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 // import './contract-editor.css';
-import { Card, Col, Row, Space, Spin, Typography, Anchor } from 'antd';
+import { Card, Col, Row, Space, Spin, Typography } from 'antd';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
 import {
