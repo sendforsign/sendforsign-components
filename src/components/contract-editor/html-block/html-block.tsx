@@ -157,14 +157,13 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					.utc()
 					.format('YYYY-MM-DD HH:mm:ss')} GMT</p>`;
 
-			handleChangeText(textTmp, false);
+			handleChangeText(textTmp, false, true);
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(textTmp);
 			// debugger;
 			setContinueLoad(false);
 			setSign('');
 			setContractSign({});
 			quillRef?.current?.enable(false);
-			sendEmail();
 		}
 	}, [sign, contractSign]);
 	useEffect(() => {
@@ -212,7 +211,11 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	};
 
 	const handleChangeText = useDebouncedCallback(
-		async (content: string, needCheck: boolean = true) => {
+		async (
+			content: string,
+			needCheck: boolean = true,
+			email: boolean = false
+		) => {
 			let body = {};
 			let changed = false;
 			let contractValueTmp = '';
@@ -269,7 +272,9 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					})
 					.then((payload: any) => {
 						//console.log('editor read', payload);
-
+						if (email) {
+							sendEmail();
+						}
 						setDocumentCurrentSaved(true);
 					})
 					.catch((error) => {

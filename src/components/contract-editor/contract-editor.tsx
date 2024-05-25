@@ -217,6 +217,9 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					);
 					setContinueLoad(false);
 				}
+				setContractType(
+					contractTmp.contractType ? contractTmp.contractType.toString() : ''
+				);
 				setCurrentData({ currentStep: ContractSteps.CONTRACT_EDITOR_STEP });
 			}
 		}

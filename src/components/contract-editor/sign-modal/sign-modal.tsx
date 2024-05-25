@@ -22,12 +22,15 @@ export const SignModal = () => {
 		contractKey,
 		clientKey,
 		setSign,
+		signCount,
 		setResultModal,
 		refreshSign,
 		refreshEvent,
 		setRefreshSign,
 		setContractSign,
 		setRefreshEvent,
+		setContractValue,
+		setNotification,
 		apiKey,
 		token,
 		ipInfo,
@@ -44,36 +47,45 @@ export const SignModal = () => {
 		if (fullName && email) {
 			// debugger;
 			setSignLoad(true);
-			let canvas: any = padRef?.current?.toDataURL();
-			const body = {
-				clientKey: !token ? clientKey : undefined,
-				contractKey: contractKey,
-				fullName: fullName,
-				email: email,
-				owner: false,
-				base64: canvas,
-				ipInfo: ipInfo,
-			};
-			await axios
-				.post(BASE_URL + ApiEntity.CONTRACT_SIGN, body, {
-					headers: {
-						Accept: 'application/vnd.api+json',
-						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-						Authorization: token ? `Bearer ${token}` : undefined,
-					},
-					responseType: 'json',
-				})
-				.then((payload: any) => {
-					//console.log('getContract read', payload);
-					setContractSign(payload.data);
-					setSign(canvas);
-					setSignLoad(false);
-					handleCancel();
-					setResultModal({ open: true, action: ContractAction.SIGN });
-					setRefreshSign(refreshSign + 1);
-					setRefreshEvent(refreshEvent + 1);
+			const changed = await checkChangeContract();
+			if (changed) {
+				setNotification({
+					text: 'Contract updated. You must check document again.',
 				});
+				handleClear();
+				setSignModal(false);
+			} else {
+				let canvas: any = padRef?.current?.toDataURL();
+				const body = {
+					clientKey: !token ? clientKey : undefined,
+					contractKey: contractKey,
+					fullName: fullName,
+					email: email,
+					owner: false,
+					base64: canvas,
+					ipInfo: ipInfo,
+				};
+				await axios
+					.post(BASE_URL + ApiEntity.CONTRACT_SIGN, body, {
+						headers: {
+							Accept: 'application/vnd.api+json',
+							'Content-Type': 'application/vnd.api+json',
+							'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+							Authorization: token ? `Bearer ${token}` : undefined,
+						},
+						responseType: 'json',
+					})
+					.then((payload: any) => {
+						//console.log('getContract read', payload);
+						setContractSign(payload.data);
+						setSign(canvas);
+						setSignLoad(false);
+						handleCancel();
+						setResultModal({ open: true, action: ContractAction.SIGN });
+						setRefreshSign(refreshSign + 1);
+						setRefreshEvent(refreshEvent + 1);
+					});
+			}
 		}
 	};
 	const handleChange = (e: any) => {
@@ -100,7 +112,41 @@ export const SignModal = () => {
 		handleClear();
 		setSignModal(false);
 	};
-
+	const checkChangeContract = async () => {
+		let changed = false;
+		let body = {
+			clientKey: !token ? clientKey : undefined,
+			contractKey: contractKey,
+			signCount: signCount,
+		};
+		await axios
+			.post(BASE_URL + ApiEntity.CHECK_CONTRACT_VALUE, body, {
+				headers: {
+					Accept: 'application/vnd.api+json',
+					'Content-Type': 'application/vnd.api+json',
+					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: token ? `Bearer ${token}` : undefined,
+				},
+				responseType: 'json',
+			})
+			.then((payload: any) => {
+				//console.log('CHECK_CONTRACT_VALUE read', payload);
+				if (payload.data.changed && payload.data.contractValue) {
+					changed = payload.data.changed;
+					setContractValue(payload.data.contractValue);
+					setRefreshSign(refreshSign + 1);
+				}
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
+			});
+		return changed;
+	};
 	const items = [
 		{
 			key: '1',

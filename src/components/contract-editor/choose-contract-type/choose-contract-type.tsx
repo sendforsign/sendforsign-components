@@ -217,6 +217,14 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					input.onchange = (e: any) => {
 						// debugger;
 						let file = e.target.files[0];
+						const fileSize = Math.round(file.size / 1048576);
+						if (fileSize > 15) {
+							setNotification({
+								text: 'File too big, please select a file less than 15mb',
+							});
+							setLoad(false);
+							return;
+						}
 						let reader = new FileReader();
 						reader.readAsArrayBuffer(file);
 						reader.onload = (readerEvent) => {

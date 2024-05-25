@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Tooltip, Card, Space, Typography, FloatButton } from 'antd';
-import { ApiEntity, ShareLinkView } from '../../../config/enum';
+import { Button, Tooltip, Card, Space, Typography } from 'antd';
+import { ApiEntity, ContractType } from '../../../config/enum';
 import { useContractEditorContext } from '../contract-editor-context';
 import axios from 'axios';
 import { BASE_URL } from '../../../config/config';
@@ -9,13 +9,10 @@ import {
 	faDownload,
 	faObjectUngroup,
 	faPaperPlane,
-	faPlane,
 	faSignature,
-	faSquarePlus,
 	faStamp,
 } from '@fortawesome/free-solid-svg-icons';
-import { ShareLinkLine } from '../share-link-line/share-link-line';
-import { ContractShareLink } from '../../../config/types';
+import useSaveArrayBuffer from '../../../hooks/use-save-array-buffer';
 
 export const ShareLinkBlock = () => {
 	const {
@@ -41,6 +38,7 @@ export const ShareLinkBlock = () => {
 		setPlaceholderVisible,
 		setIpInfo,
 		contractName,
+		contractType,
 	} = useContractEditorContext();
 
 	const [shareLinks, setShareLinks] = useState([]);
@@ -49,7 +47,7 @@ export const ShareLinkBlock = () => {
 	const [signSpin, setSignSpin] = useState(false);
 	const [approveSpin, setApproveSpin] = useState(false);
 	const [downloadPdfSpin, setDownloadPdfSpin] = useState(false);
-	const { Title, Text } = Typography;
+	const { getArrayBuffer } = useSaveArrayBuffer();
 
 	useEffect(() => {
 		setShareLinks([]);
@@ -207,18 +205,44 @@ export const ShareLinkBlock = () => {
 	};
 	const handleDownloadClick = async () => {
 		setDownloadPdfSpin(true);
-		let url = `${BASE_URL}${ApiEntity.DOWNLOAD_PDF}?contractKey=${contractKey}&clientKey=${clientKey}`;
+		if (contractType.toString() !== ContractType.PDF.toString()) {
+			let url = `${BASE_URL}${ApiEntity.DOWNLOAD_PDF}?contractKey=${contractKey}&clientKey=${clientKey}`;
 
-		await axios
-			.get(url, {
-				headers: {
-					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-					Authorization: token ? `Bearer ${token}` : undefined,
-				},
-				responseType: 'blob',
-			})
-			.then((payload) => {
-				const encodedUri = window.URL.createObjectURL(payload.data as Blob);
+			await axios
+				.get(url, {
+					headers: {
+						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: token ? `Bearer ${token}` : undefined,
+					},
+					responseType: 'blob',
+				})
+				.then((payload) => {
+					const encodedUri = window.URL.createObjectURL(payload.data as Blob);
+					const link = document.createElement('a');
+
+					link.setAttribute('href', encodedUri);
+					link.setAttribute('download', `${contractName}.pdf`);
+
+					link.click();
+					setDownloadPdfSpin(false);
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
+				});
+		} else {
+			const arrayBuffer: ArrayBuffer = (await getArrayBuffer(
+				'pdfFile'
+			)) as ArrayBuffer;
+			if (arrayBuffer) {
+				const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+				const encodedUri = window.URL.createObjectURL(blob);
 				const link = document.createElement('a');
 
 				link.setAttribute('href', encodedUri);
@@ -226,15 +250,8 @@ export const ShareLinkBlock = () => {
 
 				link.click();
 				setDownloadPdfSpin(false);
-			})
-			.catch((error) => {
-				setNotification({
-					text:
-						error.response && error.response.data && error.response.data.message
-							? error.response.data.message
-							: error.message,
-				});
-			});
+			}
+		}
 	};
 	return (
 		<Space direction='vertical' size={16} style={{ display: 'flex' }}>
