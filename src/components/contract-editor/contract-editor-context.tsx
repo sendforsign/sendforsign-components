@@ -50,7 +50,9 @@ export type TContractEditorContextType = {
 	refreshPlaceholders: number;
 	setRefreshPlaceholders: (refreshPlaceholders: number) => void;
 	placeholder: Placeholder[];
-	setPlaceholder: (placeholder: any[]) => void;
+	setPlaceholder: (placeholder: Placeholder[]) => void;
+	placeholderPdf: Placeholder;
+	setPlaceholderPdf: (placeholder: Placeholder) => void;
 	placeholderVisible: boolean;
 	setPlaceholderVisible: (placeholderVisible: boolean) => void;
 	isPdf: boolean;

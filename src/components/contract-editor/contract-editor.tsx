@@ -23,7 +23,8 @@ import { Notification } from './notification/notification';
 import { DocumentTimilineBlock } from './document-timeline-block/document-timeline-block';
 import { ChooseContractType } from './choose-contract-type/choose-contract-type';
 import { ShareLinkBlock } from './share-link-block/share-link-block';
-import { PlaceholderBlock } from './placeholder-block/placeholder-block';
+import { PlaceholderHtmlBlock } from './placeholder-html-block/placeholder-html-block';
+import { PlaceholderPdfBlock } from './placeholder-pdf-block';
 
 export interface StepChangeProps {
 	currentStep?: ContractSteps;
@@ -105,6 +106,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		useState(0);
 	const [signCount, setSignCount] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
+	const [placeholderPdf, setPlaceholderPdf] = useState<Placeholder>({});
 	const [notification, setNotification] = useState({});
 	const [ipInfo, setIpInfo] = useState('');
 	const [currentData, setCurrentData] = useState<StepChangeProps>({
@@ -486,6 +488,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setRefreshPlaceholders,
 				placeholder,
 				setPlaceholder,
+				placeholderPdf,
+				setPlaceholderPdf,
 				placeholderVisible,
 				setPlaceholderVisible,
 				contractValue,
@@ -589,7 +593,23 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 													overflow: 'auto',
 												}}
 											>
-												<PlaceholderBlock quillRef={quillRef} />
+												<PlaceholderHtmlBlock quillRef={quillRef} />
+											</Space>
+										</Col>
+									)}
+									{isPdf && placeholderVisible && (
+										<Col flex='300px' style={{ display: 'block' }}>
+											<Space
+												direction='vertical'
+												style={{
+													display: 'flex',
+													top: 10,
+													position: 'sticky',
+													maxHeight: '80vh',
+													overflow: 'auto',
+												}}
+											>
+												<PlaceholderPdfBlock />
 											</Space>
 										</Col>
 									)}

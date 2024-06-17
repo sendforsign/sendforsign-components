@@ -27,16 +27,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faCircleQuestion,
 	faGear,
-	faGlobe,
 	faLeftLong,
-	faUser,
 } from '@fortawesome/free-solid-svg-icons';
 
 type Props = {
 	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
 };
 
-export const PlaceholderBlock = ({ quillRef }: Props) => {
+export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 	const {
 		apiKey,
 		userKey,
@@ -56,6 +54,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 	const [placeholderRecipients, setPlaceholderRecipients] = useState<
 		Recipient[]
 	>([]);
+	const [delLoad, setDelLoad] = useState(false);
 
 	const { Title, Text } = Typography;
 
@@ -239,15 +238,18 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 
 		quillRef?.current?.clipboard.dangerouslyPasteHTML(
 			position ? position?.index : 0,
-			`<placeholder${index + 1} className={placeholderClass${index + 1}}>${
+			`<placeholder${placeholder[index].id} className={placeholderClass${
+				placeholder[index].id
+			}} contenteditable="false">${
 				empty ? placeholder[index].value : `{{{${placeholder[index].name}}}}`
-			}</placeholder${index + 1}>`,
+			}</placeholder${placeholder[index].id}>`,
 			'user'
 		);
 		// handleChangeText(quillRef?.root.innerHTML);
 		//console.log('handleInsertPlaceholder', quillRef?.current?.root.innerHTML);
 	};
 	const handleDeletePlaceholder = async (index: number) => {
+		setDelLoad(true);
 		let placeholdersTmp = [...placeholder];
 
 		let body = {
@@ -277,6 +279,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				setPlaceholder(placeholdersTmp);
 				// setRefreshPlaceholders(refreshPlaceholders + 1);
 				getPlaceholders(false);
+				setDelLoad(false);
 			})
 			.catch((error) => {
 				setNotification({
@@ -285,6 +288,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 							? error.response.data.message
 							: error.message,
 				});
+				setDelLoad(false);
 			});
 	};
 	const handleChange = (e: any, index: number) => {
@@ -318,11 +322,11 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 						const lineArr = array[i].split(tag);
 						for (let j = 0; j < lineArr.length; j++) {
 							if (j === 0) {
-								tag = `"placeholderClass${id}">`;
+								tag = `"placeholderClass${id}" contenteditable="false">`;
 								const elArray = lineArr[j].split(tag);
 								for (let k = 0; k < elArray.length; k++) {
 									if (k === 0) {
-										resultText += `${elArray[k]}"placeholderClass${id}">`;
+										resultText += `${elArray[k]}"placeholderClass${id}" contenteditable="false">`;
 									} else {
 										resultText += `${value}</placeholder${id}>`;
 									}
@@ -621,6 +625,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 													</Radio.Group>
 													<Divider style={{ margin: 0 }} />
 													<Button
+														loading={delLoad}
 														block
 														danger
 														type='text'

@@ -158,9 +158,11 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 
 		quillRef?.current?.clipboard.dangerouslyPasteHTML(
 			position ? position?.index : 0,
-			`<placeholder${index + 1} className={placeholderClass${index + 1}}>${
+			`<placeholder${placeholder[index].id} className={placeholderClass${
+				placeholder[index].id
+			}} contenteditable="false">${
 				empty ? placeholder[index].value : `{{{${placeholder[index].name}}}}`
-			}</placeholder${index + 1}>`,
+			}</placeholder${placeholder[index].id}>`,
 			'user'
 		);
 		// handleChangeText(quillRef?.root.innerHTML);
@@ -229,11 +231,11 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 						const lineArr = array[i].split(tag);
 						for (let j = 0; j < lineArr.length; j++) {
 							if (j === 0) {
-								tag = `"placeholderClass${id}">`;
+								tag = `"placeholderClass${id}" contenteditable="false">`;
 								const elArray = lineArr[j].split(tag);
 								for (let k = 0; k < elArray.length; k++) {
 									if (k === 0) {
-										resultText += `${elArray[k]}"placeholderClass${id}">`;
+										resultText += `${elArray[k]}"placeholderClass${id}" contenteditable="false">`;
 									} else {
 										resultText += `${value}</placeholder${id}>`;
 									}

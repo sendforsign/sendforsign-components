@@ -79,3 +79,7 @@ export const enum ContractSteps {
 	QN_A_STEP = 'QnAStep',
 	CONTRACT_EDITOR_STEP = 'ContractEditorStep',
 }
+export const enum PlaceholderView {
+	OTHER = 1,
+	SIGNATURE = 2,
+}

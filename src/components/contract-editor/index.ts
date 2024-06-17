@@ -7,7 +7,8 @@ export { HtmlBlock } from './html-block/html-block';
 export { Notification } from './notification/notification';
 export { PdfBlock } from './pdf-block/pdf-block';
 export { PdfSign } from './pdf-sign/pdf-sign';
-export { PlaceholderBlock } from './placeholder-block/placeholder-block';
+export { PlaceholderHtmlBlock } from './placeholder-html-block/placeholder-html-block';
+export { PlaceholderPdfBlock } from './placeholder-pdf-block/placeholder-pdf-block';
 export { ResultModal } from './result-modal/result-modal';
 export { SendModal } from './send-modal/send-modal';
 
