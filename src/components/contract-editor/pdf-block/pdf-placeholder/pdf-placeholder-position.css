@@ -1,0 +1,11 @@
+.resizeComponent {
+	position: absolute !important;
+	z-index: 999;
+	border: solid 1px black;
+	display: flex;
+}
+.draggableComponent {
+	position: absolute;
+	z-index: 999;
+	border: solid 1px black;
+}

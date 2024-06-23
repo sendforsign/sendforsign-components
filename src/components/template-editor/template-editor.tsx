@@ -52,6 +52,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const [refreshPlaceholders, setRefreshPlaceholders] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
 	const [spinLoad, setSpinLoad] = useState(false);
+	const [templatePlaceholderCount, setTemplatePlaceholderCount] = useState(0);
 	const templateKeyRef = useRef(templateKey);
 	const { Title, Text } = Typography;
 	const quillRef = useRef<any>();
@@ -262,6 +263,8 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 				setApiKey: setCurrApiKey,
 				token: currToken,
 				setToken: setCurrToken,
+				templatePlaceholderCount,
+				setTemplatePlaceholderCount,
 			}}
 		>
 			{spinLoad ? (

@@ -53,6 +53,8 @@ export const PlaceholderPdfBlock = () => {
 		placeholderVisible,
 		refreshPlaceholderRecipients,
 		setNotification,
+		contractPlaceholderCount,
+		setContractPlaceholderCount,
 	} = useContractEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
@@ -99,6 +101,9 @@ export const PlaceholderPdfBlock = () => {
 					}
 
 					setPlaceholder(placeholderTmp);
+					setContractPlaceholderCount(placeholderTmp.length);
+				} else {
+					setContractPlaceholderCount(0);
 				}
 				if (load) {
 					setPlaceholderLoad(false);
@@ -190,7 +195,7 @@ export const PlaceholderPdfBlock = () => {
 	const handleAddPlaceholder = async () => {
 		let placeholdersTmp = [...placeholder];
 		placeholdersTmp.push({
-			name: `Name${placeholdersTmp.length}`,
+			name: `Name${contractPlaceholderCount + 1}`,
 			value: '',
 			type: PlaceholderTypeText.INTERNAL,
 			fillingType: PlaceholderFill.NONE,

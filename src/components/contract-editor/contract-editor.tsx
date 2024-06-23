@@ -115,6 +115,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [contractEvents, setContractEvents] = useState<Array<any>>([]);
 	const [documentCurrentSaved, setDocumentCurrentSaved] = useState(true);
 	const [currentStep, setCurrentStep] = useState('');
+	const [contractPlaceholderCount, setContractPlaceholderCount] = useState(0);
 	const quillRef = useRef<any>();
 	const contractKeyRef = useRef(contractKey);
 	const { Title, Text } = Typography;
@@ -528,6 +529,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setDocumentCurrentSaved,
 				load,
 				setLoad,
+				contractPlaceholderCount,
+				setContractPlaceholderCount,
 			}}
 		>
 			{spinLoad ? (

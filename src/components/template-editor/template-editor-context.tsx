@@ -36,6 +36,8 @@ export type TTemplateEditorContextType = {
 	setApiKey: (apiKey: string) => void;
 	token: string | undefined;
 	setToken: (token: string) => void;
+	templatePlaceholderCount: number;
+	setTemplatePlaceholderCount: (templatePlaceholderCount: number) => void;
 };
 export const TemplateEditorContext = createContext<
 	TTemplateEditorContextType | undefined

@@ -1,4 +1,9 @@
-import { PlaceholderView, ShareLinkView, ShareLinkViewText } from './enum';
+import {
+	Action,
+	PlaceholderView,
+	ShareLinkView,
+	ShareLinkViewText,
+} from './enum';
 
 export type Contract = {
 	contractType?: number;
@@ -183,4 +188,17 @@ export type Insertion = {
 	height?: number;
 	positionX?: number;
 	positionY?: number;
+	action?: Action;
+};
+export type PagePlaceholder = {
+	pageId?: number;
+	id?: number;
+	placeholderKey?: string;
+	value?: string;
+	name?: string;
+	positionX?: number;
+	positionY?: number;
+	width?: number;
+	height?: number;
+	view?: PlaceholderView;
 };

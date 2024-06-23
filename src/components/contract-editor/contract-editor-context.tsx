@@ -89,6 +89,8 @@ export type TContractEditorContextType = {
 	setDocumentCurrentSaved: (documentCurrentSaved: boolean) => void;
 	load: boolean;
 	setLoad: (load: boolean) => void;
+	contractPlaceholderCount: number;
+	setContractPlaceholderCount: (contractPlaceholderCount: number) => void;
 };
 export const ContractEditorContext = createContext<
 	TContractEditorContextType | undefined
