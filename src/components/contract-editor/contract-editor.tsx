@@ -11,7 +11,12 @@ import {
 	ContractSteps,
 } from '../../config/enum';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
-import { ContractSign, Placeholder, Recipient } from '../../config/types';
+import {
+	ContractSign,
+	PagePlaceholder,
+	Placeholder,
+	Recipient,
+} from '../../config/types';
 import { ContractEditorContext } from './contract-editor-context';
 import { ApproveModal } from './approve-modal/approve-modal';
 import { SignModal } from './sign-modal/sign-modal';
@@ -94,6 +99,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [readonly, setReadonly] = useState(false);
 	const [pdfDownload, setPdfDownload] = useState(false);
 	const [load, setLoad] = useState(false);
+	const [fillType, setFillType] = useState(false);
 	const [placeholderVisible, setPlaceholderVisible] = useState(true);
 	const [sign, setSign] = useState('');
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
@@ -107,6 +113,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [signCount, setSignCount] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
 	const [placeholderPdf, setPlaceholderPdf] = useState<Placeholder>({});
+	const [pagePlaceholder, setPagePlaceholder] = useState<PagePlaceholder[]>([]);
 	const [notification, setNotification] = useState({});
 	const [ipInfo, setIpInfo] = useState('');
 	const [currentData, setCurrentData] = useState<StepChangeProps>({
@@ -118,6 +125,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [contractPlaceholderCount, setContractPlaceholderCount] = useState(0);
 	const quillRef = useRef<any>();
 	const contractKeyRef = useRef(contractKey);
+	const first = useRef(false);
 	const { Title, Text } = Typography;
 	// console.log('contractKey ContractEditor', contractKey, currClientKey);
 
@@ -191,7 +199,6 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setContractType(
 					contractTmp.contractType ? contractTmp.contractType.toString() : ''
 				);
-				// setContractValue(contractTmp.value ? contractTmp.value : '<div></div>');
 				setReadonly(false);
 				setContinueLoad(false);
 				setCurrentData({ currentStep: ContractSteps.TYPE_CHOOSE_STEP });
@@ -204,15 +211,12 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					const response = await axios.get(contractTmp.value as string, {
 						responseType: 'arraybuffer',
 					});
-					// .then(async function (response) {
 					setIsPdf(true);
 					await setArrayBuffer('pdfFile', response.data);
 					await setArrayBuffer('pdfFileOriginal', response.data);
 					setPdfDownload(true);
-					// setPdfData(response.data);
 					setPdfFileLoad(pdfFileLoad + 1);
 					setContinueLoad(false);
-					// });
 				} else {
 					// debugger;
 					setContractValue(
@@ -225,11 +229,12 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				);
 				setCurrentData({ currentStep: ContractSteps.CONTRACT_EDITOR_STEP });
 			}
+			setFillType(true);
 		}
 		// debugger;
-		if (currApiKey || currToken) {
+		if ((currApiKey || currToken) && !first.current) {
 			// console.log('contractKey ContractEditor 1');
-
+			first.current = true;
 			setContractSign({});
 			setSigns([]);
 			setPlaceholder([]);
@@ -531,6 +536,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setLoad,
 				contractPlaceholderCount,
 				setContractPlaceholderCount,
+				pagePlaceholder,
+				setPagePlaceholder,
 			}}
 		>
 			{spinLoad ? (
@@ -584,7 +591,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 											</Card>
 										</Space>
 									</Col>
-									{!isPdf && placeholderVisible && (
+									{fillType && !isPdf && placeholderVisible && (
 										<Col flex='300px' style={{ display: 'block' }}>
 											<Space
 												direction='vertical'
@@ -600,7 +607,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 											</Space>
 										</Col>
 									)}
-									{isPdf && placeholderVisible && (
+									{fillType && isPdf && placeholderVisible && (
 										<Col flex='300px' style={{ display: 'block' }}>
 											<Space
 												direction='vertical'

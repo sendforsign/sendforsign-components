@@ -5,15 +5,18 @@ import { useContractEditorContext } from '../../contract-editor-context';
 import { PlaceholderView } from '../../../../config/enum';
 import { PdfPlaceholderPosition } from '../pdf-placeholder/pdf-placeholder-position';
 type Props = {
+	docRef?: any;
 	pageNumber: number;
 	width: number;
-	height: number;
+	height?: number;
 	scale: number;
 	pagePlaceholder: PagePlaceholder[];
 	onChange?: (data: any) => void;
 	onDelete?: (data: any) => void;
+	onCreate?: (data: any) => void;
 };
 export const PdfPage = ({
+	docRef,
 	pageNumber,
 	width,
 	height,
@@ -21,12 +24,13 @@ export const PdfPage = ({
 	pagePlaceholder,
 	onChange,
 	onDelete,
+	onCreate,
 }: Props) => {
 	const { placeholderPdf, setPlaceholderPdf } = useContractEditorContext();
-	const needUpdate = useRef(false);
 	const [currPagePlaceholder, setCurrPagePlaceholder] = useState<
 		PagePlaceholder[]
 	>([]);
+	const [pageDetail, setPageDetail] = useState<any>({});
 
 	useEffect(() => {
 		if (pagePlaceholder.length > 0) {
@@ -38,17 +42,11 @@ export const PdfPage = ({
 		<div id={`page_${pageNumber}`}>
 			<Page
 				width={width}
-				height={height}
+				// height={height}
 				pageNumber={pageNumber + 1}
-				scale={scale}
-				onKeyDown={(e: any) => {
-					console.log('onKeyDown');
-				}}
-				onKeyUp={(e: any) => {
-					console.log('onKeyUp');
-				}}
-				onKeyPress={(e: any) => {
-					console.log('onKeyPress');
+				// scale={scale}
+				onLoadSuccess={(e) => {
+					setPageDetail(e);
 				}}
 				onClick={(e) => {
 					if (placeholderPdf.placeholderKey) {
@@ -56,11 +54,21 @@ export const PdfPage = ({
 						let idTmp: number[] = [];
 						let idMax = 0;
 						if (pagePlaceholderTmp && pagePlaceholderTmp.length > 0) {
-							idTmp = pagePlaceholderTmp?.map((filt) => {
-								return filt.id ? filt.id : 0;
-							});
-							idMax = Math.max(...idTmp);
+							idTmp = pagePlaceholderTmp
+								?.filter(
+									(filt) =>
+										filt.placeholderKey === placeholderPdf.placeholderKey
+								)
+								?.map((filt) => {
+									return filt.id ? filt.id : 0;
+								});
+							if (idTmp && idTmp.length > 0) {
+								idMax = Math.max(...idTmp);
+							} else {
+								idMax = 0;
+							}
 						}
+						// console.log('onClick', pagePlaceholderTmp);
 						const newPlaceholderPosition: PagePlaceholder = {
 							pageId: pageNumber,
 							id: idMax + 1,
@@ -68,17 +76,15 @@ export const PdfPage = ({
 							value: placeholderPdf.value as string,
 							name: placeholderPdf.name as string,
 							view: placeholderPdf.view as PlaceholderView,
-							positionX: parseInt((e.clientX - 50).toString(), 10),
-							positionY:
-								-e.currentTarget.offsetHeight +
-								parseInt((e.clientY + 15).toString(), 10),
+							positionX: e.clientX - 50,
+							positionY: -(e.currentTarget.offsetHeight - e.clientY - 15),
 							width: 100,
 							height: 30,
 						};
-						pagePlaceholderTmp.push(newPlaceholderPosition);
-						setCurrPagePlaceholder(pagePlaceholderTmp);
 						setPlaceholderPdf({});
-						needUpdate.current = true;
+						if (onCreate) {
+							onCreate({ pagePlaceholder: newPlaceholderPosition });
+						}
 					}
 				}}
 			>
@@ -87,6 +93,8 @@ export const PdfPage = ({
 					currPagePlaceholder.map((pagePl) => {
 						return (
 							<PdfPlaceholderPosition
+								docRef={docRef}
+								pageDetail={pageDetail}
 								pagePlaceholder={pagePl}
 								onChange={(e: any) => {
 									let pagePlaceholderTmp = [...currPagePlaceholder];

@@ -118,6 +118,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 			type: PlaceholderTypeText.INTERNAL,
 			fillingType: PlaceholderFill.NONE,
 		});
+
 		setPlaceholder(placeholdersTmp);
 
 		let body = {
@@ -195,6 +196,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				//console.log('PLACEHOLDER read', payload);
 
 				placeholdersTmp.splice(index, 1);
+
 				setPlaceholder(placeholdersTmp);
 				// setRefreshPlaceholders(refreshPlaceholders + 1);
 				getPlaceholders(false);
@@ -337,9 +339,10 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 	};
 	const handleChangeFilling = async (e: any, index: number) => {
 		// console.log('handleChangeFilling', e);
-		debugger;
+
 		let placeholderTmp = [...placeholder];
 		placeholderTmp[index].fillingType = e.target.value;
+
 		setPlaceholder(placeholderTmp);
 		let body = {
 			data: {

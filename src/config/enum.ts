@@ -83,3 +83,10 @@ export const enum PlaceholderView {
 	OTHER = 1,
 	SIGNATURE = 2,
 }
+export const enum EventStatuses {
+	SIGNED = '5',
+	APPROVED = '4',
+	SEEN = '3',
+	SENT = '2',
+	CREATED = '1',
+}

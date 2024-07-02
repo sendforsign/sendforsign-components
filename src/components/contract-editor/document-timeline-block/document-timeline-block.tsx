@@ -32,7 +32,7 @@ export const DocumentTimilineBlock = () => {
 
 	useEffect(() => {
 		let isMounted = true;
-		const getContractEvents = async () => {
+		const getContractEvents = async () => { 
 			let eventStatusTmp: EventStatus[] = [];
 			await axios
 				.get(BASE_URL + ApiEntity.EVENT_STATUS, {

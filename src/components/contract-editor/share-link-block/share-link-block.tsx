@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Tooltip, Card, Space, Typography } from 'antd';
-import { ApiEntity, ContractType } from '../../../config/enum';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import {
+	ApiEntity,
+	ContractType,
+	EventStatuses,
+	PlaceholderView,
+} from '../../../config/enum';
 import { useContractEditorContext } from '../contract-editor-context';
 import axios from 'axios';
 import { BASE_URL } from '../../../config/config';
@@ -13,6 +20,11 @@ import {
 	faStamp,
 } from '@fortawesome/free-solid-svg-icons';
 import useSaveArrayBuffer from '../../../hooks/use-save-array-buffer';
+import PDFMerger from 'pdf-merger-js/browser';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { Row } from '../../../config/types';
+import { PdfAuditTrail } from '../pdf-audit-trail/pdf-audit-trail';
+import { pdf } from '@react-pdf/renderer';
 
 export const ShareLinkBlock = () => {
 	const {
@@ -39,7 +51,11 @@ export const ShareLinkBlock = () => {
 		setIpInfo,
 		contractName,
 		contractType,
+		pagePlaceholder,
+		contractEvents,
+		signs,
 	} = useContractEditorContext();
+	dayjs.extend(utc);
 
 	const [shareLinks, setShareLinks] = useState([]);
 	const [addBtnSpin, setAddBtnSpin] = useState(false);
@@ -241,8 +257,95 @@ export const ShareLinkBlock = () => {
 				'pdfFile'
 			)) as ArrayBuffer;
 			if (arrayBuffer) {
-				const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
-				const encodedUri = window.URL.createObjectURL(blob);
+				const merger = new PDFMerger();
+				const pdfDoc = await PDFDocument.load(arrayBuffer);
+				const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+				const pages = pdfDoc.getPages();
+				const textSize = 10;
+				for (let i = 0; i < pagePlaceholder.length; i++) {
+					const scale =
+						pages[pagePlaceholder[i].pageId as number].getWidth() / 1000;
+					if (
+						pagePlaceholder[i]?.view?.toString() ===
+						PlaceholderView.SIGNATURE.toString()
+					) {
+						const pngImage = await pdfDoc.embedPng(
+							pagePlaceholder[i].base64 as string
+						);
+						pages[pagePlaceholder[i].pageId as number].drawImage(pngImage, {
+							x: (pagePlaceholder[i].positionX as number) * scale,
+							y:
+								(Math.abs(pagePlaceholder[i].positionY as number) -
+									(pagePlaceholder[i].height as number)) *
+								scale,
+							width: (pagePlaceholder[i].width as number) * scale,
+							height: (pagePlaceholder[i].height as number) * scale,
+						});
+					} else {
+						pages[pagePlaceholder[i].pageId as number].drawText(
+							(pagePlaceholder[i].value as string)
+								? (pagePlaceholder[i].value as string)
+								: (pagePlaceholder[i].name as string),
+							{
+								x: (pagePlaceholder[i]?.positionX as number) * scale,
+								y:
+									Math.abs(pagePlaceholder[i].positionY as number) * scale -
+									textSize,
+								font: helveticaFont,
+								size: textSize,
+								lineHeight: 12,
+								color: rgb(0, 0, 0),
+								opacity: 1,
+								maxWidth: (pagePlaceholder[i].width as number) * scale,
+							}
+						);
+					}
+				}
+				const pdfBytes = await pdfDoc.save();
+				await merger.add(pdfBytes.buffer);
+
+				let rows: Row[] = contractEvents
+					.filter(
+						(contractEventData) =>
+							contractEventData.status.toString() ===
+							EventStatuses.SIGNED.toString()
+					)
+					?.map((contractEventData) => {
+						let row: Row = {};
+						if (contractEventData.ipInfo) {
+							const json = JSON.parse(contractEventData.ipInfo);
+							if (json) {
+								row.json = json;
+							}
+						}
+						const signFind = signs.find(
+							(signData) =>
+								signData.email === contractEventData.email &&
+								signData.fullName === contractEventData.name
+						);
+						if (signFind) {
+							row.base64 = signFind.base64;
+						}
+						row.email = contractEventData.email;
+						row.name = contractEventData.name;
+						row.createTime = `${dayjs(contractEventData.createTime).format(
+							'YYYY-MM-DD @ HH:mm:ss'
+						)} GMT`;
+						return row;
+					});
+
+				const auditTrail = await pdf(
+					<PdfAuditTrail
+						contract={{ controlLink: contractKey, contractName: contractName }}
+						rows={rows}
+					/>
+				).toBlob();
+				await merger.add(await auditTrail.arrayBuffer());
+
+				const mergedPdfBlob = await merger.saveAsBlob();
+
+				// const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+				const encodedUri = window.URL.createObjectURL(mergedPdfBlob);
 				const link = document.createElement('a');
 
 				link.setAttribute('href', encodedUri);
@@ -356,15 +459,6 @@ export const ShareLinkBlock = () => {
 								</Button>
 							</div>
 						</Tooltip>
-						{/* <Tooltip title='Add another link to this contract.'>
-							<div>
-								<Button
-									icon={<FontAwesomeIcon icon={faSquarePlus} />}
-									onClick={handleAddShareLink}
-									loading={addBtnSpin}
-								></Button>
-							</div>
-						</Tooltip> */}
 					</Space>
 				</Space>
 			</Card>

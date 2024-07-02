@@ -1,5 +1,10 @@
 import { createContext, useContext } from 'react';
-import { ContractSign, Placeholder, Recipient } from '../../config/types';
+import {
+	ContractSign,
+	PagePlaceholder,
+	Placeholder,
+	Recipient,
+} from '../../config/types';
 import { StepChangeProps } from './contract-editor';
 
 export type TContractEditorContextType = {
@@ -51,6 +56,8 @@ export type TContractEditorContextType = {
 	setRefreshPlaceholders: (refreshPlaceholders: number) => void;
 	placeholder: Placeholder[];
 	setPlaceholder: (placeholder: Placeholder[]) => void;
+	pagePlaceholder: PagePlaceholder[];
+	setPagePlaceholder: (pagePlaceholder: PagePlaceholder[]) => void;
 	placeholderPdf: Placeholder;
 	setPlaceholderPdf: (placeholder: Placeholder) => void;
 	placeholderVisible: boolean;

@@ -82,8 +82,8 @@ export const SignModal = () => {
 						setSignLoad(false);
 						handleCancel();
 						setResultModal({ open: true, action: ContractAction.SIGN });
-						setRefreshSign(refreshSign + 1);
 						setRefreshEvent(refreshEvent + 1);
+						setRefreshSign(refreshSign + 1);
 					});
 			}
 		}

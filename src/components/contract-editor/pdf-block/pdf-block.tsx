@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Spin } from 'antd';
 import './pdf-block.css';
 import PDFMerger from 'pdf-merger-js/browser';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { pdf } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -9,18 +10,25 @@ import { PdfSign } from '../pdf-sign/pdf-sign';
 import useSaveArrayBuffer from '../../../hooks/use-save-array-buffer';
 import { useContractEditorContext } from '../contract-editor-context';
 import axios from 'axios';
-import { Action, ApiEntity, PlaceholderView } from '../../../config/enum';
+import {
+	Action,
+	ApiEntity,
+	EventStatuses,
+	PlaceholderView,
+} from '../../../config/enum';
 import { BASE_URL } from '../../../config/config';
 import {
 	ContractSign,
 	Insertion,
 	PagePlaceholder,
 	Placeholder,
+	Row,
 } from '../../../config/types';
 import { Document, pdfjs } from 'react-pdf';
 import { useResizeDetector } from 'react-resize-detector';
 import { isArray } from 'lodash';
 import { PdfPage } from './pdf-page/pdf-page';
+import { PdfAuditTrail } from '../pdf-audit-trail/pdf-audit-trail';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 export const PdfBlock = () => {
@@ -39,6 +47,11 @@ export const PdfBlock = () => {
 		continueLoad,
 		setContinueLoad,
 		setNotification,
+		setSigns,
+		contractEvents,
+		contractName,
+		pagePlaceholder,
+		setPagePlaceholder,
 	} = useContractEditorContext();
 	dayjs.extend(utc);
 	const [contractSigns, setContractSigns] = useState<ContractSign[]>([]);
@@ -47,14 +60,13 @@ export const PdfBlock = () => {
 	const scale = useRef(1);
 	const needUpdate = useRef(false);
 	const [pdfData, setPdfData] = useState<ArrayBuffer>();
-	const [pagePlaceholder, setPagePlaceholder] = useState<PagePlaceholder[]>([]);
 	const [delPlaceholderPosition, setDelPlaceholderPosition] = useState<
 		PagePlaceholder[]
 	>([]);
 	const { getArrayBuffer, setArrayBuffer } = useSaveArrayBuffer();
 
 	const { width, ref, height } = useResizeDetector();
-	console.log('scale', scale.current);
+	// console.log('scale', width, height);
 	useEffect(() => {
 		let isMounted = true;
 		const getSigns = async () => {
@@ -99,21 +111,108 @@ export const PdfBlock = () => {
 			if (!pdfFile || (pdfFile && byteLength === 0)) {
 				return;
 			}
-			const merger = new PDFMerger();
+			let merger = new PDFMerger();
 			let arrayBuffer = pdfFile;
 			await merger.add(pdfFile);
 
 			// debugger;
-			// setSigns(contractSigns);
+			setSigns(contractSigns);
 			const blob = await pdf(<PdfSign signs={contractSigns} />).toBlob();
 			arrayBuffer = await blob.arrayBuffer();
 			await merger.add(arrayBuffer as ArrayBuffer);
 
-			const mergedPdfBlob = await merger.saveAsBlob();
+			let mergedPdfBlob = await merger.saveAsBlob();
 			const mergedPdf = await mergedPdfBlob.arrayBuffer();
 			await setArrayBuffer('pdfFile', mergedPdf);
 			setPdfFileLoad(pdfFileLoad + 1);
 			if (sign) {
+				merger = new PDFMerger();
+				const pdfDoc = await PDFDocument.load(mergedPdf);
+				const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+				const pages = pdfDoc.getPages();
+				const textSize = 10;
+				for (let i = 0; i < pagePlaceholder.length; i++) {
+					const scale =
+						pages[pagePlaceholder[i].pageId as number].getWidth() / 1000;
+					if (
+						pagePlaceholder[i]?.view?.toString() ===
+						PlaceholderView.SIGNATURE.toString()
+					) {
+						const pngImage = await pdfDoc.embedPng(
+							pagePlaceholder[i].base64 as string
+						);
+						pages[pagePlaceholder[i].pageId as number].drawImage(pngImage, {
+							x: (pagePlaceholder[i].positionX as number) * scale,
+							y:
+								(Math.abs(pagePlaceholder[i].positionY as number) -
+									(pagePlaceholder[i].height as number)) *
+								scale,
+							width: (pagePlaceholder[i].width as number) * scale,
+							height: (pagePlaceholder[i].height as number) * scale,
+						});
+					} else {
+						pages[pagePlaceholder[i].pageId as number].drawText(
+							(pagePlaceholder[i].value as string)
+								? (pagePlaceholder[i].value as string)
+								: (pagePlaceholder[i].name as string),
+							{
+								x: (pagePlaceholder[i]?.positionX as number) * scale,
+								y:
+									Math.abs(pagePlaceholder[i].positionY as number) * scale -
+									textSize,
+								font: helveticaFont,
+								size: textSize,
+								lineHeight: 12,
+								color: rgb(0, 0, 0),
+								opacity: 1,
+								maxWidth: (pagePlaceholder[i].width as number) * scale,
+							}
+						);
+					}
+				}
+				const pdfBytes = await pdfDoc.save();
+				await merger.add(pdfBytes.buffer);
+
+				let rows: Row[] = contractEvents
+					.filter(
+						(contractEventData) =>
+							contractEventData.status.toString() ===
+							EventStatuses.SIGNED.toString()
+					)
+					?.map((contractEventData) => {
+						let row: Row = {};
+						if (contractEventData.ipInfo) {
+							const json = JSON.parse(contractEventData.ipInfo);
+							if (json) {
+								row.json = json;
+							}
+						}
+						const signFind = contractSigns.find(
+							(signData) =>
+								signData.email === contractEventData.email &&
+								signData.fullName === contractEventData.name
+						);
+						if (signFind) {
+							row.base64 = signFind.base64;
+						}
+						row.email = contractEventData.email;
+						row.name = contractEventData.name;
+						row.createTime = `${dayjs(contractEventData.createTime).format(
+							'YYYY-MM-DD @ HH:mm:ss'
+						)} GMT`;
+						return row;
+					});
+
+				const auditTrail = await pdf(
+					<PdfAuditTrail
+						contract={{ controlLink: contractKey, contractName: contractName }}
+						rows={rows}
+					/>
+				).toBlob();
+				await merger.add(await auditTrail.arrayBuffer());
+
+				const mergedPdfBlob = await merger.saveAsBlob();
+
 				const formData = new FormData();
 				formData.append('pdf', mergedPdfBlob);
 				let url = `${BASE_URL}${ApiEntity.CONTRACT_EMAIL_SIGN_PDF}?contractKey=${contractKey}&clientKey=${clientKey}`;
@@ -187,10 +286,26 @@ export const PdfBlock = () => {
 						(pl) => pl.placeholderKey === pagePlaceholder[i]?.placeholderKey
 					);
 					if (findIndex >= 0) {
+						let base64 = '';
+						if (
+							contractSigns &&
+							contractSigns.length > 0 &&
+							placeholder[findIndex].view?.toString() ===
+								PlaceholderView.SIGNATURE.toString()
+						) {
+							const findSign = contractSigns.find(
+								(contractSign) =>
+									contractSign.shareLink ===
+									placeholder[findIndex].externalRecipientKey
+							);
+							if (findSign) {
+								base64 = findSign.base64 as string;
+							}
+						}
+						pagePlaceholder[i].base64 = base64;
 						pagePlaceholderTmp.push(pagePlaceholder[i]);
 					}
 				}
-				setPagePlaceholder(pagePlaceholderTmp);
 			} else {
 				for (let i = 0; i < placeholder.length; i++) {
 					if (
@@ -199,6 +314,21 @@ export const PdfBlock = () => {
 						(placeholder[i]?.insertion as Insertion[]).length > 0
 					) {
 						const insertion = placeholder[i]?.insertion;
+						let base64 = '';
+						if (
+							contractSigns &&
+							contractSigns.length > 0 &&
+							placeholder[i].view?.toString() ===
+								PlaceholderView.SIGNATURE.toString()
+						) {
+							const findSign = contractSigns.find(
+								(contractSign) =>
+									contractSign.shareLink === placeholder[i].externalRecipientKey
+							);
+							if (findSign) {
+								base64 = findSign.base64 as string;
+							}
+						}
 						if (insertion) {
 							for (let j = 0; j < insertion.length; j++) {
 								pagePlaceholderTmp.push({
@@ -212,16 +342,16 @@ export const PdfBlock = () => {
 									width: insertion[j].width as number,
 									height: insertion[j].height as number,
 									view: placeholder[i].view as PlaceholderView,
+									base64: base64,
 								});
 							}
 						}
 					}
 				}
-
-				setPagePlaceholder(pagePlaceholderTmp);
 			}
+			setPagePlaceholder(pagePlaceholderTmp);
 		}
-	}, [placeholder]);
+	}, [placeholder, contractSigns]);
 
 	const save = async () => {
 		if (needUpdate.current) {
@@ -344,7 +474,7 @@ export const PdfBlock = () => {
 		}
 	};
 	return (
-		<div ref={ref}>
+		<div ref={ref} style={{ overflow: 'auto' }}>
 			<Document
 				loading={<Spin spinning={continueLoad} />}
 				file={pdfData}
@@ -367,13 +497,19 @@ export const PdfBlock = () => {
 				{new Array(numPages).fill(0).map((_, i) => {
 					return (
 						<PdfPage
-							height={height as number}
-							width={width as number}
+							docRef={ref}
+							width={1000}
 							pageNumber={i}
 							scale={scale.current}
 							pagePlaceholder={pagePlaceholder.filter(
 								(pagePl) => pagePl.pageId?.toString() === i.toString()
 							)}
+							onCreate={(e: any) => {
+								let pagePlaceholderTmp = [...pagePlaceholder];
+								pagePlaceholderTmp.push(e.pagePlaceholder);
+								setPagePlaceholder(pagePlaceholderTmp);
+								needUpdate.current = true;
+							}}
 							onChange={(e: any) => {
 								const currPagePlaceholder = e.pagePlaceholder;
 								let pagePlaceholderTmp = [...pagePlaceholder];
@@ -417,146 +553,9 @@ export const PdfBlock = () => {
 									}
 								}
 								setPagePlaceholder(pagePlaceholderTmp);
+								needUpdate.current = true;
 							}}
 						/>
-						// <div
-						// 	id={`page_${i}`}
-						// 	onDrop={(e) => {
-						// 		console.log(e);
-						// 	}}
-						// >
-						// 	<Page
-						// 		width={width}
-						// 		height={height}
-						// 		pageNumber={i + 1}
-						// 		scale={scale.current}
-						// 		onClick={(e) => {
-						// 			if (placeholderPdf.placeholderKey) {
-						// 				let pagePlaceholderTmp = [...pagePlaceholder];
-						// 				let idTmp: number[] = [];
-						// 				const filter = pagePlaceholderTmp.filter(
-						// 					(pagePl) => pagePl.pageId?.toString() === i.toString()
-						// 				);
-						// 				let idMax = 0;
-						// 				if (filter && filter.length > 0) {
-						// 					idTmp = filter?.map((filt) => {
-						// 						return filt.id ? filt.id : 0;
-						// 					});
-						// 					idMax = Math.max(...idTmp);
-						// 				}
-						// 				const newPlaceholderPosition: PagePlaceholder = {
-						// 					pageId: i,
-						// 					id: idMax + 1,
-						// 					placeholderKey: placeholderPdf.placeholderKey,
-						// 					value: placeholderPdf.value as string,
-						// 					name: placeholderPdf.name as string,
-						// 					view: placeholderPdf.view as PlaceholderView,
-						// 					positionX: parseInt((e.clientX - 50).toString(), 10),
-						// 					positionY:
-						// 						-e.currentTarget.offsetHeight +
-						// 						parseInt((e.clientY + 15).toString(), 10),
-						// 					width: 100,
-						// 					height: 30,
-						// 				};
-						// 				pagePlaceholderTmp.push(newPlaceholderPosition);
-						// 				setPagePlaceholder(pagePlaceholderTmp);
-						// 				setPlaceholderPdf({});
-						// 				needUpdate.current = true;
-						// 			}
-						// 		}}
-						// 	>
-						// 		{pagePlaceholder &&
-						// 			pagePlaceholder.length > 0 &&
-						// 			pagePlaceholder
-						// 				.filter(
-						// 					(pagePl) => pagePl.pageId?.toString() === i.toString()
-						// 				)
-						// 				.map((pagePl) => {
-						// 					return (
-						// 						<PdfPlaceholderPosition
-						// 							pagePlaceholder={pagePl}
-						// 							onChange={(e: any) => {
-						// 								console.log(e);
-						// 							}}
-						// 						/>
-						// 						// <Draggable
-						// 						// 	bounds='parent'
-						// 						// 	onStop={(e, position) => {
-						// 						// 		e.stopPropagation();
-						// 						// 		e.preventDefault();
-						// 						// 		handleDrag(pagePl.pageId, pagePl.id, position);
-						// 						// 	}}
-						// 						// 	position={{
-						// 						// 		x: pagePl.positionX,
-						// 						// 		y: pagePl.positionY,
-						// 						// 	}}
-						// 						// 	// onMouseDown={(e: any) => {
-						// 						// 	// 	console.log('onMouseDown', e);
-						// 						// 	// }}
-						// 						// 	// onStart={(e: any) => {
-						// 						// 	// 	console.log('onStart', e);
-						// 						// 	// }}
-						// 						// >
-						// 						// 	//{' '}
-						// 						// 	{/* <Resizable
-						// 						// // 	className='resizeComponent'
-						// 						// // 	size={{
-						// 						// // 		width: pagePl.width,
-						// 						// // 		height: pagePl.height,
-						// 						// // 	}}
-						// 						// // 	minHeight={'30px'}
-						// 						// // 	minWidth={'100px'}
-						// 						// // 	maxWidth={'400px'}
-						// 						// // 	maxHeight={'200px'}
-						// 						// // 	enable={{
-						// 						// // 		topRight: true,
-						// 						// // 		bottomRight: true,
-						// 						// // 		bottomLeft: true,
-						// 						// // 		topLeft: true,
-						// 						// // 	}}
-						// 						// // 	bounds={'parent'}
-						// 						// // 	boundsByDirection={false}
-						// 						// // 	lockAspectRatio={true}
-						// 						// // 	resizeRatio={[1, 1]}
-						// 						// // 	onResizeStart={(e) => {
-						// 						// // 		e.stopPropagation();
-						// 						// // 		e.preventDefault();
-						// 						// // 	}}
-						// 						// // 	onResizeStop={(e, direction, ref, d) => {
-						// 						// // 		console.log('direction', direction, ref);
-						// 						// // 		e.stopPropagation();
-						// 						// // 		e.preventDefault();
-						// 						// // 		handleResize(pagePl.pageId, pagePl.id, d);
-						// 						// // 	}}
-						// 						// // > */}
-						// 						// 	<div
-						// 						// 		id={`insertion-${pagePl.pageId}-${pagePl.id}-${pagePl.placeholderKey}`}
-						// 						// 		className='resizeComponent'
-						// 						// 		// onClick={() => {
-						// 						// 		// 	console.log('onClick');
-						// 						// 		// }}
-						// 						// 		// onResize={(e: any) => {
-						// 						// 		// 	console.log('onResizeCapture', e);
-						// 						// 		// }}
-						// 						// 		// draggable
-						// 						// 		// onDragStart={(e: any) => {
-						// 						// 		// 	console.log('onClick');
-						// 						// 		// }}
-						// 						// 	>
-						// 						// 		{pagePl.view?.toString() ===
-						// 						// 		PlaceholderView.SIGNATURE.toString() ? (
-						// 						// 			<FontAwesomeIcon icon={faDownload} />
-						// 						// 		) : (
-						// 						// 			<>{pagePl.value ? pagePl.value : pagePl.name}</>
-						// 						// 		)}
-						// 						// 	</div>
-						// 						// 	// {/* </Resizable> */}
-						// 						// 	//{' '}
-						// 						// </Draggable>
-						// 					);
-						// 				})}
-						// 	</Page>
-						// </div>
 					);
 				})}
 			</Document>

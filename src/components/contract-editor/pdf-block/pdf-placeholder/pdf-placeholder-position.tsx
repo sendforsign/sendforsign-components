@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import './pdf-placeholder-position.css';
 import { Resizable } from 're-resizable';
 import Draggable from 'react-draggable';
@@ -7,17 +7,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PlaceholderView } from '../../../../config/enum';
 import { PagePlaceholder } from '../../../../config/types';
 import { Button, Popover, Space } from 'antd';
+import { isNaN } from 'lodash';
 
 type Props = {
+	docRef?: any;
+	pageDetail?: any;
 	pagePlaceholder: PagePlaceholder;
 	onChange?: (data: any) => void;
 	onDelete?: (data: any) => void;
 };
 export const PdfPlaceholderPosition = ({
+	docRef,
+	pageDetail,
 	pagePlaceholder,
 	onChange,
 	onDelete,
 }: Props) => {
+	const first = useRef(false);
 	const handleResize = async (size: any) => {
 		pagePlaceholder.width =
 			parseInt(
@@ -33,54 +39,65 @@ export const PdfPlaceholderPosition = ({
 			onChange({ pagePlaceholder: pagePlaceholder });
 		}
 	};
-	const handleDrag = async (position: any) => {
-		const x =
-			parseInt(
-				(pagePlaceholder?.positionX
-					? pagePlaceholder?.positionX
-					: 0
-				).toString(),
-				10
-			) + parseInt(position.deltaX.toString(), 10);
+	const handleDrag = async (e: any, position: any) => {
+		// console.log('handleDrag', position, pagePlaceholder);
+		if (!first.current && (isNaN(position.lastX) || isNaN(position.lastY))) {
+			return;
+		}
+		first.current = true;
+		let x = 0;
 		const clientWidth =
 			parseInt(position.node.parentNode.clientWidth.toString(), 10) -
 			parseInt(
 				(pagePlaceholder?.width ? pagePlaceholder?.width : 0).toString(),
 				10
 			);
-		if (Math.abs(x) > clientWidth) {
-			pagePlaceholder.positionX = clientWidth;
-		} else if (x < 0) {
-			pagePlaceholder.positionX = 0;
-		} else {
-			pagePlaceholder.positionX = parseInt(x.toString(), 10);
-		}
-
-		const y =
-			parseInt(
-				(pagePlaceholder?.positionY
-					? pagePlaceholder?.positionY
+		if (isNaN(position.lastX)) {
+			x = parseInt(
+				(pagePlaceholder?.positionX
+					? pagePlaceholder?.positionX
 					: 0
 				).toString(),
 				10
-			) + parseInt(position.deltaY.toString(), 10);
+			);
+		} else {
+			if (parseInt(position.lastX.toString(), 10) < 0) {
+				x = 0;
+			} else if (parseInt(position.lastX.toString(), 10) > clientWidth) {
+				x = clientWidth;
+			} else {
+				x = parseInt(position.lastX.toString(), 10);
+			}
+		}
+		pagePlaceholder.positionX = parseInt(x.toString(), 10);
+		let y = 0;
 		const clientHeight =
-			0 +
+			0 -
 			parseInt(
 				(pagePlaceholder?.height ? pagePlaceholder.height : 0).toString(),
 				10
 			);
-		if (Math.abs(y) > position.node.parentNode.clientHeight) {
-			pagePlaceholder.positionY = parseInt(
-				position.node.parentNode.clientHeight.toString(),
+		if (isNaN(position.lastY)) {
+			y = parseInt(
+				(pagePlaceholder.positionY
+					? pagePlaceholder.positionY
+					: clientHeight
+				).toString(),
 				10
 			);
-		} else if (y > -clientHeight) {
-			pagePlaceholder.positionY = -clientHeight;
 		} else {
-			pagePlaceholder.positionY = parseInt(y.toString(), 10);
+			if (parseInt(position.lastY.toString(), 10) > clientHeight) {
+				y = clientHeight;
+			} else if (
+				parseInt(position.lastY.toString(), 10) <
+				-position.node.parentNode.clientHeight
+			) {
+				y = -position.node.parentNode.clientHeight;
+			} else {
+				y = parseInt(position.lastY.toString(), 10);
+			}
 		}
-
+		pagePlaceholder.positionY = parseInt(y.toString(), 10);
 		if (onChange) {
 			onChange({ pagePlaceholder: pagePlaceholder });
 		}
@@ -88,11 +105,12 @@ export const PdfPlaceholderPosition = ({
 
 	return (
 		<Draggable
-			bounds={`page_${pagePlaceholder.pageId}`}
+			// bounds={`page_${pagePlaceholder.pageId}`}
+			bounds='parent'
 			onStop={(e, position) => {
 				e.stopPropagation();
 				e.preventDefault();
-				handleDrag(position);
+				handleDrag(e, position);
 			}}
 			position={{
 				x: pagePlaceholder.positionX as number,
@@ -117,14 +135,14 @@ export const PdfPlaceholderPosition = ({
 				}}
 				bounds={'parent'}
 				boundsByDirection={false}
-				lockAspectRatio={true}
-				resizeRatio={[1, 1]}
+				// lockAspectRatio={true}
+				// resizeRatio={[1, 1]}
 				onResizeStart={(e) => {
 					e.stopPropagation();
 					e.preventDefault();
 				}}
 				onResizeStop={(e, direction, ref, d) => {
-					console.log('direction', direction, ref);
+					// console.log('direction', direction, ref);
 					e.stopPropagation();
 					e.preventDefault();
 					handleResize(d);
@@ -163,13 +181,31 @@ export const PdfPlaceholderPosition = ({
 					>
 						{pagePlaceholder.view?.toString() ===
 						PlaceholderView.SIGNATURE.toString() ? (
-							<FontAwesomeIcon icon={faDownload} />
-						) : (
 							<>
+								{pagePlaceholder.base64 ? (
+									<img
+										alt='signature'
+										src={pagePlaceholder.base64}
+										width={pagePlaceholder.width}
+										height={pagePlaceholder.height}
+									/>
+								) : (
+									<FontAwesomeIcon icon={faDownload} />
+								)}
+							</>
+						) : (
+							<div
+								style={{
+									fontFamily: 'Inter',
+									fontSize: 15,
+									fontWeight: 500,
+									color: 'black',
+								}}
+							>
 								{pagePlaceholder.value
 									? pagePlaceholder.value
 									: pagePlaceholder.name}
-							</>
+							</div>
 						)}
 					</div>
 				</Popover>

@@ -18,8 +18,10 @@ import { BASE_URL } from '../../../config/config';
 import {
 	Action,
 	ApiEntity,
+	ContractType,
 	PlaceholderFill,
 	PlaceholderTypeText,
+	PlaceholderView,
 } from '../../../config/enum';
 import axios from 'axios';
 import { Placeholder, Recipient } from '../../../config/types';
@@ -39,6 +41,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		apiKey,
 		userKey,
 		token,
+		contractType,
 		contractKey,
 		clientKey,
 		placeholder,
@@ -92,7 +95,12 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 						index < payload.data.placeholders.length;
 						index++
 					) {
-						placeholderTmp.push(payload.data.placeholders[index]);
+						if (
+							payload.data.placeholders[index].view.toString() !==
+							PlaceholderView.SIGNATURE.toString()
+						) {
+							placeholderTmp.push(payload.data.placeholders[index]);
+						}
 					}
 
 					setPlaceholder(placeholderTmp);
@@ -162,7 +170,11 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 	};
 	useEffect(() => {
 		let isMounted = true;
-		if (contractKey && (clientKey || token)) {
+		if (
+			contractType.toString() !== ContractType.PDF.toString() &&
+			contractKey &&
+			(clientKey || token)
+		) {
 			getRecipients();
 		}
 		return () => {
@@ -173,6 +185,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 	useEffect(() => {
 		let isMounted = true;
 		if (
+			contractType.toString() !== ContractType.PDF.toString() &&
 			contractKey &&
 			(clientKey || token) &&
 			(currPlaceholder !== refreshPlaceholders || placeholderVisible) &&
@@ -451,8 +464,8 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		changeValue(index);
 	};
 	const handleChangeFilling = async (e: any, index: number) => {
-		console.log('handleChangeFilling', e);
-		debugger;
+		// console.log('handleChangeFilling', e);
+
 		let placeholderTmp = [...placeholder];
 		let body = {
 			data: {

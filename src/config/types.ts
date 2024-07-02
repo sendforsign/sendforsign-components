@@ -13,6 +13,7 @@ export type Contract = {
 	contractValue?: string;
 	statusId?: number;
 	statusName?: string;
+	contractName?: string;
 	changeTime?: Date;
 	changed?: boolean;
 	view?: ShareLinkView;
@@ -201,4 +202,12 @@ export type PagePlaceholder = {
 	width?: number;
 	height?: number;
 	view?: PlaceholderView;
+	base64?: string;
+};
+export type Row = {
+	json?: any;
+	email?: string;
+	name?: string;
+	createTime?: string;
+	base64?: string;
 };

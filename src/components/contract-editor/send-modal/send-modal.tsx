@@ -45,6 +45,8 @@ export const SendModal = () => {
 		clientKey,
 		userKey,
 		refreshEvent,
+		setRefreshPlaceholders,
+		refreshPlaceholders,
 		refreshRecipients,
 		refreshPlaceholderRecipients,
 		setRefreshEvent,
@@ -219,7 +221,6 @@ export const SendModal = () => {
 		}
 	};
 	const handleSendOne = async (index: number) => {
-		debugger;
 		let recipientsTmp: Recipient[] = [];
 		recipientsTmp.push(recipients[index]);
 		const body = {
@@ -542,6 +543,8 @@ export const SendModal = () => {
 	const handleCancel = () => {
 		setRecipients([]);
 		setRefreshPlaceholderRecipients(refreshPlaceholderRecipients + 1);
+
+		setRefreshPlaceholders(refreshPlaceholders + 1);
 		setSendModal(false);
 	};
 	return (

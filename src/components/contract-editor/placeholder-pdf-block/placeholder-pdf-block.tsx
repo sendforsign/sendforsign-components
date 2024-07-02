@@ -18,6 +18,7 @@ import { BASE_URL } from '../../../config/config';
 import {
 	Action,
 	ApiEntity,
+	ContractType,
 	PlaceholderFill,
 	PlaceholderTypeText,
 	PlaceholderView,
@@ -43,6 +44,7 @@ export const PlaceholderPdfBlock = () => {
 		apiKey,
 		userKey,
 		token,
+		contractType,
 		contractKey,
 		clientKey,
 		placeholder,
@@ -99,7 +101,6 @@ export const PlaceholderPdfBlock = () => {
 					) {
 						placeholderTmp.push(payload.data.placeholders[index]);
 					}
-
 					setPlaceholder(placeholderTmp);
 					setContractPlaceholderCount(placeholderTmp.length);
 				} else {
@@ -167,7 +168,11 @@ export const PlaceholderPdfBlock = () => {
 	};
 	useEffect(() => {
 		let isMounted = true;
-		if (contractKey && (clientKey || token)) {
+		if (
+			contractType.toString() === ContractType.PDF.toString() &&
+			contractKey &&
+			(clientKey || token)
+		) {
 			getRecipients();
 		}
 		return () => {
@@ -178,6 +183,7 @@ export const PlaceholderPdfBlock = () => {
 	useEffect(() => {
 		let isMounted = true;
 		if (
+			contractType.toString() === ContractType.PDF.toString() &&
 			contractKey &&
 			(clientKey || token) &&
 			(currPlaceholder !== refreshPlaceholders || placeholderVisible) &&
@@ -200,6 +206,7 @@ export const PlaceholderPdfBlock = () => {
 			type: PlaceholderTypeText.INTERNAL,
 			fillingType: PlaceholderFill.NONE,
 		});
+
 		setPlaceholder(placeholdersTmp);
 
 		let body = {
@@ -310,6 +317,7 @@ export const PlaceholderPdfBlock = () => {
 
 				break;
 		}
+
 		setPlaceholder(placeholderTmp);
 	};
 	const changeValueInTag = (id: number, value: string) => {
@@ -453,7 +461,7 @@ export const PlaceholderPdfBlock = () => {
 	};
 	const handleChangeFilling = async (e: any, index: number) => {
 		console.log('handleChangeFilling', e);
-		debugger;
+
 		let placeholderTmp = [...placeholder];
 		let body = {
 			data: {
@@ -482,6 +490,7 @@ export const PlaceholderPdfBlock = () => {
 			body.data.placeholder.fillingType = PlaceholderFill.SPECIFIC;
 			body.data.placeholder.externalRecipientKey = e.target.value;
 		}
+
 		setPlaceholder(placeholderTmp);
 		await axios
 			.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
