@@ -267,6 +267,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setContractValue('<div></div>');
 				setReadonly(false);
 				setContinueLoad(false);
+				setFillType(true);
 				// console.log('contractKey ContractEditor 3');
 			}
 		} else {

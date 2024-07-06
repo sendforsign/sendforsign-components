@@ -10,6 +10,7 @@ type Props = {
 	width: number;
 	height?: number;
 	scale: number;
+	readonly?: boolean;
 	pagePlaceholder: PagePlaceholder[];
 	onChange?: (data: any) => void;
 	onDelete?: (data: any) => void;
@@ -21,6 +22,7 @@ export const PdfPage = ({
 	width,
 	height,
 	scale,
+	readonly,
 	pagePlaceholder,
 	onChange,
 	onDelete,
@@ -96,6 +98,7 @@ export const PdfPage = ({
 								docRef={docRef}
 								pageDetail={pageDetail}
 								pagePlaceholder={pagePl}
+								readonly={readonly}
 								onChange={(e: any) => {
 									let pagePlaceholderTmp = [...currPagePlaceholder];
 									let placeholderIndex = pagePlaceholderTmp.findIndex(

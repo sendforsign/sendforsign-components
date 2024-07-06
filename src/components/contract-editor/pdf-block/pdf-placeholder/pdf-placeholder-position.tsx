@@ -12,6 +12,7 @@ import { isNaN } from 'lodash';
 type Props = {
 	docRef?: any;
 	pageDetail?: any;
+	readonly?: boolean;
 	pagePlaceholder: PagePlaceholder;
 	onChange?: (data: any) => void;
 	onDelete?: (data: any) => void;
@@ -19,6 +20,7 @@ type Props = {
 export const PdfPlaceholderPosition = ({
 	docRef,
 	pageDetail,
+	readonly,
 	pagePlaceholder,
 	onChange,
 	onDelete,
@@ -105,7 +107,7 @@ export const PdfPlaceholderPosition = ({
 
 	return (
 		<Draggable
-			// bounds={`page_${pagePlaceholder.pageId}`}
+			disabled={readonly}
 			bounds='parent'
 			onStop={(e, position) => {
 				e.stopPropagation();
@@ -128,10 +130,10 @@ export const PdfPlaceholderPosition = ({
 				maxWidth={'400px'}
 				maxHeight={'200px'}
 				enable={{
-					topRight: true,
-					bottomRight: true,
-					bottomLeft: true,
-					topLeft: true,
+					topRight: !readonly,
+					bottomRight: !readonly,
+					bottomLeft: !readonly,
+					topLeft: !readonly,
 				}}
 				bounds={'parent'}
 				boundsByDirection={false}
@@ -148,27 +150,72 @@ export const PdfPlaceholderPosition = ({
 					handleResize(d);
 				}}
 			>
-				<Popover
-					content={
-						<Space direction='vertical' style={{ display: 'flex' }}>
-							<Button
-								block
-								danger
-								type='text'
-								onClick={(e) => {
-									if (onDelete) {
-										e.stopPropagation();
-										e.preventDefault();
-										onDelete({ pagePlaceholder: pagePlaceholder });
-									}
-								}}
-							>
-								Delete
-							</Button>
-						</Space>
-					}
-					trigger='contextMenu'
-				>
+				{!readonly ? (
+					<Popover
+						content={
+							<Space direction='vertical' style={{ display: 'flex' }}>
+								<Button
+									block
+									danger
+									type='text'
+									onClick={(e) => {
+										if (onDelete) {
+											e.stopPropagation();
+											e.preventDefault();
+											onDelete({ pagePlaceholder: pagePlaceholder });
+										}
+									}}
+								>
+									Delete
+								</Button>
+							</Space>
+						}
+						trigger='contextMenu'
+					>
+						<div
+							id={`insertion_${pagePlaceholder?.placeholderKey?.replaceAll(
+								'-',
+								'_'
+							)}-${pagePlaceholder.pageId}-${pagePlaceholder.id}`}
+							style={{
+								width: `${(pagePlaceholder.width as number) - 1}px`,
+								height: `${(pagePlaceholder.height as number) - 1}px`,
+							}}
+						>
+							{pagePlaceholder.view?.toString() ===
+							PlaceholderView.SIGNATURE.toString() ? (
+								<>
+									{pagePlaceholder.base64 ? (
+										<img
+											alt='signature'
+											src={pagePlaceholder.base64}
+											width={pagePlaceholder.width}
+											height={pagePlaceholder.height}
+										/>
+									) : (
+										<div>
+											{pagePlaceholder.name}{' '}
+											<FontAwesomeIcon icon={faDownload} />
+										</div>
+									)}
+								</>
+							) : (
+								<div
+									style={{
+										fontFamily: 'Inter',
+										fontSize: 15,
+										fontWeight: 500,
+										color: 'black',
+									}}
+								>
+									{pagePlaceholder.value
+										? pagePlaceholder.value
+										: pagePlaceholder.name}
+								</div>
+							)}
+						</div>
+					</Popover>
+				) : (
 					<div
 						id={`insertion_${pagePlaceholder?.placeholderKey?.replaceAll(
 							'-',
@@ -208,7 +255,7 @@ export const PdfPlaceholderPosition = ({
 							</div>
 						)}
 					</div>
-				</Popover>
+				)}
 			</Resizable>
 		</Draggable>
 	);

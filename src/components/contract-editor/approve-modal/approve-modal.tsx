@@ -25,7 +25,7 @@ export const ApproveModal = () => {
 	const [spinLoad, setSpinLoad] = useState(false);
 
 	// console.log('contractKey 9');
-	const handleOk = async () => {
+	const handleOk = async () => { 
 		setSpinLoad(true);
 		const body = {
 			clientKey: !token ? clientKey : undefined,

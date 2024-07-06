@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
 	Space,
 	Card,
@@ -56,6 +56,7 @@ export const SendModal = () => {
 	} = useContractEditorContext();
 	const [sendLoad, setSendLoad] = useState(false);
 	const [dataLoad, setDataLoad] = useState(false);
+	const [saveLoad, setSaveLoad] = useState(false);
 	const [insertRecipient, setInsertRecipient] = useState<Recipient[]>([]);
 	const [updateRecipient, setUpdateRecipient] = useState<Recipient[]>([]);
 	const [deleteRecipient, setDeleteRecipient] = useState<Recipient[]>([]);
@@ -63,6 +64,7 @@ export const SendModal = () => {
 	const [id, setId] = useState(0);
 	const [recipientInit, setRecipientInit] = useState(false);
 	const [load, setLoad] = useState(false);
+	const isSave = useRef(false);
 	const options = [
 		{ label: 'Sign', value: ShareLinkViewText.SIGN },
 		{ label: 'Approve', value: ShareLinkViewText.APPROVE },
@@ -201,6 +203,7 @@ export const SendModal = () => {
 					responseType: 'json',
 				})
 				.then((payload: any) => {
+					isSave.current = true;
 					setSendLoad(false);
 					handleCancel();
 					if (payload.data.result) {
@@ -321,6 +324,7 @@ export const SendModal = () => {
 					(recipient) => recipient.id === updateRecipient[index].id
 				);
 				if (recipientFind) {
+					setSaveLoad(true);
 					const body = {
 						data: {
 							action: Action.UPDATE,
@@ -349,6 +353,7 @@ export const SendModal = () => {
 						})
 						.then((payload: any) => {})
 						.catch((error) => {
+							isSave.current = true;
 							setNotification({
 								text:
 									error.response &&
@@ -362,6 +367,7 @@ export const SendModal = () => {
 			}
 		}
 		if (deleteRecipient.length > 0) {
+			setSaveLoad(true);
 			for (let index = 0; index < deleteRecipient.length; index++) {
 				const body = {
 					data: {
@@ -384,7 +390,9 @@ export const SendModal = () => {
 						},
 						responseType: 'json',
 					})
-					.then((payload: any) => {})
+					.then((payload: any) => {
+						isSave.current = true;
+					})
 					.catch((error) => {
 						setNotification({
 							text:
@@ -399,15 +407,17 @@ export const SendModal = () => {
 		}
 		if (insertRecipient.length > 0) {
 			let insertTmp: Recipient[] = [];
-			insertTmp.push({
-				id: recipients[0].id,
-				fullname: recipients[0].fullname,
-				email: recipients[0].email,
-				customMessage: recipients[0].customMessage,
-				position: recipients[0].position,
-				action: recipients[0].action,
-				recipientKey: '',
-			});
+			if (recipients[0] && !recipients[0].recipientKey) {
+				insertTmp.push({
+					id: recipients[0].id,
+					fullname: recipients[0].fullname,
+					email: recipients[0].email,
+					customMessage: recipients[0].customMessage,
+					position: recipients[0].position,
+					action: recipients[0].action,
+					recipientKey: '',
+				});
+			}
 			for (let index = 0; index < insertRecipient.length; index++) {
 				const recipientFind = recipients.find(
 					(recipient) => recipient.id === insertRecipient[index].id
@@ -416,8 +426,8 @@ export const SendModal = () => {
 					insertTmp.push(recipientFind);
 				}
 			}
-			// if
 			if (insertTmp.length > 0) {
+				setSaveLoad(true);
 				const body = {
 					data: {
 						action: Action.CREATE,
@@ -437,7 +447,9 @@ export const SendModal = () => {
 						},
 						responseType: 'json',
 					})
-					.then((payload: any) => {})
+					.then((payload: any) => {
+						isSave.current = true;
+					})
 					.catch((error) => {
 						setNotification({
 							text:
@@ -456,6 +468,7 @@ export const SendModal = () => {
 			deleteRecipient.length === 0 &&
 			insertRecipient.length === 0
 		) {
+			setSaveLoad(true);
 			const body = {
 				data: {
 					action: Action.CREATE,
@@ -485,7 +498,9 @@ export const SendModal = () => {
 					},
 					responseType: 'json',
 				})
-				.then((payload: any) => {})
+				.then((payload: any) => {
+					isSave.current = true;
+				})
 				.catch((error) => {
 					setNotification({
 						text:
@@ -541,10 +556,13 @@ export const SendModal = () => {
 		});
 	};
 	const handleCancel = () => {
+		setSaveLoad(false);
 		setRecipients([]);
-		setRefreshPlaceholderRecipients(refreshPlaceholderRecipients + 1);
-
-		setRefreshPlaceholders(refreshPlaceholders + 1);
+		if (isSave.current) {
+			setRefreshPlaceholderRecipients(refreshPlaceholderRecipients + 1);
+			setRefreshPlaceholders(refreshPlaceholders + 1);
+			isSave.current = false;
+		}
 		setSendModal(false);
 	};
 	return (
@@ -559,7 +577,11 @@ export const SendModal = () => {
 					<Button key='cancel' onClick={handleCancel}>
 						Cancel
 					</Button>
-					<Button key='saveAndClose' onClick={handleSaveAndClose}>
+					<Button
+						loading={saveLoad}
+						key='saveAndClose'
+						onClick={handleSaveAndClose}
+					>
 						Save & Close
 					</Button>
 					{recipientInit && (
@@ -712,19 +734,6 @@ export const SendModal = () => {
 											</Tooltip>
 										</Col>
 									</Row>
-									{/* <Row wrap={false} align="middle" style={{ margin: "32px 0" }}>
-                  <Col flex="auto">
-                    <Button block icon={<FontAwesomeIcon icon={faSignature} />}>
-                      Sign
-                    </Button>
-                  </Col>
-                  <Col flex="8px" />
-                  <Col flex="auto">
-                    <Button block icon={<FontAwesomeIcon icon={faStamp} />}>
-                      Approve
-                    </Button>
-                  </Col>
-                </Row> */}
 									<Row wrap={false} style={{ margin: '16px 0 0 0' }}>
 										<Col>
 											<Spin spinning={false}>

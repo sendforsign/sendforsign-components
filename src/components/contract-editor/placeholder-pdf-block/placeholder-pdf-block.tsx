@@ -186,8 +186,10 @@ export const PlaceholderPdfBlock = () => {
 			contractType.toString() === ContractType.PDF.toString() &&
 			contractKey &&
 			(clientKey || token) &&
-			(currPlaceholder !== refreshPlaceholders || placeholderVisible) &&
-			(!placeholder || placeholder.length === 0)
+			placeholderVisible &&
+			(currPlaceholder !== refreshPlaceholders ||
+				!placeholder ||
+				placeholder.length === 0)
 		) {
 			setCurrPlaceholder(refreshPlaceholders);
 			getRecipients();
@@ -247,20 +249,6 @@ export const PlaceholderPdfBlock = () => {
 	};
 	const handleInsertPlaceholder = (index: number) => {
 		setPlaceholderPdf(placeholder[index]);
-		// const position = quillRef?.current?.getSelection();
-		// //console.log('position', position, quillRef);
-		// const empty = placeholder[index].value
-		// 	? placeholder[index].value?.replace(/\s/g, '')
-		// 	: '';
-		// quillRef?.current?.clipboard.dangerouslyPasteHTML(
-		// 	position ? position?.index : 0,
-		// 	`<placeholder${index + 1} className={placeholderClass${index + 1}}>${
-		// 		empty ? placeholder[index].value : `{{{${placeholder[index].name}}}}`
-		// 	}</placeholder${index + 1}>`,
-		// 	'user'
-		// );
-		// handleChangeText(quillRef?.root.innerHTML);
-		//console.log('handleInsertPlaceholder', quillRef?.current?.root.innerHTML);
 	};
 	const handleDeletePlaceholder = async (index: number) => {
 		let placeholdersTmp = [...placeholder];

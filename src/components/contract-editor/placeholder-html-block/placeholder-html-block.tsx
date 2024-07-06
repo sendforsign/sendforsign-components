@@ -188,8 +188,10 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			contractType.toString() !== ContractType.PDF.toString() &&
 			contractKey &&
 			(clientKey || token) &&
-			(currPlaceholder !== refreshPlaceholders || placeholderVisible) &&
-			(!placeholder || placeholder.length === 0)
+			placeholderVisible &&
+			(currPlaceholder !== refreshPlaceholders ||
+				!placeholder ||
+				placeholder.length === 0)
 		) {
 			setCurrPlaceholder(refreshPlaceholders);
 			getRecipients();

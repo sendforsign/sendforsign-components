@@ -59,6 +59,7 @@ export const PdfBlock = () => {
 	// const [scale, setScale] = useState(1);
 	const scale = useRef(1);
 	const needUpdate = useRef(false);
+	const readOnly = useRef(false);
 	const [pdfData, setPdfData] = useState<ArrayBuffer>();
 	const [delPlaceholderPosition, setDelPlaceholderPosition] = useState<
 		PagePlaceholder[]
@@ -84,6 +85,9 @@ export const PdfBlock = () => {
 				.then((payload: any) => {
 					if (isMounted) {
 						setContractSigns(payload.data);
+						if (payload.data.length > 0) {
+							readOnly.current = true;
+						}
 					}
 				})
 				.catch((error) => {
@@ -501,6 +505,7 @@ export const PdfBlock = () => {
 							width={1000}
 							pageNumber={i}
 							scale={scale.current}
+							readonly={readOnly.current}
 							pagePlaceholder={pagePlaceholder.filter(
 								(pagePl) => pagePl.pageId?.toString() === i.toString()
 							)}
