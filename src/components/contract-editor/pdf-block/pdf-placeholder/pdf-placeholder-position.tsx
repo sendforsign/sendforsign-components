@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import './pdf-placeholder-position.css';
 import { Resizable } from 're-resizable';
 import Draggable from 'react-draggable';
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faSignature } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PlaceholderView } from '../../../../config/enum';
 import { PagePlaceholder } from '../../../../config/types';
@@ -194,8 +194,8 @@ export const PdfPlaceholderPosition = ({
 										/>
 									) : (
 										<div>
-											{pagePlaceholder.name}{' '}
-											<FontAwesomeIcon icon={faDownload} />
+											<FontAwesomeIcon icon={faSignature} />{' '}
+											{pagePlaceholder.name}
 										</div>
 									)}
 								</>
@@ -237,7 +237,7 @@ export const PdfPlaceholderPosition = ({
 										height={pagePlaceholder.height}
 									/>
 								) : (
-									<FontAwesomeIcon icon={faDownload} />
+									<FontAwesomeIcon icon={faSignature} />
 								)}
 							</>
 						) : (
