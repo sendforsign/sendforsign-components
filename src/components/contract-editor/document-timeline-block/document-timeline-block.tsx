@@ -32,7 +32,7 @@ export const DocumentTimilineBlock = () => {
 
 	useEffect(() => {
 		let isMounted = true;
-		const getContractEvents = async () => { 
+		const getContractEvents = async () => {
 			let eventStatusTmp: EventStatus[] = [];
 			await axios
 				.get(BASE_URL + ApiEntity.EVENT_STATUS, {
@@ -60,7 +60,7 @@ export const DocumentTimilineBlock = () => {
 								: error.message,
 					});
 				});
-			const url = `${BASE_URL}${ApiEntity.CONTRACT_EVENT}?contractKey=${contractKey}&clientKey=${clientKey}`;
+			const url = `${BASE_URL}${ApiEntity.CONTRACT_EVENT}?contractKey=${contractKey}&clientKey=${clientKey}`; 
 			await axios
 				.get(url, {
 					headers: {
@@ -73,9 +73,9 @@ export const DocumentTimilineBlock = () => {
 				})
 				.then((payload: any) => {
 					//console.log('getEventStatus read', payload);
+					setContractEvents(payload.data);
 
 					if (isMounted) {
-						setContractEvents(payload.data);
 						const timelinesTmp: TimelineItemProps[] = payload.data.map(
 							(contractEventData: {
 								status: { toString: () => string | undefined };

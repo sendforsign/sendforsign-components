@@ -43,6 +43,7 @@ export const PdfBlock = () => {
 		clientKey,
 		placeholder,
 		pdfFileLoad,
+		refreshEvent,
 		setPdfFileLoad,
 		continueLoad,
 		setContinueLoad,
@@ -65,9 +66,48 @@ export const PdfBlock = () => {
 		PagePlaceholder[]
 	>([]);
 	const { getArrayBuffer, setArrayBuffer } = useSaveArrayBuffer();
+	const contractEvent = useRef(contractEvents);
+	const currentPagePlaceholder = useRef<PagePlaceholder[]>([]);
 
 	const { width, ref, height } = useResizeDetector();
 	// console.log('scale', width, height);
+	useEffect(() => {
+		let isMounted = true;
+		const getContractEvents = async () => {
+			const url = `${BASE_URL}${ApiEntity.CONTRACT_EVENT}?contractKey=${contractKey}&clientKey=${clientKey}`;
+
+			await axios
+				.get(url, {
+					headers: {
+						Accept: 'application/vnd.api+json',
+						'Content-Type': 'application/vnd.api+json',
+						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: token ? `Bearer ${token}` : undefined,
+					},
+					responseType: 'json',
+				})
+				.then((payload: any) => {
+					//console.log('getEventStatus read', payload);
+					contractEvent.current = payload.data;
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
+				});
+		};
+		if (apiKey || token) {
+			getContractEvents();
+		}
+		return () => {
+			isMounted = false;
+		};
+	}, [refreshEvent]);
 	useEffect(() => {
 		let isMounted = true;
 		const getSigns = async () => {
@@ -176,8 +216,13 @@ export const PdfBlock = () => {
 				}
 				const pdfBytes = await pdfDoc.save();
 				await merger.add(pdfBytes.buffer);
-
-				let rows: Row[] = contractEvents
+				console.log(
+					'contractEventData',
+					contractEvent.current,
+					contractEvents,
+					contractSigns
+				);
+				let rows: Row[] = contractEvent.current
 					.filter(
 						(contractEventData) =>
 							contractEventData.status.toString() ===
@@ -354,6 +399,7 @@ export const PdfBlock = () => {
 				}
 			}
 			setPagePlaceholder(pagePlaceholderTmp);
+			currentPagePlaceholder.current = pagePlaceholderTmp;
 		}
 	}, [placeholder, contractSigns]);
 
@@ -477,6 +523,7 @@ export const PdfBlock = () => {
 				});
 		}
 	};
+	console.log('pagePlaceholder', pagePlaceholder);
 	return (
 		<div ref={ref} style={{ overflow: 'auto' }}>
 			<Document
@@ -497,6 +544,7 @@ export const PdfBlock = () => {
 				onMouseLeave={async (e: any) => {
 					await save();
 				}}
+				
 			>
 				{new Array(numPages).fill(0).map((_, i) => {
 					return (
@@ -510,14 +558,15 @@ export const PdfBlock = () => {
 								(pagePl) => pagePl.pageId?.toString() === i.toString()
 							)}
 							onCreate={(e: any) => {
-								let pagePlaceholderTmp = [...pagePlaceholder];
+								let pagePlaceholderTmp = [...currentPagePlaceholder.current];
 								pagePlaceholderTmp.push(e.pagePlaceholder);
+								currentPagePlaceholder.current = pagePlaceholderTmp;
 								setPagePlaceholder(pagePlaceholderTmp);
 								needUpdate.current = true;
 							}}
 							onChange={(e: any) => {
 								const currPagePlaceholder = e.pagePlaceholder;
-								let pagePlaceholderTmp = [...pagePlaceholder];
+								let pagePlaceholderTmp = [...currentPagePlaceholder.current];
 								for (
 									let index = 0;
 									index < currPagePlaceholder.length;
@@ -537,6 +586,7 @@ export const PdfBlock = () => {
 									}
 								}
 								setPagePlaceholder(pagePlaceholderTmp);
+								currentPagePlaceholder.current = pagePlaceholderTmp;
 								needUpdate.current = true;
 							}}
 							onDelete={(e) => {
@@ -558,6 +608,7 @@ export const PdfBlock = () => {
 									}
 								}
 								setPagePlaceholder(pagePlaceholderTmp);
+								currentPagePlaceholder.current = pagePlaceholderTmp;
 								needUpdate.current = true;
 							}}
 						/>

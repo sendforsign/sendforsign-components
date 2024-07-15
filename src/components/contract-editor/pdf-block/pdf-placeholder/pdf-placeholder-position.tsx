@@ -42,7 +42,7 @@ export const PdfPlaceholderPosition = ({
 		}
 	};
 	const handleDrag = async (e: any, position: any) => {
-		// console.log('handleDrag', position, pagePlaceholder);
+		console.log('handleDrag', position, pagePlaceholder);
 		if (!first.current && (isNaN(position.lastX) || isNaN(position.lastY))) {
 			return;
 		}

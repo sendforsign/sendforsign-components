@@ -44,6 +44,7 @@ export const PlaceholderPdfBlock = () => {
 		apiKey,
 		userKey,
 		token,
+		readonly,
 		contractType,
 		contractKey,
 		clientKey,
@@ -519,6 +520,16 @@ export const PlaceholderPdfBlock = () => {
 					placeholder.map((holder, index) => {
 						return (
 							<Space
+								draggable
+								onDragOver={(e) => {
+									e.preventDefault();
+								}}
+								onDragStart={(e) => {
+									e.dataTransfer.setData(
+										'placeholderKey',
+										holder.placeholderKey as string
+									);
+								}}
 								direction='vertical'
 								size={2}
 								style={{ display: 'flex' }}
@@ -531,6 +542,7 @@ export const PlaceholderPdfBlock = () => {
 												<Button
 													size='small'
 													type='text'
+													disabled={readonly}
 													icon={
 														<FontAwesomeIcon
 															icon={faLeftLong}
@@ -549,7 +561,7 @@ export const PlaceholderPdfBlock = () => {
 											id='PlaceholderName'
 											readOnly={
 												holder.view?.toString() !==
-												PlaceholderView.SIGNATURE.toString()
+													PlaceholderView.SIGNATURE.toString() && !readonly
 													? false
 													: true
 											}
@@ -672,6 +684,7 @@ export const PlaceholderPdfBlock = () => {
 									<Input
 										id='PlaceholderValue'
 										placeholder='Enter value'
+										readOnly={readonly}
 										value={holder.value}
 										onChange={(e: any) => handleChange(e, index)}
 										onBlur={(e: any) => handleBlur(e, index)}
