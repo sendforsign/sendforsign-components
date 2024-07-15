@@ -642,14 +642,14 @@ export const SendModal = () => {
 									value={''}
 								/>
 							</Col>
-							<Col flex='8px' />
+							{/* <Col flex='8px' />
 							<Col>
 								<Tooltip title='Set signing order.'>
 									<div>
 										<InputNumber min={1} max={10} style={{ width: '56px' }} />
 									</div>
 								</Tooltip>
-							</Col>
+							</Col> */}
 						</Row>
 					</Card>
 				</Space>
@@ -717,7 +717,7 @@ export const SendModal = () => {
 												onChange={(e: any) => handleChange(e, index)}
 											/>
 										</Col>
-										<Col flex='8px' />
+										{/* <Col flex='8px' />
 										<Col>
 											<Tooltip title='Set signing order.'>
 												<div>
@@ -732,7 +732,7 @@ export const SendModal = () => {
 													/>
 												</div>
 											</Tooltip>
-										</Col>
+										</Col> */}
 									</Row>
 									<Row wrap={false} style={{ margin: '16px 0 0 0' }}>
 										<Col>
