@@ -27,10 +27,17 @@ import axios from 'axios';
 import { Placeholder, Recipient } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+	faA,
 	faCircleQuestion,
+	faFileSignature,
+	faFileText,
+	faFont,
 	faGear,
 	faGlobe,
+	faGripVertical,
 	faLeftLong,
+	faSignature,
+	faTextWidth,
 	faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import Draggable from 'react-draggable';
@@ -537,15 +544,19 @@ export const PlaceholderPdfBlock = () => {
 							>
 								<Row wrap={false} align={'middle'}>
 									<Col>
-										<Tooltip title='Click to insert the placeholder and choose position in the file.'>
+										<Tooltip title='Drop onto the document.'>
 											<div>
 												<Button
 													size='small'
 													type='text'
+													style={{cursor: 'grab'}}
 													disabled={readonly}
 													icon={
 														<FontAwesomeIcon
-															icon={faLeftLong}
+															icon={holder.view?.toString() !==
+																PlaceholderView.SIGNATURE.toString() && !readonly
+																? faFont
+																: faSignature}
 															size='sm'
 															onClick={() => {
 																handleInsertPlaceholder(index);
@@ -566,8 +577,8 @@ export const PlaceholderPdfBlock = () => {
 													: true
 											}
 											placeholder='Enter placeholder name'
-											variant='borderless'
 											value={holder.name}
+											variant='borderless'
 											onChange={(e: any) => handleChange(e, index)}
 											onBlur={(e: any) => handleBlur(e, index)}
 										/>
