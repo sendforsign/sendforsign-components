@@ -526,7 +526,7 @@ export const PlaceholderPdfBlock = () => {
 				{placeholder &&
 					placeholder.map((holder, index) => {
 						return (
-							<Space
+							<Space className='ph-style'
 								draggable
 								onDragOver={(e) => {
 									e.preventDefault();
