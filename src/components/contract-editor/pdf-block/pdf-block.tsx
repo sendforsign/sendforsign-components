@@ -31,6 +31,16 @@ import { PdfPage } from './pdf-page/pdf-page';
 import { PdfAuditTrail } from '../pdf-audit-trail/pdf-audit-trail';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+type PlaceholderInsertion = {
+	pageId?: number;
+	id?: number;
+	placeholderKey?: string;
+	action?: Action;
+	width?: number;
+	height?: number;
+	positionX?: number;
+	positionY?: number;
+};
 export const PdfBlock = () => {
 	const {
 		apiKey,
@@ -67,7 +77,8 @@ export const PdfBlock = () => {
 	>([]);
 	const { getArrayBuffer, setArrayBuffer } = useSaveArrayBuffer();
 	const contractEvent = useRef(contractEvents);
-	const currentPagePlaceholder = useRef<PagePlaceholder[]>([]);
+	const currentPagePl = useRef<PagePlaceholder[]>([]);
+	const insertion = useRef<PlaceholderInsertion[]>([]);
 
 	const { width, ref, height } = useResizeDetector();
 	// console.log('scale', width, height);
@@ -318,6 +329,7 @@ export const PdfBlock = () => {
 	}, [pdfFileLoad]);
 	useEffect(() => {
 		if (placeholder && placeholder.length > 0) {
+			console.log('placeholder', placeholder);
 			let pagePlaceholderTmp: PagePlaceholder[] = [];
 			if (pagePlaceholder && pagePlaceholder.length > 0) {
 				for (let i = 0; i < placeholder.length; i++) {
@@ -399,96 +411,127 @@ export const PdfBlock = () => {
 				}
 			}
 			setPagePlaceholder(pagePlaceholderTmp);
-			currentPagePlaceholder.current = pagePlaceholderTmp;
+			currentPagePl.current = pagePlaceholderTmp;
 		}
 	}, [placeholder, contractSigns]);
 
 	const save = async () => {
 		if (needUpdate.current) {
 			needUpdate.current = false;
-			let pagePlaceholderTmp = [...pagePlaceholder];
 			let resultPlaceholders: Placeholder[] = [];
-			for (let index = 0; index < pagePlaceholderTmp.length; index++) {
-				const placeholderFindIndex = resultPlaceholders.findIndex(
-					(resultPl) =>
-						resultPl.placeholderKey === pagePlaceholderTmp[index].placeholderKey
-				);
-				if (placeholderFindIndex >= 0) {
-					resultPlaceholders[placeholderFindIndex].insertion?.push({
-						pageId: pagePlaceholderTmp[index].pageId,
-						id: pagePlaceholderTmp[index].id,
-						width: pagePlaceholderTmp[index].width
-							? pagePlaceholderTmp[index].width
-							: 100,
-						height: pagePlaceholderTmp[index].height
-							? pagePlaceholderTmp[index].height
-							: 300,
-						positionX: pagePlaceholderTmp[index].positionX
-							? pagePlaceholderTmp[index].positionX
-							: 0,
-						positionY: pagePlaceholderTmp[index].positionY
-							? pagePlaceholderTmp[index].positionY
-							: 0,
-						action: Action.UPDATE,
-					});
-				} else {
+			for (let index = 0; index < insertion.current.length; index++) {
+				console.log('insertion.current[index]', insertion.current[index]);
+				if (insertion.current[index].action === Action.UPDATE) {
 					resultPlaceholders.push({
-						placeholderKey: pagePlaceholderTmp[index].placeholderKey,
+						placeholderKey: insertion.current[index].placeholderKey,
 						insertion: [
 							{
-								pageId: pagePlaceholderTmp[index].pageId,
-								id: pagePlaceholderTmp[index].id,
-								width: pagePlaceholderTmp[index].width,
-								height: pagePlaceholderTmp[index].height,
-								positionX: pagePlaceholderTmp[index].positionX,
-								positionY: pagePlaceholderTmp[index].positionY,
+								pageId: insertion.current[index].pageId,
+								id: insertion.current[index].id,
+								width: insertion.current[index].width,
+								height: insertion.current[index].height,
+								positionX: insertion.current[index].positionX,
+								positionY: insertion.current[index].positionY,
 								action: Action.UPDATE,
 							},
 						],
 					});
-				}
-			}
-			for (let index = 0; index < delPlaceholderPosition.length; index++) {
-				const placeholderFindIndex = resultPlaceholders.findIndex(
-					(resultPl) =>
-						resultPl.placeholderKey ===
-						delPlaceholderPosition[index].placeholderKey
-				);
-				if (placeholderFindIndex >= 0) {
-					resultPlaceholders[placeholderFindIndex].insertion?.push({
-						pageId: delPlaceholderPosition[index].pageId,
-						id: delPlaceholderPosition[index].id,
-						width: delPlaceholderPosition[index].width
-							? delPlaceholderPosition[index].width
-							: 100,
-						height: delPlaceholderPosition[index].height
-							? delPlaceholderPosition[index].height
-							: 300,
-						positionX: delPlaceholderPosition[index].positionX
-							? delPlaceholderPosition[index].positionX
-							: 0,
-						positionY: delPlaceholderPosition[index].positionY
-							? delPlaceholderPosition[index].positionY
-							: 0,
-						action: Action.DELETE,
-					});
 				} else {
 					resultPlaceholders.push({
-						placeholderKey: delPlaceholderPosition[index].placeholderKey,
+						placeholderKey: insertion.current[index].placeholderKey,
 						insertion: [
 							{
-								pageId: delPlaceholderPosition[index].pageId,
-								id: delPlaceholderPosition[index].id,
-								width: delPlaceholderPosition[index].width,
-								height: delPlaceholderPosition[index].height,
-								positionX: delPlaceholderPosition[index].positionX,
-								positionY: delPlaceholderPosition[index].positionY,
+								pageId: insertion.current[index].pageId,
+								id: insertion.current[index].id,
 								action: Action.DELETE,
 							},
 						],
 					});
 				}
 			}
+			// let pagePlaceholderTmp = [...pagePlaceholder];
+			// let resultPlaceholders: Placeholder[] = [];
+			// for (let index = 0; index < pagePlaceholderTmp.length; index++) {
+			// 	const placeholderFindIndex = resultPlaceholders.findIndex(
+			// 		(resultPl) =>
+			// 			resultPl.placeholderKey === pagePlaceholderTmp[index].placeholderKey
+			// 	);
+			// 	if (placeholderFindIndex >= 0) {
+			// 		resultPlaceholders[placeholderFindIndex].insertion?.push({
+			// 			pageId: pagePlaceholderTmp[index].pageId,
+			// 			id: pagePlaceholderTmp[index].id,
+			// 			width: pagePlaceholderTmp[index].width
+			// 				? pagePlaceholderTmp[index].width
+			// 				: 100,
+			// 			height: pagePlaceholderTmp[index].height
+			// 				? pagePlaceholderTmp[index].height
+			// 				: 300,
+			// 			positionX: pagePlaceholderTmp[index].positionX
+			// 				? pagePlaceholderTmp[index].positionX
+			// 				: 0,
+			// 			positionY: pagePlaceholderTmp[index].positionY
+			// 				? pagePlaceholderTmp[index].positionY
+			// 				: 0,
+			// 			action: Action.UPDATE,
+			// 		});
+			// 	} else {
+			// 		resultPlaceholders.push({
+			// 			placeholderKey: pagePlaceholderTmp[index].placeholderKey,
+			// 			insertion: [
+			// 				{
+			// 					pageId: pagePlaceholderTmp[index].pageId,
+			// 					id: pagePlaceholderTmp[index].id,
+			// 					width: pagePlaceholderTmp[index].width,
+			// 					height: pagePlaceholderTmp[index].height,
+			// 					positionX: pagePlaceholderTmp[index].positionX,
+			// 					positionY: pagePlaceholderTmp[index].positionY,
+			// 					action: Action.UPDATE,
+			// 				},
+			// 			],
+			// 		});
+			// 	}
+			// }
+			// for (let index = 0; index < delPlaceholderPosition.length; index++) {
+			// 	const placeholderFindIndex = resultPlaceholders.findIndex(
+			// 		(resultPl) =>
+			// 			resultPl.placeholderKey ===
+			// 			delPlaceholderPosition[index].placeholderKey
+			// 	);
+			// 	if (placeholderFindIndex >= 0) {
+			// 		resultPlaceholders[placeholderFindIndex].insertion?.push({
+			// 			pageId: delPlaceholderPosition[index].pageId,
+			// 			id: delPlaceholderPosition[index].id,
+			// 			width: delPlaceholderPosition[index].width
+			// 				? delPlaceholderPosition[index].width
+			// 				: 100,
+			// 			height: delPlaceholderPosition[index].height
+			// 				? delPlaceholderPosition[index].height
+			// 				: 300,
+			// 			positionX: delPlaceholderPosition[index].positionX
+			// 				? delPlaceholderPosition[index].positionX
+			// 				: 0,
+			// 			positionY: delPlaceholderPosition[index].positionY
+			// 				? delPlaceholderPosition[index].positionY
+			// 				: 0,
+			// 			action: Action.DELETE,
+			// 		});
+			// 	} else {
+			// 		resultPlaceholders.push({
+			// 			placeholderKey: delPlaceholderPosition[index].placeholderKey,
+			// 			insertion: [
+			// 				{
+			// 					pageId: delPlaceholderPosition[index].pageId,
+			// 					id: delPlaceholderPosition[index].id,
+			// 					width: delPlaceholderPosition[index].width,
+			// 					height: delPlaceholderPosition[index].height,
+			// 					positionX: delPlaceholderPosition[index].positionX,
+			// 					positionY: delPlaceholderPosition[index].positionY,
+			// 					action: Action.DELETE,
+			// 				},
+			// 			],
+			// 		});
+			// 	}
+			// }
 			let body = {
 				data: {
 					action: Action.UPDATE,
@@ -523,7 +566,6 @@ export const PdfBlock = () => {
 				});
 		}
 	};
-	console.log('pagePlaceholder', pagePlaceholder);
 	return (
 		<div ref={ref} style={{ overflow: 'auto' }}>
 			<Document
@@ -541,10 +583,9 @@ export const PdfBlock = () => {
 				onError={() => {
 					//console.log('PdfViewer error');
 				}}
-				onMouseLeave={async (e: any) => {
-					await save();
-				}}
-				
+				// onMouseLeave={async (e: any) => {
+				// 	await save();
+				// }}
 			>
 				{new Array(numPages).fill(0).map((_, i) => {
 					return (
@@ -558,57 +599,59 @@ export const PdfBlock = () => {
 								(pagePl) => pagePl.pageId?.toString() === i.toString()
 							)}
 							onCreate={(e: any) => {
-								let pagePlaceholderTmp = [...currentPagePlaceholder.current];
-								pagePlaceholderTmp.push(e.pagePlaceholder);
-								currentPagePlaceholder.current = pagePlaceholderTmp;
-								setPagePlaceholder(pagePlaceholderTmp);
+								insertion.current.push({
+									placeholderKey: e.pagePlaceholder.placeholderKey,
+									pageId: e.pagePlaceholder.pageId,
+									id: e.pagePlaceholder.id,
+									width: e.pagePlaceholder.width,
+									height: e.pagePlaceholder.height,
+									positionX: e.pagePlaceholder.positionX,
+									positionY: e.pagePlaceholder.positionY,
+									action: Action.UPDATE,
+								});
 								needUpdate.current = true;
 							}}
 							onChange={(e: any) => {
-								const currPagePlaceholder = e.pagePlaceholder;
-								let pagePlaceholderTmp = [...currentPagePlaceholder.current];
-								for (
-									let index = 0;
-									index < currPagePlaceholder.length;
-									index++
-								) {
-									const findIndex = pagePlaceholderTmp.findIndex(
-										(pagePl) =>
-											pagePl?.pageId?.toString() ===
-												currPagePlaceholder[index].pageId.toString() &&
-											pagePl.placeholderKey ===
-												currPagePlaceholder[index].placeholderKey &&
-											pagePl?.id?.toString() ===
-												currPagePlaceholder[index].id.toString()
-									);
-									if (findIndex >= 0) {
-										pagePlaceholderTmp[findIndex] = currPagePlaceholder[index];
-									}
+								const insertionIndex = insertion.current.findIndex(
+									(insert) =>
+										insert.placeholderKey ===
+											e.pagePlaceholder.placeholderKey &&
+										insert.pageId?.toString() ===
+											e.pagePlaceholder.pageId?.toString() &&
+										insert.id?.toString() === e.pagePlaceholder.id?.toString()
+								);
+								if (insertionIndex >= 0) {
+									insertion.current[insertionIndex] = {
+										placeholderKey: e.pagePlaceholder.placeholderKey,
+										pageId: e.pagePlaceholder.pageId,
+										id: e.pagePlaceholder.id,
+										width: e.pagePlaceholder.width,
+										height: e.pagePlaceholder.height,
+										positionX: e.pagePlaceholder.positionX,
+										positionY: e.pagePlaceholder.positionY,
+										action: Action.UPDATE,
+									};
+								} else {
+									insertion.current.push({
+										placeholderKey: e.pagePlaceholder.placeholderKey,
+										pageId: e.pagePlaceholder.pageId,
+										id: e.pagePlaceholder.id,
+										width: e.pagePlaceholder.width,
+										height: e.pagePlaceholder.height,
+										positionX: e.pagePlaceholder.positionX,
+										positionY: e.pagePlaceholder.positionY,
+										action: Action.UPDATE,
+									});
 								}
-								setPagePlaceholder(pagePlaceholderTmp);
-								currentPagePlaceholder.current = pagePlaceholderTmp;
 								needUpdate.current = true;
 							}}
 							onDelete={(e) => {
-								const delPlaceholderPositionTmp = [...delPlaceholderPosition];
-								delPlaceholderPositionTmp.push(e.pagePlaceholder);
-								setDelPlaceholderPosition(delPlaceholderPositionTmp);
-								let pagePlaceholderTmp: PagePlaceholder[] = [];
-								for (let index = 0; index < pagePlaceholder.length; index++) {
-									if (
-										pagePlaceholder[index].pageId?.toString() ===
-											e.pagePlaceholder.pageId?.toString() &&
-										pagePlaceholder[index].placeholderKey ===
-											e.pagePlaceholder.placeholderKey &&
-										pagePlaceholder[index].id?.toString() ===
-											e.pagePlaceholder.id?.toString()
-									) {
-									} else {
-										pagePlaceholderTmp.push(pagePlaceholder[index]);
-									}
-								}
-								setPagePlaceholder(pagePlaceholderTmp);
-								currentPagePlaceholder.current = pagePlaceholderTmp;
+								insertion.current.push({
+									placeholderKey: e.pagePlaceholder.placeholderKey,
+									pageId: e.pagePlaceholder.pageId,
+									id: e.pagePlaceholder.id,
+									action: Action.DELETE,
+								});
 								needUpdate.current = true;
 							}}
 						/>

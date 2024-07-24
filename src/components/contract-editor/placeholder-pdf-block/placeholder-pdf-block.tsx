@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
 	Space,
 	Card,
@@ -65,6 +65,7 @@ export const PlaceholderPdfBlock = () => {
 		setNotification,
 		contractPlaceholderCount,
 		setContractPlaceholderCount,
+		signs,
 	} = useContractEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
@@ -72,6 +73,7 @@ export const PlaceholderPdfBlock = () => {
 		Recipient[]
 	>([]);
 	const [delLoad, setDelLoad] = useState(false);
+	const readonlyCurrent = useRef(false);
 
 	const { Title, Text } = Typography;
 
@@ -207,6 +209,11 @@ export const PlaceholderPdfBlock = () => {
 			isMounted = false;
 		};
 	}, [refreshPlaceholders, placeholderVisible]);
+	useEffect(() => {
+		if (signs && signs.length > 0) {
+			readonlyCurrent.current = true;
+		}
+	}, [signs]);
 
 	const handleAddPlaceholder = async () => {
 		let placeholdersTmp = [...placeholder];
@@ -316,46 +323,6 @@ export const PlaceholderPdfBlock = () => {
 
 		setPlaceholder(placeholderTmp);
 	};
-	const changeValueInTag = (id: number, value: string) => {
-		// let text = quillRef?.current?.root.innerHTML;
-		// let tag = `<placeholder${id}`;
-		// let array = text?.split(tag);
-		// let resultText = '';
-		// if (array) {
-		// 	for (let i = 0; i < array.length; i++) {
-		// 		if (array.length > 1) {
-		// 			if (i === 0) {
-		// 				resultText += array[i];
-		// 			} else {
-		// 				resultText += `<placeholder${id}`;
-		// 				tag = `</placeholder${id}>`;
-		// 				const lineArr = array[i].split(tag);
-		// 				for (let j = 0; j < lineArr.length; j++) {
-		// 					if (j === 0) {
-		// 						tag = `"placeholderClass${id}">`;
-		// 						const elArray = lineArr[j].split(tag);
-		// 						for (let k = 0; k < elArray.length; k++) {
-		// 							if (k === 0) {
-		// 								resultText += `${elArray[k]}"placeholderClass${id}">`;
-		// 							} else {
-		// 								resultText += `${value}</placeholder${id}>`;
-		// 							}
-		// 						}
-		// 					} else {
-		// 						resultText += lineArr[j];
-		// 					}
-		// 				}
-		// 			}
-		// 		} else {
-		// 			resultText = array[i];
-		// 		}
-		// 	}
-		// 	quillRef?.current?.clipboard.dangerouslyPasteHTML(resultText, 'user');
-		// 	// handleChangeText(resultText, false);
-		// 	quillRef?.current?.blur();
-		// }
-		//console.log('changeValueInTag', quillRef?.current?.root.innerHTML);
-	};
 	const handleBlur = async (e: any, index: number) => {
 		switch (e.target.id) {
 			case 'PlaceholderName':
@@ -404,14 +371,6 @@ export const PlaceholderPdfBlock = () => {
 	};
 	const changeValue = async (index: number) => {
 		let placeholdersTmp = [...placeholder];
-		if (placeholdersTmp[index].name) {
-			changeValueInTag(
-				placeholdersTmp[index].id ? (placeholdersTmp[index].id as number) : 0,
-				placeholdersTmp[index].value
-					? (placeholdersTmp[index].value as string)
-					: `{{{${placeholdersTmp[index].name as string}}}}`
-			);
-		}
 
 		let body = {
 			data: {
@@ -511,6 +470,7 @@ export const PlaceholderPdfBlock = () => {
 				});
 			});
 	};
+	console.log('readonly', readonly);
 	return (
 		<Card
 			loading={placeholderLoad || continueLoad}
@@ -526,8 +486,9 @@ export const PlaceholderPdfBlock = () => {
 				{placeholder &&
 					placeholder.map((holder, index) => {
 						return (
-							<Space className='ph-style'
-								draggable
+							<Space
+								className='ph-style'
+								draggable={!readonlyCurrent.current}
 								onDragOver={(e) => {
 									e.preventDefault();
 								}}
@@ -549,14 +510,17 @@ export const PlaceholderPdfBlock = () => {
 												<Button
 													size='small'
 													type='text'
-													style={{cursor: 'grab'}}
-													disabled={readonly}
+													style={{ cursor: 'grab' }}
+													disabled={readonlyCurrent.current}
 													icon={
 														<FontAwesomeIcon
-															icon={holder.view?.toString() !==
-																PlaceholderView.SIGNATURE.toString() && !readonly
-																? faFont
-																: faSignature}
+															icon={
+																holder.view?.toString() !==
+																	PlaceholderView.SIGNATURE.toString() &&
+																!readonly
+																	? faFont
+																	: faSignature
+															}
 															size='sm'
 															onClick={() => {
 																handleInsertPlaceholder(index);
@@ -572,7 +536,8 @@ export const PlaceholderPdfBlock = () => {
 											id='PlaceholderName'
 											readOnly={
 												holder.view?.toString() !==
-													PlaceholderView.SIGNATURE.toString() && !readonly
+													PlaceholderView.SIGNATURE.toString() &&
+												!readonlyCurrent.current
 													? false
 													: true
 											}
@@ -600,6 +565,7 @@ export const PlaceholderPdfBlock = () => {
 															<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
 																<div>
 																	<Button
+																		disabled={readonlyCurrent.current}
 																		size='small'
 																		icon={
 																			<FontAwesomeIcon
@@ -665,6 +631,7 @@ export const PlaceholderPdfBlock = () => {
 														</Radio.Group>
 														<Divider style={{ margin: 0 }} />
 														<Button
+															disabled={readonlyCurrent.current}
 															loading={delLoad}
 															block
 															danger
@@ -681,6 +648,7 @@ export const PlaceholderPdfBlock = () => {
 											>
 												<div>
 													<Button
+														disabled={readonlyCurrent.current}
 														size='small'
 														type='text'
 														icon={<FontAwesomeIcon icon={faGear} size='xs' />}
@@ -695,7 +663,7 @@ export const PlaceholderPdfBlock = () => {
 									<Input
 										id='PlaceholderValue'
 										placeholder='Enter value'
-										readOnly={readonly}
+										readOnly={readonlyCurrent.current}
 										value={holder.value}
 										onChange={(e: any) => handleChange(e, index)}
 										onBlur={(e: any) => handleBlur(e, index)}
@@ -707,7 +675,12 @@ export const PlaceholderPdfBlock = () => {
 					})}
 
 				<Space direction='vertical' size={2} style={{ display: 'flex' }}>
-					<Button block type='dashed' onClick={handleAddPlaceholder}>
+					<Button
+						disabled={readonlyCurrent.current}
+						block
+						type='dashed'
+						onClick={handleAddPlaceholder}
+					>
 						Add placeholder
 					</Button>
 				</Space>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
 	Space,
 	Card,
@@ -41,6 +41,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		apiKey,
 		userKey,
 		token,
+		readonly,
 		contractType,
 		contractKey,
 		clientKey,
@@ -60,6 +61,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		Recipient[]
 	>([]);
 	const [delLoad, setDelLoad] = useState(false);
+	const readonlyCurrent = useRef(false);
 
 	const { Title, Text } = Typography;
 
@@ -201,7 +203,11 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			isMounted = false;
 		};
 	}, [refreshPlaceholders, placeholderVisible]);
-
+	useEffect(() => {
+		if (readonly) {
+			readonlyCurrent.current = true;
+		}
+	}, [readonly]);
 	const handleAddPlaceholder = async () => {
 		let placeholdersTmp = [...placeholder];
 		placeholdersTmp.push({
@@ -328,9 +334,14 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 	};
 	const changeValueInTag = (id: number, value: string) => {
 		let text = quillRef?.current?.root.innerHTML;
+		let contenteditable = false;
+		if (text?.includes('contenteditable')) {
+			contenteditable = true;
+		}
 		let tag = `<placeholder${id}`;
 		let array = text?.split(tag);
 		let resultText = '';
+		debugger;
 		if (array) {
 			for (let i = 0; i < array.length; i++) {
 				if (array.length > 1) {
@@ -342,11 +353,15 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 						const lineArr = array[i].split(tag);
 						for (let j = 0; j < lineArr.length; j++) {
 							if (j === 0) {
-								tag = `"placeholderClass${id}" contenteditable="false">`;
+								tag = contenteditable
+									? `"placeholderClass${id}" contenteditable="false">`
+									: `"placeholderClass${id}">`;
 								const elArray = lineArr[j].split(tag);
 								for (let k = 0; k < elArray.length; k++) {
 									if (k === 0) {
-										resultText += `${elArray[k]}"placeholderClass${id}" contenteditable="false">`;
+										resultText += contenteditable
+											? `${elArray[k]}"placeholderClass${id}" contenteditable="false">`
+											: `${elArray[k]}"placeholderClass${id}">`;
 									} else {
 										resultText += `${value}</placeholder${id}>`;
 									}
@@ -535,8 +550,9 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				{placeholder &&
 					placeholder.map((holder, index) => {
 						return (
-							<Space className='ph-style'
-								draggable
+							<Space
+								className='ph-style'
+								draggable={!readonlyCurrent.current}
 								direction='vertical'
 								size={2}
 								style={{ display: 'flex' }}
@@ -547,6 +563,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 										<Tooltip title='Click to insert the placeholder at the current cursor position in the text.'>
 											<div>
 												<Button
+													disabled={readonlyCurrent.current}
 													size='small'
 													type='text'
 													icon={
@@ -564,6 +581,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 									</Col>
 									<Col>
 										<Input
+											readOnly={readonlyCurrent.current}
 											id='PlaceholderName'
 											placeholder='Enter placeholder name'
 											variant='borderless'
@@ -584,6 +602,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 														<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
 															<div>
 																<Button
+																	disabled={readonlyCurrent.current}
 																	size='small'
 																	icon={
 																		<FontAwesomeIcon
@@ -645,6 +664,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 													</Radio.Group>
 													<Divider style={{ margin: 0 }} />
 													<Button
+														disabled={readonlyCurrent.current}
 														loading={delLoad}
 														block
 														danger
@@ -661,6 +681,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 										>
 											<div>
 												<Button
+													disabled={readonlyCurrent.current}
 													size='small'
 													type='text'
 													icon={<FontAwesomeIcon icon={faGear} size='xs' />}
@@ -670,6 +691,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 									</Col>
 								</Row>
 								<Input
+									readOnly={readonlyCurrent.current}
 									id='PlaceholderValue'
 									placeholder='Enter value'
 									value={holder.value}
@@ -682,7 +704,12 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 					})}
 
 				<Space direction='vertical' size={2} style={{ display: 'flex' }}>
-					<Button block type='dashed' onClick={handleAddPlaceholder}>
+					<Button
+						disabled={readonlyCurrent.current}
+						block
+						type='dashed'
+						onClick={handleAddPlaceholder}
+					>
 						Add placeholder
 					</Button>
 				</Space>
