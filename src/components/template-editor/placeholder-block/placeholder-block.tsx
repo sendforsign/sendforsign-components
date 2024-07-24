@@ -387,6 +387,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 						return (
 							<Space
 								draggable
+								className='ph-style'
 								direction='vertical'
 								size={2}
 								style={{ display: 'flex' }}
