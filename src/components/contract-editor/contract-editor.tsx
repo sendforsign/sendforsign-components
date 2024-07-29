@@ -30,6 +30,9 @@ import { ChooseContractType } from './choose-contract-type/choose-contract-type'
 import { ShareLinkBlock } from './share-link-block/share-link-block';
 import { PlaceholderHtmlBlock } from './placeholder-html-block/placeholder-html-block';
 import { PlaceholderPdfBlock } from './placeholder-pdf-block';
+import { PdfBlockDnd } from './pdf-block-dnd';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 export interface StepChangeProps {
 	currentStep?: ContractSteps;
@@ -554,76 +557,79 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 						<>
 							{editorVisible && (
 								<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false}>
-									<Col flex='auto'>
-										<Space direction='vertical' style={{ display: 'flex' }}>
-											<Card loading={continueLoad}>
-												<Space
-													direction='vertical'
-													size={16}
-													style={{ display: 'flex' }}
-												>
+									<DndProvider backend={HTML5Backend}>
+										<Col flex='auto'>
+											<Space direction='vertical' style={{ display: 'flex' }}>
+												<Card loading={continueLoad}>
 													<Space
 														direction='vertical'
-														size={2}
-														className='SharingDocHeader'
+														size={16}
+														style={{ display: 'flex' }}
 													>
-														<Title level={4} style={{ margin: '0 0 0 0' }}>
-															Review your document
-														</Title>
-														{!isPdf && (
-															<Text type='secondary'>
-																Highlight text to see options.
-															</Text>
+														<Space
+															direction='vertical'
+															size={2}
+															className='SharingDocHeader'
+														>
+															<Title level={4} style={{ margin: '0 0 0 0' }}>
+																Review your document
+															</Title>
+															{!isPdf && (
+																<Text type='secondary'>
+																	Highlight text to see options.
+																</Text>
+															)}
+														</Space>
+														{!isPdf ? (
+															<>
+																{contractValue && (
+																	<HtmlBlock
+																		value={contractValue}
+																		quillRef={quillRef}
+																	/>
+																)}
+															</>
+														) : (
+															// <PdfBlock />
+															<PdfBlockDnd />
 														)}
 													</Space>
-													{!isPdf ? (
-														<>
-															{contractValue && (
-																<HtmlBlock
-																	value={contractValue}
-																	quillRef={quillRef}
-																/>
-															)}
-														</>
-													) : (
-														<PdfBlock />
-													)}
+												</Card>
+											</Space>
+										</Col>
+										{fillType && !isPdf && placeholderVisible && (
+											<Col flex='300px' style={{ display: 'block' }}>
+												<Space
+													direction='vertical'
+													style={{
+														display: 'flex',
+														top: 10,
+														position: 'sticky',
+														maxHeight: '80vh',
+														overflow: 'auto',
+													}}
+												>
+													<PlaceholderHtmlBlock quillRef={quillRef} />
 												</Space>
-											</Card>
-										</Space>
-									</Col>
-									{fillType && !isPdf && placeholderVisible && (
-										<Col flex='300px' style={{ display: 'block' }}>
-											<Space
-												direction='vertical'
-												style={{
-													display: 'flex',
-													top: 10,
-													position: 'sticky',
-													maxHeight: '80vh',
-													overflow: 'auto',
-												}}
-											>
-												<PlaceholderHtmlBlock quillRef={quillRef} />
-											</Space>
-										</Col>
-									)}
-									{fillType && isPdf && placeholderVisible && (
-										<Col flex='300px' style={{ display: 'block' }}>
-											<Space
-												direction='vertical'
-												style={{
-													display: 'flex',
-													top: 10,
-													position: 'sticky',
-													maxHeight: '80vh',
-													overflow: 'auto',
-												}}
-											>
-												<PlaceholderPdfBlock />
-											</Space>
-										</Col>
-									)}
+											</Col>
+										)}
+										{fillType && isPdf && placeholderVisible && (
+											<Col flex='300px' style={{ display: 'block' }}>
+												<Space
+													direction='vertical'
+													style={{
+														display: 'flex',
+														top: 10,
+														position: 'sticky',
+														maxHeight: '80vh',
+														overflow: 'auto',
+													}}
+												>
+													<PlaceholderPdfBlock />
+												</Space>
+											</Col>
+										)}
+									</DndProvider>
 								</Row>
 							)}
 							<div id='contractActionsFooter'>

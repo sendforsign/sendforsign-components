@@ -12,7 +12,6 @@ import {
 	Popover,
 	Divider,
 } from 'antd';
-import QuillNamespace from 'quill';
 import { useContractEditorContext } from '../contract-editor-context';
 import { BASE_URL } from '../../../config/config';
 import {
@@ -27,20 +26,12 @@ import axios from 'axios';
 import { Placeholder, Recipient } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-	faA,
 	faCircleQuestion,
-	faFileSignature,
-	faFileText,
 	faFont,
 	faGear,
-	faGlobe,
-	faGripVertical,
-	faLeftLong,
 	faSignature,
-	faTextWidth,
-	faUser,
 } from '@fortawesome/free-solid-svg-icons';
-import Draggable from 'react-draggable';
+import { useDrag } from 'react-dnd';
 
 type Props = {
 	// quillRef: React.MutableRefObject<QuillNamespace | undefined>;
@@ -74,9 +65,21 @@ export const PlaceholderPdfBlock = () => {
 	>([]);
 	const [delLoad, setDelLoad] = useState(false);
 	const readonlyCurrent = useRef(false);
+	// const [chosePlaceholder, setChosePlaceholder] = useState<Placeholder>({});
+	const chosePlaceholder = useRef<Placeholder>({});
 
 	const { Title, Text } = Typography;
-
+	// const [, drag] = useDrag(
+	// 	() => ({
+	// 		type: `chosePlaceholder`,
+	// 		item: { chosePlaceholder: chosePlaceholder.current },
+	// 		collect: (monitor) => ({
+	// 			isDragging: !!monitor.isDragging(),
+	// 			canDrag: !readonly,
+	// 		}),
+	// 	}),
+	// 	[chosePlaceholder.current]
+	// );
 	const getPlaceholders = async (load = true) => {
 		//console.log('PlaceholderBlock');
 		if (load) {
@@ -486,191 +489,217 @@ export const PlaceholderPdfBlock = () => {
 				{placeholder &&
 					placeholder.map((holder, index) => {
 						return (
-							<Space
-								className='ph-style'
+							<div
+								id={`placeholder${holder?.placeholderKey?.replaceAll(
+									'-',
+									'_'
+								)}`}
 								draggable={!readonlyCurrent.current}
-								onDragOver={(e) => {
-									e.preventDefault();
-								}}
 								onDragStart={(e) => {
 									e.dataTransfer.setData(
 										'placeholderKey',
 										holder.placeholderKey as string
 									);
+									setPlaceholderPdf(holder);
 								}}
-								direction='vertical'
-								size={2}
-								style={{ display: 'flex' }}
-								key={holder.placeholderKey}
+								role={'PlaceholderBlock'}
 							>
-								<Row wrap={false} align={'middle'}>
-									<Col>
-										<Tooltip title='Drop onto the document.'>
-											<div>
-												<Button
-													size='small'
-													type='text'
-													style={{ cursor: 'grab' }}
-													disabled={readonlyCurrent.current}
-													icon={
-														<FontAwesomeIcon
-															icon={
-																holder.view?.toString() !==
-																	PlaceholderView.SIGNATURE.toString() &&
-																!readonly
-																	? faFont
-																	: faSignature
-															}
-															size='sm'
-															onClick={() => {
-																handleInsertPlaceholder(index);
-															}}
-														/>
-													}
-												/>
-											</div>
-										</Tooltip>
-									</Col>
-									<Col>
-										<Input
-											id='PlaceholderName'
-											readOnly={
-												holder.view?.toString() !==
-													PlaceholderView.SIGNATURE.toString() &&
-												!readonlyCurrent.current
-													? false
-													: true
-											}
-											placeholder='Enter placeholder name'
-											value={holder.name}
-											variant='borderless'
-											onChange={(e: any) => handleChange(e, index)}
-											onBlur={(e: any) => handleBlur(e, index)}
-										/>
-									</Col>
-									<Col flex={'auto'}></Col>
-									{holder.view?.toString() !==
-										PlaceholderView.SIGNATURE.toString() && (
-										<Col flex='24px'>
-											<Popover
-												content={
-													<Space
-														direction='vertical'
-														style={{ display: 'flex' }}
-													>
-														<Space>
-															<Text type='secondary'>
-																Who fills in this field:
-															</Text>
-															<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
-																<div>
-																	<Button
-																		disabled={readonlyCurrent.current}
-																		size='small'
-																		icon={
-																			<FontAwesomeIcon
-																				icon={faCircleQuestion}
-																				size='xs'
-																			/>
-																		}
-																		type='text'
-																	></Button>
-																</div>
-															</Tooltip>
-														</Space>
-														<Radio.Group
-															size='small'
-															value={
-																holder.fillingType &&
-																holder.fillingType.toString() !==
-																	PlaceholderFill.SPECIFIC.toString()
-																	? holder.fillingType?.toString()
-																	: holder.fillingType &&
-																	  holder.fillingType.toString() ===
-																			PlaceholderFill.SPECIFIC.toString() &&
-																	  holder.externalRecipientKey &&
-																	  placeholderRecipients &&
-																	  placeholderRecipients.length > 0
-																	? placeholderRecipients.find(
-																			(placeholderRecipient) =>
-																				placeholderRecipient.recipientKey?.includes(
-																					holder.externalRecipientKey as string
-																				)
-																	  )?.recipientKey
-																	: '1'
-															}
-															onChange={(e: any) =>
-																handleChangeFilling(e, index)
-															}
-														>
-															<Space direction='vertical'>
-																<Radio value={PlaceholderFill.NONE.toString()}>
-																	None
-																</Radio>
-																<Radio
-																	value={PlaceholderFill.CREATOR.toString()}
-																>
-																	Contract owner
-																</Radio>
-																{placeholderRecipients &&
-																	placeholderRecipients.length > 0 &&
-																	placeholderRecipients.map(
-																		(placeholderRecipient) => {
-																			return (
-																				<Radio
-																					value={
-																						placeholderRecipient.recipientKey
-																					}
-																				>
-																					{placeholderRecipient.fullname}
-																				</Radio>
-																			);
-																		}
-																	)}
-															</Space>
-														</Radio.Group>
-														<Divider style={{ margin: 0 }} />
-														<Button
-															disabled={readonlyCurrent.current}
-															loading={delLoad}
-															block
-															danger
-															type='text'
-															onClick={() => {
-																handleDeletePlaceholder(index);
-															}}
-														>
-															Delete
-														</Button>
-													</Space>
-												}
-												trigger='click'
-											>
+								<Space
+									// id={`placeholder${holder?.placeholderKey?.replaceAll(
+									// 	'-',
+									// 	'_'
+									// )}`}
+									className='ph-style'
+									// ref={drag}
+									// onDragOver={(e) => {
+									// 	e.preventDefault();
+									// }}
+									// onDragStart={(e) => {
+									// 	e.dataTransfer.setData(
+									// 		'placeholderKey',
+									// 		holder.placeholderKey as string
+									// 	);
+									// 	setPlaceholderPdf(holder);
+									// }}
+									direction='vertical'
+									size={2}
+									style={{ display: 'flex' }}
+									// key={holder.placeholderKey}
+								>
+									<Row wrap={false} align={'middle'}>
+										<Col>
+											<Tooltip title='Drop onto the document.'>
 												<div>
 													<Button
-														disabled={readonlyCurrent.current}
 														size='small'
 														type='text'
-														icon={<FontAwesomeIcon icon={faGear} size='xs' />}
+														style={{ cursor: 'grab' }}
+														disabled={readonlyCurrent.current}
+														onClick={() => {
+															chosePlaceholder.current = holder;
+														}}
+														icon={
+															<FontAwesomeIcon
+																icon={
+																	holder.view?.toString() !==
+																		PlaceholderView.SIGNATURE.toString() &&
+																	!readonly
+																		? faFont
+																		: faSignature
+																}
+																size='sm'
+																onClick={() => {
+																	handleInsertPlaceholder(index);
+																}}
+															/>
+														}
 													/>
 												</div>
-											</Popover>
+											</Tooltip>
 										</Col>
+										<Col>
+											<Input
+												id='PlaceholderName'
+												readOnly={
+													holder.view?.toString() !==
+														PlaceholderView.SIGNATURE.toString() &&
+													!readonlyCurrent.current
+														? false
+														: true
+												}
+												placeholder='Enter placeholder name'
+												value={holder.name}
+												variant='borderless'
+												onChange={(e: any) => handleChange(e, index)}
+												onBlur={(e: any) => handleBlur(e, index)}
+											/>
+										</Col>
+										<Col flex={'auto'}></Col>
+										{holder.view?.toString() !==
+											PlaceholderView.SIGNATURE.toString() && (
+											<Col flex='24px'>
+												<Popover
+													content={
+														<Space
+															direction='vertical'
+															style={{ display: 'flex' }}
+														>
+															<Space>
+																<Text type='secondary'>
+																	Who fills in this field:
+																</Text>
+																<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
+																	<div>
+																		<Button
+																			disabled={readonlyCurrent.current}
+																			size='small'
+																			icon={
+																				<FontAwesomeIcon
+																					icon={faCircleQuestion}
+																					size='xs'
+																				/>
+																			}
+																			type='text'
+																		></Button>
+																	</div>
+																</Tooltip>
+															</Space>
+															<Radio.Group
+																size='small'
+																value={
+																	holder.fillingType &&
+																	holder.fillingType.toString() !==
+																		PlaceholderFill.SPECIFIC.toString()
+																		? holder.fillingType?.toString()
+																		: holder.fillingType &&
+																		  holder.fillingType.toString() ===
+																				PlaceholderFill.SPECIFIC.toString() &&
+																		  holder.externalRecipientKey &&
+																		  placeholderRecipients &&
+																		  placeholderRecipients.length > 0
+																		? placeholderRecipients.find(
+																				(placeholderRecipient) =>
+																					placeholderRecipient.recipientKey?.includes(
+																						holder.externalRecipientKey as string
+																					)
+																		  )?.recipientKey
+																		: '1'
+																}
+																onChange={(e: any) =>
+																	handleChangeFilling(e, index)
+																}
+															>
+																<Space direction='vertical'>
+																	<Radio
+																		value={PlaceholderFill.NONE.toString()}
+																	>
+																		None
+																	</Radio>
+																	<Radio
+																		value={PlaceholderFill.CREATOR.toString()}
+																	>
+																		Contract owner
+																	</Radio>
+																	{placeholderRecipients &&
+																		placeholderRecipients.length > 0 &&
+																		placeholderRecipients.map(
+																			(placeholderRecipient) => {
+																				return (
+																					<Radio
+																						value={
+																							placeholderRecipient.recipientKey
+																						}
+																					>
+																						{placeholderRecipient.fullname}
+																					</Radio>
+																				);
+																			}
+																		)}
+																</Space>
+															</Radio.Group>
+															<Divider style={{ margin: 0 }} />
+															<Button
+																disabled={readonlyCurrent.current}
+																loading={delLoad}
+																block
+																danger
+																type='text'
+																onClick={() => {
+																	handleDeletePlaceholder(index);
+																}}
+															>
+																Delete
+															</Button>
+														</Space>
+													}
+													trigger='click'
+												>
+													<div>
+														<Button
+															disabled={readonlyCurrent.current}
+															size='small'
+															type='text'
+															icon={<FontAwesomeIcon icon={faGear} size='xs' />}
+														/>
+													</div>
+												</Popover>
+											</Col>
+										)}
+									</Row>
+									{holder.view?.toString() !==
+										PlaceholderView.SIGNATURE.toString() && (
+										<Input
+											id='PlaceholderValue'
+											placeholder='Enter value'
+											readOnly={readonlyCurrent.current}
+											value={holder.value}
+											onChange={(e: any) => handleChange(e, index)}
+											onBlur={(e: any) => handleBlur(e, index)}
+											onPressEnter={() => handleEnter(index)}
+										/>
 									)}
-								</Row>
-								{holder.view?.toString() !==
-									PlaceholderView.SIGNATURE.toString() && (
-									<Input
-										id='PlaceholderValue'
-										placeholder='Enter value'
-										readOnly={readonlyCurrent.current}
-										value={holder.value}
-										onChange={(e: any) => handleChange(e, index)}
-										onBlur={(e: any) => handleBlur(e, index)}
-										onPressEnter={() => handleEnter(index)}
-									/>
-								)}
-							</Space>
+								</Space>
+							</div>
 						);
 					})}
 

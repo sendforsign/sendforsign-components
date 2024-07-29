@@ -90,3 +90,6 @@ export const enum EventStatuses {
 	SENT = '2',
 	CREATED = '1',
 }
+export const ItemTypes = {
+	PLACEHOLDER: 'placeholder',
+};

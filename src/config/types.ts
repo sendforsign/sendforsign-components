@@ -211,3 +211,9 @@ export type Row = {
 	createTime?: string;
 	base64?: string;
 };
+export interface DragItem {
+	pagePlaceholder: PagePlaceholder;
+}
+export interface NewDrag {
+	chosePlaceholder: Placeholder;
+}
