@@ -161,7 +161,6 @@ export const PdfPlaceholder = ({
 										fontFamily: 'Inter',
 										fontSize: 15,
 										fontWeight: 500,
-										color: 'black',
 										width: `${(pagePlaceholder?.width as number) - 1}px`,
 										height: `${(pagePlaceholder?.height as number) - 1}px`,
 									}}
@@ -198,7 +197,6 @@ export const PdfPlaceholder = ({
 									fontFamily: 'Inter',
 									fontSize: 15,
 									fontWeight: 500,
-									color: 'black',
 								}}
 							>
 								{pagePlaceholder.value

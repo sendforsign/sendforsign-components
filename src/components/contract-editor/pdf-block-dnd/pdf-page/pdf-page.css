@@ -1,8 +1,9 @@
 .resizeComponent {
 	position: absolute !important;
 	z-index: 999;
-	border: solid 1px #333;
-	background-color: #f0f0f0;
+	border: 1px solid #d0e0c7;
+	background-color: #eeeeee;
+	color: #49aa19;
 	padding-left: 2px;
 	border-radius: 4px;
 	display: flex;
