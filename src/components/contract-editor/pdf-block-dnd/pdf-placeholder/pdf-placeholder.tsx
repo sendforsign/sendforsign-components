@@ -8,8 +8,10 @@ import { PagePlaceholder } from '../../../../config/types';
 import { Button, Popover, Space } from 'antd';
 import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
+import { useContractEditorContext } from '../../contract-editor-context';
 
 type Props = {
+	id: string;
 	readonly?: boolean;
 	pagePlaceholder: PagePlaceholder;
 	onChange?: (data: any) => void;
@@ -31,16 +33,19 @@ function getStyles(
 	};
 }
 export const PdfPlaceholder = ({
+	id,
 	readonly,
 	pagePlaceholder,
 	onChange,
 	onDelete,
 }: Props) => {
+	const { setPagePlaceholderDrag } = useContractEditorContext();
+	// console.log('pagePlaceholder PdfPlaceholder', pagePlaceholder);
 	const currPagePlaceholder = useRef<PagePlaceholder>(pagePlaceholder);
 	const [{ isDragging }, drag, preview] = useDrag(
 		() => ({
 			type: `placeholder${pagePlaceholder.pageId}`,
-			item: { pagePlaceholder: currPagePlaceholder.current },
+			item: { id: id, pagePlaceholder: pagePlaceholder },
 			collect: (monitor) => ({
 				isDragging: !!monitor.isDragging(),
 				canDrag: !readonly,
@@ -51,9 +56,13 @@ export const PdfPlaceholder = ({
 	useEffect(() => {
 		preview(getEmptyImage(), { captureDraggingState: true });
 	}, []);
+	useEffect(() => {
+		currPagePlaceholder.current = pagePlaceholder;
+		// console.log('useEffect currPagePlaceholder', currPagePlaceholder.current);
+	}, [pagePlaceholder]);
 
 	const handleResize = (size: any) => {
-		console.log('handleResize', size);
+		// console.log('handleResize', size);
 
 		const plTmp = { ...pagePlaceholder };
 
@@ -72,18 +81,19 @@ export const PdfPlaceholder = ({
 			onChange({ pagePlaceholder: plTmp });
 		}
 	};
-
+	// console.log('currPagePlaceholder', currPagePlaceholder.current);
 	return (
 		<div
-			id={`insertion_${pagePlaceholder?.placeholderKey?.replaceAll('-', '_')}-${
-				pagePlaceholder.pageId
-			}-${pagePlaceholder.id}`}
+			id={id}
 			ref={drag}
 			style={getStyles(
 				pagePlaceholder.positionX as number,
 				pagePlaceholder.positionY as number,
 				isDragging
 			)}
+			onDrag={() => {
+				setPagePlaceholderDrag(currPagePlaceholder.current);
+			}}
 		>
 			<Resizable
 				className='resizeComponent'

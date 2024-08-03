@@ -126,6 +126,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [documentCurrentSaved, setDocumentCurrentSaved] = useState(true);
 	const [currentStep, setCurrentStep] = useState('');
 	const [contractPlaceholderCount, setContractPlaceholderCount] = useState(0);
+	const [pagePlaceholderDrag, setPagePlaceholderDrag] =
+		useState<PagePlaceholder>({});
 	const quillRef = useRef<any>();
 	const contractKeyRef = useRef(contractKey);
 	const first = useRef(false);
@@ -542,6 +544,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setContractPlaceholderCount,
 				pagePlaceholder,
 				setPagePlaceholder,
+				pagePlaceholderDrag,
+				setPagePlaceholderDrag,
 			}}
 		>
 			{spinLoad ? (

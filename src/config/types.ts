@@ -212,6 +212,7 @@ export type Row = {
 	base64?: string;
 };
 export interface DragItem {
+	id: string;
 	pagePlaceholder: PagePlaceholder;
 }
 export interface NewDrag {

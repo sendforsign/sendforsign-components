@@ -66,110 +66,7 @@ export const PdfBlockDnd = () => {
 	const currentPagePl = useRef<PagePlaceholder[]>([]);
 
 	const { width, ref, height } = useResizeDetector();
-	// const [, drop] = useDrop(
-	// 	() => ({
-	// 		accept: `chosePlaceholder`,
-	// 		// canDrop: () => {
-	// 		// 	// debugger;
-	// 		// },
-	// 		// drop: async (item: NewDrag, monitor) => {
-	// 		// 	debugger;
-	// 		// 	console.log(
-	// 		// 		item,
-	// 		// 		monitor.getInitialClientOffset(),
-	// 		// 		monitor.getDropResult(),
-	// 		// 		monitor.getInitialSourceClientOffset(),
-	// 		// 		monitor.getClientOffset(),
-	// 		// 		monitor.getDifferenceFromInitialOffset(),
-	// 		// 		monitor.getSourceClientOffset()
-	// 		// 	);
-	// 		// 	// const delta = monitor.getDifferenceFromInitialOffset() as {
-	// 		// 	// 	x: number;
-	// 		// 	// 	y: number;
-	// 		// 	// };
 
-	// 		// 	// let left = Math.round(
-	// 		// 	// 	parseInt((item.pagePlaceholder.positionX as number).toString()) +
-	// 		// 	// 		delta.x
-	// 		// 	// );
-	// 		// 	// const offsetWidth =
-	// 		// 	// 	(div?.offsetWidth as number) -
-	// 		// 	// 	parseInt((item.pagePlaceholder.width as number).toString());
-	// 		// 	// if (left < 0) {
-	// 		// 	// 	left = 0;
-	// 		// 	// } else if (left > offsetWidth) {
-	// 		// 	// 	left = offsetWidth;
-	// 		// 	// }
-
-	// 		// 	// let top = Math.round(
-	// 		// 	// 	parseInt((item.pagePlaceholder.positionY as number).toString()) +
-	// 		// 	// 		delta.y
-	// 		// 	// );
-	// 		// 	// const offsetHeight =
-	// 		// 	// 	(div?.offsetHeight as number) -
-	// 		// 	// 	parseInt((item.pagePlaceholder.height as number).toString());
-	// 		// 	// if (top < 0) {
-	// 		// 	// 	top = 0;
-	// 		// 	// } else if (top > offsetHeight) {
-	// 		// 	// 	top = offsetHeight;
-	// 		// 	// }
-	// 		// 	// const findIndex = currPagePlaceholder.findIndex(
-	// 		// 	// 	(currPl) =>
-	// 		// 	// 		currPl.placeholderKey === item.pagePlaceholder.placeholderKey &&
-	// 		// 	// 		currPl.pageId?.toString() ===
-	// 		// 	// 			item.pagePlaceholder.pageId?.toString() &&
-	// 		// 	// 		currPl.id?.toString() === item.pagePlaceholder.id?.toString()
-	// 		// 	// );
-	// 		// 	// if (findIndex >= 0) {
-	// 		// 	// 	let currPagePlaceholderTmp = [...currPagePlaceholder];
-	// 		// 	// 	currPagePlaceholderTmp[findIndex].positionX = left;
-	// 		// 	// 	currPagePlaceholderTmp[findIndex].positionY = top;
-	// 		// 	// 	setCurrPagePlaceholder(currPagePlaceholderTmp);
-
-	// 		// 	// 	const insertionIndex = insertion.current.findIndex(
-	// 		// 	// 		(insert) =>
-	// 		// 	// 			insert.placeholderKey === item.pagePlaceholder.placeholderKey &&
-	// 		// 	// 			insert.pageId?.toString() ===
-	// 		// 	// 				item.pagePlaceholder.pageId?.toString() &&
-	// 		// 	// 			insert.id?.toString() === item.pagePlaceholder.id?.toString()
-	// 		// 	// 	);
-	// 		// 	// 	if (insertionIndex >= 0) {
-	// 		// 	// 		insertion.current[insertionIndex] = {
-	// 		// 	// 			placeholderKey: item.pagePlaceholder.placeholderKey,
-	// 		// 	// 			pageId: item.pagePlaceholder.pageId,
-	// 		// 	// 			id: item.pagePlaceholder.id,
-	// 		// 	// 			width: item.pagePlaceholder.width,
-	// 		// 	// 			height: item.pagePlaceholder.height,
-	// 		// 	// 			positionX: left,
-	// 		// 	// 			positionY: top,
-	// 		// 	// 			action: Action.UPDATE,
-	// 		// 	// 		};
-	// 		// 	// 	} else {
-	// 		// 	// 		insertion.current.push({
-	// 		// 	// 			placeholderKey: item.pagePlaceholder.placeholderKey,
-	// 		// 	// 			pageId: item.pagePlaceholder.pageId,
-	// 		// 	// 			id: item.pagePlaceholder.id,
-	// 		// 	// 			width: item.pagePlaceholder.width,
-	// 		// 	// 			height: item.pagePlaceholder.height,
-	// 		// 	// 			positionX: left,
-	// 		// 	// 			positionY: top,
-	// 		// 	// 			action: Action.UPDATE,
-	// 		// 	// 		});
-	// 		// 	// 	}
-	// 		// 	// 	needUpdate.current = true;
-	// 		// 	// 	await save();
-	// 		// 	// }
-	// 		// 	return undefined;
-	// 		// },
-	// 		collect: (monitor) => ({
-	// 			isOver: monitor.isOver(),
-	// 			canDrop: monitor.canDrop(),
-	// 		}),
-	// 	})
-	// 	// [currPagePlaceholder, insertion.current, div]
-	// );
-
-	// console.log('scale', width, height);
 	useEffect(() => {
 		let isMounted = true;
 		const getContractEvents = async () => {
@@ -315,12 +212,12 @@ export const PdfBlockDnd = () => {
 				}
 				const pdfBytes = await pdfDoc.save();
 				await merger.add(pdfBytes.buffer);
-				console.log(
-					'contractEventData',
-					contractEvent.current,
-					contractEvents,
-					contractSigns
-				);
+				// console.log(
+				// 	'contractEventData',
+				// 	contractEvent.current,
+				// 	contractEvents,
+				// 	contractSigns
+				// );
 				let rows: Row[] = contractEvent.current
 					.filter(
 						(contractEventData) =>
@@ -417,7 +314,7 @@ export const PdfBlockDnd = () => {
 	}, [pdfFileLoad]);
 	useEffect(() => {
 		if (placeholder && placeholder.length > 0) {
-			console.log('placeholder', placeholder);
+			// console.log('placeholder useEffect', placeholder);
 			let pagePlaceholderTmp: PagePlaceholder[] = [];
 			if (pagePlaceholder && pagePlaceholder.length > 0) {
 				for (let i = 0; i < placeholder.length; i++) {
@@ -427,6 +324,7 @@ export const PdfBlockDnd = () => {
 					if (placeholderFilter && placeholderFilter.length > 0) {
 						for (let j = 0; j < placeholderFilter.length; j++) {
 							placeholderFilter[j].value = placeholder[i].value as string;
+							placeholderFilter[j].name = placeholder[i].name as string;
 						}
 					}
 				}
@@ -503,6 +401,7 @@ export const PdfBlockDnd = () => {
 		}
 	}, [placeholder, contractSigns]);
 
+	// console.log('pagePlaceholder useEffect', pagePlaceholder);
 	return (
 		<div ref={ref} style={{ overflow: 'auto' }}>
 			<Document
@@ -516,8 +415,11 @@ export const PdfBlockDnd = () => {
 				onError={() => {}}
 			>
 				{new Array(numPages).fill(0).map((_, i) => {
+					// let random = Math.random();
 					return (
 						<PdfPage
+							id={`page_${i}`}
+							idInsert={`page_insert_${i}`}
 							width={1000}
 							pageNumber={i}
 							readonly={readOnly.current}

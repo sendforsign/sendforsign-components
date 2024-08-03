@@ -88,7 +88,7 @@ export const PdfPage = ({
 		let isMounted = true;
 
 		if (pagePlaceholder.length > 0 && isMounted) {
-			console.log('PdfPage pagePlaceholder', pagePlaceholder);
+			// console.log('PdfPage pagePlaceholder', pagePlaceholder);
 			currPagePl.current = pagePlaceholder;
 			setCurrPagePlaceholder(pagePlaceholder);
 			const keyArr = getPlaceholderKeys(pagePlaceholder);
@@ -122,33 +122,13 @@ export const PdfPage = ({
 			div?.addEventListener('mousemove', (e: any) => {
 				// debugger;
 				if (finishDrop.current) {
-					// const offsetWidth =
-					// 	e.target.offsetWidth - (currentId.current.width as number);
-					// if (e.offsetX < 0) {
-					// 	currentId.current.positionX = 0;
-					// } else if (e.offsetX >= offsetWidth) {
-					// 	currentId.current.positionX = offsetWidth;
-					// } else {
-					// 	currentId.current.positionX = e.offsetX;
-					// }
-
-					// const offsetHeight = e.target.offsetHeight - e.offsetY;
-					// if (offsetHeight > -(currentId?.current?.height as number)) {
-					// 	currentId.current.positionY = -(offsetHeight as number);
-					// } else if (offsetHeight < -e.target.offsetHeight) {
-					// 	currentId.current.positionY = -e.target.offsetHeight;
-					// } else {
-					// 	currentId.current.positionY = -offsetHeight;
-					// }
 					currentId.current.positionX = e.offsetX;
 					currentId.current.positionY = e.offsetY;
-					console.log(
-						'mousemove',
-						// offsetWidth,
-						// offsetHeight,
-						currentId.current.positionX,
-						currentId.current.positionY
-					);
+					// console.log(
+					// 	'mousemove',
+					// 	currentId.current.positionX,
+					// 	currentId.current.positionY
+					// );
 
 					insertion.current.push({
 						placeholderKey: currentId.current.placeholderKey,
@@ -181,7 +161,7 @@ export const PdfPage = ({
 			needUpdate.current = false;
 			let resultPlaceholders: Placeholder[] = [];
 			for (let index = 0; index < insertion.current.length; index++) {
-				console.log('insertion.current[index]', insertion.current[index]);
+				// console.log('insertion.current[index]', insertion.current[index]);
 				if (insertion.current[index].action === Action.UPDATE) {
 					resultPlaceholders.push({
 						placeholderKey: insertion.current[index].placeholderKey,
@@ -210,89 +190,7 @@ export const PdfPage = ({
 					});
 				}
 			}
-			// let pagePlaceholderTmp = [...pagePlaceholder];
-			// let resultPlaceholders: Placeholder[] = [];
-			// for (let index = 0; index < pagePlaceholderTmp.length; index++) {
-			// 	const placeholderFindIndex = resultPlaceholders.findIndex(
-			// 		(resultPl) =>
-			// 			resultPl.placeholderKey === pagePlaceholderTmp[index].placeholderKey
-			// 	);
-			// 	if (placeholderFindIndex >= 0) {
-			// 		resultPlaceholders[placeholderFindIndex].insertion?.push({
-			// 			pageId: pagePlaceholderTmp[index].pageId,
-			// 			id: pagePlaceholderTmp[index].id,
-			// 			width: pagePlaceholderTmp[index].width
-			// 				? pagePlaceholderTmp[index].width
-			// 				: 100,
-			// 			height: pagePlaceholderTmp[index].height
-			// 				? pagePlaceholderTmp[index].height
-			// 				: 300,
-			// 			positionX: pagePlaceholderTmp[index].positionX
-			// 				? pagePlaceholderTmp[index].positionX
-			// 				: 0,
-			// 			positionY: pagePlaceholderTmp[index].positionY
-			// 				? pagePlaceholderTmp[index].positionY
-			// 				: 0,
-			// 			action: Action.UPDATE,
-			// 		});
-			// 	} else {
-			// 		resultPlaceholders.push({
-			// 			placeholderKey: pagePlaceholderTmp[index].placeholderKey,
-			// 			insertion: [
-			// 				{
-			// 					pageId: pagePlaceholderTmp[index].pageId,
-			// 					id: pagePlaceholderTmp[index].id,
-			// 					width: pagePlaceholderTmp[index].width,
-			// 					height: pagePlaceholderTmp[index].height,
-			// 					positionX: pagePlaceholderTmp[index].positionX,
-			// 					positionY: pagePlaceholderTmp[index].positionY,
-			// 					action: Action.UPDATE,
-			// 				},
-			// 			],
-			// 		});
-			// 	}
-			// }
-			// for (let index = 0; index < delPlaceholderPosition.length; index++) {
-			// 	const placeholderFindIndex = resultPlaceholders.findIndex(
-			// 		(resultPl) =>
-			// 			resultPl.placeholderKey ===
-			// 			delPlaceholderPosition[index].placeholderKey
-			// 	);
-			// 	if (placeholderFindIndex >= 0) {
-			// 		resultPlaceholders[placeholderFindIndex].insertion?.push({
-			// 			pageId: delPlaceholderPosition[index].pageId,
-			// 			id: delPlaceholderPosition[index].id,
-			// 			width: delPlaceholderPosition[index].width
-			// 				? delPlaceholderPosition[index].width
-			// 				: 100,
-			// 			height: delPlaceholderPosition[index].height
-			// 				? delPlaceholderPosition[index].height
-			// 				: 300,
-			// 			positionX: delPlaceholderPosition[index].positionX
-			// 				? delPlaceholderPosition[index].positionX
-			// 				: 0,
-			// 			positionY: delPlaceholderPosition[index].positionY
-			// 				? delPlaceholderPosition[index].positionY
-			// 				: 0,
-			// 			action: Action.DELETE,
-			// 		});
-			// 	} else {
-			// 		resultPlaceholders.push({
-			// 			placeholderKey: delPlaceholderPosition[index].placeholderKey,
-			// 			insertion: [
-			// 				{
-			// 					pageId: delPlaceholderPosition[index].pageId,
-			// 					id: delPlaceholderPosition[index].id,
-			// 					width: delPlaceholderPosition[index].width,
-			// 					height: delPlaceholderPosition[index].height,
-			// 					positionX: delPlaceholderPosition[index].positionX,
-			// 					positionY: delPlaceholderPosition[index].positionY,
-			// 					action: Action.DELETE,
-			// 				},
-			// 			],
-			// 		});
-			// 	}
-			// }
+
 			let body = {
 				data: {
 					action: Action.UPDATE,
@@ -326,33 +224,6 @@ export const PdfPage = ({
 					});
 				});
 		}
-	};
-	const handleResize = (index: number, size: any) => {
-		console.log('handleResize', size);
-
-		const currPagePlaceholderTmp = [...currPagePlaceholder];
-		currPagePlaceholderTmp[index].height =
-			parseInt(
-				(currPagePlaceholderTmp[index].height as number).toString() || '0',
-				10
-			) + parseInt(size.height, 10);
-		currPagePlaceholderTmp[index].width =
-			parseInt(
-				(currPagePlaceholderTmp[index].width as number).toString() || '0',
-				10
-			) + parseInt(size.width, 10);
-		setCurrPagePlaceholder(currPagePlaceholderTmp);
-
-		insertion.current[index] = {
-			placeholderKey: currPagePlaceholderTmp[index].placeholderKey,
-			pageId: currPagePlaceholderTmp[index].pageId,
-			id: currPagePlaceholderTmp[index].id,
-			width: currPagePlaceholderTmp[index].width,
-			height: currPagePlaceholderTmp[index].height,
-			positionX: currPagePlaceholderTmp[index].positionX,
-			positionY: currPagePlaceholderTmp[index].positionY,
-			action: Action.UPDATE,
-		};
 	};
 
 	const handleDrag = (index: number, position: any) => {

@@ -96,6 +96,8 @@ export type TContractEditorContextType = {
 	setDocumentCurrentSaved: (documentCurrentSaved: boolean) => void;
 	load: boolean;
 	setLoad: (load: boolean) => void;
+	pagePlaceholderDrag: PagePlaceholder;
+	setPagePlaceholderDrag: (pagePlaceholderDrag: PagePlaceholder) => void;
 	contractPlaceholderCount: number;
 	setContractPlaceholderCount: (contractPlaceholderCount: number) => void;
 };

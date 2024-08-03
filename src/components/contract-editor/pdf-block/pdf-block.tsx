@@ -329,7 +329,7 @@ export const PdfBlock = () => {
 	}, [pdfFileLoad]);
 	useEffect(() => {
 		if (placeholder && placeholder.length > 0) {
-			console.log('placeholder', placeholder);
+			// console.log('placeholder', placeholder);
 			let pagePlaceholderTmp: PagePlaceholder[] = [];
 			if (pagePlaceholder && pagePlaceholder.length > 0) {
 				for (let i = 0; i < placeholder.length; i++) {
@@ -415,157 +415,6 @@ export const PdfBlock = () => {
 		}
 	}, [placeholder, contractSigns]);
 
-	const save = async () => {
-		if (needUpdate.current) {
-			needUpdate.current = false;
-			let resultPlaceholders: Placeholder[] = [];
-			for (let index = 0; index < insertion.current.length; index++) {
-				console.log('insertion.current[index]', insertion.current[index]);
-				if (insertion.current[index].action === Action.UPDATE) {
-					resultPlaceholders.push({
-						placeholderKey: insertion.current[index].placeholderKey,
-						insertion: [
-							{
-								pageId: insertion.current[index].pageId,
-								id: insertion.current[index].id,
-								width: insertion.current[index].width,
-								height: insertion.current[index].height,
-								positionX: insertion.current[index].positionX,
-								positionY: insertion.current[index].positionY,
-								action: Action.UPDATE,
-							},
-						],
-					});
-				} else {
-					resultPlaceholders.push({
-						placeholderKey: insertion.current[index].placeholderKey,
-						insertion: [
-							{
-								pageId: insertion.current[index].pageId,
-								id: insertion.current[index].id,
-								action: Action.DELETE,
-							},
-						],
-					});
-				}
-			}
-			// let pagePlaceholderTmp = [...pagePlaceholder];
-			// let resultPlaceholders: Placeholder[] = [];
-			// for (let index = 0; index < pagePlaceholderTmp.length; index++) {
-			// 	const placeholderFindIndex = resultPlaceholders.findIndex(
-			// 		(resultPl) =>
-			// 			resultPl.placeholderKey === pagePlaceholderTmp[index].placeholderKey
-			// 	);
-			// 	if (placeholderFindIndex >= 0) {
-			// 		resultPlaceholders[placeholderFindIndex].insertion?.push({
-			// 			pageId: pagePlaceholderTmp[index].pageId,
-			// 			id: pagePlaceholderTmp[index].id,
-			// 			width: pagePlaceholderTmp[index].width
-			// 				? pagePlaceholderTmp[index].width
-			// 				: 100,
-			// 			height: pagePlaceholderTmp[index].height
-			// 				? pagePlaceholderTmp[index].height
-			// 				: 300,
-			// 			positionX: pagePlaceholderTmp[index].positionX
-			// 				? pagePlaceholderTmp[index].positionX
-			// 				: 0,
-			// 			positionY: pagePlaceholderTmp[index].positionY
-			// 				? pagePlaceholderTmp[index].positionY
-			// 				: 0,
-			// 			action: Action.UPDATE,
-			// 		});
-			// 	} else {
-			// 		resultPlaceholders.push({
-			// 			placeholderKey: pagePlaceholderTmp[index].placeholderKey,
-			// 			insertion: [
-			// 				{
-			// 					pageId: pagePlaceholderTmp[index].pageId,
-			// 					id: pagePlaceholderTmp[index].id,
-			// 					width: pagePlaceholderTmp[index].width,
-			// 					height: pagePlaceholderTmp[index].height,
-			// 					positionX: pagePlaceholderTmp[index].positionX,
-			// 					positionY: pagePlaceholderTmp[index].positionY,
-			// 					action: Action.UPDATE,
-			// 				},
-			// 			],
-			// 		});
-			// 	}
-			// }
-			// for (let index = 0; index < delPlaceholderPosition.length; index++) {
-			// 	const placeholderFindIndex = resultPlaceholders.findIndex(
-			// 		(resultPl) =>
-			// 			resultPl.placeholderKey ===
-			// 			delPlaceholderPosition[index].placeholderKey
-			// 	);
-			// 	if (placeholderFindIndex >= 0) {
-			// 		resultPlaceholders[placeholderFindIndex].insertion?.push({
-			// 			pageId: delPlaceholderPosition[index].pageId,
-			// 			id: delPlaceholderPosition[index].id,
-			// 			width: delPlaceholderPosition[index].width
-			// 				? delPlaceholderPosition[index].width
-			// 				: 100,
-			// 			height: delPlaceholderPosition[index].height
-			// 				? delPlaceholderPosition[index].height
-			// 				: 300,
-			// 			positionX: delPlaceholderPosition[index].positionX
-			// 				? delPlaceholderPosition[index].positionX
-			// 				: 0,
-			// 			positionY: delPlaceholderPosition[index].positionY
-			// 				? delPlaceholderPosition[index].positionY
-			// 				: 0,
-			// 			action: Action.DELETE,
-			// 		});
-			// 	} else {
-			// 		resultPlaceholders.push({
-			// 			placeholderKey: delPlaceholderPosition[index].placeholderKey,
-			// 			insertion: [
-			// 				{
-			// 					pageId: delPlaceholderPosition[index].pageId,
-			// 					id: delPlaceholderPosition[index].id,
-			// 					width: delPlaceholderPosition[index].width,
-			// 					height: delPlaceholderPosition[index].height,
-			// 					positionX: delPlaceholderPosition[index].positionX,
-			// 					positionY: delPlaceholderPosition[index].positionY,
-			// 					action: Action.DELETE,
-			// 				},
-			// 			],
-			// 		});
-			// 	}
-			// }
-			let body = {
-				data: {
-					action: Action.UPDATE,
-					clientKey: !token ? clientKey : undefined,
-					contractKey: contractKey,
-					placeholders: resultPlaceholders,
-				},
-			};
-			await axios
-				.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-					headers: {
-						Accept: 'application/vnd.api+json',
-						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-						Authorization: token ? `Bearer ${token}` : undefined,
-					},
-					responseType: 'json',
-				})
-				.then((payload: any) => {
-					//console.log('PLACEHOLDER read', payload);
-					// setRefreshPlaceholders(refreshPlaceholders + 1);
-				})
-				.catch((error) => {
-					setNotification({
-						text:
-							error.response &&
-							error.response.data &&
-							error.response.data.message
-								? error.response.data.message
-								: error.message,
-					});
-				});
-		}
-	};
 	return (
 		<div ref={ref} style={{ overflow: 'auto' }}>
 			<Document
@@ -583,9 +432,6 @@ export const PdfBlock = () => {
 				onError={() => {
 					//console.log('PdfViewer error');
 				}}
-				// onMouseLeave={async (e: any) => {
-				// 	await save();
-				// }}
 			>
 				{new Array(numPages).fill(0).map((_, i) => {
 					return (

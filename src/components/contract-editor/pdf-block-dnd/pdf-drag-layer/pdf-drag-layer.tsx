@@ -2,8 +2,10 @@ import React, { CSSProperties } from 'react';
 
 import { useDragLayer, XYCoord } from 'react-dnd';
 import { PdfPlaceholderPreview } from '../pdf-placeholder-preview';
+import { useContractEditorContext } from '../../contract-editor-context';
 
 export const PdfDragLayer = () => {
+	const { pagePlaceholderDrag } = useContractEditorContext();
 	const layerStyles: CSSProperties = {
 		position: 'fixed',
 		pointerEvents: 'none',
@@ -43,8 +45,8 @@ export const PdfDragLayer = () => {
 		}));
 
 	function renderItem() {
-		if (itemType?.toString().includes('placeholder')) {
-			return <PdfPlaceholderPreview pagePlaceholder={item.pagePlaceholder} />;
+		if (itemType?.toString().includes('placeholder') && pagePlaceholderDrag) {
+			return <PdfPlaceholderPreview pagePlaceholder={pagePlaceholderDrag} />;
 		} else {
 			return null;
 		}
