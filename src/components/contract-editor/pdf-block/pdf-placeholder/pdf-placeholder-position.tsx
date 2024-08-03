@@ -242,7 +242,6 @@ export const PdfPlaceholderPosition = ({
 										fontFamily: 'Inter',
 										fontSize: 15,
 										fontWeight: 500,
-										color: 'black',
 									}}
 								>
 									{currPagePl.value ? currPagePl.value : currPagePl.name}
@@ -279,7 +278,6 @@ export const PdfPlaceholderPosition = ({
 									fontFamily: 'Inter',
 									fontSize: 15,
 									fontWeight: 500,
-									color: 'black',
 								}}
 							>
 								{currPagePl.value ? currPagePl.value : currPagePl.name}

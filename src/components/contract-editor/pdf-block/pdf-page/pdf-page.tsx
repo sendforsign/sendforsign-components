@@ -578,7 +578,6 @@ export const PdfPage = ({
 															fontFamily: 'Inter',
 															fontSize: 15,
 															fontWeight: 500,
-															color: 'black',
 														}}
 													>
 														{pagePl.value ? pagePl.value : pagePl.name}
@@ -615,7 +614,6 @@ export const PdfPage = ({
 														fontFamily: 'Inter',
 														fontSize: 15,
 														fontWeight: 500,
-														color: 'black',
 													}}
 												>
 													{pagePl.value ? pagePl.value : pagePl.name}
