@@ -28,6 +28,7 @@ export const PdfPlaceholderPreview = ({ pagePlaceholder }: Props) => {
 						src={pagePlaceholder.base64}
 						width={pagePlaceholder.width}
 						height={pagePlaceholder.height}
+						style={{objectFit: 'contain'}}
 					/>
 				) : (
 					<FontAwesomeIcon icon={faSignature} />

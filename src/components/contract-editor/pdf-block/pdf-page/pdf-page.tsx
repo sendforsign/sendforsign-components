@@ -565,6 +565,7 @@ export const PdfPage = ({
 															src={pagePl.base64}
 															width={pagePl.width}
 															height={pagePl.height}
+															style={{objectFit: 'contain'}}
 														/>
 													) : (
 														<div>
@@ -604,6 +605,7 @@ export const PdfPage = ({
 														src={pagePl.base64}
 														width={pagePl.width}
 														height={pagePl.height}
+														style={{objectFit: 'contain'}}
 													/>
 												) : (
 													<FontAwesomeIcon icon={faSignature} />

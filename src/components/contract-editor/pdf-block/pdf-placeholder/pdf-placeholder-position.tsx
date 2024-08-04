@@ -230,6 +230,7 @@ export const PdfPlaceholderPosition = ({
 										src={currPagePl.base64}
 										width={currPagePl.width}
 										height={currPagePl.height}
+										style={{objectFit: 'contain'}}
 									/>
 								) : (
 									<div>
@@ -268,6 +269,7 @@ export const PdfPlaceholderPosition = ({
 									src={currPagePl.base64}
 									width={currPagePl.width}
 									height={currPagePl.height}
+									style={{objectFit: 'contain'}}
 								/>
 							) : (
 								<FontAwesomeIcon icon={faSignature} />

@@ -545,7 +545,7 @@ export const PlaceholderDrag = ({
 										<FontAwesomeIcon
 											icon={
 												currPlaceholder.current.view?.toString() !==
-													PlaceholderView.SIGNATURE.toString() && !readonly
+													PlaceholderView.SIGNATURE.toString()
 													? faFont
 													: faSignature
 											}
