@@ -464,6 +464,7 @@ export const SendModal = () => {
 		}
 		if (
 			recipients.length === 1 &&
+			recipientInit &&
 			updateRecipient.length === 0 &&
 			deleteRecipient.length === 0 &&
 			insertRecipient.length === 0

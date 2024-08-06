@@ -70,8 +70,6 @@ export const PlaceholderDrag = ({
 		setPlaceholderPdf(currPlaceholder.current);
 	};
 	const handleDeletePlaceholder = async () => {
-		// let placeholdersTmp = [...placeholder];
-
 		let body = {
 			data: {
 				action: Action.DELETE,
@@ -96,12 +94,6 @@ export const PlaceholderDrag = ({
 				if (onDelete) {
 					onDelete({ placeholder: currPlaceholder.current });
 				}
-				//console.log('PLACEHOLDER read', payload);
-				// placeholdersTmp.splice(index, 1);
-				// setPlaceholder(placeholdersTmp);
-				// // setRefreshPlaceholders(refreshPlaceholders + 1);
-				// getPlaceholders(false);
-				// setDelLoad(false);
 			})
 			.catch((error) => {
 				setNotification({
@@ -110,11 +102,9 @@ export const PlaceholderDrag = ({
 							? error.response.data.message
 							: error.message,
 				});
-				// setDelLoad(false);
 			});
 	};
 	const handleChange = (e: any) => {
-		// let placeholderTmp = [...placeholder];
 		switch (e.target.id) {
 			case 'PlaceholderName':
 				currPlaceholder.current.name = e.target.value;
@@ -129,12 +119,10 @@ export const PlaceholderDrag = ({
 		if (onChange) {
 			onChange({ placeholder: currPlaceholder.current });
 		}
-		// 	setPlaceholder(placeholderTmp);
 	};
 	const handleBlur = async (e: any) => {
 		switch (e.target.id) {
 			case 'PlaceholderName':
-				// let placeholdersTmp = [...placeholder];
 				let body = {
 					data: {
 						action: Action.UPDATE,
@@ -156,10 +144,7 @@ export const PlaceholderDrag = ({
 						},
 						responseType: 'json',
 					})
-					.then((payload: any) => {
-						//console.log('PLACEHOLDER read', payload);
-						// setRefreshPlaceholders(refreshPlaceholders + 1);
-					})
+					.then((payload: any) => {})
 					.catch((error) => {
 						setNotification({
 							text:
@@ -177,8 +162,6 @@ export const PlaceholderDrag = ({
 		}
 	};
 	const changeValue = async () => {
-		// let placeholdersTmp = [...placeholder];
-
 		let body = {
 			data: {
 				action: Action.UPDATE,
@@ -200,10 +183,7 @@ export const PlaceholderDrag = ({
 				},
 				responseType: 'json',
 			})
-			.then((payload: any) => {
-				//console.log('PLACEHOLDER read', payload);
-				// setRefreshPlaceholders(refreshPlaceholders + 1);
-			})
+			.then((payload: any) => {})
 			.catch((error) => {
 				setNotification({
 					text:
@@ -217,9 +197,6 @@ export const PlaceholderDrag = ({
 		changeValue();
 	};
 	const handleChangeFilling = async (e: any) => {
-		// console.log('handleChangeFilling', e);
-
-		// let placeholderTmp = [...placeholder];
 		let body = {
 			data: {
 				action: Action.UPDATE,
@@ -282,7 +259,6 @@ export const PlaceholderDrag = ({
 				'_'
 			)}`}
 			ref={!readonly ? drag : undefined}
-			// draggable={!readonlyCurrent.current}
 			onDragStart={(e) => {
 				e.dataTransfer.setData(
 					'placeholderKey',
