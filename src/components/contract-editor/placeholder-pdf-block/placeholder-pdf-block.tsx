@@ -64,10 +64,10 @@ export const PlaceholderPdfBlock = () => {
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
 	const [placeholderRecipients, setPlaceholderRecipients] = useState<
 		Recipient[]
-	>([]); 
-	const readonlyCurrent = useRef(false); 
+	>([]);
+	const readonlyCurrent = useRef(false);
 
-	const { Title, Text } = Typography; 
+	const { Title, Text } = Typography;
 	const getPlaceholders = async (load = true) => {
 		//console.log('PlaceholderBlock');
 		if (load) {
@@ -216,7 +216,7 @@ export const PlaceholderPdfBlock = () => {
 			fillingType: PlaceholderFill.NONE,
 		});
 
-		setPlaceholder(placeholdersTmp);
+		// setPlaceholder(placeholdersTmp);
 
 		let body = {
 			data: {
@@ -251,6 +251,7 @@ export const PlaceholderPdfBlock = () => {
 					placeholderKey: payload.data.placeholder.placeholderKey,
 				};
 				setPlaceholder(placeholdersTmp);
+				setContractPlaceholderCount(contractPlaceholderCount + 1);
 				getPlaceholders(false);
 			})
 			.catch((error) => {

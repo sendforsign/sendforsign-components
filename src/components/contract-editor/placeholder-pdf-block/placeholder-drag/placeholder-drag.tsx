@@ -17,9 +17,7 @@ import { BASE_URL } from '../../../../config/config';
 import {
 	Action,
 	ApiEntity,
-	ContractType,
 	PlaceholderFill,
-	PlaceholderTypeText,
 	PlaceholderView,
 } from '../../../../config/enum';
 import axios from 'axios';
@@ -299,7 +297,7 @@ export const PlaceholderDrag = ({
 										<FontAwesomeIcon
 											icon={
 												currPlaceholder.current.view?.toString() !==
-													PlaceholderView.SIGNATURE.toString()
+												PlaceholderView.SIGNATURE.toString()
 													? faFont
 													: faSignature
 											}
