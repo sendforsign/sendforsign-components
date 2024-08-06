@@ -85,7 +85,7 @@ export const PdfPlaceholder = ({
 	return (
 		<div
 			id={id}
-			ref={drag}
+			ref={!readonly ? drag : undefined}
 			style={getStyles(
 				pagePlaceholder.positionX as number,
 				pagePlaceholder.positionY as number,
@@ -158,7 +158,7 @@ export const PdfPlaceholder = ({
 										src={pagePlaceholder.base64}
 										width={pagePlaceholder.width}
 										height={pagePlaceholder.height}
-										style={{objectFit: 'contain'}}
+										style={{ objectFit: 'contain' }}
 									/>
 								) : (
 									<div>
@@ -198,7 +198,7 @@ export const PdfPlaceholder = ({
 									src={pagePlaceholder.base64}
 									width={pagePlaceholder.width}
 									height={pagePlaceholder.height}
-									style={{objectFit: 'contain'}}
+									style={{ objectFit: 'contain' }}
 								/>
 							) : (
 								<FontAwesomeIcon icon={faSignature} />

@@ -77,22 +77,20 @@ export const PdfPage = ({
 		() => ({
 			accept: `placeholder${pageNumber}`,
 			drop: async (item: DragItem, monitor) => {
-				// debugger;
-				// console.log('PdfPage currPagePlaceholder', pagePlaceholderDrag, item);
-
+				if (readonly) {
+					return undefined;
+				}
 				const delta = monitor.getDifferenceFromInitialOffset() as {
 					x: number;
 					y: number;
 				};
 
 				let left = Math.round(
-					// parseInt((item.pagePlaceholder.positionX as number).toString()) +
 					parseInt((pagePlaceholderDrag.positionX as number).toString()) +
 						delta.x
 				);
 				const offsetWidth =
 					(div?.offsetWidth as number) -
-					// parseInt((item.pagePlaceholder.width as number).toString());
 					parseInt((pagePlaceholderDrag.width as number).toString());
 				if (left < 0) {
 					left = 0;
@@ -101,13 +99,11 @@ export const PdfPage = ({
 				}
 
 				let top = Math.round(
-					// parseInt((item.pagePlaceholder.positionY as number).toString()) +
 					parseInt((pagePlaceholderDrag.positionY as number).toString()) +
 						delta.y
 				);
 				const offsetHeight =
 					(div?.offsetHeight as number) -
-					// parseInt((item.pagePlaceholder.height as number).toString());
 					parseInt((pagePlaceholderDrag.height as number).toString());
 				if (top < 0) {
 					top = 0;
@@ -117,10 +113,6 @@ export const PdfPage = ({
 				// console.log('PdfPage currPagePlaceholder', currPagePlaceholder);
 				const findIndex = currPagePlaceholder.findIndex(
 					(currPl) =>
-						// currPl.placeholderKey === item.pagePlaceholder.placeholderKey &&
-						// currPl.pageId?.toString() ===
-						// 	item.pagePlaceholder.pageId?.toString() &&
-						// currPl.id?.toString() === item.pagePlaceholder.id?.toString()
 						currPl.placeholderKey === pagePlaceholderDrag.placeholderKey &&
 						currPl.pageId?.toString() ===
 							pagePlaceholderDrag.pageId?.toString() &&
@@ -131,42 +123,14 @@ export const PdfPage = ({
 					currPagePlaceholderTmp[findIndex].positionX = left;
 					currPagePlaceholderTmp[findIndex].positionY = top;
 					setCurrPagePlaceholder(currPagePlaceholderTmp);
-					// console.log('setCurrPagePlaceholder2', currPagePlaceholderTmp);
 
 					const insertionIndex = insertion.current.findIndex(
 						(insert) =>
-							// insert.placeholderKey === item.pagePlaceholder.placeholderKey &&
-							// insert.pageId?.toString() ===
-							// 	item.pagePlaceholder.pageId?.toString() &&
-							// insert.id?.toString() === item.pagePlaceholder.id?.toString()
 							insert.placeholderKey === pagePlaceholderDrag.placeholderKey &&
 							insert.pageId?.toString() ===
 								pagePlaceholderDrag.pageId?.toString() &&
 							insert.id?.toString() === pagePlaceholderDrag.id?.toString()
 					);
-					// if (insertionIndex >= 0) {
-					// 	insertion.current[insertionIndex] = {
-					// 		placeholderKey: item.pagePlaceholder.placeholderKey,
-					// 		pageId: item.pagePlaceholder.pageId,
-					// 		id: item.pagePlaceholder.id,
-					// 		width: item.pagePlaceholder.width,
-					// 		height: item.pagePlaceholder.height,
-					// 		positionX: left,
-					// 		positionY: top,
-					// 		action: Action.UPDATE,
-					// 	};
-					// } else {
-					// 	insertion.current.push({
-					// 		placeholderKey: item.pagePlaceholder.placeholderKey,
-					// 		pageId: item.pagePlaceholder.pageId,
-					// 		id: item.pagePlaceholder.id,
-					// 		width: item.pagePlaceholder.width,
-					// 		height: item.pagePlaceholder.height,
-					// 		positionX: left,
-					// 		positionY: top,
-					// 		action: Action.UPDATE,
-					// 	});
-					// }
 					if (insertionIndex >= 0) {
 						insertion.current[insertionIndex] = {
 							placeholderKey: pagePlaceholderDrag.placeholderKey,
@@ -262,7 +226,7 @@ export const PdfPage = ({
 		if (div) {
 			div?.addEventListener('mousemove', async (e: any) => {
 				// debugger;
-				if (finishDrop.current) {
+				if (finishDrop.current && !readonly) {
 					currentId.current.positionX = e.offsetX;
 					currentId.current.positionY = e.offsetY;
 					// console.log('mousemove', currPagePlaceholder, currPagePl.current);
@@ -298,7 +262,7 @@ export const PdfPage = ({
 		};
 	}, [div]);
 	const save = async () => {
-		if (needUpdate.current) {
+		if (needUpdate.current && !readonly) {
 			debugger;
 			needUpdate.current = false;
 			let resultPlaceholders: Placeholder[] = [];
