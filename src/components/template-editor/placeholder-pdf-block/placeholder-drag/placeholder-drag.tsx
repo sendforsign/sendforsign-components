@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import {
 	Space,
-	Card,
 	Typography,
 	Button,
 	Input,
@@ -12,18 +11,16 @@ import {
 	Popover,
 	Divider,
 } from 'antd';
-import { useContractEditorContext } from '../../contract-editor-context';
+import { useTemplateEditorContext } from '../../template-editor-context';
 import { BASE_URL } from '../../../../config/config';
 import {
 	Action,
 	ApiEntity,
-	ContractType,
 	PlaceholderFill,
-	PlaceholderTypeText,
 	PlaceholderView,
 } from '../../../../config/enum';
 import axios from 'axios';
-import { Placeholder, Recipient } from '../../../../config/types';
+import { Placeholder } from '../../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faCircleQuestion,
@@ -36,7 +33,6 @@ import { useDrag } from 'react-dnd';
 type Props = {
 	readonly?: boolean;
 	placeholder: Placeholder;
-	recipients?: Recipient[];
 	onChange?: (data: any) => void;
 	onDelete?: (data: any) => void;
 };
@@ -44,7 +40,6 @@ type Props = {
 export const PlaceholderDrag = ({
 	readonly,
 	placeholder,
-	recipients,
 	onChange,
 	onDelete,
 }: Props) => {
@@ -53,11 +48,11 @@ export const PlaceholderDrag = ({
 		apiKey,
 		userKey,
 		token,
-		contractKey,
+		templateKey,
 		clientKey,
 		setPlaceholderPdf,
 		setNotification,
-	} = useContractEditorContext();
+	} = useTemplateEditorContext();
 
 	const { Title, Text } = Typography;
 	const [, drag] = useDrag(
@@ -75,11 +70,13 @@ export const PlaceholderDrag = ({
 		setPlaceholderPdf(currPlaceholder.current);
 	};
 	const handleDeletePlaceholder = async () => {
+		// let placeholdersTmp = [...placeholder];
+
 		let body = {
 			data: {
 				action: Action.DELETE,
 				clientKey: !token ? clientKey : undefined,
-				contractKey: contractKey,
+				templateKey: templateKey,
 				placeholder: {
 					placeholderKey: currPlaceholder.current.placeholderKey,
 				},
@@ -99,6 +96,12 @@ export const PlaceholderDrag = ({
 				if (onDelete) {
 					onDelete({ placeholder: currPlaceholder.current });
 				}
+				//console.log('PLACEHOLDER read', payload);
+				// placeholdersTmp.splice(index, 1);
+				// setPlaceholder(placeholdersTmp);
+				// // setRefreshPlaceholders(refreshPlaceholders + 1);
+				// getPlaceholders(false);
+				// setDelLoad(false);
 			})
 			.catch((error) => {
 				setNotification({
@@ -107,9 +110,11 @@ export const PlaceholderDrag = ({
 							? error.response.data.message
 							: error.message,
 				});
+				// setDelLoad(false);
 			});
 	};
 	const handleChange = (e: any) => {
+		// let placeholderTmp = [...placeholder];
 		switch (e.target.id) {
 			case 'PlaceholderName':
 				currPlaceholder.current.name = e.target.value;
@@ -124,15 +129,17 @@ export const PlaceholderDrag = ({
 		if (onChange) {
 			onChange({ placeholder: currPlaceholder.current });
 		}
+		// 	setPlaceholder(placeholderTmp);
 	};
 	const handleBlur = async (e: any) => {
 		switch (e.target.id) {
 			case 'PlaceholderName':
+				// let placeholdersTmp = [...placeholder];
 				let body = {
 					data: {
 						action: Action.UPDATE,
 						clientKey: !token ? clientKey : undefined,
-						contractKey: contractKey,
+						templateKey: templateKey,
 						placeholder: {
 							placeholderKey: currPlaceholder.current.placeholderKey,
 							name: currPlaceholder.current.name,
@@ -170,11 +177,13 @@ export const PlaceholderDrag = ({
 		}
 	};
 	const changeValue = async () => {
+		// let placeholdersTmp = [...placeholder];
+
 		let body = {
 			data: {
 				action: Action.UPDATE,
 				clientKey: !token ? clientKey : undefined,
-				contractKey: contractKey,
+				templateKey: templateKey,
 				placeholder: {
 					placeholderKey: currPlaceholder.current.placeholderKey,
 					value: currPlaceholder.current.value,
@@ -208,11 +217,14 @@ export const PlaceholderDrag = ({
 		changeValue();
 	};
 	const handleChangeFilling = async (e: any) => {
+		// console.log('handleChangeFilling', e);
+
+		// let placeholderTmp = [...placeholder];
 		let body = {
 			data: {
 				action: Action.UPDATE,
 				clientKey: !token ? clientKey : undefined,
-				contractKey: contractKey,
+				templateKey: templateKey,
 				placeholder: {
 					placeholderKey: currPlaceholder.current.placeholderKey,
 					fillingType: 1,
@@ -270,6 +282,7 @@ export const PlaceholderDrag = ({
 				'_'
 			)}`}
 			ref={!readonly ? drag : undefined}
+			// draggable={!readonlyCurrent.current}
 			onDragStart={(e) => {
 				e.dataTransfer.setData(
 					'placeholderKey',
@@ -284,7 +297,6 @@ export const PlaceholderDrag = ({
 				direction='vertical'
 				size={2}
 				style={{ display: 'flex' }}
-				// key={holder.placeholderKey}
 			>
 				<Row wrap={false} align={'middle'}>
 					<Col>
@@ -299,7 +311,7 @@ export const PlaceholderDrag = ({
 										<FontAwesomeIcon
 											icon={
 												currPlaceholder.current.view?.toString() !==
-													PlaceholderView.SIGNATURE.toString()
+													PlaceholderView.SIGNATURE.toString() && !readonly
 													? faFont
 													: faSignature
 											}
@@ -361,18 +373,6 @@ export const PlaceholderDrag = ({
 												currPlaceholder.current.fillingType.toString() !==
 													PlaceholderFill.SPECIFIC.toString()
 													? currPlaceholder.current.fillingType?.toString()
-													: currPlaceholder.current.fillingType &&
-													  currPlaceholder.current.fillingType.toString() ===
-															PlaceholderFill.SPECIFIC.toString() &&
-													  currPlaceholder.current.externalRecipientKey &&
-													  recipients &&
-													  recipients.length > 0
-													? recipients.find((placeholderRecipient) =>
-															placeholderRecipient.recipientKey?.includes(
-																currPlaceholder.current
-																	.externalRecipientKey as string
-															)
-													  )?.recipientKey
 													: '1'
 											}
 											onChange={(e: any) => handleChangeFilling(e)}
@@ -384,15 +384,6 @@ export const PlaceholderDrag = ({
 												<Radio value={PlaceholderFill.CREATOR.toString()}>
 													Contract owner
 												</Radio>
-												{recipients &&
-													recipients.length > 0 &&
-													recipients.map((placeholderRecipient) => {
-														return (
-															<Radio value={placeholderRecipient.recipientKey}>
-																{placeholderRecipient.fullname}
-															</Radio>
-														);
-													})}
 											</Space>
 										</Radio.Group>
 										<Divider style={{ margin: 0 }} />

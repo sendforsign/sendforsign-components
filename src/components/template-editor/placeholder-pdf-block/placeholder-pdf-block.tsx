@@ -12,13 +12,12 @@ import {
 	Popover,
 	Divider,
 } from 'antd';
-import { useContractEditorContext } from '../contract-editor-context';
+import { useTemplateEditorContext } from '../template-editor-context';
 import { BASE_URL } from '../../../config/config';
 import {
 	Action,
 	ApiEntity,
 	ContractType,
-	ContractTypeText,
 	PlaceholderFill,
 	PlaceholderTypeText,
 	PlaceholderView,
@@ -35,39 +34,40 @@ import {
 import { useDrag } from 'react-dnd';
 import { PlaceholderDrag } from './placeholder-drag';
 
-type Props = {
-	// quillRef: React.MutableRefObject<QuillNamespace | undefined>;
-};
-
 export const PlaceholderPdfBlock = () => {
 	const {
 		apiKey,
 		userKey,
 		token,
-		readonly,
-		contractType,
-		contractKey,
+		isPdf,
+		templateKey,
 		clientKey,
 		placeholder,
 		continueLoad,
 		setPlaceholder,
-		setPlaceholderPdf,
 		refreshPlaceholders,
-		placeholderVisible,
-		refreshPlaceholderRecipients,
 		setNotification,
-		contractPlaceholderCount,
-		setContractPlaceholderCount,
-		signs,
-	} = useContractEditorContext();
+		templatePlaceholderCount,
+		setTemplatePlaceholderCount,
+	} = useTemplateEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
-	const [placeholderRecipients, setPlaceholderRecipients] = useState<
-		Recipient[]
-	>([]); 
-	const readonlyCurrent = useRef(false); 
 
-	const { Title, Text } = Typography; 
+	const readonlyCurrent = useRef(false); 
+	const chosePlaceholder = useRef<Placeholder>({});
+
+	const { Title, Text } = Typography;
+	const [, drag] = useDrag(
+		() => ({
+			type: `chosePlaceholder`,
+			item: { chosePlaceholder: chosePlaceholder.current },
+			collect: (monitor) => ({
+				isDragging: !!monitor.isDragging(),
+				canDrag: !!monitor.canDrag(),
+			}),
+		}),
+		[chosePlaceholder.current]
+	);
 	const getPlaceholders = async (load = true) => {
 		//console.log('PlaceholderBlock');
 		if (load) {
@@ -77,7 +77,7 @@ export const PlaceholderPdfBlock = () => {
 			data: {
 				action: Action.LIST,
 				clientKey: !token ? clientKey : undefined,
-				contractKey: contractKey,
+				templateKey: templateKey,
 			},
 		};
 		await axios
@@ -103,9 +103,9 @@ export const PlaceholderPdfBlock = () => {
 						placeholderTmp.push(payload.data.placeholders[index]);
 					}
 					setPlaceholder(placeholderTmp);
-					setContractPlaceholderCount(placeholderTmp.length);
+					setTemplatePlaceholderCount(placeholderTmp.length);
 				} else {
-					setContractPlaceholderCount(0);
+					setTemplatePlaceholderCount(0);
 				}
 				if (load) {
 					setPlaceholderLoad(false);
@@ -120,97 +120,27 @@ export const PlaceholderPdfBlock = () => {
 				});
 			});
 	};
-	const getRecipients = async () => {
-		const body = {
-			data: {
-				action: Action.LIST,
-				clientKey: !token ? clientKey : undefined,
-				userKey: userKey,
-				contractKey: contractKey,
-				// getShareLinks: true,
-			},
-		};
-		await axios
-			.post(BASE_URL + ApiEntity.RECIPIENT, body, {
-				headers: {
-					Accept: 'application/vnd.api+json',
-					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-					Authorization: token ? `Bearer ${token}` : undefined,
-				},
-				responseType: 'json',
-			})
-			.then((payload: any) => {
-				//console.log('getShareLinks read', payload);
-				if (payload.data.recipients && payload.data.recipients.length > 0) {
-					setPlaceholderRecipients(
-						payload.data.recipients.map((recipient: Recipient) => {
-							return {
-								id: recipient.id,
-								fullname: recipient.fullname,
-								email: recipient.email,
-								customMessage: recipient.customMessage,
-								position: recipient.position,
-								action: recipient.action,
-								recipientKey: recipient.recipientKey,
-							};
-						})
-					);
-				}
-			})
-			.catch((error) => {
-				setNotification({
-					text:
-						error.response && error.response.data && error.response.data.message
-							? error.response.data.message
-							: error.message,
-				});
-			});
-	};
-	useEffect(() => {
-		let isMounted = true;
-		if (
-			contractType.toString() === ContractType.PDF.toString() &&
-			contractKey &&
-			(clientKey || token)
-		) {
-			getRecipients();
-		}
-		return () => {
-			isMounted = false;
-		};
-	}, [refreshPlaceholderRecipients]);
 
 	useEffect(() => {
 		let isMounted = true;
 		if (
-			(contractType.toString() === ContractType.PDF.toString() ||
-				contractType.toString() === ContractTypeText.PDF.toString()) &&
-			contractKey &&
+			isPdf &&
+			templateKey &&
 			(clientKey || token) &&
-			placeholderVisible &&
-			(currPlaceholder !== refreshPlaceholders ||
-				!placeholder ||
-				placeholder.length === 0)
+			(currPlaceholder !== refreshPlaceholders || placeholder.length === 0)
 		) {
 			setCurrPlaceholder(refreshPlaceholders);
-			getRecipients();
 			getPlaceholders();
 		}
 		return () => {
 			isMounted = false;
 		};
-	}, [refreshPlaceholders, placeholderVisible]);
-	useEffect(() => {
-		if (signs && signs.length > 0) {
-			readonlyCurrent.current = true;
-		}
-	}, [signs]);
+	}, [refreshPlaceholders]);
 
 	const handleAddPlaceholder = async () => {
 		let placeholdersTmp = [...placeholder];
 		placeholdersTmp.push({
-			name: `Name${contractPlaceholderCount + 1}`,
+			name: `Name${templatePlaceholderCount + 1}`,
 			value: '',
 			type: PlaceholderTypeText.INTERNAL,
 			fillingType: PlaceholderFill.NONE,
@@ -222,7 +152,7 @@ export const PlaceholderPdfBlock = () => {
 			data: {
 				action: Action.CREATE,
 				clientKey: !token ? clientKey : undefined,
-				contractKey: contractKey,
+				templateKey: templateKey,
 				placeholder: {
 					name: `Name${placeholdersTmp.length}`,
 					value: '',
@@ -242,7 +172,7 @@ export const PlaceholderPdfBlock = () => {
 			})
 			.then((payload: any) => {
 				placeholdersTmp[placeholdersTmp.length - 1] = {
-					name: `Name${contractPlaceholderCount + 1}`,
+					name: `Name${templatePlaceholderCount + 1}`,
 					value: '',
 					type: PlaceholderTypeText.INTERNAL,
 					fillingType: PlaceholderFill.NONE,
@@ -272,11 +202,10 @@ export const PlaceholderPdfBlock = () => {
 		placeholderTmp.splice(index, 1);
 		setPlaceholder(placeholderTmp);
 	};
-	console.log('readonly', readonly, readonlyCurrent.current);
 	return (
 		<Card
 			loading={placeholderLoad || continueLoad}
-			key={`PlaceholderBlock${contractKey}`}
+			key={`PlaceholderBlock${templateKey}`}
 		>
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 				<Space direction='vertical' size={2}>
@@ -290,7 +219,6 @@ export const PlaceholderPdfBlock = () => {
 						return (
 							<PlaceholderDrag
 								placeholder={holder}
-								recipients={placeholderRecipients}
 								readonly={readonlyCurrent.current}
 								onChange={(e: any) => {
 									handleChange(e.placeholder, index);

@@ -6,11 +6,11 @@ import {
 	PagePlaceholder,
 	Placeholder,
 } from '../../../../config/types';
-import { useContractEditorContext } from '../../contract-editor-context';
+import { useTemplateEditorContext } from '../../template-editor-context';
 import { Action, ApiEntity, PlaceholderView } from '../../../../config/enum';
 import { PdfPlaceholder } from '../pdf-placeholder/pdf-placeholder';
 import { BASE_URL } from '../../../../config/config';
-import axios from 'axios';
+import axios from 'axios'; 
 import './pdf-page.css';
 import { useDrop } from 'react-dnd';
 import { PdfDragLayer } from '../pdf-drag-layer';
@@ -19,6 +19,8 @@ type Props = {
 	idInsert: string;
 	pageNumber: number;
 	width: number;
+	// height?: number;
+	// scale: number;
 	readonly?: boolean;
 	pagePlaceholder: PagePlaceholder[];
 };
@@ -51,11 +53,11 @@ export const PdfPage = ({
 		apiKey,
 		token,
 		clientKey,
-		contractKey,
+		templateKey,
 		setNotification,
 		placeholderPdf,
 		setPlaceholderPdf,
-	} = useContractEditorContext();
+	} = useTemplateEditorContext();
 	const currPagePl = useRef<PagePlaceholder[]>([]);
 	const [currPagePlaceholder, setCurrPagePlaceholder] = useState<
 		PagePlaceholder[]
@@ -337,7 +339,7 @@ export const PdfPage = ({
 				data: {
 					action: Action.UPDATE,
 					clientKey: !token ? clientKey : undefined,
-					contractKey: contractKey,
+					templateKey: templateKey,
 					placeholders: resultPlaceholders,
 				},
 			};

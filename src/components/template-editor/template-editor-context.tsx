@@ -1,5 +1,10 @@
 import { createContext, useContext } from 'react';
-import { ContractSign, ContractType, Placeholder } from '../../config/types';
+import {
+	ContractSign,
+	ContractType,
+	PagePlaceholder,
+	Placeholder,
+} from '../../config/types';
 
 export type TTemplateEditorContextType = {
 	resultModal: { open: boolean; action: string };
@@ -10,6 +15,8 @@ export type TTemplateEditorContextType = {
 	setUserKey: (userKey: string) => void;
 	templateKey: string | undefined;
 	setTemplateKey: (templateKey: string) => void;
+	notification: { text?: any };
+	setNotification: (text: any) => void;
 	templateName: string;
 	setTemplateName: (templateName: string) => void;
 	templateValue: string;
@@ -30,12 +37,16 @@ export type TTemplateEditorContextType = {
 	setRefreshPlaceholders: (refreshPlaceholders: number) => void;
 	placeholder: Placeholder[];
 	setPlaceholder: (placeholder: Placeholder[]) => void;
-	placeholderVisible: boolean;
-	setPlaceholderVisible: (placeholderVisible: boolean) => void;
+	placeholderPdf: Placeholder;
+	setPlaceholderPdf: (placeholder: Placeholder) => void;
 	apiKey: string | undefined;
 	setApiKey: (apiKey: string) => void;
 	token: string | undefined;
 	setToken: (token: string) => void;
+	pagePlaceholderDrag: PagePlaceholder;
+	setPagePlaceholderDrag: (pagePlaceholderDrag: PagePlaceholder) => void;
+	pagePlaceholder: PagePlaceholder[];
+	setPagePlaceholder: (pagePlaceholder: PagePlaceholder[]) => void;
 	templatePlaceholderCount: number;
 	setTemplatePlaceholderCount: (templatePlaceholderCount: number) => void;
 };

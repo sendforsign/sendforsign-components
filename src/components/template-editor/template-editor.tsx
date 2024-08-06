@@ -8,9 +8,12 @@ import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
 import { TemplateEditorContext } from './template-editor-context';
 import { HtmlBlock } from './html-block/html-block';
 import { ChooseTemplateType } from './choose-template-type/choose-template-type';
-import { Placeholder, Template } from '../../config/types';
-import { PdfViewer } from './pdf-viewer/pdf-viewer';
-import { PlaceholderBlock } from './placeholder-block/placeholder-block';
+import { PagePlaceholder, Placeholder, Template } from '../../config/types';
+import { PlaceholderHtmlBlock } from './placeholder-html-block';
+import { PlaceholderPdfBlock } from './placeholder-pdf-block';
+import { PdfBlockDnd } from './pdf-block-dnd';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 export interface TemplateEditorProps {
 	apiKey?: string;
 	clientKey?: string;
@@ -34,6 +37,8 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const [resultModal, setResultModal] = useState({ open: false, action: '' });
 	const [templateName, setTemplateName] = useState('');
 	const [templateValue, setTemplateValue] = useState('');
+	const [notification, setNotification] = useState({});
+
 	const [isPdf, setIsPdf] = useState(false);
 	const [isNew, setIsNew] = useState(false);
 	const [createTemplate, setCreateTemplate] = useState(false);
@@ -41,7 +46,6 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const [editorVisible, setEditorVisible] = useState(
 		templateKey ? true : false
 	);
-	const [placeholderVisible, setPlaceholderVisible] = useState(true);
 	const [templateType, setTemplateType] = useState('');
 	const [currTemplateKey, setCurrTemplateKey] = useState(templateKey);
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
@@ -51,7 +55,11 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
 	const [refreshPlaceholders, setRefreshPlaceholders] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
+	const [placeholderPdf, setPlaceholderPdf] = useState<Placeholder>({});
+	const [pagePlaceholder, setPagePlaceholder] = useState<PagePlaceholder[]>([]);
 	const [spinLoad, setSpinLoad] = useState(false);
+	const [pagePlaceholderDrag, setPagePlaceholderDrag] =
+		useState<PagePlaceholder>({});
 	const [templatePlaceholderCount, setTemplatePlaceholderCount] = useState(0);
 	const templateKeyRef = useRef(templateKey);
 	const { Title, Text } = Typography;
@@ -257,14 +265,20 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 				setRefreshPlaceholders,
 				placeholder,
 				setPlaceholder,
-				placeholderVisible,
-				setPlaceholderVisible,
 				apiKey: currApiKey,
 				setApiKey: setCurrApiKey,
 				token: currToken,
 				setToken: setCurrToken,
 				templatePlaceholderCount,
 				setTemplatePlaceholderCount,
+				notification,
+				setNotification,
+				placeholderPdf,
+				setPlaceholderPdf,
+				pagePlaceholder,
+				setPagePlaceholder,
+				pagePlaceholderDrag,
+				setPagePlaceholderDrag,
 			}}
 		>
 			{spinLoad ? (
@@ -274,58 +288,76 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 					{isNew && <ChooseTemplateType />}
 					{editorVisible && (
 						<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false}>
-							<Col flex='auto'>
-								<Space
-									direction='vertical'
-									size={16}
-									style={{ display: 'flex' }}
-								>
-									<Card loading={continueLoad}>
-										<Space
-											direction='vertical'
-											size={16}
-											style={{ display: 'flex' }}
-										>
-											<Space direction='vertical' size={2}>
-												<Title level={4} style={{ margin: '0 0 0 0' }}>
-													Review your template
-												</Title>
-												<Text type='secondary'>
-													Highlight text to see options.
-												</Text>
-											</Space>
-											{!isPdf ? (
-												<>
-													{templateValue && (
-														<HtmlBlock
-															value={templateValue}
-															quillRef={quillRef}
-														/>
-													)}
-												</>
-											) : (
-												<PdfViewer />
-											)}
-										</Space>
-									</Card>
-								</Space>
-							</Col>
-							{!isPdf && (
-								<Col flex='300px' style={{ display: 'block' }}>
+							<DndProvider backend={HTML5Backend}>
+								<Col flex='auto'>
 									<Space
 										direction='vertical'
-										style={{
-											display: 'flex',
-											top: 10,
-											position: 'sticky',
-											maxHeight: '90vh',
-											overflow: 'auto',
-										}}
+										size={16}
+										style={{ display: 'flex' }}
 									>
-										<PlaceholderBlock quillRef={quillRef} />
+										<Card loading={continueLoad}>
+											<Space
+												direction='vertical'
+												size={16}
+												style={{ display: 'flex' }}
+											>
+												<Space direction='vertical' size={2}>
+													<Title level={4} style={{ margin: '0 0 0 0' }}>
+														Review your template
+													</Title>
+													<Text type='secondary'>
+														Highlight text to see options.
+													</Text>
+												</Space>
+												{!isPdf ? (
+													<>
+														{templateValue && (
+															<HtmlBlock
+																value={templateValue}
+																quillRef={quillRef}
+															/>
+														)}
+													</>
+												) : (
+													<PdfBlockDnd />
+												)}
+											</Space>
+										</Card>
 									</Space>
 								</Col>
-							)}
+								{!isPdf && (
+									<Col flex='300px' style={{ display: 'block' }}>
+										<Space
+											direction='vertical'
+											style={{
+												display: 'flex',
+												top: 10,
+												position: 'sticky',
+												maxHeight: '80vh',
+												overflow: 'auto',
+											}}
+										>
+											<PlaceholderHtmlBlock quillRef={quillRef} />
+										</Space>
+									</Col>
+								)}
+								{isPdf && (
+									<Col flex='300px' style={{ display: 'block' }}>
+										<Space
+											direction='vertical'
+											style={{
+												display: 'flex',
+												top: 10,
+												position: 'sticky',
+												maxHeight: '80vh',
+												overflow: 'auto',
+											}}
+										>
+											<PlaceholderPdfBlock />
+										</Space>
+									</Col>
+								)}
+							</DndProvider>
 						</Row>
 					)}
 				</Space>

@@ -19,13 +19,7 @@ export const ChooseTemplateType = () => {
 		setPdfFileLoad,
 		continueLoad,
 		setContinueLoad,
-	} = useTemplateEditorContext();
-	// if (!process.env.SENDFORSIGN_API_KEY) {
-	// 	//console.log(
-	// 		'process.env.SENDFORSIGN_API_KEY',
-	// 		process.env.SENDFORSIGN_API_KEY
-	// 	);
-	// }
+	} = useTemplateEditorContext(); 
 	const [options, setOptions] = useState<SegmentedLabeledOption[]>([]);
 	const { setArrayBuffer } = useSaveArrayBuffer();
 	const [createDisable, setCreateDisable] = useState(true);

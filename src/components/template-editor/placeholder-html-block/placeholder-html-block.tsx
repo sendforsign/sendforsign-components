@@ -1,52 +1,65 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
 	Space,
 	Card,
 	Typography,
 	Button,
 	Input,
+	Radio,
 	Row,
 	Tooltip,
 	Col,
 	Popover,
-	Radio,
 	Divider,
 } from 'antd';
 import QuillNamespace from 'quill';
+import { useTemplateEditorContext } from '../template-editor-context';
 import { BASE_URL } from '../../../config/config';
 import {
 	Action,
 	ApiEntity,
+	ContractType,
 	PlaceholderFill,
 	PlaceholderTypeText,
+	PlaceholderView,
 } from '../../../config/enum';
 import axios from 'axios';
-import { Placeholder } from '../../../config/types';
+import { Placeholder, Recipient } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faCircleQuestion,
 	faGear,
 	faLeftLong,
 } from '@fortawesome/free-solid-svg-icons';
-import { useTemplateEditorContext } from '../template-editor-context';
 
 type Props = {
 	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
 };
 
-export const PlaceholderBlock = ({ quillRef }: Props) => {
+export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 	const {
+		apiKey,
+		userKey,
+		token,
+		isPdf,
 		templateKey,
+		templateType,
 		clientKey,
 		placeholder,
 		continueLoad,
 		setPlaceholder,
 		refreshPlaceholders,
-		apiKey,
-		token,
+		templatePlaceholderCount,
+		setTemplatePlaceholderCount,
+		setNotification,
 	} = useTemplateEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
+	const [placeholderRecipients, setPlaceholderRecipients] = useState<
+		Recipient[]
+	>([]);
+	const [delLoad, setDelLoad] = useState(false);
+	const readonlyCurrent = useRef(false);
 
 	const { Title, Text } = Typography;
 
@@ -82,43 +95,56 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 						index < payload.data.placeholders.length;
 						index++
 					) {
-						placeholderTmp.push(payload.data.placeholders[index]);
+						if (
+							payload.data.placeholders[index].view.toString() !==
+							PlaceholderView.SIGNATURE.toString()
+						) {
+							placeholderTmp.push(payload.data.placeholders[index]);
+						}
 					}
 
 					setPlaceholder(placeholderTmp);
+					setTemplatePlaceholderCount(placeholderTmp.length);
+				} else {
+					setTemplatePlaceholderCount(0);
 				}
 				if (load) {
 					setPlaceholderLoad(false);
 				}
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
 			});
 	};
 
 	useEffect(() => {
 		let isMounted = true;
 		if (
+			!isPdf &&
 			templateKey &&
 			(clientKey || token) &&
 			currPlaceholder !== refreshPlaceholders
 		) {
 			setCurrPlaceholder(refreshPlaceholders);
-			if (isMounted) {
-				getPlaceholders();
-			}
+			getPlaceholders();
 		}
 		return () => {
 			isMounted = false;
 		};
 	}, [refreshPlaceholders]);
-
 	const handleAddPlaceholder = async () => {
 		let placeholdersTmp = [...placeholder];
 		placeholdersTmp.push({
-			name: `Name${placeholdersTmp.length}`,
+			name: `Name${templatePlaceholderCount + 1}`,
 			value: '',
 			type: PlaceholderTypeText.INTERNAL,
 			fillingType: PlaceholderFill.NONE,
 		});
-
 		setPlaceholder(placeholdersTmp);
 
 		let body = {
@@ -147,6 +173,14 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				//console.log('PLACEHOLDER read', payload);
 				// setRefreshPlaceholders(refreshPlaceholders + 1);
 				getPlaceholders(false);
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
 			});
 	};
 	const handleInsertPlaceholder = (index: number) => {
@@ -170,6 +204,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 		//console.log('handleInsertPlaceholder', quillRef?.current?.root.innerHTML);
 	};
 	const handleDeletePlaceholder = async (index: number) => {
+		setDelLoad(true);
 		let placeholdersTmp = [...placeholder];
 
 		let body = {
@@ -196,10 +231,19 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 				//console.log('PLACEHOLDER read', payload);
 
 				placeholdersTmp.splice(index, 1);
-
 				setPlaceholder(placeholdersTmp);
 				// setRefreshPlaceholders(refreshPlaceholders + 1);
 				getPlaceholders(false);
+				setDelLoad(false);
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
+				setDelLoad(false);
 			});
 	};
 	const handleChange = (e: any, index: number) => {
@@ -219,9 +263,14 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 	};
 	const changeValueInTag = (id: number, value: string) => {
 		let text = quillRef?.current?.root.innerHTML;
+		let contenteditable = false;
+		if (text?.includes('contenteditable')) {
+			contenteditable = true;
+		}
 		let tag = `<placeholder${id}`;
 		let array = text?.split(tag);
 		let resultText = '';
+		debugger;
 		if (array) {
 			for (let i = 0; i < array.length; i++) {
 				if (array.length > 1) {
@@ -233,11 +282,15 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 						const lineArr = array[i].split(tag);
 						for (let j = 0; j < lineArr.length; j++) {
 							if (j === 0) {
-								tag = `"placeholderClass${id}" contenteditable="false">`;
+								tag = contenteditable
+									? `"placeholderClass${id}" contenteditable="false">`
+									: `"placeholderClass${id}">`;
 								const elArray = lineArr[j].split(tag);
 								for (let k = 0; k < elArray.length; k++) {
 									if (k === 0) {
-										resultText += `${elArray[k]}"placeholderClass${id}" contenteditable="false">`;
+										resultText += contenteditable
+											? `${elArray[k]}"placeholderClass${id}" contenteditable="false">`
+											: `${elArray[k]}"placeholderClass${id}">`;
 									} else {
 										resultText += `${value}</placeholder${id}>`;
 									}
@@ -285,6 +338,16 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 					.then((payload: any) => {
 						//console.log('PLACEHOLDER read', payload);
 						// setRefreshPlaceholders(refreshPlaceholders + 1);
+					})
+					.catch((error) => {
+						setNotification({
+							text:
+								error.response &&
+								error.response.data &&
+								error.response.data.message
+									? error.response.data.message
+									: error.message,
+						});
 					});
 				break;
 
@@ -327,6 +390,15 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 			})
 			.then((payload: any) => {
 				//console.log('PLACEHOLDER read', payload);
+				// setRefreshPlaceholders(refreshPlaceholders + 1);
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
 			});
 	};
 	const handleClick = (e: any, index: number) => {
@@ -368,6 +440,14 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 			.then((payload: any) => {
 				//console.log('PLACEHOLDER read', payload);
 				// setRefreshPlaceholders(refreshPlaceholders + 1);
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
 			});
 	};
 	return (
@@ -386,8 +466,8 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 					placeholder.map((holder, index) => {
 						return (
 							<Space
-								draggable
 								className='ph-style'
+								draggable={!readonlyCurrent.current}
 								direction='vertical'
 								size={2}
 								style={{ display: 'flex' }}
@@ -398,6 +478,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 										<Tooltip title='Click to insert the placeholder at the current cursor position in the text.'>
 											<div>
 												<Button
+													disabled={readonlyCurrent.current}
 													size='small'
 													type='text'
 													icon={
@@ -415,6 +496,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 									</Col>
 									<Col>
 										<Input
+											readOnly={readonlyCurrent.current}
 											id='PlaceholderName'
 											placeholder='Enter placeholder name'
 											variant='borderless'
@@ -435,6 +517,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 														<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
 															<div>
 																<Button
+																	disabled={readonlyCurrent.current}
 																	size='small'
 																	icon={
 																		<FontAwesomeIcon
@@ -449,26 +532,55 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 													</Space>
 													<Radio.Group
 														size='small'
-														value={parseInt(
-															holder.fillingType
+														value={
+															holder.fillingType &&
+															holder.fillingType.toString() !==
+																PlaceholderFill.SPECIFIC.toString()
 																? holder.fillingType?.toString()
-																: '1',
-															10
-														)}
+																: holder.fillingType &&
+																  holder.fillingType.toString() ===
+																		PlaceholderFill.SPECIFIC.toString() &&
+																  holder.externalRecipientKey &&
+																  placeholderRecipients &&
+																  placeholderRecipients.length > 0
+																? placeholderRecipients.find(
+																		(placeholderRecipient) =>
+																			placeholderRecipient.recipientKey?.includes(
+																				holder.externalRecipientKey as string
+																			)
+																  )?.recipientKey
+																: '1'
+														}
 														onChange={(e: any) => handleChangeFilling(e, index)}
 													>
 														<Space direction='vertical'>
-															<Radio value={PlaceholderFill.NONE}>None</Radio>
-															<Radio value={PlaceholderFill.CREATOR}>
+															<Radio value={PlaceholderFill.NONE.toString()}>
+																None
+															</Radio>
+															<Radio value={PlaceholderFill.CREATOR.toString()}>
 																Contract owner
 															</Radio>
-															{/* <Radio value={PlaceholderFill.ANY}>
-																Any external recipient
-															</Radio> */}
+															{placeholderRecipients &&
+																placeholderRecipients.length > 0 &&
+																placeholderRecipients.map(
+																	(placeholderRecipient) => {
+																		return (
+																			<Radio
+																				value={
+																					placeholderRecipient.recipientKey
+																				}
+																			>
+																				{placeholderRecipient.fullname}
+																			</Radio>
+																		);
+																	}
+																)}
 														</Space>
 													</Radio.Group>
 													<Divider style={{ margin: 0 }} />
 													<Button
+														disabled={readonlyCurrent.current}
+														loading={delLoad}
 														block
 														danger
 														type='text'
@@ -484,6 +596,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 										>
 											<div>
 												<Button
+													disabled={readonlyCurrent.current}
 													size='small'
 													type='text'
 													icon={<FontAwesomeIcon icon={faGear} size='xs' />}
@@ -493,6 +606,7 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 									</Col>
 								</Row>
 								<Input
+									readOnly={readonlyCurrent.current}
 									id='PlaceholderValue'
 									placeholder='Enter value'
 									value={holder.value}
@@ -505,7 +619,12 @@ export const PlaceholderBlock = ({ quillRef }: Props) => {
 					})}
 
 				<Space direction='vertical' size={2} style={{ display: 'flex' }}>
-					<Button block type='dashed' onClick={handleAddPlaceholder}>
+					<Button
+						disabled={readonlyCurrent.current}
+						block
+						type='dashed'
+						onClick={handleAddPlaceholder}
+					>
 						Add placeholder
 					</Button>
 				</Space>

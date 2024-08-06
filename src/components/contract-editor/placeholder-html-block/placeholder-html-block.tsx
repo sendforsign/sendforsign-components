@@ -19,6 +19,7 @@ import {
 	Action,
 	ApiEntity,
 	ContractType,
+	ContractTypeText,
 	PlaceholderFill,
 	PlaceholderTypeText,
 	PlaceholderView,
@@ -188,6 +189,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		let isMounted = true;
 		if (
 			contractType.toString() !== ContractType.PDF.toString() &&
+			contractType.toString() !== ContractTypeText.PDF.toString() &&
 			contractKey &&
 			(clientKey || token) &&
 			placeholderVisible &&
