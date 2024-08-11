@@ -1,3 +1,3 @@
-import { PdfPlaceholderPosition } from './pdf-placeholder';
+import { PdfPlaceholder } from './pdf-placeholder';
 
-export { PdfPlaceholderPosition };
+export { PdfPlaceholder };

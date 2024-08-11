@@ -11,7 +11,6 @@ import useSaveArrayBuffer from '../../../hooks/use-save-array-buffer';
 import { useContractEditorContext } from '../contract-editor-context';
 import axios from 'axios';
 import {
-	Action,
 	ApiEntity,
 	EventStatuses,
 	PlaceholderView,
@@ -20,7 +19,6 @@ import { BASE_URL } from '../../../config/config';
 import {
 	ContractSign,
 	Insertion,
-	NewDrag,
 	PagePlaceholder,
 	Row,
 } from '../../../config/types';
@@ -29,7 +27,6 @@ import { useResizeDetector } from 'react-resize-detector';
 import { isArray } from 'lodash';
 import { PdfPage } from './pdf-page/pdf-page';
 import { PdfAuditTrail } from '../pdf-audit-trail/pdf-audit-trail';
-import { useDrop } from 'react-dnd';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
