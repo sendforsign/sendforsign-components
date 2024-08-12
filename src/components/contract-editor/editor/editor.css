@@ -1,0 +1,8 @@
+.editor {
+  min-width: 1px;
+}
+
+.editor > .ProseMirror:focus-visible {
+  outline: none;
+  border: none;
+}
