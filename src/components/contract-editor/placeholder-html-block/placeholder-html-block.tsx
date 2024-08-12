@@ -343,7 +343,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		let tag = `<placeholder${id}`;
 		let array = text?.split(tag);
 		let resultText = '';
-		debugger;
+		// debugger;
 		if (array) {
 			for (let i = 0; i < array.length; i++) {
 				if (array.length > 1) {

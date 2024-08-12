@@ -273,7 +273,7 @@ export const PlaceholderPdfBlock = () => {
 		placeholderTmp.splice(index, 1);
 		setPlaceholder(placeholderTmp);
 	};
-	console.log('readonly', readonly, readonlyCurrent.current);
+	// console.log('readonly', readonly, readonlyCurrent.current);
 	return (
 		<Card
 			loading={placeholderLoad || continueLoad}

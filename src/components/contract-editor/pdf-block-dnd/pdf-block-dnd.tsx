@@ -116,11 +116,9 @@ export const PdfBlockDnd = () => {
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					if (isMounted) {
-						setContractSigns(payload.data);
-						if (payload.data.length > 0) {
-							readOnly.current = true;
-						}
+					setContractSigns(payload.data);
+					if (payload.data.length > 0) {
+						readOnly.current = true;
 					}
 				})
 				.catch((error) => {
@@ -267,11 +265,9 @@ export const PdfBlockDnd = () => {
 						responseType: 'json',
 					})
 					.then((payload: any) => {
-						if (isMounted) {
-							setSign('');
-							// debugger;
-							setContinueLoad(false);
-						}
+						setSign('');
+						// debugger;
+						setContinueLoad(false);
 					})
 					.catch((error) => {
 						setNotification({
@@ -298,11 +294,9 @@ export const PdfBlockDnd = () => {
 			const arrayBuffer: ArrayBuffer = (await getArrayBuffer(
 				'pdfFile'
 			)) as ArrayBuffer;
-			if (isMounted) {
-				setPdfData(arrayBuffer);
-				setContinueLoad(false);
-				setLoad(false);
-			}
+			setPdfData(arrayBuffer);
+			setContinueLoad(false);
+			setLoad(false);
 		};
 		getValue();
 		return () => {

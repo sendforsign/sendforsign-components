@@ -182,11 +182,9 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				})
 				.then((payload: any) => {
 					//console.log('getSigns read', payload);
-					if (isMounted) {
-						setSignCount(payload.data.length);
-						if (payload.data.length > 0) {
-							setReadonly(true);
-						}
+					setSignCount(payload.data.length);
+					if (payload.data.length > 0) {
+						setReadonly(true);
 					}
 				})
 				.catch((error) => {

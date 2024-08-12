@@ -72,25 +72,6 @@ export const TemplateList: FC<TemplateListProps> = ({
 				</Button>
 			),
 		},
-		// {
-		// 	title: 'Status',
-		// 	dataIndex: 'status',
-		// 	render: (_: any, record: DataType) => (
-		// 		<>
-		// 			{record.status?.map((tag) => {
-		// 				let color = 'purple';
-		// 				if (tag === 'Signed') {
-		// 					color = 'green';
-		// 				}
-		// 				return (
-		// 					<Tag color={color} key={tag}>
-		// 						{tag}
-		// 					</Tag>
-		// 				);
-		// 			})}
-		// 		</>
-		// 	),
-		// },
 		{
 			title: 'Created at',
 			dataIndex: 'createdAt',
@@ -138,28 +119,26 @@ export const TemplateList: FC<TemplateListProps> = ({
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					if (isMounted) {
-						let array: DataType[] = payload.data.templates.map(
-							(template: any) => {
-								return {
-									key: template.templateKey,
-									name: template.name ? template.name : 'Empty name',
-									// status: ['Draft'],
-									createdAt: dayjs(
-										template.createTime
-											? template.createTime.toString()
-											: new Date().toString()
-									).format('YYYY-MM-DD HH:mm:ss'),
-									changedAt: dayjs(
-										template.changeTime
-											? template.changeTime.toString()
-											: new Date().toString()
-									).format('YYYY-MM-DD HH:mm:ss'),
-								};
-							}
-						);
-						setData(array);
-					}
+					let array: DataType[] = payload.data.templates.map(
+						(template: any) => {
+							return {
+								key: template.templateKey,
+								name: template.name ? template.name : 'Empty name',
+								// status: ['Draft'],
+								createdAt: dayjs(
+									template.createTime
+										? template.createTime.toString()
+										: new Date().toString()
+								).format('YYYY-MM-DD HH:mm:ss'),
+								changedAt: dayjs(
+									template.changeTime
+										? template.changeTime.toString()
+										: new Date().toString()
+								).format('YYYY-MM-DD HH:mm:ss'),
+							};
+						}
+					);
+					setData(array);
 				});
 		};
 		if (currApiKey || currToken) {

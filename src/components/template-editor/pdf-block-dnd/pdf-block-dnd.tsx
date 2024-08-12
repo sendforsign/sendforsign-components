@@ -37,10 +37,8 @@ export const PdfBlockDnd = () => {
 			const arrayBuffer: ArrayBuffer = (await getArrayBuffer(
 				'pdfFileTemplate'
 			)) as ArrayBuffer;
-			if (isMounted) {
-				setPdfData(arrayBuffer);
-				setContinueLoad(false);
-			}
+			setPdfData(arrayBuffer);
+			setContinueLoad(false);
 		};
 		getValue();
 		return () => {

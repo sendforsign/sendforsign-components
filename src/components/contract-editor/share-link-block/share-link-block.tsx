@@ -85,9 +85,7 @@ export const ShareLinkBlock = () => {
 						responseType: 'json',
 					})
 					.then((payload: any) => {
-						if (isMounted) {
-							setShareLinks(payload.data);
-						}
+						setShareLinks(payload.data);
 					})
 					.catch((error) => {
 						setNotification({

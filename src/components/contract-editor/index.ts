@@ -5,7 +5,7 @@ export { ChooseContractType } from './choose-contract-type/choose-contract-type'
 export { DocumentTimilineBlock } from './document-timeline-block/document-timeline-block';
 export { HtmlBlock } from './html-block/html-block';
 export { Notification } from './notification/notification';
-export { PdfBlock } from './pdf-block/pdf-block';
+export { PdfBlockDnd } from './pdf-block-dnd/pdf-block-dnd';
 export { PdfSign } from './pdf-sign/pdf-sign';
 export { PlaceholderHtmlBlock } from './placeholder-html-block/placeholder-html-block';
 export { PlaceholderPdfBlock } from './placeholder-pdf-block/placeholder-pdf-block';

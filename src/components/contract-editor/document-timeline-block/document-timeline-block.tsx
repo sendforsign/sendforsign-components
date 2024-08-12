@@ -46,9 +46,7 @@ export const DocumentTimilineBlock = () => {
 				})
 				.then((payload: any) => {
 					//console.log('getEventStatus read', payload);
-					if (isMounted) {
-						eventStatusTmp = payload.data;
-					}
+					eventStatusTmp = payload.data;
 				})
 				.catch((error) => {
 					setNotification({
@@ -60,7 +58,7 @@ export const DocumentTimilineBlock = () => {
 								: error.message,
 					});
 				});
-			const url = `${BASE_URL}${ApiEntity.CONTRACT_EVENT}?contractKey=${contractKey}&clientKey=${clientKey}`; 
+			const url = `${BASE_URL}${ApiEntity.CONTRACT_EVENT}?contractKey=${contractKey}&clientKey=${clientKey}`;
 			await axios
 				.get(url, {
 					headers: {
@@ -75,90 +73,88 @@ export const DocumentTimilineBlock = () => {
 					//console.log('getEventStatus read', payload);
 					setContractEvents(payload.data);
 
-					if (isMounted) {
-						const timelinesTmp: TimelineItemProps[] = payload.data.map(
-							(contractEventData: {
-								status: { toString: () => string | undefined };
-								createTime:
-									| string
-									| number
-									| Date
-									| dayjs.Dayjs
-									| null
-									| undefined;
-								email:
-									| string
-									| number
-									| boolean
-									| React.ReactElement<
-											any,
-											string | React.JSXElementConstructor<any>
-									  >
-									| Iterable<React.ReactNode>
-									| React.ReactPortal
-									| null
-									| undefined;
-								name:
-									| string
-									| number
-									| boolean
-									| React.ReactElement<
-											any,
-											string | React.JSXElementConstructor<any>
-									  >
-									| Iterable<React.ReactNode>
-									| React.ReactPortal
-									| null
-									| undefined;
-							}) => {
-								const statusFind = eventStatusTmp.find(
-									(eventStatus) =>
-										eventStatus?.id?.toString() ===
-										contractEventData.status.toString()
-								);
-								return {
-									color: 'gray',
-									label: (
-										<>
-											<Text type='secondary'>
-												{dayjs(contractEventData.createTime).format(
-													'YYYY-MM-DD HH:mm:ss'
-												)}
-											</Text>
-										</>
-									),
-									children: (
-										<>
-											<Space direction='vertical' size={16}>
-												<Tag color={statusFind?.color}>{statusFind?.name}</Tag>
-												{contractEventData.email && (
-													<Space direction='vertical' wrap>
-														{contractEventData.email && (
-															<Space direction='horizontal'>
-																<Text type='secondary'>Email</Text>
-																<Tag bordered={false}>
-																	{contractEventData.email}
-																</Tag>
-															</Space>
-														)}
-														{contractEventData.name && (
-															<Space direction='horizontal'>
-																<Text type='secondary'>Name</Text>
-																<Tag bordered={false}>
-																	{contractEventData.name}
-																</Tag>
-															</Space>
-														)}
-													</Space>
-												)}
-											</Space>
-										</>
-									),
-								};
-							}
-						);
-						setTimelines(timelinesTmp);
-					}
+					const timelinesTmp: TimelineItemProps[] = payload.data.map(
+						(contractEventData: {
+							status: { toString: () => string | undefined };
+							createTime:
+								| string
+								| number
+								| Date
+								| dayjs.Dayjs
+								| null
+								| undefined;
+							email:
+								| string
+								| number
+								| boolean
+								| React.ReactElement<
+										any,
+										string | React.JSXElementConstructor<any>
+								  >
+								| Iterable<React.ReactNode>
+								| React.ReactPortal
+								| null
+								| undefined;
+							name:
+								| string
+								| number
+								| boolean
+								| React.ReactElement<
+										any,
+										string | React.JSXElementConstructor<any>
+								  >
+								| Iterable<React.ReactNode>
+								| React.ReactPortal
+								| null
+								| undefined;
+						}) => {
+							const statusFind = eventStatusTmp.find(
+								(eventStatus) =>
+									eventStatus?.id?.toString() ===
+									contractEventData.status.toString()
+							);
+							return {
+								color: 'gray',
+								label: (
+									<>
+										<Text type='secondary'>
+											{dayjs(contractEventData.createTime).format(
+												'YYYY-MM-DD HH:mm:ss'
+											)}
+										</Text>
+									</>
+								),
+								children: (
+									<>
+										<Space direction='vertical' size={16}>
+											<Tag color={statusFind?.color}>{statusFind?.name}</Tag>
+											{contractEventData.email && (
+												<Space direction='vertical' wrap>
+													{contractEventData.email && (
+														<Space direction='horizontal'>
+															<Text type='secondary'>Email</Text>
+															<Tag bordered={false}>
+																{contractEventData.email}
+															</Tag>
+														</Space>
+													)}
+													{contractEventData.name && (
+														<Space direction='horizontal'>
+															<Text type='secondary'>Name</Text>
+															<Tag bordered={false}>
+																{contractEventData.name}
+															</Tag>
+														</Space>
+													)}
+												</Space>
+											)}
+										</Space>
+									</>
+								),
+							};
+						}
+					);
+					setTimelines(timelinesTmp);
 				})
 				.catch((error) => {
 					setNotification({

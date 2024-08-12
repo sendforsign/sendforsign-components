@@ -146,10 +146,8 @@ export const ContractList: FC<ContractListProps> = ({
 				})
 				.then((payload: any) => {
 					//console.log('getEventStatus read', payload);
-					if (isMounted) {
-						eventStatusTmp = payload.data;
-						setEventStatus(eventStatusTmp);
-					}
+					eventStatusTmp = payload.data;
+					setEventStatus(eventStatusTmp);
 				});
 			await axios
 				.post(BASE_URL + ApiEntity.CONTRACT, body, {
@@ -163,23 +161,21 @@ export const ContractList: FC<ContractListProps> = ({
 				})
 				.then((payload: any) => {
 					//console.log('editor list', payload);
-					if (isMounted) {
-						let array: DataType[] = payload.data.contracts.map(
-							(contract: any) => {
-								return {
-									key: contract.contractKey,
-									name: contract.name ? contract.name : 'Empty name',
-									status: contract.status,
-									createdAt: dayjs(
-										contract.createTime
-											? contract.createTime.toString()
-											: new Date().toString()
-									).format('YYYY-MM-DD HH:mm:ss'),
-								};
-							}
-						);
-						setData(array);
-					}
+					let array: DataType[] = payload.data.contracts.map(
+						(contract: any) => {
+							return {
+								key: contract.contractKey,
+								name: contract.name ? contract.name : 'Empty name',
+								status: contract.status,
+								createdAt: dayjs(
+									contract.createTime
+										? contract.createTime.toString()
+										: new Date().toString()
+								).format('YYYY-MM-DD HH:mm:ss'),
+							};
+						}
+					);
+					setData(array);
 				});
 		};
 		if (currApiKey || currToken) {

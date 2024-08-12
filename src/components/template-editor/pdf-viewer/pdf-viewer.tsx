@@ -22,9 +22,7 @@ export const PdfViewer = () => {
 			const arrayBuffer: ArrayBuffer = (await getArrayBuffer(
 				'pdfFileTemplate'
 			)) as ArrayBuffer;
-			if (isMounted) {
-				setPdfData(arrayBuffer);
-			}
+			setPdfData(arrayBuffer);
 		};
 		getValue();
 		return () => {

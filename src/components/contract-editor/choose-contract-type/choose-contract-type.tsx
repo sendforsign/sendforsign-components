@@ -102,8 +102,26 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 				.then((payload: any) => {
 					//console.log('editor read', payload);
 					let array: SegmentedLabeledOption[] = [];
-					if (isMounted) {
-						setCurrentData({ currentStep: ContractSteps.TYPE_CHOOSE_STEP });
+					setCurrentData({ currentStep: ContractSteps.TYPE_CHOOSE_STEP });
+					array.push({
+						label: (
+							<div
+								style={{
+									paddingTop: '8px',
+									width: 100,
+									whiteSpace: 'normal',
+									lineHeight: '20px',
+								}}
+							>
+								<Tag style={{ margin: '4px 0' }} color={'magenta'}>
+									File
+								</Tag>
+								<div style={{ padding: '4px 0' }}>Upload your DOCX file</div>
+							</div>
+						),
+						value: `template_${ContractTypeText.DOCX}`,
+					});
+					if (allowPdf) {
 						array.push({
 							label: (
 								<div
@@ -117,31 +135,31 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 									<Tag style={{ margin: '4px 0' }} color={'magenta'}>
 										File
 									</Tag>
-									<div style={{ padding: '4px 0' }}>Upload your DOCX file</div>
+									<div style={{ padding: '4px 0' }}>Upload your PDF file</div>
 								</div>
 							),
-							value: `template_${ContractTypeText.DOCX}`,
+							value: `template_${ContractTypeText.PDF}`,
 						});
-						if (allowPdf) {
-							array.push({
-								label: (
-									<div
-										style={{
-											paddingTop: '8px',
-											width: 100,
-											whiteSpace: 'normal',
-											lineHeight: '20px',
-										}}
-									>
-										<Tag style={{ margin: '4px 0' }} color={'magenta'}>
-											File
-										</Tag>
-										<div style={{ padding: '4px 0' }}>Upload your PDF file</div>
-									</div>
-								),
-								value: `template_${ContractTypeText.PDF}`,
-							});
-						}
+					}
+					array.push({
+						label: (
+							<div
+								style={{
+									paddingTop: '8px',
+									width: 100,
+									whiteSpace: 'normal',
+									lineHeight: '20px',
+								}}
+							>
+								<Tag style={{ margin: '4px 0' }} color={'cyan'}>
+									Empty
+								</Tag>
+								<div style={{ padding: '4px 0' }}>Draft from scratch</div>
+							</div>
+						),
+						value: `template_${ContractTypeText.EMPTY}`,
+					});
+					payload.data.templates.forEach((template: any) => {
 						array.push({
 							label: (
 								<div
@@ -152,37 +170,17 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 										lineHeight: '20px',
 									}}
 								>
-									<Tag style={{ margin: '4px 0' }} color={'cyan'}>
-										Empty
+									<Tag style={{ margin: '4px 0' }} color={'geekblue'}>
+										Template
 									</Tag>
-									<div style={{ padding: '4px 0' }}>Draft from scratch</div>
+									<div style={{ padding: '4px 0' }}>{template.name}</div>
 								</div>
 							),
-							value: `template_${ContractTypeText.EMPTY}`,
+							value: template.templateKey,
 						});
-						payload.data.templates.forEach((template: any) => {
-							array.push({
-								label: (
-									<div
-										style={{
-											paddingTop: '8px',
-											width: 100,
-											whiteSpace: 'normal',
-											lineHeight: '20px',
-										}}
-									>
-										<Tag style={{ margin: '4px 0' }} color={'geekblue'}>
-											Template
-										</Tag>
-										<div style={{ padding: '4px 0' }}>{template.name}</div>
-									</div>
-								),
-								value: template.templateKey,
-							});
-						});
-						setOptions(array);
-						setLoadSegmented(false);
-					}
+					});
+					setOptions(array);
+					setLoadSegmented(false);
 				})
 				.catch((error) => {
 					setNotification({

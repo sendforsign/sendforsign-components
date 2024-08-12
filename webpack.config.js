@@ -23,6 +23,10 @@ module.exports = (args) => {
         // },
         resolve: {
             extensions: [".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx", ".json", ".css"],
+            alias: {
+                "react/jsx-dev-runtime": "react/jsx-dev-runtime.js",
+                "react/jsx-runtime": "react/jsx-runtime.js"
+            }
         },
         externals: {
             lodash: {

@@ -121,9 +121,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 							responseType: 'json',
 						})
 						.then((payload: any) => {
-							if (isMounted) {
-								templateTmp = payload.data.template;
-							}
+							templateTmp = payload.data.template;
 						});
 					if (templateTmp.isPdf) {
 						await axios
@@ -195,9 +193,8 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					if (isMounted) {
-						console.log('TEMPLATE', isMounted, payload);
-					}
+					// console.log('TEMPLATE', isMounted, payload);
+
 					setCurrTemplateKey(payload.data.template.templateKey);
 					templateTmp = payload.data.template;
 					setIsNew(false);

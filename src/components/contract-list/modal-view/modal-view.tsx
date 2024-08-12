@@ -27,10 +27,10 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 
 	useEffect(() => {
 		if (contractModal) {
-			if (contractKey !== currentKey) {
+			if (contractKey !== currentKey) { 
 				setCurrentKey(contractKey);
 				setLoad(true);
-				setTimeout(() => {
+				setTimeout(() => { 
 					setLoad(false);
 				}, 10);
 			}

@@ -263,7 +263,7 @@ export const PdfPage = ({
 	}, [div]);
 	const save = async () => {
 		if (needUpdate.current && !readonly) {
-			debugger;
+			// debugger;
 			needUpdate.current = false;
 			let resultPlaceholders: Placeholder[] = [];
 			for (let index = 0; index < insertion.current.length; index++) {
