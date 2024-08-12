@@ -33,6 +33,7 @@ import { PlaceholderPdfBlock } from './placeholder-pdf-block';
 import { PdfBlockDnd } from './pdf-block-dnd';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { Editor } from './editor';
 
 export interface StepChangeProps {
 	currentStep?: ContractSteps;
@@ -587,10 +588,11 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 														{!isPdf ? (
 															<>
 																{contractValue && (
-																	<HtmlBlock
-																		value={contractValue}
-																		quillRef={quillRef}
-																	/>
+																	// <HtmlBlock
+																	// 	value={contractValue}
+																	// 	quillRef={quillRef}
+																	// />
+																	<Editor />
 																)}
 															</>
 														) : (
