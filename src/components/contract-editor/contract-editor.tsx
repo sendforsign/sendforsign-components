@@ -34,6 +34,7 @@ import { PdfBlockDnd } from './pdf-block-dnd';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Editor } from './editor';
+import { useKeysStore } from '../../stores'
 
 export interface StepChangeProps {
 	currentStep?: ContractSteps;
@@ -134,6 +135,12 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const first = useRef(false);
 	const { Title, Text } = Typography;
 	// console.log('contractKey ContractEditor', contractKey, currClientKey);
+	const [setKeys, flushKeys] = useKeysStore(s => [s.setKeys, s.flush])
+
+	useEffect(() => {
+		setKeys({ clientKey, userKey, apiKey, token, contractKey });
+		return flushKeys;
+	}, [clientKey, userKey, apiKey, token, contractKey]);
 
 	useEffect(() => {
 		setCurrToken(token);

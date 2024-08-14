@@ -1,6 +1,7 @@
 import { Schema, Node as ProseMirrorNode } from "prosemirror-model";
 import { EditorState, Plugin, Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
+import { save } from "./save";
 
 export class ProseMirror {
   state: EditorState | null;
@@ -25,6 +26,8 @@ export class ProseMirror {
     const newState = this.view.state.apply(tr);
     this.view.updateState(newState);
     this.state = newState;
+
+    save(this.view.state.doc);
   }
 
   flush = () => {

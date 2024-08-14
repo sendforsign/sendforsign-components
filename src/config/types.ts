@@ -218,3 +218,20 @@ export interface DragItem {
 export interface NewDrag {
 	chosePlaceholder: Placeholder;
 }
+
+export type Error = {
+	response: {
+		data: {
+			message: string;
+		}
+	};
+	message: undefined;
+} | {
+	message: string;
+	response: undefined;
+}
+
+export function isError(error: any): error is Error {
+	return error && error.response && error.response.data && error.response.data.message ||
+		error && error.message;
+}
