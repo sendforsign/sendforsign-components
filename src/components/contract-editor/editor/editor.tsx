@@ -14,8 +14,13 @@ export const Editor = memo(function Editor() {
     // Get contract and
     // Initialize ProseMirror editor
     getContract().then((contract) => {
-      if (!contract) {
-        setPm(new ProseMirror({ plugins, doc: ProseMirrorNode.fromJSON(schema, JSON.parse('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":""}]}]}')) }))
+      if (
+        // No data
+        !contract ||
+        // Or content is HTML (old version)
+        (contract.value as string).startsWith('<')
+      ) {
+        setPm(new ProseMirror({ plugins, doc: ProseMirrorNode.fromJSON(schema, JSON.parse('{"type":"doc","content":[{"type":"paragraph","content":[]}]}')) }))
         return;
       }
       setPm(new ProseMirror({ plugins, doc: ProseMirrorNode.fromJSON(schema, JSON.parse(contract.value)) }));
