@@ -88,32 +88,6 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				// scrollingContainer: 'body',
 				theme: 'bubble',
 			});
-
-			if (quillRef.current) {
-				quillRef?.current
-					?.getModule('toolbar')
-					.container.addEventListener(
-						'mousedown',
-						(e: {
-							preventDefault: () => void;
-							stopPropagation: () => void;
-						}) => {
-							e.preventDefault();
-							e.stopPropagation();
-						}
-					);
-
-				quillRef.current.on(
-					'text-change',
-					function (delta: any, oldDelta: any, source: any) {
-						if (source === 'user') {
-							handleChangeText(
-								quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
-							);
-						}
-					}
-				);
-			}
 		}
 	}, [container]);
 	useEffect(() => {

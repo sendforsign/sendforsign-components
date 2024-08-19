@@ -31,7 +31,7 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 				setCurrentKey(contractKey);
 				setLoad(true);
 				setTimeout(() => {
-					setLoad(false);
+					setLoad?.(false);
 				}, 10);
 			}
 		}

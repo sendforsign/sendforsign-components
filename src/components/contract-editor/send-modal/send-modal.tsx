@@ -664,7 +664,7 @@ export const SendModal = () => {
 						recipients.length > 0 &&
 						recipients.map((recipient, index) => {
 							return (
-								<Card loading={dataLoad}>
+								<Card loading={dataLoad} key={recipient.id}>
 									<Row
 										wrap={false}
 										align='middle'
