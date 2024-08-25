@@ -98,6 +98,10 @@ export type TContractEditorContextType = {
 	setLoad: (load: boolean) => void;
 	pagePlaceholderDrag: PagePlaceholder;
 	setPagePlaceholderDrag: (pagePlaceholderDrag: PagePlaceholder) => void;
+	placeholderChange: Placeholder;
+	setPlaceholderChange: (placeholderChange: Placeholder) => void;
+	placeholderDelete: string;
+	setPlaceholderDelete: (placeholderDelete: string) => void;
 	contractPlaceholderCount: number;
 	setContractPlaceholderCount: (contractPlaceholderCount: number) => void;
 };

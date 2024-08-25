@@ -115,6 +115,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [signCount, setSignCount] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
 	const [placeholderPdf, setPlaceholderPdf] = useState<Placeholder>({});
+	const [placeholderChange, setPlaceholderChange] = useState<Placeholder>({});
+	const [placeholderDelete, setPlaceholderDelete] = useState<string>('');
 	const [pagePlaceholder, setPagePlaceholder] = useState<PagePlaceholder[]>([]);
 	const [notification, setNotification] = useState({});
 	const [ipInfo, setIpInfo] = useState('');
@@ -133,17 +135,17 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const { Title, Text } = Typography;
 	// console.log('contractKey ContractEditor', contractKey, currClientKey);
 
-	useEffect(() => { 
+	useEffect(() => {
 		setCurrToken(token);
 		setRefreshEvent(refreshEvent + 1);
 	}, [token]);
-	useEffect(() => { 
+	useEffect(() => {
 		setCurrApiKey(apiKey);
 	}, [apiKey]);
-	useEffect(() => { 
+	useEffect(() => {
 		setCurrClientKey(clientKey);
 	}, [clientKey]);
-	useEffect(() => { 
+	useEffect(() => {
 		setCurrUserKey(userKey);
 	}, [userKey]);
 	useEffect(() => {
@@ -183,7 +185,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					},
 					responseType: 'json',
 				})
-				.then((result) => { 
+				.then((result) => {
 					contractTmp = result.data.contract;
 				})
 				.catch((error) => {
@@ -204,22 +206,22 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setReadonly(false);
 				setContinueLoad(false);
 				setCurrentData({ currentStep: ContractSteps.TYPE_CHOOSE_STEP });
-			} else { 
+			} else {
 				if (
 					contractTmp &&
 					contractTmp.contractType &&
 					contractTmp.contractType.toString() === ContractType.PDF.toString()
-				) { 
+				) {
 					const response = await axios.get(contractTmp.value as string, {
 						responseType: 'arraybuffer',
-					}); 
+					});
 					setIsPdf(true);
 					await setArrayBuffer('pdfFile', response.data);
 					await setArrayBuffer('pdfFileOriginal', response.data);
 					setPdfDownload(true);
 					setPdfFileLoad(pdfFileLoad + 1);
 					setContinueLoad(false);
-				} else { 
+				} else {
 					// debugger;
 					setContractValue(
 						contractTmp.value ? contractTmp.value : '<div></div>'
@@ -235,7 +237,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		}
 		// debugger;
 		if (!first.current) {
-			if (currApiKey || currToken) { 
+			if (currApiKey || currToken) {
 				// console.log('contractKey ContractEditor 1');
 				first.current = true;
 				setContractSign({});
@@ -249,19 +251,19 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setCurrContractKey(contractKey);
 				// console.log('contractKey ContractEditor 4', contractKeyRef.current);
 
-				if (contractKeyRef.current) { 
+				if (contractKeyRef.current) {
 					getContract().catch(console.error);
 					if (beforeCreated) {
 						setIsNew(false);
 						setPdfDownload(false);
-					} else { 
+					} else {
 						setIsNew(false);
 						setEditorVisible(true);
 						setRefreshEvent(refreshEvent + 1);
 						setRefreshShareLink(refreshShareLink + 1);
 						setRefreshSign(refreshSign + 1);
 					}
-				} else { 
+				} else {
 					setBeforeCreated(false);
 					setIsNew(true);
 					setPdfDownload(false);
@@ -273,7 +275,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					setFillType(true);
 					// console.log('contractKey ContractEditor 3');
 				}
-			} else { 
+			} else {
 				// console.log('contractKey ContractEditor 2');
 				setSpinLoad(true);
 			}
@@ -545,6 +547,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setPagePlaceholder,
 				pagePlaceholderDrag,
 				setPagePlaceholderDrag,
+				placeholderChange,
+				setPlaceholderChange,
+				placeholderDelete,
+				setPlaceholderDelete,
 			}}
 		>
 			{spinLoad ? (

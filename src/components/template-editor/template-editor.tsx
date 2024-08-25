@@ -56,6 +56,8 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const [refreshPlaceholders, setRefreshPlaceholders] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
 	const [placeholderPdf, setPlaceholderPdf] = useState<Placeholder>({});
+	const [placeholderChange, setPlaceholderChange] = useState<Placeholder>({});
+	const [placeholderDelete, setPlaceholderDelete] = useState<string>('');
 	const [pagePlaceholder, setPagePlaceholder] = useState<PagePlaceholder[]>([]);
 	const [spinLoad, setSpinLoad] = useState(false);
 	const [pagePlaceholderDrag, setPagePlaceholderDrag] =
@@ -276,6 +278,10 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 				setPagePlaceholder,
 				pagePlaceholderDrag,
 				setPagePlaceholderDrag,
+				placeholderChange,
+				setPlaceholderChange,
+				placeholderDelete,
+				setPlaceholderDelete,
 			}}
 		>
 			{spinLoad ? (

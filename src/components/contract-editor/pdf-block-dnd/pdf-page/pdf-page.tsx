@@ -46,6 +46,10 @@ export const PdfPage = ({
 }: Props) => {
 	const {
 		placeholder,
+		placeholderChange,
+		setPlaceholderChange,
+		placeholderDelete,
+		setPlaceholderDelete,
 		pagePlaceholderDrag,
 		setPagePlaceholderDrag,
 		apiKey,
@@ -241,6 +245,21 @@ export const PdfPage = ({
 						positionY: currentId.current.positionY,
 						action: Action.UPDATE,
 					});
+					// const placeholderIndex = placeholder.findIndex(
+					// 	(pl) => pl.placeholderKey === currentId.current.placeholderKey
+					// );
+					// if (placeholderIndex >= 0) {
+					// 	let placeholderTmp = [...placeholder];
+					// 	placeholderTmp[placeholderIndex].insertion?.push({
+					// 		pageId: currentId.current.pageId,
+					// 		id: currentId.current.id,
+					// 		width: currentId.current.width,
+					// 		height: currentId.current.height,
+					// 		positionX: currentId.current.positionX,
+					// 		positionY: currentId.current.positionY,
+					// 	});
+					// 	setPlaceholder(placeholderTmp);
+					// }
 					needUpdate.current = true;
 					let currPagePlaceholderTmp = [...currPagePl.current];
 					currPagePlaceholderTmp.push(currentId.current);
@@ -261,6 +280,46 @@ export const PdfPage = ({
 			div?.removeEventListener('mousemove', () => {});
 		};
 	}, [div]);
+	useEffect(() => {
+		if (
+			currPagePlaceholder &&
+			currPagePlaceholder.length > 0 &&
+			placeholderChange &&
+			placeholderChange.placeholderKey
+		) {
+			setPlaceholderChange({});
+			let pagePlaceholderTmp = [...currPagePlaceholder];
+			let pagePlaceholderFilter = pagePlaceholderTmp.filter(
+				(pagePl) => pagePl.placeholderKey === placeholderChange.placeholderKey
+			);
+			for (let i = 0; i < pagePlaceholderFilter.length; i++) {
+				const pagePlaceholderIndex = pagePlaceholderTmp.findIndex(
+					(pagePl) =>
+						pagePl.id?.toString() === pagePlaceholderFilter[i].id?.toString() &&
+						pagePl.placeholderKey === pagePlaceholderFilter[i].placeholderKey
+				);
+				if (pagePlaceholderIndex >= 0) {
+					pagePlaceholderTmp[pagePlaceholderIndex].value =
+						placeholderChange.value;
+				}
+			}
+			setCurrPagePlaceholder(pagePlaceholderTmp);
+		}
+	}, [placeholderChange]);
+	useEffect(() => {
+		if (
+			currPagePlaceholder &&
+			currPagePlaceholder.length > 0 &&
+			placeholderDelete
+		) {
+			setPlaceholderDelete('');
+			let pagePlaceholderTmp = [...currPagePlaceholder];
+			let pagePlaceholderFilter = pagePlaceholderTmp.filter(
+				(pagePl) => pagePl.placeholderKey !== placeholderDelete
+			);
+			setCurrPagePlaceholder(pagePlaceholderFilter);
+		}
+	}, [placeholderDelete]);
 	const save = async () => {
 		if (needUpdate.current && !readonly) {
 			// debugger;

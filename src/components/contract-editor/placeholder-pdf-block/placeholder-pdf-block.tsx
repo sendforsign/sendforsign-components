@@ -52,6 +52,8 @@ export const PlaceholderPdfBlock = () => {
 		continueLoad,
 		setPlaceholder,
 		setPlaceholderPdf,
+		setPlaceholderChange,
+		setPlaceholderDelete,
 		refreshPlaceholders,
 		placeholderVisible,
 		refreshPlaceholderRecipients,
@@ -266,11 +268,13 @@ export const PlaceholderPdfBlock = () => {
 	const handleChange = (placeholderChange: Placeholder, index: number) => {
 		let placeholderTmp = [...placeholder];
 		placeholderTmp[index] = placeholderChange;
+		setPlaceholderChange(placeholderChange);
 		setPlaceholder(placeholderTmp);
 	};
 	const handleDelete = (placeholderDelete: Placeholder, index: number) => {
 		let placeholderTmp = [...placeholder];
 		placeholderTmp.splice(index, 1);
+		setPlaceholderDelete(placeholderDelete.placeholderKey as string);
 		setPlaceholder(placeholderTmp);
 	};
 	// console.log('readonly', readonly, readonlyCurrent.current);

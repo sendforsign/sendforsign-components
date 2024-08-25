@@ -10,7 +10,7 @@ import { useTemplateEditorContext } from '../../template-editor-context';
 import { Action, ApiEntity, PlaceholderView } from '../../../../config/enum';
 import { PdfPlaceholder } from '../pdf-placeholder/pdf-placeholder';
 import { BASE_URL } from '../../../../config/config';
-import axios from 'axios'; 
+import axios from 'axios';
 import './pdf-page.css';
 import { useDrop } from 'react-dnd';
 import { PdfDragLayer } from '../pdf-drag-layer';
@@ -48,6 +48,7 @@ export const PdfPage = ({
 }: Props) => {
 	const {
 		placeholder,
+		setPlaceholder,
 		pagePlaceholderDrag,
 		setPagePlaceholderDrag,
 		apiKey,
@@ -57,6 +58,10 @@ export const PdfPage = ({
 		setNotification,
 		placeholderPdf,
 		setPlaceholderPdf,
+		placeholderChange,
+		setPlaceholderChange,
+		placeholderDelete,
+		setPlaceholderDelete,
 	} = useTemplateEditorContext();
 	const currPagePl = useRef<PagePlaceholder[]>([]);
 	const [currPagePlaceholder, setCurrPagePlaceholder] = useState<
@@ -79,22 +84,17 @@ export const PdfPage = ({
 		() => ({
 			accept: `placeholder${pageNumber}`,
 			drop: async (item: DragItem, monitor) => {
-				// debugger;
-				// console.log('PdfPage currPagePlaceholder', pagePlaceholderDrag, item);
-
 				const delta = monitor.getDifferenceFromInitialOffset() as {
 					x: number;
 					y: number;
 				};
 
 				let left = Math.round(
-					// parseInt((item.pagePlaceholder.positionX as number).toString()) +
 					parseInt((pagePlaceholderDrag.positionX as number).toString()) +
 						delta.x
 				);
 				const offsetWidth =
 					(div?.offsetWidth as number) -
-					// parseInt((item.pagePlaceholder.width as number).toString());
 					parseInt((pagePlaceholderDrag.width as number).toString());
 				if (left < 0) {
 					left = 0;
@@ -103,13 +103,11 @@ export const PdfPage = ({
 				}
 
 				let top = Math.round(
-					// parseInt((item.pagePlaceholder.positionY as number).toString()) +
 					parseInt((pagePlaceholderDrag.positionY as number).toString()) +
 						delta.y
 				);
 				const offsetHeight =
 					(div?.offsetHeight as number) -
-					// parseInt((item.pagePlaceholder.height as number).toString());
 					parseInt((pagePlaceholderDrag.height as number).toString());
 				if (top < 0) {
 					top = 0;
@@ -119,10 +117,6 @@ export const PdfPage = ({
 				// console.log('PdfPage currPagePlaceholder', currPagePlaceholder);
 				const findIndex = currPagePlaceholder.findIndex(
 					(currPl) =>
-						// currPl.placeholderKey === item.pagePlaceholder.placeholderKey &&
-						// currPl.pageId?.toString() ===
-						// 	item.pagePlaceholder.pageId?.toString() &&
-						// currPl.id?.toString() === item.pagePlaceholder.id?.toString()
 						currPl.placeholderKey === pagePlaceholderDrag.placeholderKey &&
 						currPl.pageId?.toString() ===
 							pagePlaceholderDrag.pageId?.toString() &&
@@ -137,38 +131,11 @@ export const PdfPage = ({
 
 					const insertionIndex = insertion.current.findIndex(
 						(insert) =>
-							// insert.placeholderKey === item.pagePlaceholder.placeholderKey &&
-							// insert.pageId?.toString() ===
-							// 	item.pagePlaceholder.pageId?.toString() &&
-							// insert.id?.toString() === item.pagePlaceholder.id?.toString()
 							insert.placeholderKey === pagePlaceholderDrag.placeholderKey &&
 							insert.pageId?.toString() ===
 								pagePlaceholderDrag.pageId?.toString() &&
 							insert.id?.toString() === pagePlaceholderDrag.id?.toString()
 					);
-					// if (insertionIndex >= 0) {
-					// 	insertion.current[insertionIndex] = {
-					// 		placeholderKey: item.pagePlaceholder.placeholderKey,
-					// 		pageId: item.pagePlaceholder.pageId,
-					// 		id: item.pagePlaceholder.id,
-					// 		width: item.pagePlaceholder.width,
-					// 		height: item.pagePlaceholder.height,
-					// 		positionX: left,
-					// 		positionY: top,
-					// 		action: Action.UPDATE,
-					// 	};
-					// } else {
-					// 	insertion.current.push({
-					// 		placeholderKey: item.pagePlaceholder.placeholderKey,
-					// 		pageId: item.pagePlaceholder.pageId,
-					// 		id: item.pagePlaceholder.id,
-					// 		width: item.pagePlaceholder.width,
-					// 		height: item.pagePlaceholder.height,
-					// 		positionX: left,
-					// 		positionY: top,
-					// 		action: Action.UPDATE,
-					// 	});
-					// }
 					if (insertionIndex >= 0) {
 						insertion.current[insertionIndex] = {
 							placeholderKey: pagePlaceholderDrag.placeholderKey,
@@ -279,6 +246,21 @@ export const PdfPage = ({
 						positionY: currentId.current.positionY,
 						action: Action.UPDATE,
 					});
+					const placeholderIndex = placeholder.findIndex(
+						(pl) => pl.placeholderKey === currentId.current.placeholderKey
+					);
+					if (placeholderIndex >= 0) {
+						let placeholderTmp = [...placeholder];
+						placeholderTmp[placeholderIndex].insertion?.push({
+							pageId: currentId.current.pageId,
+							id: currentId.current.id,
+							width: currentId.current.width,
+							height: currentId.current.height,
+							positionX: currentId.current.positionX,
+							positionY: currentId.current.positionY,
+						});
+						setPlaceholder(placeholderTmp);
+					}
 					needUpdate.current = true;
 					let currPagePlaceholderTmp = [...currPagePl.current];
 					currPagePlaceholderTmp.push(currentId.current);
@@ -299,6 +281,46 @@ export const PdfPage = ({
 			div?.removeEventListener('mousemove', () => {});
 		};
 	}, [div]);
+	useEffect(() => {
+		if (
+			currPagePlaceholder &&
+			currPagePlaceholder.length > 0 &&
+			placeholderChange &&
+			placeholderChange.placeholderKey
+		) {
+			setPlaceholderChange({});
+			let pagePlaceholderTmp = [...currPagePlaceholder];
+			let pagePlaceholderFilter = pagePlaceholderTmp.filter(
+				(pagePl) => pagePl.placeholderKey === placeholderChange.placeholderKey
+			);
+			for (let i = 0; i < pagePlaceholderFilter.length; i++) {
+				const pagePlaceholderIndex = pagePlaceholderTmp.findIndex(
+					(pagePl) =>
+						pagePl.id?.toString() === pagePlaceholderFilter[i].id?.toString() &&
+						pagePl.placeholderKey === pagePlaceholderFilter[i].placeholderKey
+				);
+				if (pagePlaceholderIndex >= 0) {
+					pagePlaceholderTmp[pagePlaceholderIndex].value =
+						placeholderChange.value;
+				}
+			}
+			setCurrPagePlaceholder(pagePlaceholderTmp);
+		}
+	}, [placeholderChange]);
+	useEffect(() => {
+		if (
+			currPagePlaceholder &&
+			currPagePlaceholder.length > 0 &&
+			placeholderDelete
+		) {
+			setPlaceholderDelete('');
+			let pagePlaceholderTmp = [...currPagePlaceholder];
+			let pagePlaceholderFilter = pagePlaceholderTmp.filter(
+				(pagePl) => pagePl.placeholderKey !== placeholderDelete
+			);
+			setCurrPagePlaceholder(pagePlaceholderFilter);
+		}
+	}, [placeholderDelete]);
 	const save = async () => {
 		if (needUpdate.current) {
 			// debugger;

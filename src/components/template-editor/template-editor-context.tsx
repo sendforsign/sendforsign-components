@@ -47,6 +47,10 @@ export type TTemplateEditorContextType = {
 	setPagePlaceholderDrag: (pagePlaceholderDrag: PagePlaceholder) => void;
 	pagePlaceholder: PagePlaceholder[];
 	setPagePlaceholder: (pagePlaceholder: PagePlaceholder[]) => void;
+	placeholderChange: Placeholder;
+	setPlaceholderChange: (placeholderChange: Placeholder) => void;
+	placeholderDelete: string;
+	setPlaceholderDelete: (placeholderDelete: string) => void;
 	templatePlaceholderCount: number;
 	setTemplatePlaceholderCount: (templatePlaceholderCount: number) => void;
 };

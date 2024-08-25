@@ -1,36 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-	Space,
-	Card,
-	Typography,
-	Button,
-	Input,
-	Radio,
-	Row,
-	Tooltip,
-	Col,
-	Popover,
-	Divider,
-} from 'antd';
+import { Space, Card, Typography, Button } from 'antd';
 import { useTemplateEditorContext } from '../template-editor-context';
 import { BASE_URL } from '../../../config/config';
 import {
 	Action,
 	ApiEntity,
-	ContractType,
 	PlaceholderFill,
 	PlaceholderTypeText,
-	PlaceholderView,
 } from '../../../config/enum';
 import axios from 'axios';
-import { Placeholder, Recipient } from '../../../config/types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-	faCircleQuestion,
-	faFont,
-	faGear,
-	faSignature,
-} from '@fortawesome/free-solid-svg-icons';
+import { Placeholder } from '../../../config/types';
 import { useDrag } from 'react-dnd';
 import { PlaceholderDrag } from './placeholder-drag';
 
@@ -47,13 +26,15 @@ export const PlaceholderPdfBlock = () => {
 		setPlaceholder,
 		refreshPlaceholders,
 		setNotification,
+		setPlaceholderChange,
+		setPlaceholderDelete,
 		templatePlaceholderCount,
 		setTemplatePlaceholderCount,
 	} = useTemplateEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
 
-	const readonlyCurrent = useRef(false); 
+	const readonlyCurrent = useRef(false);
 	const chosePlaceholder = useRef<Placeholder>({});
 
 	const { Title, Text } = Typography;
@@ -195,11 +176,13 @@ export const PlaceholderPdfBlock = () => {
 	const handleChange = (placeholderChange: Placeholder, index: number) => {
 		let placeholderTmp = [...placeholder];
 		placeholderTmp[index] = placeholderChange;
+		setPlaceholderChange(placeholderChange);
 		setPlaceholder(placeholderTmp);
 	};
 	const handleDelete = (placeholderDelete: Placeholder, index: number) => {
 		let placeholderTmp = [...placeholder];
 		placeholderTmp.splice(index, 1);
+		setPlaceholderDelete(placeholderDelete.placeholderKey as string);
 		setPlaceholder(placeholderTmp);
 	};
 	return (
