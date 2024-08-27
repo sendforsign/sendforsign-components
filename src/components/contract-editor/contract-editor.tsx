@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
-// import './contract-editor.css';
 import { Card, Col, Row, Space, Spin, Typography } from 'antd';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
@@ -11,12 +10,7 @@ import {
 	ContractSteps,
 } from '../../config/enum';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
-import {
-	ContractSign,
-	PagePlaceholder,
-	Placeholder,
-	Recipient,
-} from '../../config/types';
+import { ContractSign, PagePlaceholder, Placeholder } from '../../config/types';
 import { ContractEditorContext } from './contract-editor-context';
 import { ApproveModal } from './approve-modal/approve-modal';
 import { SignModal } from './sign-modal/sign-modal';

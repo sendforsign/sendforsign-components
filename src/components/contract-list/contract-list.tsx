@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import {
 	Typography,
 	Tag,
@@ -9,6 +9,8 @@ import {
 	Button,
 	TableColumnsType,
 	Spin,
+	Dropdown,
+	MenuProps,
 } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -19,11 +21,13 @@ import useSaveParams from '../../hooks/use-save-params';
 import { ContractListContext } from './contract-list-context';
 import { ModalView } from './modal-view/modal-view';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { DownOutlined } from '@ant-design/icons';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { EventStatus } from '../../config/types';
+import { Notification } from './notification/notification';
 
 interface DataType {
-	key: string;
+	key?: string;
 	name?: string;
 	status?: string;
 	createdAt?: string;
@@ -53,13 +57,25 @@ export const ContractList: FC<ContractListProps> = ({
 	const [currUserKey, setCurrUserKey] = useState(userKey);
 	const [currApiKey, setCurrApiKey] = useState(apiKey);
 	const [currToken, setCurrToken] = useState(token);
+	const [notification, setNotification] = useState({});
 	const [contractModal, setContractModal] = useState(false);
 	const [needUpdate, setNeedUpdate] = useState(false);
 	const [refreshContracts, setRefreshContracts] = useState(0);
 	const [data, setData] = useState<DataType[]>([]);
 	const [eventStatus, setEventStatus] = useState<EventStatus[]>([]);
 	const [spinLoad, setSpinLoad] = useState(false);
+	const currentRecord = useRef<DataType>({});
 	const { Title } = Typography;
+	const items: MenuProps['items'] = [
+		{
+			label: 'Archive',
+			key: Action.ARCHIVE,
+		},
+		{
+			label: 'Convert into template',
+			key: Action.CONVERT,
+		},
+	];
 
 	const chooseContract = (text: string) => {
 		// debugger;
@@ -70,6 +86,103 @@ export const ContractList: FC<ContractListProps> = ({
 		if (isModal) {
 			setContractModal(true);
 			setParam('openModal', true);
+		}
+	};
+	const dropdownClick: MenuProps['onClick'] = async (e: any) => {
+		if (currentRecord.current && currentRecord.current.key) {
+			switch (e.key) {
+				case Action.ARCHIVE:
+					let url: string = BASE_URL + ApiEntity.CONTRACT;
+					let bodyContract = {
+						data: {
+							action: Action.ARCHIVE,
+							clientKey: !token ? currClientKey : undefined,
+							userKey: currUserKey ? currUserKey : '',
+							contract: {
+								contractKey: currentRecord.current.key,
+							},
+						},
+					};
+					await axios
+						.post(url, bodyContract, {
+							headers: {
+								Accept: 'application/vnd.api+json',
+								'Content-Type': 'application/vnd.api+json',
+								'x-sendforsign-key':
+									!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+								Authorization: currToken ? `Bearer ${currToken}` : undefined,
+							},
+							responseType: 'json',
+						})
+						.then((result) => {
+							if (result.data.code === 201) {
+								let dataTmp = data.filter(
+									(line) => line.key !== currentRecord.current.key
+								);
+								setData(dataTmp);
+								setNotification({
+									text: result.data.message,
+								});
+							}
+							currentRecord.current = {};
+						})
+						.catch((error) => {
+							setNotification({
+								text:
+									error.response &&
+									error.response.data &&
+									error.response.data.message
+										? error.response.data.message
+										: error.message,
+							});
+						});
+					break;
+				case Action.CONVERT:
+					url = BASE_URL + ApiEntity.TEMPLATE;
+					let bodyTemplate = {
+						data: {
+							action: Action.CONVERT,
+							clientKey: !token ? currClientKey : undefined,
+							userKey: currUserKey ? currUserKey : '',
+							template: {
+								contractKey: currentRecord.current.key,
+								name: `New template ${dayjs(new Date().toString()).format(
+									'YYYY-MM-DD HH:mm:ss'
+								)}`,
+							},
+						},
+					};
+					await axios
+						.post(url, bodyTemplate, {
+							headers: {
+								Accept: 'application/vnd.api+json',
+								'Content-Type': 'application/vnd.api+json',
+								'x-sendforsign-key':
+									!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+								Authorization: currToken ? `Bearer ${currToken}` : undefined,
+							},
+							responseType: 'json',
+						})
+						.then((result) => {
+							if (result.data.code === 201) {
+								setNotification({
+									text: result.data.message,
+								});
+							}
+							currentRecord.current = {};
+						})
+						.catch((error) => {
+							setNotification({
+								text:
+									error.response &&
+									error.response.data &&
+									error.response.data.message
+										? error.response.data.message
+										: error.message,
+							});
+						});
+					break;
+			}
 		}
 	};
 	const columns: TableColumnsType<DataType> = [
@@ -106,8 +219,23 @@ export const ContractList: FC<ContractListProps> = ({
 			},
 		},
 		{
-			title: 'Created at',
-			dataIndex: 'createdAt',
+			title: 'Action',
+			dataIndex: 'action',
+			render: (_: any, record: DataType) => {
+				return (
+					<Dropdown
+						menu={{ items, onClick: dropdownClick }}
+						onOpenChange={() => {
+							currentRecord.current = record;
+						}}
+					>
+						<Space>
+							More
+							<DownOutlined />
+						</Space>
+					</Dropdown>
+				);
+			},
 		},
 	];
 	useEffect(() => {
@@ -209,6 +337,8 @@ export const ContractList: FC<ContractListProps> = ({
 				setNeedUpdate,
 				apiKey: currApiKey,
 				setApiKey: setCurrApiKey,
+				notification,
+				setNotification,
 			}}
 		>
 			{spinLoad ? (
@@ -253,6 +383,7 @@ export const ContractList: FC<ContractListProps> = ({
 				</Space>
 			)}
 			<ModalView id={currContractKey ? currContractKey : 'New contract'} />
+			<Notification />
 		</ContractListContext.Provider>
 	);
 };

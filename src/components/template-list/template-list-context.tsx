@@ -10,6 +10,8 @@ export type TTemplateListContextType = {
 	setClientKey: (clientKey: string) => void;
 	userKey: string | undefined;
 	setUserKey: (userKey: string) => void;
+	notification: { text?: any };
+	setNotification: (text: any) => void;
 	refreshTemplate: number;
 	setRefreshTemplate: (refreshTemplate: number) => void;
 	apiKey: string | undefined;

@@ -4,6 +4,8 @@ import { ContractSign } from '../../config/types';
 export type TContractListContextType = {
 	contractModal: boolean;
 	setContractModal: (contractModal: boolean) => void;
+	notification: { text?: any };
+	setNotification: (text: any) => void;
 	contractKey: string;
 	setContractKey: (contractKey: string) => void;
 	clientKey: string | undefined;

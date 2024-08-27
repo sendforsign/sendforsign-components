@@ -1,5 +1,16 @@
-import React, { FC, useEffect, useState } from 'react';
-import { Typography, Card, Space, Row, Col, Button, Spin } from 'antd';
+import React, { FC, useEffect, useRef, useState } from 'react';
+import {
+	Typography,
+	Card,
+	Space,
+	Row,
+	Col,
+	Button,
+	Spin,
+	MenuProps,
+	Dropdown,
+} from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { BASE_URL } from '../../config/config';
@@ -10,14 +21,14 @@ import { TemplateListContext } from './template-list-context';
 import { ModalView } from './modal-view/modal-view';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { Notification } from './notification/notification';
 
 interface DataType {
-	key: string;
+	key?: string;
 	name?: string;
 	status?: string[];
 	createdAt?: string;
 	changedAt?: string;
-	createdBy?: string;
 }
 export interface TemplateListProps {
 	apiKey?: string;
@@ -42,11 +53,20 @@ export const TemplateList: FC<TemplateListProps> = ({
 	const [currUserKey, setCurrUserKey] = useState(userKey);
 	const [currApiKey, setCurrApiKey] = useState(apiKey);
 	const [currToken, setCurrToken] = useState(token);
+	const [notification, setNotification] = useState({});
 	const [templateModal, setTemplateModal] = useState(false);
 	const [refreshTemplate, setRefreshTemplate] = useState(0);
 	const [spinLoad, setSpinLoad] = useState(false);
 	const [data, setData] = useState<DataType[]>([]);
+	const currentRecord = useRef<DataType>({});
 	const { Title } = Typography;
+	const items: MenuProps['items'] = [
+		{
+			label: 'Delete',
+			key: Action.DELETE,
+		},
+	];
+
 	const chooseTemplate = (text: string) => {
 		// debugger;
 		clearParams();
@@ -55,6 +75,58 @@ export const TemplateList: FC<TemplateListProps> = ({
 		if (isModal) {
 			setTemplateModal(true);
 			setParam('openModalTemplate', true);
+		}
+	};
+	const dropdownClick: MenuProps['onClick'] = async (e: any) => {
+		if (currentRecord.current && currentRecord.current.key) {
+			switch (e.key) {
+				case Action.DELETE:
+					let url = BASE_URL + ApiEntity.TEMPLATE;
+					let bodyTemplate = {
+						data: {
+							action: Action.DELETE,
+							clientKey: !token ? currClientKey : undefined,
+							userKey: currUserKey ? currUserKey : '',
+							template: {
+								templateKey: currentRecord.current.key,
+							},
+						},
+					};
+					await axios
+						.post(url, bodyTemplate, {
+							headers: {
+								Accept: 'application/vnd.api+json',
+								'Content-Type': 'application/vnd.api+json',
+								'x-sendforsign-key':
+									!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+								Authorization: currToken ? `Bearer ${currToken}` : undefined,
+							},
+							responseType: 'json',
+						})
+						.then((result) => {
+							if (result.data.code === 201) {
+								let dataTmp = data.filter(
+									(line) => line.key !== currentRecord.current.key
+								);
+								setData(dataTmp);
+								setNotification({
+									text: result.data.message,
+								});
+							}
+							currentRecord.current = {};
+						})
+						.catch((error) => {
+							setNotification({
+								text:
+									error.response &&
+									error.response.data &&
+									error.response.data.message
+										? error.response.data.message
+										: error.message,
+							});
+						});
+					break;
+			}
 		}
 	};
 	const columns: ColumnsType<DataType> = [
@@ -81,8 +153,23 @@ export const TemplateList: FC<TemplateListProps> = ({
 			dataIndex: 'changedAt',
 		},
 		{
-			title: 'Created by',
-			dataIndex: 'createdBy',
+			title: 'Action',
+			dataIndex: 'action',
+			render: (_: any, record: DataType) => {
+				return (
+					<Dropdown
+						menu={{ items, onClick: dropdownClick }}
+						onOpenChange={() => {
+							currentRecord.current = record;
+						}}
+					>
+						<Space>
+							More
+							<DownOutlined />
+						</Space>
+					</Dropdown>
+				);
+			},
 		},
 	];
 
@@ -169,6 +256,8 @@ export const TemplateList: FC<TemplateListProps> = ({
 				setApiKey: setCurrApiKey,
 				token: currToken,
 				setToken: setCurrToken,
+				notification,
+				setNotification,
 			}}
 		>
 			{spinLoad ? (
@@ -213,6 +302,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 				</Space>
 			)}
 			<ModalView />
+			<Notification />
 		</TemplateListContext.Provider>
 	);
 };

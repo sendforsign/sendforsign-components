@@ -37,6 +37,8 @@ export const enum Action {
 	DELETE = 'delete',
 	LIST = 'list',
 	SEND = 'send',
+	ARCHIVE = 'archive',
+	CONVERT = 'convert',
 }
 export const enum ContractType {
 	DOCX = 6,
