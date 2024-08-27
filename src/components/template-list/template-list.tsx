@@ -20,7 +20,7 @@ import useSaveParams from '../../hooks/use-save-params';
 import { TemplateListContext } from './template-list-context';
 import { ModalView } from './modal-view/modal-view';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsisVertical, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Notification } from './notification/notification';
 
 interface DataType {
@@ -153,7 +153,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 			dataIndex: 'changedAt',
 		},
 		{
-			title: 'Action',
+			title: '',
 			dataIndex: 'action',
 			render: (_: any, record: DataType) => {
 				return (
@@ -163,10 +163,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 							currentRecord.current = record;
 						}}
 					>
-						<Space>
-							More
-							<DownOutlined />
-						</Space>
+						<Button icon={<FontAwesomeIcon icon={faEllipsisVertical} />} type='text' />							
 					</Dropdown>
 				);
 			},

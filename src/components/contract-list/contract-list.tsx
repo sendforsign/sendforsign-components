@@ -22,7 +22,7 @@ import { ContractListContext } from './contract-list-context';
 import { ModalView } from './modal-view/modal-view';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DownOutlined } from '@ant-design/icons';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsisVertical, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { EventStatus } from '../../config/types';
 import { Notification } from './notification/notification';
 
@@ -219,7 +219,7 @@ export const ContractList: FC<ContractListProps> = ({
 			},
 		},
 		{
-			title: 'Action',
+			title: '',
 			dataIndex: 'action',
 			render: (_: any, record: DataType) => {
 				return (
@@ -229,10 +229,7 @@ export const ContractList: FC<ContractListProps> = ({
 							currentRecord.current = record;
 						}}
 					>
-						<Space>
-							More
-							<DownOutlined />
-						</Space>
+						<Button icon={<FontAwesomeIcon icon={faEllipsisVertical} />} type='text' />							
 					</Dropdown>
 				);
 			},
