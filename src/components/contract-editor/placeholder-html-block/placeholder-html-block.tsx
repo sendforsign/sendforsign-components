@@ -11,6 +11,7 @@ import {
 	Col,
 	Popover,
 	Divider,
+	Select
 } from 'antd';
 import QuillNamespace from 'quill';
 import { useContractEditorContext } from '../contract-editor-context';
@@ -28,6 +29,7 @@ import axios from 'axios';
 import { Placeholder, Recipient } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+	faCircle,
 	faCircleQuestion,
 	faGear,
 	faLeftLong,
@@ -549,6 +551,16 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 					</Title>
 					<Text type='secondary'>Add reusable text to the content.</Text>
 				</Space>
+				<Select defaultValue="All placeholders" style={{width: '100%'}} options={[
+					{ value: 'All placeholders', label: <span><FontAwesomeIcon icon={faCircle} color='#fafafa' size='sm'/> All placeholders</span> }, 
+					{ value: 'owner', label: <span><FontAwesomeIcon icon={faCircle} color='#fafafa' size='sm'/> Contract owner</span> },
+					{ value: 'recipient1', label: <span><FontAwesomeIcon icon={faCircle} color='#8ae2f4' size='sm'/> Ilia Bovkunov</span> },
+					{ value: 'recipient2', label: <span><FontAwesomeIcon icon={faCircle} color='#f59600' size='sm'/> Ilia Bovkunov</span> },
+					{ value: 'recipient3', label: <span><FontAwesomeIcon icon={faCircle} color='#e5befc' size='sm'/> Ilia Bovkunov</span> },
+					{ value: 'recipient4', label: <span><FontAwesomeIcon icon={faCircle} color='#ffe175' size='sm'/> Ilia Bovkunov</span> },
+					{ value: 'recipient5', label: <span><FontAwesomeIcon icon={faCircle} color='#51d474' size='sm'/> Ilia Bovkunov</span> }
+
+				]} />
 				{placeholder &&
 					placeholder.map((holder, index) => {
 						return (
@@ -566,6 +578,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 											<div>
 												<Button
 													disabled={readonlyCurrent.current}
+													style={{ background:'#8ae2f4' }}
 													size='small'
 													type='text'
 													icon={

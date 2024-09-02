@@ -81,8 +81,8 @@ table.quill-better-table td {
 [class^="placeholderClass"] {
   border-radius: 4px;
   border: 1px solid #d0e0c7;
-  color: #49aa19;
-  background: #eeeeee;
+  color: black;
+  background: #8ae2f4;
 }
 
 .ant-space-item:has(> #contractActionsFooter) {
