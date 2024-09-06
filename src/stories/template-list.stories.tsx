@@ -2,6 +2,7 @@ import React from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 
 import { TemplateList } from '../components/template-list';
+import { TemplateListProps } from '../components/template-list/template-list';
 
 const meta: Meta<typeof TemplateList> = {
 	component: TemplateList,
@@ -12,7 +13,7 @@ export default meta;
 
 type Story = StoryObj<typeof TemplateList>;
 
-export const Primary: Story = (args) => (
+export const Primary: Story = (args: React.JSX.IntrinsicAttributes & TemplateListProps) => (
 	<TemplateList data-testId='InputField-id' {...args} />
 );
 Primary.args = {

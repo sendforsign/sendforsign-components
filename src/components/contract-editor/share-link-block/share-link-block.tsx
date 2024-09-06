@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Tooltip, Card, Space, Typography } from 'antd';
+import { Button, Tooltip, Card, Space } from 'antd';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import {
-	ApiEntity,
-	ContractType,
-	EventStatuses,
-	PlaceholderView,
-} from '../../../config/enum';
+import { ApiEntity } from '../../../config/enum';
 import { useContractEditorContext } from '../contract-editor-context';
 import axios from 'axios';
 import { BASE_URL } from '../../../config/config';
@@ -20,11 +15,6 @@ import {
 	faStamp,
 } from '@fortawesome/free-solid-svg-icons';
 import useSaveArrayBuffer from '../../../hooks/use-save-array-buffer';
-import PDFMerger from 'pdf-merger-js/browser';
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import { Row } from '../../../config/types';
-import { PdfAuditTrail } from '../pdf-audit-trail/pdf-audit-trail';
-import { pdf } from '@react-pdf/renderer';
 
 export const ShareLinkBlock = () => {
 	const {
@@ -50,10 +40,6 @@ export const ShareLinkBlock = () => {
 		setPlaceholderVisible,
 		setIpInfo,
 		contractName,
-		contractType,
-		pagePlaceholder,
-		contractEvents,
-		signs,
 	} = useContractEditorContext();
 	dayjs.extend(utc);
 
@@ -62,8 +48,7 @@ export const ShareLinkBlock = () => {
 	const [sendSpin, setSendSpin] = useState(false);
 	const [signSpin, setSignSpin] = useState(false);
 	const [approveSpin, setApproveSpin] = useState(false);
-	const [downloadPdfSpin, setDownloadPdfSpin] = useState(false);
-	const { getArrayBuffer } = useSaveArrayBuffer();
+	const [downloadPdfSpin, setDownloadPdfSpin] = useState(false); 
 
 	useEffect(() => {
 		setShareLinks([]);

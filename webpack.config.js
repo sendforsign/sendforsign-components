@@ -4,28 +4,78 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 
 module.exports = (args) => {
     return {
-        // plugins: [new BundleAnalyzerPlugin()],
+        plugins: [
+            // new BundleAnalyzerPlugin({ analyzerMode: 'server' })
+        ],
         mode: isDevelopment ? 'development' : 'production',
         entry: './src/index.ts',
-        devtool: 'eval-source-map',
+        // entry: {
+        //     "sendforsign": [
+        //         "dist/vendor/index.js",
+        //         "../lib/guid-generator/src/index.ts"
+        //     ]
+        // },
+        // entry: {
+        //     contract_editor: './src/components/contract-editor/index.ts',
+        //     contract_list: './src/components/contract-list/index.ts',
+        //     template_editor: './src/components/template-editor/index.ts',
+        //     template_list: './src/components/template-list/index.ts',
+        // },
+        // devtool: 'eval-source-map',
+        devtool: isDevelopment ? 'eval-source-map' : 'source-map',
+        // devtool: false,
         output: {
+            // filename: 'sendforsign.js',
             filename: 'index.js',
+            // chunkFilename: "[name].chunkhash.js",
+            // filename: '[name]/index.js',
             path: path.resolve(__dirname, 'dist'),
-            globalObject: 'this',
+            // globalObject: 'this',
+            globalObject: 'typeof self !== \'undefined\' ? self : this',
             library: {
                 name: 'sendforsign',
                 type: 'umd',
             },
+            umdNamedDefine: true,
             clean: true
         },
         // optimization: {
-        //   runtimeChunk: true,
+        //     chunkIds: "named" // To keep filename consistent between different modes (for example building only)
+        // },
+        // stats: {
+        //     chunks: true,
+        //     chunkRelations: true
+        // },
+        // optimization: {
+        //     splitChunks: {
+        //         chunks: 'all',
+        //         minSize: 10000,
+        //         maxSize: 250000,
+        //         minRemainingSize: 0,
+        //         minChunks: 1,
+        //         // maxAsyncRequests: 30,
+        //         // maxInitialRequests: 30,
+        //         name: "vendor",
+        //         // cacheGroups: {
+        //         //     defaultVendors: {
+        //         //         test: /[\\/]node_modules[\\/]/,
+        //         //         priority: -10,
+        //         //         reuseExistingChunk: true,
+        //         //     },
+        //         //     default: {
+        //         //         minChunks: 2,
+        //         //         priority: -20,
+        //         //         reuseExistingChunk: true,
+        //         //     },
+        //         // },
+        //         // test: /[\\/]node_modules[\\/]/, // включает в бандл файлы из node_modules
+        //     },
         // },
         resolve: {
-            extensions: [".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx", ".json", ".css"],
+            extensions: [".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx", ".json"],
             alias: {
-                "react/jsx-dev-runtime": "react/jsx-dev-runtime.js",
-                "react/jsx-runtime": "react/jsx-runtime.js"
+                "react/jsx-dev-runtime.js": "react/jsx-dev-runtime",
+                "react/jsx-runtime.js": "react/jsx-runtime"
             }
         },
         externals: {
@@ -35,7 +85,18 @@ module.exports = (args) => {
                 amd: 'lodash',
                 root: '_',
             },
-            react: 'react'
+            react: {
+                root: 'React',
+                commonjs: 'react',
+                commonjs2: 'react',
+                amd: 'react',
+            },
+            'react-dom': {
+                root: 'ReactDOM',
+                commonjs: 'react-dom',
+                commonjs2: 'react-dom',
+                amd: 'react-dom',
+            },
         },
         module: {
             rules: [
@@ -56,21 +117,15 @@ module.exports = (args) => {
                         { loader: 'style-loader' },
                         {
                             loader: 'css-loader',
-                            // options: {
-                            //     modules: true,
-                            //     importLoaders: 1,
-                            //     // localIdentName: "[name]_[local]_[hash:base64]",
-                            //     sourceMap: true
-                            // },
                         },
                     ],
-                    // exclude: /node_modules/,
                 },
                 {
                     test: /\.(js|jsx)$/,
                     enforce: 'pre',
                     use: ['babel-loader', 'source-map-loader'],
                     exclude: /node_modules/,
+
                 }
             ],
         },
