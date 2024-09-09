@@ -147,7 +147,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 			dataIndex: 'changedAt',
 		},
 		{
-			title: '',
+			title: 'Action',
 			dataIndex: 'action',
 			render: (_: any, record: DataType) => {
 				return (

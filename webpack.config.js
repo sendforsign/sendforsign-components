@@ -1,34 +1,24 @@
 const path = require('path');
+const webpack = require('webpack');
+const nodeExternals = require('webpack-node-externals');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 module.exports = (args) => {
     return {
         plugins: [
+            new webpack.DefinePlugin({
+                'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+            }),
             // new BundleAnalyzerPlugin({ analyzerMode: 'server' })
         ],
         mode: isDevelopment ? 'development' : 'production',
         entry: './src/index.ts',
-        // entry: {
-        //     "sendforsign": [
-        //         "dist/vendor/index.js",
-        //         "../lib/guid-generator/src/index.ts"
-        //     ]
-        // },
-        // entry: {
-        //     contract_editor: './src/components/contract-editor/index.ts',
-        //     contract_list: './src/components/contract-list/index.ts',
-        //     template_editor: './src/components/template-editor/index.ts',
-        //     template_list: './src/components/template-list/index.ts',
-        // },
         // devtool: 'eval-source-map',
         devtool: isDevelopment ? 'eval-source-map' : 'source-map',
         // devtool: false,
         output: {
-            // filename: 'sendforsign.js',
             filename: 'index.js',
-            // chunkFilename: "[name].chunkhash.js",
-            // filename: '[name]/index.js',
             path: path.resolve(__dirname, 'dist'),
             // globalObject: 'this',
             globalObject: 'typeof self !== \'undefined\' ? self : this',
@@ -36,7 +26,8 @@ module.exports = (args) => {
                 name: 'sendforsign',
                 type: 'umd',
             },
-            umdNamedDefine: true,
+            // umdNamedDefine: true,
+            publicPath: '/dist/',
             clean: true
         },
         // optimization: {
@@ -73,12 +64,23 @@ module.exports = (args) => {
         // },
         resolve: {
             extensions: [".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx", ".json"],
-            alias: {
+
+            // extensions: ['.tsx', '.ts', '.js'],
+            fallback: {
+                //     'react/jsx-runtime': 'react/jsx-runtime.js',
+                //     'react/jsx-dev-runtime': 'react/jsx-dev-runtime.js',
+                // }
+                // alias: {
                 "react/jsx-dev-runtime.js": "react/jsx-dev-runtime",
                 "react/jsx-runtime.js": "react/jsx-runtime"
+                // }
+                // alias: {
+                // "react/jsx-dev-runtime": "react/jsx-dev-runtime.js",
+                // "react/jsx-runtime": "react/jsx-runtime.js"
             }
         },
-        externals: {
+        externalsPresets: { node: true },
+        externals: [{
             lodash: {
                 commonjs: 'lodash',
                 commonjs2: 'lodash',
@@ -96,8 +98,8 @@ module.exports = (args) => {
                 commonjs: 'react-dom',
                 commonjs2: 'react-dom',
                 amd: 'react-dom',
-            },
-        },
+            }
+        }, nodeExternals()],
         module: {
             rules: [
                 {
@@ -119,6 +121,19 @@ module.exports = (args) => {
                             loader: 'css-loader',
                         },
                     ],
+                },
+                {
+                    test: /\.(js|jsx)$/,
+                    exclude: /node_modules/,
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: [
+                                '@babel/preset-env',
+                                '@babel/preset-react'
+                            ]
+                        }
+                    }
                 },
                 {
                     test: /\.(js|jsx)$/,

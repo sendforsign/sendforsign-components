@@ -1,8 +1,16 @@
 {
 	"compilerOptions": {
-		"target": "ES6" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+		"target": "ES5" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
 		// "lib": ["dom", "ES2015", "ES2016", "ES2021"],
-		"lib": ["DOM", "ES5", "ES6", "ES2015.Promise", "ES2016", "ES2021"],
+		"lib": [
+			"DOM",
+			"ES5",
+			"ES6",
+			"ES2015.Promise",
+			"ES2016",
+			"ES2020",
+			"ES2021"
+		],
 		"jsx": "react" /* Specify what JSX code is generated. */,
 		// "jsxImportSource": "react",
 		"module": "CommonJS" /* Specify what module code is generated. */,
@@ -13,7 +21,7 @@
 		// "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
 		// "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */
 		// "types": [],                                      /* Specify type package names to be included without being referenced in a source file. */
-		// "allowUmdGlobalAccess": true,                     /* Allow accessing UMD globals from modules. */
+		"allowUmdGlobalAccess": true /* Allow accessing UMD globals from modules. */,
 		// "moduleSuffixes": [],                             /* List of file name suffixes to search when resolving a module. */
 		// "allowImportingTsExtensions": true,               /* Allow imports to include TypeScript file extensions. Requires '--moduleResolution bundler' and either '--noEmit' or '--emitDeclarationOnly' to be set. */
 		// "resolvePackageJsonExports": true,                /* Use the package.json 'exports' field when resolving package imports. */
@@ -37,7 +45,7 @@
 		// "outFile": "./",                                  /* Specify a file that bundles all outputs into one JavaScript file. If 'declaration' is true, also designates a file that bundles all .d.ts output. */
 		"outDir": "dist" /* Specify an output folder for all emitted files. */,
 		// "removeComments": true,                           /* Disable emitting comments. */
-		"noEmit": true /* Disable emitting files from a compilation. */,
+		// "noEmit": true /* Disable emitting files from a compilation. */,
 		// "importHelpers": true,                            /* Allow importing helper functions from tslib once per project, instead of including them per-file. */
 		// "importsNotUsedAsValues": "remove",               /* Specify emit/checking behavior for imports that are only used for types. */
 		// "downlevelIteration": true,                       /* Emit more compliant, but verbose and less performant JavaScript for iteration. */
@@ -50,11 +58,11 @@
 		// "noEmitHelpers": true,                            /* Disable generating custom helper functions like '__extends' in compiled output. */
 		// "noEmitOnError": true,                            /* Disable emitting files if any type checking errors are reported. */
 		// "preserveConstEnums": true,                       /* Disable erasing 'const enum' declarations in generated code. */
-		"declarationDir": "dist" /* Specify the output directory for generated declaration files. */,
+		// "declarationDir": "dist" /* Specify the output directory for generated declaration files. */,
 		// "preserveValueImports": true,                     /* Preserve unused imported values in the JavaScript output that would otherwise be removed. */
 
 		/* Interop Constraints */
-		// "isolatedModules": true /* Ensure that each file can be safely transpiled without relying on other imports. */,
+		"isolatedModules": true /* Ensure that each file can be safely transpiled without relying on other imports. */,
 		// "verbatimModuleSyntax": true,                     /* Do not transform or elide any imports or exports not marked as type-only, ensuring they are written in the output file's format based on the 'module' setting. */
 		"allowSyntheticDefaultImports": true /* Allow 'import x from y' when a module doesn't have a default export. */,
 		"esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,

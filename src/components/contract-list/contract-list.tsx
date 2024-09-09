@@ -212,7 +212,7 @@ export const ContractList: FC<ContractListProps> = ({
 			},
 		},
 		{
-			title: '',
+			title: 'Action',
 			dataIndex: 'action',
 			render: (_: any, record: DataType) => {
 				return (
@@ -255,6 +255,7 @@ export const ContractList: FC<ContractListProps> = ({
 		};
 		const getContracts = async () => {
 			let eventStatusTmp: EventStatus[] = [];
+			console.log('axios', axios, BASE_URL, ApiEntity.EVENT_STATUS);
 			await axios
 				.get(BASE_URL + ApiEntity.EVENT_STATUS, {
 					headers: {
