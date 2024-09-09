@@ -1,22 +1,17 @@
-const path = require('path');
-const webpack = require('webpack');
+const path = require('path'); 
 const nodeExternals = require('webpack-node-externals');
+
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 module.exports = (args) => {
     return {
         plugins: [
-            new webpack.DefinePlugin({
-                'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-            }),
             // new BundleAnalyzerPlugin({ analyzerMode: 'server' })
         ],
         mode: isDevelopment ? 'development' : 'production',
         entry: './src/index.ts',
-        // devtool: 'eval-source-map',
         devtool: isDevelopment ? 'eval-source-map' : 'source-map',
-        // devtool: false,
         output: {
             filename: 'index.js',
             path: path.resolve(__dirname, 'dist'),
@@ -26,8 +21,7 @@ module.exports = (args) => {
                 name: 'sendforsign',
                 type: 'umd',
             },
-            // umdNamedDefine: true,
-            publicPath: '/dist/',
+            umdNamedDefine: true,
             clean: true
         },
         // optimization: {
@@ -64,19 +58,9 @@ module.exports = (args) => {
         // },
         resolve: {
             extensions: [".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx", ".json"],
-
-            // extensions: ['.tsx', '.ts', '.js'],
             fallback: {
-                //     'react/jsx-runtime': 'react/jsx-runtime.js',
-                //     'react/jsx-dev-runtime': 'react/jsx-dev-runtime.js',
-                // }
-                // alias: {
                 "react/jsx-dev-runtime.js": "react/jsx-dev-runtime",
                 "react/jsx-runtime.js": "react/jsx-runtime"
-                // }
-                // alias: {
-                // "react/jsx-dev-runtime": "react/jsx-dev-runtime.js",
-                // "react/jsx-runtime": "react/jsx-runtime.js"
             }
         },
         externalsPresets: { node: true },
@@ -98,8 +82,9 @@ module.exports = (args) => {
                 commonjs: 'react-dom',
                 commonjs2: 'react-dom',
                 amd: 'react-dom',
-            }
-        }, nodeExternals()],
+            },
+        },
+        nodeExternals()],
         module: {
             rules: [
                 {
@@ -121,19 +106,6 @@ module.exports = (args) => {
                             loader: 'css-loader',
                         },
                     ],
-                },
-                {
-                    test: /\.(js|jsx)$/,
-                    exclude: /node_modules/,
-                    use: {
-                        loader: 'babel-loader',
-                        options: {
-                            presets: [
-                                '@babel/preset-env',
-                                '@babel/preset-react'
-                            ]
-                        }
-                    }
                 },
                 {
                     test: /\.(js|jsx)$/,
