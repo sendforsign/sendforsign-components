@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { Space, Modal, Typography, Card } from 'antd';
 import { useTemplateListContext } from '../template-list-context';
 import { TemplateEditor } from '../../template-editor';
-import useSaveParams from '../../../hooks/use-save-params';
+// import useSaveParams from '../../../hooks/use-save-params';
 
 export const ModalView = () => {
-	const { clearParams } = useSaveParams();
+	// const { clearParams } = useSaveParams();
 	const {
 		apiKey,
 		token,
@@ -38,7 +38,7 @@ export const ModalView = () => {
 		setTemplateKey('');
 		setRefreshTemplate(refreshTemplate + 1);
 		setTemplateModal(false);
-		clearParams();
+		// clearParams();
 	};
 	return (
 		<Modal

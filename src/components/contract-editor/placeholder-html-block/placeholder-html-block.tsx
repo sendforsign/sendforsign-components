@@ -29,6 +29,7 @@ import { Placeholder, Recipient } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faCircleQuestion,
+	faClose,
 	faGear,
 	faLeftLong,
 } from '@fortawesome/free-solid-svg-icons';
@@ -50,6 +51,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		continueLoad,
 		setPlaceholder,
 		refreshPlaceholders,
+		setPlaceholderVisible,
 		placeholderVisible,
 		refreshPlaceholderRecipients,
 		setNotification,
@@ -340,7 +342,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		if (text?.includes('contenteditable')) {
 			contenteditable = true;
 		}
-		let tag = `<placeholder${id}`;
+		let tag = `<placeholder${id} class=`;
 		let array = text?.split(tag);
 		let resultText = '';
 		// debugger;
@@ -350,7 +352,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 					if (i === 0) {
 						resultText += array[i];
 					} else {
-						resultText += `<placeholder${id}`;
+						resultText += `<placeholder${id} class=`;
 						tag = `</placeholder${id}>`;
 						const lineArr = array[i].split(tag);
 						for (let j = 0; j < lineArr.length; j++) {
@@ -544,9 +546,14 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		>
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 				<Space direction='vertical' size={2}>
+					<Space>
 					<Title level={4} style={{ margin: '0 0 0 0' }}>
 						Placeholders
 					</Title>
+					<Tooltip title='Close sidebar.'>
+					<Button size='small' icon={<FontAwesomeIcon icon={faClose} />} onClick={() => {setPlaceholderVisible(!placeholderVisible);}} />
+					</Tooltip>
+					</Space>
 					<Text type='secondary'>Add reusable text to the content.</Text>
 				</Space>
 				{placeholder &&
@@ -583,7 +590,13 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 									</Col>
 									<Col>
 										<Input
-											readOnly={readonlyCurrent.current}
+											readOnly={
+												holder.view?.toString() !==
+													PlaceholderView.SIGNATURE.toString() &&
+												!readonlyCurrent.current
+													? false
+													: true
+											}
 											id='PlaceholderName'
 											placeholder='Enter placeholder name'
 											variant='borderless'
@@ -593,114 +606,127 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 										/>
 									</Col>
 									<Col flex={'auto'}></Col>
-									<Col flex='24px'>
-										<Popover
-											content={
-												<Space direction='vertical' style={{ display: 'flex' }}>
-													<Space>
-														<Text type='secondary'>
-															Who fills in this field:
-														</Text>
-														<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
-															<div>
-																<Button
-																	disabled={readonlyCurrent.current}
-																	size='small'
-																	icon={
-																		<FontAwesomeIcon
-																			icon={faCircleQuestion}
-																			size='xs'
-																		/>
-																	}
-																	type='text'
-																></Button>
-															</div>
-														</Tooltip>
-													</Space>
-													<Radio.Group
-														size='small'
-														value={
-															holder.fillingType &&
-															holder.fillingType.toString() !==
-																PlaceholderFill.SPECIFIC.toString()
-																? holder.fillingType?.toString()
-																: holder.fillingType &&
-																  holder.fillingType.toString() ===
-																		PlaceholderFill.SPECIFIC.toString() &&
-																  holder.externalRecipientKey &&
-																  placeholderRecipients &&
-																  placeholderRecipients.length > 0
-																? placeholderRecipients.find(
-																		(placeholderRecipient) =>
-																			placeholderRecipient.recipientKey?.includes(
-																				holder.externalRecipientKey as string
-																			)
-																  )?.recipientKey
-																: '1'
-														}
-														onChange={(e: any) => handleChangeFilling(e, index)}
+									{holder.view?.toString() !==
+										PlaceholderView.SIGNATURE.toString() && (
+										<Col flex='24px'>
+											<Popover
+												content={
+													<Space
+														direction='vertical'
+														style={{ display: 'flex' }}
 													>
-														<Space direction='vertical'>
-															<Radio value={PlaceholderFill.NONE.toString()}>
-																None
-															</Radio>
-															<Radio value={PlaceholderFill.CREATOR.toString()}>
-																Contract owner
-															</Radio>
-															{placeholderRecipients &&
-																placeholderRecipients.length > 0 &&
-																placeholderRecipients.map(
-																	(placeholderRecipient) => {
-																		return (
-																			<Radio
-																				value={
-																					placeholderRecipient.recipientKey
-																				}
-																			>
-																				{placeholderRecipient.fullname}
-																			</Radio>
-																		);
-																	}
-																)}
+														<Space>
+															<Text type='secondary'>
+																Who fills in this field:
+															</Text>
+															<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
+																<div>
+																	<Button
+																		disabled={readonlyCurrent.current}
+																		size='small'
+																		icon={
+																			<FontAwesomeIcon
+																				icon={faCircleQuestion}
+																				size='xs'
+																			/>
+																		}
+																		type='text'
+																	></Button>
+																</div>
+															</Tooltip>
 														</Space>
-													</Radio.Group>
-													<Divider style={{ margin: 0 }} />
+														<Radio.Group
+															size='small'
+															value={
+																holder.fillingType &&
+																holder.fillingType.toString() !==
+																	PlaceholderFill.SPECIFIC.toString()
+																	? holder.fillingType?.toString()
+																	: holder.fillingType &&
+																	  holder.fillingType.toString() ===
+																			PlaceholderFill.SPECIFIC.toString() &&
+																	  holder.externalRecipientKey &&
+																	  placeholderRecipients &&
+																	  placeholderRecipients.length > 0
+																	? placeholderRecipients.find(
+																			(placeholderRecipient) =>
+																				placeholderRecipient.recipientKey?.includes(
+																					holder.externalRecipientKey as string
+																				)
+																	  )?.recipientKey
+																	: '1'
+															}
+															onChange={(e: any) =>
+																handleChangeFilling(e, index)
+															}
+														>
+															<Space direction='vertical'>
+																<Radio value={PlaceholderFill.NONE.toString()}>
+																	None
+																</Radio>
+																<Radio
+																	value={PlaceholderFill.CREATOR.toString()}
+																>
+																	Contract owner
+																</Radio>
+																{placeholderRecipients &&
+																	placeholderRecipients.length > 0 &&
+																	placeholderRecipients.map(
+																		(placeholderRecipient) => {
+																			return (
+																				<Radio
+																					value={
+																						placeholderRecipient.recipientKey
+																					}
+																				>
+																					{placeholderRecipient.fullname}
+																				</Radio>
+																			);
+																		}
+																	)}
+															</Space>
+														</Radio.Group>
+														<Divider style={{ margin: 0 }} />
+														<Button
+															disabled={readonlyCurrent.current}
+															loading={delLoad}
+															block
+															danger
+															type='text'
+															onClick={() => {
+																handleDeletePlaceholder(index);
+															}}
+														>
+															Delete
+														</Button>
+													</Space>
+												}
+												trigger='click'
+											>
+												<div>
 													<Button
 														disabled={readonlyCurrent.current}
-														loading={delLoad}
-														block
-														danger
+														size='small'
 														type='text'
-														onClick={() => {
-															handleDeletePlaceholder(index);
-														}}
-													>
-														Delete
-													</Button>
-												</Space>
-											}
-											trigger='click'
-										>
-											<div>
-												<Button
-													disabled={readonlyCurrent.current}
-													size='small'
-													type='text'
-													icon={<FontAwesomeIcon icon={faGear} size='xs' />}
-												/>
-											</div>
-										</Popover>
-									</Col>
+														icon={<FontAwesomeIcon icon={faGear} size='xs' />}
+													/>
+												</div>
+											</Popover>
+										</Col>
+									)}
 								</Row>
-								<Input
-									readOnly={readonlyCurrent.current}
-									id='PlaceholderValue'
-									placeholder='Enter value'
-									value={holder.value}
-									onChange={(e: any) => handleChange(e, index)}
-									onBlur={(e: any) => handleBlur(e, index)}
-									onPressEnter={() => handleEnter(index)}
-								/>
+								{holder.view?.toString() !==
+									PlaceholderView.SIGNATURE.toString() && (
+									<Input
+										readOnly={readonlyCurrent.current}
+										id='PlaceholderValue'
+										placeholder='Enter value'
+										value={holder.value}
+										onChange={(e: any) => handleChange(e, index)}
+										onBlur={(e: any) => handleBlur(e, index)}
+										onPressEnter={() => handleEnter(index)}
+									/>
+								)}
 							</Space>
 						);
 					})}

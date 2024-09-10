@@ -15,8 +15,7 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import { BASE_URL } from '../../config/config';
 import { Action, ApiEntity } from '../../config/enum';
-import Table, { ColumnsType } from 'antd/es/table';
-import useSaveParams from '../../hooks/use-save-params';
+import Table, { ColumnsType } from 'antd/es/table'; 
 import { TemplateListContext } from './template-list-context';
 import { ModalView } from './modal-view/modal-view';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -44,10 +43,9 @@ export const TemplateList: FC<TemplateListProps> = ({
 	isModal = true,
 	userKey,
 }) => {
-	if (!apiKey && !token && !window.location.href.includes('story')) {
-		throw new Error('Missing authority data');
-	}
-	const { setParam, getParam, clearParams } = useSaveParams();
+	// if (!apiKey && !token && !window.location.href.includes('story')) {
+	// 	throw new Error('Missing authority data');
+	// } 
 	const [currTemplateKey, setCurrTemplateKey] = useState('');
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
@@ -67,14 +65,10 @@ export const TemplateList: FC<TemplateListProps> = ({
 		},
 	];
 
-	const chooseTemplate = (text: string) => {
-		// debugger;
-		clearParams();
-		setCurrTemplateKey(text);
-		setParam('templateKey', text);
+	const chooseTemplate = (text: string) => { 
+		setCurrTemplateKey(text); 
 		if (isModal) {
-			setTemplateModal(true);
-			setParam('openModalTemplate', true);
+			setTemplateModal(true); 
 		}
 	};
 	const dropdownClick: MenuProps['onClick'] = async (e: any) => {
@@ -153,7 +147,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 			dataIndex: 'changedAt',
 		},
 		{
-			title: '',
+			title: 'Action',
 			dataIndex: 'action',
 			render: (_: any, record: DataType) => {
 				return (
@@ -302,4 +296,4 @@ export const TemplateList: FC<TemplateListProps> = ({
 			<Notification />
 		</TemplateListContext.Provider>
 	);
-};
+};  

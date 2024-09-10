@@ -267,7 +267,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		if (text?.includes('contenteditable')) {
 			contenteditable = true;
 		}
-		let tag = `<placeholder${id}`;
+		let tag = `<placeholder${id} class=`;
 		let array = text?.split(tag);
 		let resultText = '';
 		// debugger;
@@ -277,7 +277,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 					if (i === 0) {
 						resultText += array[i];
 					} else {
-						resultText += `<placeholder${id}`;
+						resultText += `<placeholder${id} class=`;
 						tag = `</placeholder${id}>`;
 						const lineArr = array[i].split(tag);
 						for (let j = 0; j < lineArr.length; j++) {
