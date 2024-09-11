@@ -11,6 +11,7 @@ import {
 	Spin,
 	Dropdown,
 	MenuProps,
+	Empty
 } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -312,6 +313,12 @@ export const ContractList: FC<ContractListProps> = ({
 	}, [refreshContracts]);
 
 	// console.log('contractKey 2', currContractKey);
+	const toggleButton = (
+		<Button type="primary" onClick={() => {chooseContract('');}}>
+		  Add document
+		</Button>
+	  );
+
 	return (
 		<ContractListContext.Provider
 			value={{
@@ -344,6 +351,7 @@ export const ContractList: FC<ContractListProps> = ({
 							style={{ minWidth: 600 }}
 							columns={columns}
 							dataSource={data}
+							locale={{emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="You haven't created any documents yet">{toggleButton}</Empty>}}
 							title={() => (
 								<Row>
 									<Col>

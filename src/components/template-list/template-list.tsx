@@ -9,6 +9,7 @@ import {
 	Spin,
 	MenuProps,
 	Dropdown,
+	Empty
 } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -230,6 +231,12 @@ export const TemplateList: FC<TemplateListProps> = ({
 		};
 	}, [refreshTemplate]);
 
+	const toggleButton = (
+		<Button type="primary" onClick={() => {chooseTemplate('');}}>
+		  Add template
+		</Button>
+	  );
+
 	return (
 		<TemplateListContext.Provider
 			value={{
@@ -260,6 +267,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 							style={{ minWidth: 600 }}
 							columns={columns}
 							dataSource={data}
+							locale={{emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="You haven't created any templates yet">{toggleButton}</Empty>}}
 							title={() => (
 								<Row>
 									<Col>

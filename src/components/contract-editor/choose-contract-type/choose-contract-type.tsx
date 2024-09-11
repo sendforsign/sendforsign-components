@@ -531,10 +531,10 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 					<Space direction='vertical' size={2}>
 						<Title level={4} style={{ margin: '0' }}>
-							Select a document type or upload a file
+							Select a document to be signed
 						</Title>
 						<Text type='secondary'>
-							This will speed up the drafting process.
+							Draft from scratch, use a template, or upload a file.
 						</Text>
 					</Space>
 					<Segmented
