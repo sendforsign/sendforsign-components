@@ -553,7 +553,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				</Space>
 				<Select defaultValue="All placeholders" style={{width: '100%'}} options={[
 					{ value: 'All placeholders', label: <span><FontAwesomeIcon icon={faCircle} color='#fafafa' size='sm'/> All placeholders</span> }, 
-					{ value: 'owner', label: <span><FontAwesomeIcon icon={faCircle} color='#fafafa' size='sm'/> Contract owner</span> },
+					{ value: 'owner', label: <span><FontAwesomeIcon icon={faCircle} color='#eaeaea' size='sm'/> Contract owner</span> },
 					{ value: 'recipient1', label: <span><FontAwesomeIcon icon={faCircle} color='#8ae2f4' size='sm'/> Ilia Bovkunov</span> },
 					{ value: 'recipient2', label: <span><FontAwesomeIcon icon={faCircle} color='#f59600' size='sm'/> Ilia Bovkunov</span> },
 					{ value: 'recipient3', label: <span><FontAwesomeIcon icon={faCircle} color='#e5befc' size='sm'/> Ilia Bovkunov</span> },
