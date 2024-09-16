@@ -16,7 +16,6 @@ import { PlaceholderDrag } from './placeholder-drag';
 export const PlaceholderPdfBlock = () => {
 	const {
 		apiKey,
-		userKey,
 		token,
 		isPdf,
 		templateKey,
@@ -35,20 +34,8 @@ export const PlaceholderPdfBlock = () => {
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
 
 	const readonlyCurrent = useRef(false);
-	const chosePlaceholder = useRef<Placeholder>({});
 
 	const { Title, Text } = Typography;
-	const [, drag] = useDrag(
-		() => ({
-			type: `chosePlaceholder`,
-			item: { chosePlaceholder: chosePlaceholder.current },
-			collect: (monitor) => ({
-				isDragging: !!monitor.isDragging(),
-				canDrag: !!monitor.canDrag(),
-			}),
-		}),
-		[chosePlaceholder.current]
-	);
 	const getPlaceholders = async (load = true) => {
 		//console.log('PlaceholderBlock');
 		if (load) {
@@ -162,6 +149,7 @@ export const PlaceholderPdfBlock = () => {
 					placeholderKey: payload.data.placeholder.placeholderKey,
 				};
 				setPlaceholder(placeholdersTmp);
+				setTemplatePlaceholderCount(templatePlaceholderCount + 1);
 				getPlaceholders(false);
 			})
 			.catch((error) => {

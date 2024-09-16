@@ -61,9 +61,6 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	onStepChange,
 	onDocumentSave,
 }) => {
-	// if (!apiKey && !token && !window.location.href.includes('story')) {
-	// 	throw new Error('Missing authority data');
-	// }
 	const { setArrayBuffer, getArrayBuffer, clearArrayBuffer } =
 		useSaveArrayBuffer();
 	const [beforeCreated, setBeforeCreated] = useState(canReDraft);

@@ -244,32 +244,12 @@ export const PdfPage = ({
 						positionX: currentId.current.positionX,
 						positionY: currentId.current.positionY,
 						action: Action.UPDATE,
-					});
-					// const placeholderIndex = placeholder.findIndex(
-					// 	(pl) => pl.placeholderKey === currentId.current.placeholderKey
-					// );
-					// if (placeholderIndex >= 0) {
-					// 	let placeholderTmp = [...placeholder];
-					// 	placeholderTmp[placeholderIndex].insertion?.push({
-					// 		pageId: currentId.current.pageId,
-					// 		id: currentId.current.id,
-					// 		width: currentId.current.width,
-					// 		height: currentId.current.height,
-					// 		positionX: currentId.current.positionX,
-					// 		positionY: currentId.current.positionY,
-					// 	});
-					// 	setPlaceholder(placeholderTmp);
-					// }
+					}); 
 					needUpdate.current = true;
 					let currPagePlaceholderTmp = [...currPagePl.current];
 					currPagePlaceholderTmp.push(currentId.current);
 					setCurrPagePlaceholder(currPagePlaceholderTmp);
-					currPagePl.current.push(currentId.current);
-					// console.log(
-					// 	'setCurrPagePlaceholder1',
-					// 	currPagePlaceholderTmp,
-					// 	currPagePl.current
-					// );
+					currPagePl.current.push(currentId.current); 
 					currentId.current = {};
 					finishDrop.current = false;
 					await save();

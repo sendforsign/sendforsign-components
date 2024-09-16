@@ -11,12 +11,11 @@ import {
 	Dropdown,
 	Empty
 } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { BASE_URL } from '../../config/config';
 import { Action, ApiEntity } from '../../config/enum';
-import Table, { ColumnsType } from 'antd/es/table'; 
+import Table, { ColumnsType } from 'antd/es/table';
 import { TemplateListContext } from './template-list-context';
 import { ModalView } from './modal-view/modal-view';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -44,9 +43,6 @@ export const TemplateList: FC<TemplateListProps> = ({
 	isModal = true,
 	userKey,
 }) => {
-	// if (!apiKey && !token && !window.location.href.includes('story')) {
-	// 	throw new Error('Missing authority data');
-	// } 
 	const [currTemplateKey, setCurrTemplateKey] = useState('');
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
@@ -66,10 +62,10 @@ export const TemplateList: FC<TemplateListProps> = ({
 		},
 	];
 
-	const chooseTemplate = (text: string) => { 
-		setCurrTemplateKey(text); 
+	const chooseTemplate = (text: string) => {
+		setCurrTemplateKey(text);
 		if (isModal) {
-			setTemplateModal(true); 
+			setTemplateModal(true);
 		}
 	};
 	const dropdownClick: MenuProps['onClick'] = async (e: any) => {
@@ -158,7 +154,10 @@ export const TemplateList: FC<TemplateListProps> = ({
 							currentRecord.current = record;
 						}}
 					>
-						<Button icon={<FontAwesomeIcon icon={faEllipsisVertical} />} type='text' />							
+						<Button
+							icon={<FontAwesomeIcon icon={faEllipsisVertical} />}
+							type='text'
+						/>
 					</Dropdown>
 				);
 			},
@@ -304,4 +303,4 @@ export const TemplateList: FC<TemplateListProps> = ({
 			<Notification />
 		</TemplateListContext.Provider>
 	);
-};  
+};

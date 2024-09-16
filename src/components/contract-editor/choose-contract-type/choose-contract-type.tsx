@@ -358,6 +358,11 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 						// setPdfData(response.data);
 						setPdfFileLoad(pdfFileLoad + 1);
 						setContractValue(template.value as string);
+						if (beforeCreated && contractName) {
+							// setCreateContract(true);
+						} else {
+							setChooseTemplate(chooseTemplate + 1);
+						}
 						setFieldBlockVisible(true);
 						setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
 						setCreateDisable(true);

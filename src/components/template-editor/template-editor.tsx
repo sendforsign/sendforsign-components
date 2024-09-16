@@ -28,9 +28,6 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	clientKey,
 	userKey,
 }) => {
-	// if (!apiKey && !token && !window.location.href.includes('story')) {
-	// 	throw new Error('Missing authority data');
-	// }
 	const { getArrayBuffer, setArrayBuffer, clearArrayBuffer } =
 		useSaveArrayBuffer();
 
@@ -367,4 +364,4 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 			)}
 		</TemplateEditorContext.Provider>
 	);
-}; 
+};

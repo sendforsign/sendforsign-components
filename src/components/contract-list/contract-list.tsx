@@ -21,7 +21,6 @@ import Table from 'antd/es/table';
 import { ContractListContext } from './contract-list-context';
 import { ModalView } from './modal-view/modal-view';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { DownOutlined } from '@ant-design/icons';
 import { faEllipsisVertical, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { EventStatus } from '../../config/types';
 import { Notification } from './notification/notification';
@@ -48,9 +47,6 @@ export const ContractList: FC<ContractListProps> = ({
 	isModal = true,
 	userKey,
 }) => {
-	// if (!apiKey && !token && !window.location.href.includes('story')) {
-	// 	throw new Error('Missing authority data');
-	// }
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currContractKey, setCurrContractKey] = useState('');
 	const [currUserKey, setCurrUserKey] = useState(userKey);
@@ -86,8 +82,8 @@ export const ContractList: FC<ContractListProps> = ({
 		if (currentRecord.current && currentRecord.current.key) {
 			switch (e.key) {
 				case Action.ARCHIVE:
-					let url: string = BASE_URL + ApiEntity.CONTRACT;
-					let bodyContract = {
+					const urlContract: string = BASE_URL + ApiEntity.CONTRACT;
+					const bodyContract = {
 						data: {
 							action: Action.ARCHIVE,
 							clientKey: !token ? currClientKey : undefined,
@@ -98,7 +94,7 @@ export const ContractList: FC<ContractListProps> = ({
 						},
 					};
 					await axios
-						.post(url, bodyContract, {
+						.post(urlContract, bodyContract, {
 							headers: {
 								Accept: 'application/vnd.api+json',
 								'Content-Type': 'application/vnd.api+json',
@@ -132,8 +128,8 @@ export const ContractList: FC<ContractListProps> = ({
 						});
 					break;
 				case Action.CONVERT:
-					url = BASE_URL + ApiEntity.TEMPLATE;
-					let bodyTemplate = {
+					const urlTemplate: string = BASE_URL + ApiEntity.TEMPLATE;
+					const bodyTemplate = {
 						data: {
 							action: Action.CONVERT,
 							clientKey: !token ? currClientKey : undefined,
@@ -147,7 +143,7 @@ export const ContractList: FC<ContractListProps> = ({
 						},
 					};
 					await axios
-						.post(url, bodyTemplate, {
+						.post(urlTemplate, bodyTemplate, {
 							headers: {
 								Accept: 'application/vnd.api+json',
 								'Content-Type': 'application/vnd.api+json',

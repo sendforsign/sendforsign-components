@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
 	Space,
 	Typography,
@@ -54,7 +54,7 @@ export const PlaceholderDrag = ({
 		setNotification,
 	} = useTemplateEditorContext();
 
-	const { Title, Text } = Typography;
+	const { Text } = Typography;
 	const [, drag] = useDrag(
 		() => ({
 			type: `chosePlaceholder`,
@@ -66,6 +66,10 @@ export const PlaceholderDrag = ({
 		}),
 		[currPlaceholder.current]
 	);
+
+	useEffect(() => {
+		currPlaceholder.current = placeholder;
+	}, [placeholder]);
 	const handleInsertPlaceholder = () => {
 		setPlaceholderPdf(currPlaceholder.current);
 	};
