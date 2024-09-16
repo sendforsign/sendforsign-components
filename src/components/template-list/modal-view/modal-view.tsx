@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { Space, Modal, Typography, Card } from 'antd';
 import { useTemplateListContext } from '../template-list-context';
 import { TemplateEditor } from '../../template-editor';
-import useSaveParams from '../../../hooks/use-save-params';
+// import useSaveParams from '../../../hooks/use-save-params';
 
 export const ModalView = () => {
-	const { clearParams } = useSaveParams();
+	// const { clearParams } = useSaveParams();
 	const {
 		apiKey,
 		token,
@@ -38,7 +38,7 @@ export const ModalView = () => {
 		setTemplateKey('');
 		setRefreshTemplate(refreshTemplate + 1);
 		setTemplateModal(false);
-		clearParams();
+		// clearParams();
 	};
 	return (
 		<Modal
@@ -55,10 +55,10 @@ export const ModalView = () => {
 						<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 							<Space direction='vertical' size={2}>
 								<Title level={4} style={{ margin: '0' }}>
-									Select a document type or upload a file
+									Select a document to be signed
 								</Title>
 								<Text type='secondary'>
-									This will speed up the drafting process.
+									Draft from scratch, use a template, or upload a file.
 								</Text>
 							</Space>
 						</Space>

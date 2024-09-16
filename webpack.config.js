@@ -7,7 +7,7 @@ module.exports = (args) => {
         // plugins: [new BundleAnalyzerPlugin()],
         mode: isDevelopment ? 'development' : 'production',
         entry: './src/index.ts',
-        devtool: 'eval-source-map',
+        devtool: isDevelopment ? 'eval-source-map' : 'source-map',
         output: {
             filename: 'index.js',
             path: path.resolve(__dirname, 'dist'),

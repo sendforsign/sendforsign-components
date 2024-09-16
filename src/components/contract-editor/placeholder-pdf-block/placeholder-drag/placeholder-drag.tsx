@@ -57,7 +57,7 @@ export const PlaceholderDrag = ({
 		setNotification,
 	} = useContractEditorContext();
 
-	const { Title, Text } = Typography;
+	const { Text } = Typography;
 	const [, drag] = useDrag(
 		() => ({
 			type: `chosePlaceholder`,
@@ -147,10 +147,7 @@ export const PlaceholderDrag = ({
 						},
 						responseType: 'json',
 					})
-					.then((payload: any) => {
-						//console.log('PLACEHOLDER read', payload);
-						// setRefreshPlaceholders(refreshPlaceholders + 1);
-					})
+					.then((payload: any) => {})
 					.catch((error) => {
 						setNotification({
 							text:
@@ -189,10 +186,7 @@ export const PlaceholderDrag = ({
 				},
 				responseType: 'json',
 			})
-			.then((payload: any) => {
-				//console.log('PLACEHOLDER read', payload);
-				// setRefreshPlaceholders(refreshPlaceholders + 1);
-			})
+			.then((payload: any) => {})
 			.catch((error) => {
 				setNotification({
 					text:
@@ -282,7 +276,6 @@ export const PlaceholderDrag = ({
 				direction='vertical'
 				size={2}
 				style={{ display: 'flex' }}
-				// key={holder.placeholderKey}
 			>
 				<Row wrap={false} align={'middle'}>
 					<Col>

@@ -9,14 +9,13 @@ import {
 	Spin,
 	MenuProps,
 	Dropdown,
+	Empty
 } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { BASE_URL } from '../../config/config';
 import { Action, ApiEntity } from '../../config/enum';
 import Table, { ColumnsType } from 'antd/es/table';
-import useSaveParams from '../../hooks/use-save-params';
 import { TemplateListContext } from './template-list-context';
 import { ModalView } from './modal-view/modal-view';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -44,10 +43,6 @@ export const TemplateList: FC<TemplateListProps> = ({
 	isModal = true,
 	userKey,
 }) => {
-	if (!apiKey && !token && !window.location.href.includes('story')) {
-		throw new Error('Missing authority data');
-	}
-	const { setParam, getParam, clearParams } = useSaveParams();
 	const [currTemplateKey, setCurrTemplateKey] = useState('');
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
@@ -68,13 +63,9 @@ export const TemplateList: FC<TemplateListProps> = ({
 	];
 
 	const chooseTemplate = (text: string) => {
-		// debugger;
-		clearParams();
 		setCurrTemplateKey(text);
-		setParam('templateKey', text);
 		if (isModal) {
 			setTemplateModal(true);
-			setParam('openModalTemplate', true);
 		}
 	};
 	const dropdownClick: MenuProps['onClick'] = async (e: any) => {
@@ -153,7 +144,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 			dataIndex: 'changedAt',
 		},
 		{
-			title: '',
+			title: 'Action',
 			dataIndex: 'action',
 			render: (_: any, record: DataType) => {
 				return (
@@ -163,7 +154,10 @@ export const TemplateList: FC<TemplateListProps> = ({
 							currentRecord.current = record;
 						}}
 					>
-						<Button icon={<FontAwesomeIcon icon={faEllipsisVertical} />} type='text' />							
+						<Button
+							icon={<FontAwesomeIcon icon={faEllipsisVertical} />}
+							type='text'
+						/>
 					</Dropdown>
 				);
 			},
@@ -236,6 +230,12 @@ export const TemplateList: FC<TemplateListProps> = ({
 		};
 	}, [refreshTemplate]);
 
+	const toggleButton = (
+		<Button type="primary" onClick={() => {chooseTemplate('');}}>
+		  Add template
+		</Button>
+	  );
+
 	return (
 		<TemplateListContext.Provider
 			value={{
@@ -266,6 +266,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 							style={{ minWidth: 600 }}
 							columns={columns}
 							dataSource={data}
+							locale={{emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="You haven't created any templates yet">{toggleButton}</Empty>}}
 							title={() => (
 								<Row>
 									<Col>

@@ -358,6 +358,11 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 						// setPdfData(response.data);
 						setPdfFileLoad(pdfFileLoad + 1);
 						setContractValue(template.value as string);
+						if (beforeCreated && contractName) {
+							// setCreateContract(true);
+						} else {
+							setChooseTemplate(chooseTemplate + 1);
+						}
 						setFieldBlockVisible(true);
 						setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
 						setCreateDisable(true);
@@ -531,10 +536,10 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 					<Space direction='vertical' size={2}>
 						<Title level={4} style={{ margin: '0' }}>
-							Select a document type or upload a file
+							Select a document to be signed
 						</Title>
 						<Text type='secondary'>
-							This will speed up the drafting process.
+							Draft from scratch, use a template, or upload a file.
 						</Text>
 					</Space>
 					<Segmented

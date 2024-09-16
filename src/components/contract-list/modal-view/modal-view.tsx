@@ -3,12 +3,12 @@ import React, { FC, useEffect, useState } from 'react';
 import { Card, Space, Modal, Typography, Tag, Segmented } from 'antd';
 import { useContractListContext } from '../contract-list-context';
 import { ContractEditor } from '../../contract-editor';
-import useSaveParams from '../../../hooks/use-save-params';
+// import useSaveParams from '../../../hooks/use-save-params';
 export interface ModalViewProps {
 	id?: string;
 }
 export const ModalView: FC<ModalViewProps> = ({ id }) => {
-	const { clearParams } = useSaveParams();
+	// const { clearParams } = useSaveParams();
 	const {
 		contractKey,
 		contractModal,
@@ -27,10 +27,10 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 
 	useEffect(() => {
 		if (contractModal) {
-			if (contractKey !== currentKey) { 
+			if (contractKey !== currentKey) {
 				setCurrentKey(contractKey);
 				setLoad(true);
-				setTimeout(() => { 
+				setTimeout(() => {
 					setLoad(false);
 				}, 10);
 			}
@@ -42,7 +42,7 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 		setContractKey('');
 		setContractModal(false);
 		setRefreshContracts(refreshContracts + 1);
-		clearParams();
+		// clearParams();
 	};
 	// const handleStep = (e: any) => {
 	// 	console.log('handleStep', e);
@@ -66,10 +66,10 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 						<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 							<Space direction='vertical' size={2}>
 								<Title level={4} style={{ margin: '0' }}>
-									Select a document type or upload a file
+									Select a document to be signed
 								</Title>
 								<Text type='secondary'>
-									This will speed up the drafting process.
+									Draft a document from scratch, use a template, or upload a file.
 								</Text>
 							</Space>
 						</Space>

@@ -266,11 +266,6 @@ export const PdfPage = ({
 					currPagePlaceholderTmp.push(currentId.current);
 					setCurrPagePlaceholder(currPagePlaceholderTmp);
 					currPagePl.current.push(currentId.current);
-					// console.log(
-					// 	'setCurrPagePlaceholder1',
-					// 	currPagePlaceholderTmp,
-					// 	currPagePl.current
-					// );
 					currentId.current = {};
 					finishDrop.current = false;
 					await save();

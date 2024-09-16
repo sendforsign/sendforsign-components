@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Card, Col, Row, Space, Spin, Typography } from 'antd';
+import './contract-editor.css';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
 import {
@@ -60,9 +61,6 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	onStepChange,
 	onDocumentSave,
 }) => {
-	if (!apiKey && !token && !window.location.href.includes('story')) {
-		throw new Error('Missing authority data');
-	}
 	const { setArrayBuffer, getArrayBuffer, clearArrayBuffer } =
 		useSaveArrayBuffer();
 	const [beforeCreated, setBeforeCreated] = useState(canReDraft);

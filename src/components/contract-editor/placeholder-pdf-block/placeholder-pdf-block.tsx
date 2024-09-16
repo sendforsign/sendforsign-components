@@ -28,6 +28,7 @@ import { Placeholder, Recipient } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faCircleQuestion,
+	faClose,
 	faFont,
 	faGear,
 	faSignature,
@@ -44,17 +45,16 @@ export const PlaceholderPdfBlock = () => {
 		apiKey,
 		userKey,
 		token,
-		readonly,
 		contractType,
 		contractKey,
 		clientKey,
 		placeholder,
 		continueLoad,
 		setPlaceholder,
-		setPlaceholderPdf,
 		setPlaceholderChange,
 		setPlaceholderDelete,
 		refreshPlaceholders,
+		setPlaceholderVisible,
 		placeholderVisible,
 		refreshPlaceholderRecipients,
 		setNotification,
@@ -210,15 +210,13 @@ export const PlaceholderPdfBlock = () => {
 	}, [signs]);
 
 	const handleAddPlaceholder = async () => {
-		let placeholdersTmp = [...placeholder];
+		let placeholdersTmp: Placeholder[] = [...placeholder];
 		placeholdersTmp.push({
 			name: `Name${contractPlaceholderCount + 1}`,
 			value: '',
 			type: PlaceholderTypeText.INTERNAL,
 			fillingType: PlaceholderFill.NONE,
 		});
-
-		// setPlaceholder(placeholdersTmp);
 
 		let body = {
 			data: {
@@ -285,9 +283,20 @@ export const PlaceholderPdfBlock = () => {
 		>
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 				<Space direction='vertical' size={2}>
-					<Title level={4} style={{ margin: '0 0 0 0' }}>
-						Placeholders
-					</Title>
+					<Space>
+						<Title level={4} style={{ margin: '0 0 0 0' }}>
+							Placeholders
+						</Title>
+						<Tooltip title='Close sidebar.'>
+							<Button
+								size='small'
+								icon={<FontAwesomeIcon icon={faClose} />}
+								onClick={() => {
+									setPlaceholderVisible(!placeholderVisible);
+								}}
+							/>
+						</Tooltip>
+					</Space>
 					<Text type='secondary'>Add reusable text to the content.</Text>
 				</Space>
 				{placeholder &&

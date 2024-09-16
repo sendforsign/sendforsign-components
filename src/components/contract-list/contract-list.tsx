@@ -11,17 +11,16 @@ import {
 	Spin,
 	Dropdown,
 	MenuProps,
+	Empty
 } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { BASE_URL } from '../../config/config';
 import { Action, ApiEntity } from '../../config/enum';
 import Table from 'antd/es/table';
-import useSaveParams from '../../hooks/use-save-params';
 import { ContractListContext } from './contract-list-context';
 import { ModalView } from './modal-view/modal-view';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { DownOutlined } from '@ant-design/icons';
 import { faEllipsisVertical, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { EventStatus } from '../../config/types';
 import { Notification } from './notification/notification';
@@ -48,12 +47,8 @@ export const ContractList: FC<ContractListProps> = ({
 	isModal = true,
 	userKey,
 }) => {
-	if (!apiKey && !token && !window.location.href.includes('story')) {
-		throw new Error('Missing authority data');
-	}
-	const { setParam, clearParams } = useSaveParams();
-	const [currContractKey, setCurrContractKey] = useState('');
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
+	const [currContractKey, setCurrContractKey] = useState('');
 	const [currUserKey, setCurrUserKey] = useState(userKey);
 	const [currApiKey, setCurrApiKey] = useState(apiKey);
 	const [currToken, setCurrToken] = useState(token);
@@ -78,22 +73,17 @@ export const ContractList: FC<ContractListProps> = ({
 	];
 
 	const chooseContract = (text: string) => {
-		// debugger;
-		clearParams();
 		setCurrContractKey(text);
-		setParam('contractKey', text);
-		// console.log('contractKey 1', text);
 		if (isModal) {
 			setContractModal(true);
-			setParam('openModal', true);
 		}
 	};
 	const dropdownClick: MenuProps['onClick'] = async (e: any) => {
 		if (currentRecord.current && currentRecord.current.key) {
 			switch (e.key) {
 				case Action.ARCHIVE:
-					let url: string = BASE_URL + ApiEntity.CONTRACT;
-					let bodyContract = {
+					const urlContract: string = BASE_URL + ApiEntity.CONTRACT;
+					const bodyContract = {
 						data: {
 							action: Action.ARCHIVE,
 							clientKey: !token ? currClientKey : undefined,
@@ -104,7 +94,7 @@ export const ContractList: FC<ContractListProps> = ({
 						},
 					};
 					await axios
-						.post(url, bodyContract, {
+						.post(urlContract, bodyContract, {
 							headers: {
 								Accept: 'application/vnd.api+json',
 								'Content-Type': 'application/vnd.api+json',
@@ -138,8 +128,8 @@ export const ContractList: FC<ContractListProps> = ({
 						});
 					break;
 				case Action.CONVERT:
-					url = BASE_URL + ApiEntity.TEMPLATE;
-					let bodyTemplate = {
+					const urlTemplate: string = BASE_URL + ApiEntity.TEMPLATE;
+					const bodyTemplate = {
 						data: {
 							action: Action.CONVERT,
 							clientKey: !token ? currClientKey : undefined,
@@ -153,7 +143,7 @@ export const ContractList: FC<ContractListProps> = ({
 						},
 					};
 					await axios
-						.post(url, bodyTemplate, {
+						.post(urlTemplate, bodyTemplate, {
 							headers: {
 								Accept: 'application/vnd.api+json',
 								'Content-Type': 'application/vnd.api+json',
@@ -219,7 +209,7 @@ export const ContractList: FC<ContractListProps> = ({
 			},
 		},
 		{
-			title: '',
+			title: 'Action',
 			dataIndex: 'action',
 			render: (_: any, record: DataType) => {
 				return (
@@ -229,7 +219,10 @@ export const ContractList: FC<ContractListProps> = ({
 							currentRecord.current = record;
 						}}
 					>
-						<Button icon={<FontAwesomeIcon icon={faEllipsisVertical} />} type='text' />							
+						<Button
+							icon={<FontAwesomeIcon icon={faEllipsisVertical} />}
+							type='text'
+						/>
 					</Dropdown>
 				);
 			},
@@ -259,6 +252,7 @@ export const ContractList: FC<ContractListProps> = ({
 		};
 		const getContracts = async () => {
 			let eventStatusTmp: EventStatus[] = [];
+			console.log('axios', axios, BASE_URL, ApiEntity.EVENT_STATUS);
 			await axios
 				.get(BASE_URL + ApiEntity.EVENT_STATUS, {
 					headers: {
@@ -315,6 +309,12 @@ export const ContractList: FC<ContractListProps> = ({
 	}, [refreshContracts]);
 
 	// console.log('contractKey 2', currContractKey);
+	const toggleButton = (
+		<Button type="primary" onClick={() => {chooseContract('');}}>
+		  Add document
+		</Button>
+	  );
+
 	return (
 		<ContractListContext.Provider
 			value={{
@@ -347,6 +347,7 @@ export const ContractList: FC<ContractListProps> = ({
 							style={{ minWidth: 600 }}
 							columns={columns}
 							dataSource={data}
+							locale={{emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="You haven't created any documents yet">{toggleButton}</Empty>}}
 							title={() => (
 								<Row>
 									<Col>
