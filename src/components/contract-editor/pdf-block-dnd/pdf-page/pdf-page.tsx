@@ -244,12 +244,12 @@ export const PdfPage = ({
 						positionX: currentId.current.positionX,
 						positionY: currentId.current.positionY,
 						action: Action.UPDATE,
-					}); 
+					});
 					needUpdate.current = true;
 					let currPagePlaceholderTmp = [...currPagePl.current];
 					currPagePlaceholderTmp.push(currentId.current);
 					setCurrPagePlaceholder(currPagePlaceholderTmp);
-					currPagePl.current.push(currentId.current); 
+					currPagePl.current.push(currentId.current);
 					currentId.current = {};
 					finishDrop.current = false;
 					await save();
@@ -415,6 +415,7 @@ export const PdfPage = ({
 								positionY: -600,
 								width: 100,
 								height: 50,
+								color: currPlaceholder.color,
 							};
 							currentId.current = newPlaceholderPosition;
 							finishDrop.current = true;

@@ -29,6 +29,7 @@ import {
 	Action,
 	ApiEntity,
 	ContractAction,
+	PlaceholderColor,
 	ShareLinkViewText,
 } from '../../../config/enum';
 import axios from 'axios';
@@ -44,15 +45,15 @@ export const SendModal = () => {
 		contractKey,
 		clientKey,
 		userKey,
+		placeholder,
+		isPdf,
 		refreshEvent,
 		setRefreshPlaceholders,
 		refreshPlaceholders,
 		refreshRecipients,
-		refreshPlaceholderRecipients,
 		setRefreshEvent,
 		setResultModal,
 		setNotification,
-		setRefreshPlaceholderRecipients,
 	} = useContractEditorContext();
 	const [sendLoad, setSendLoad] = useState(false);
 	const [dataLoad, setDataLoad] = useState(false);
@@ -392,6 +393,9 @@ export const SendModal = () => {
 					})
 					.then((payload: any) => {
 						isSave.current = true;
+						if (!isPdf) {
+							removeClasses(deleteRecipient[index].recipientKey as string);
+						}
 					})
 					.catch((error) => {
 						setNotification({
@@ -556,11 +560,26 @@ export const SendModal = () => {
 			text: 'Sharing link copied.',
 		});
 	};
+	const removeClasses = (recipientKey: string) => {
+		const placeholderFilter = placeholder.filter(
+			(holder) => holder.externalRecipientKey === recipientKey
+		);
+		if (placeholderFilter) {
+			for (let i = 0; i < placeholderFilter.length; i++) {
+				const elements = document.getElementsByTagName(
+					`placeholder${placeholderFilter[i].id}`
+				);
+				for (let i = 0; i < elements.length; i++) {
+					let element: any = elements[i];
+					element.style.background = PlaceholderColor.OTHER;
+				}
+			}
+		}
+	};
 	const handleCancel = () => {
 		setSaveLoad(false);
 		setRecipients([]);
 		if (isSave.current) {
-			setRefreshPlaceholderRecipients(refreshPlaceholderRecipients + 1);
 			setRefreshPlaceholders(refreshPlaceholders + 1);
 			isSave.current = false;
 		}

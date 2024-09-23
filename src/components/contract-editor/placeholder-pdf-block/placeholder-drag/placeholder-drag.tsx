@@ -32,6 +32,7 @@ import {
 import { useDrag } from 'react-dnd';
 
 type Props = {
+	style?: any;
 	readonly?: boolean;
 	placeholder: Placeholder;
 	recipients?: Recipient[];
@@ -40,6 +41,7 @@ type Props = {
 };
 
 export const PlaceholderDrag = ({
+	style,
 	readonly,
 	placeholder,
 	recipients,
@@ -55,6 +57,8 @@ export const PlaceholderDrag = ({
 		clientKey,
 		setPlaceholderPdf,
 		setNotification,
+		refreshOnlyPlaceholders,
+		setRefreshOnlyPlaceholders,
 	} = useContractEditorContext();
 
 	const { Text } = Typography;
@@ -208,7 +212,7 @@ export const PlaceholderDrag = ({
 				placeholder: {
 					placeholderKey: currPlaceholder.current.placeholderKey,
 					fillingType: 1,
-					externalRecipientKey: undefined,
+					externalRecipientKey: '',
 				},
 			},
 		};
@@ -219,8 +223,8 @@ export const PlaceholderDrag = ({
 		) {
 			currPlaceholder.current.fillingType = e.target.value;
 			body.data.placeholder.fillingType = e.target.value;
-			currPlaceholder.current.externalRecipientKey = undefined;
-			body.data.placeholder.externalRecipientKey = undefined;
+			currPlaceholder.current.externalRecipientKey = '';
+			body.data.placeholder.externalRecipientKey = '';
 		} else {
 			currPlaceholder.current.fillingType = PlaceholderFill.SPECIFIC;
 			currPlaceholder.current.externalRecipientKey = e.target.value;
@@ -242,8 +246,7 @@ export const PlaceholderDrag = ({
 				responseType: 'json',
 			})
 			.then((payload: any) => {
-				//console.log('PLACEHOLDER read', payload);
-				// setRefreshPlaceholders(refreshPlaceholders + 1);
+				setRefreshOnlyPlaceholders(refreshOnlyPlaceholders + 1);
 			})
 			.catch((error) => {
 				setNotification({
@@ -269,13 +272,14 @@ export const PlaceholderDrag = ({
 				);
 				setPlaceholderPdf(currPlaceholder.current);
 			}}
+			style={style}
 			role={'PlaceholderBlock'}
 		>
 			<Space
 				className='ph-style'
 				direction='vertical'
 				size={2}
-				style={{ display: 'flex' }}
+				style={style ? style : { display: 'flex', marginBottom: '16px' }}
 			>
 				<Row wrap={false} align={'middle'}>
 					<Col>
@@ -284,7 +288,10 @@ export const PlaceholderDrag = ({
 								<Button
 									size='small'
 									type='text'
-									style={{ cursor: 'grab' }}
+									style={{
+										background: `${currPlaceholder.current.color}`,
+										cursor: 'grab',
+									}}
 									disabled={readonly}
 									icon={
 										<FontAwesomeIcon

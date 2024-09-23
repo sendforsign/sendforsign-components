@@ -95,3 +95,12 @@ export const enum EventStatuses {
 export const ItemTypes = {
 	PLACEHOLDER: 'placeholder',
 };
+export const enum PlaceholderColor {
+	OTHER = '#fafafa',
+	OWNER = '#eaeaea',
+	// FIRST = '#8ae2f4',
+	// SECOND = '#f59600',
+	// THIRD = '#e5befc',
+	// FOURTH = '#ffe175',
+	// FIFTH = '#51d474',
+}

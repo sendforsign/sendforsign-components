@@ -89,6 +89,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [currApiKey, setCurrApiKey] = useState(apiKey);
 	const [currToken, setCurrToken] = useState(token);
 	const [continueLoad, setContinueLoad] = useState(false);
+	const [fillPlaceholderLoad, setFillPlaceholderLoad] = useState(false);
 	const [createContract, setCreateContract] = useState(false);
 	const [readonly, setReadonly] = useState(false);
 	const [pdfDownload, setPdfDownload] = useState(false);
@@ -102,8 +103,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [refreshShareLink, setRefreshShareLink] = useState(0);
 	const [refreshRecipients, setRefreshRecipients] = useState(0);
 	const [refreshPlaceholders, setRefreshPlaceholders] = useState(0);
-	const [refreshPlaceholderRecipients, setRefreshPlaceholderRecipients] =
-		useState(0);
+	const [refreshOnlyPlaceholders, setRefreshOnlyPlaceholders] = useState(0);
+
 	const [signCount, setSignCount] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
 	const [placeholderPdf, setPlaceholderPdf] = useState<Placeholder>({});
@@ -525,8 +526,6 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setContractEvents,
 				fillPlaceholder,
 				setFillPlaceholder,
-				refreshPlaceholderRecipients,
-				setRefreshPlaceholderRecipients,
 				currentData,
 				setCurrentData,
 				documentCurrentSaved,
@@ -543,6 +542,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setPlaceholderChange,
 				placeholderDelete,
 				setPlaceholderDelete,
+				fillPlaceholderLoad,
+				setFillPlaceholderLoad,
+				refreshOnlyPlaceholders,
+				setRefreshOnlyPlaceholders,
 			}}
 		>
 			{spinLoad ? (
@@ -561,7 +564,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 									<DndProvider backend={HTML5Backend}>
 										<Col flex='auto'>
 											<Space direction='vertical' style={{ display: 'flex' }}>
-												<Card loading={continueLoad}>
+												<Card loading={continueLoad || fillPlaceholderLoad}>
 													<Space
 														direction='vertical'
 														size={16}

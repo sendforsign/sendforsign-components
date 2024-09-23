@@ -11,7 +11,7 @@ import {
 	Spin,
 	Dropdown,
 	MenuProps,
-	Empty
+	Empty,
 } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -59,6 +59,7 @@ export const ContractList: FC<ContractListProps> = ({
 	const [data, setData] = useState<DataType[]>([]);
 	const [eventStatus, setEventStatus] = useState<EventStatus[]>([]);
 	const [spinLoad, setSpinLoad] = useState(false);
+	const [contractsLoad, setContractsLoad] = useState(false);
 	const currentRecord = useRef<DataType>({});
 	const { Title } = Typography;
 	const items: MenuProps['items'] = [
@@ -251,6 +252,7 @@ export const ContractList: FC<ContractListProps> = ({
 			},
 		};
 		const getContracts = async () => {
+			setContractsLoad(true);
 			let eventStatusTmp: EventStatus[] = [];
 			console.log('axios', axios, BASE_URL, ApiEntity.EVENT_STATUS);
 			await axios
@@ -295,6 +297,7 @@ export const ContractList: FC<ContractListProps> = ({
 						}
 					);
 					setData(array);
+					setContractsLoad(false);
 				});
 		};
 		if (currApiKey || currToken) {
@@ -310,10 +313,15 @@ export const ContractList: FC<ContractListProps> = ({
 
 	// console.log('contractKey 2', currContractKey);
 	const toggleButton = (
-		<Button type="primary" onClick={() => {chooseContract('');}}>
-		  Add document
+		<Button
+			type='primary'
+			onClick={() => {
+				chooseContract('');
+			}}
+		>
+			Add document
 		</Button>
-	  );
+	);
 
 	return (
 		<ContractListContext.Provider
@@ -344,10 +352,20 @@ export const ContractList: FC<ContractListProps> = ({
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 					<Card style={{ overflow: 'auto' }}>
 						<Table
+							loading={contractsLoad}
 							style={{ minWidth: 600 }}
 							columns={columns}
 							dataSource={data}
-							locale={{emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="You haven't created any documents yet">{toggleButton}</Empty>}}
+							locale={{
+								emptyText: (
+									<Empty
+										image={Empty.PRESENTED_IMAGE_SIMPLE}
+										description="You haven't created any documents yet"
+									>
+										{toggleButton}
+									</Empty>
+								),
+							}}
 							title={() => (
 								<Row>
 									<Col>

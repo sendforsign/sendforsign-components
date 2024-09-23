@@ -1,21 +1,20 @@
-.resizeComponent {
+/* .resizeComponent {
 	position: absolute !important;
 	z-index: 999;
 	border: 1px solid #d0e0c7;
-	background-color: #eeeeee;
-	color: #49aa19;
+	color: #000000;
 	padding-left: 2px;
 	border-radius: 4px;
 	display: flex;
 	user-select: auto;
 	box-sizing: border-box;
 	cursor: move;
-}
-.draggableComponent {
+} */
+/* .draggableComponent {
 	position: absolute;
 	z-index: 999;
 	border: solid 1px #333;
-}
+} */
 
 .react-pdf__Page__canvas {
 	border-radius: 8px;

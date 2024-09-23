@@ -316,6 +316,7 @@ export const PdfBlockDnd = () => {
 						for (let j = 0; j < placeholderFilter.length; j++) {
 							placeholderFilter[j].value = placeholder[i].value as string;
 							placeholderFilter[j].name = placeholder[i].name as string;
+							placeholderFilter[j].color = placeholder[i].color;
 						}
 					}
 				}
@@ -341,6 +342,7 @@ export const PdfBlockDnd = () => {
 							}
 						}
 						pagePlaceholder[i].base64 = base64;
+						pagePlaceholder[i].color = placeholder[findIndex].color;
 						pagePlaceholderTmp.push(pagePlaceholder[i]);
 					}
 				}
@@ -381,6 +383,7 @@ export const PdfBlockDnd = () => {
 									height: insertion[j].height as number,
 									view: placeholder[i].view as PlaceholderView,
 									base64: base64,
+									color: placeholder[i].color,
 								});
 							}
 						}

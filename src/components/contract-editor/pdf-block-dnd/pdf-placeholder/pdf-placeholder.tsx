@@ -20,7 +20,8 @@ type Props = {
 function getStyles(
 	left: number,
 	top: number,
-	isDragging: boolean
+	isDragging: boolean,
+	color: string
 ): CSSProperties {
 	const transform = `translate3d(${left}px, ${top}px, 0)`;
 	return {
@@ -30,6 +31,7 @@ function getStyles(
 		opacity: isDragging ? 0 : 1,
 		height: isDragging ? 0 : '',
 		display: 'inline-block',
+		background: color,
 	};
 }
 export const PdfPlaceholder = ({
@@ -89,7 +91,8 @@ export const PdfPlaceholder = ({
 			style={getStyles(
 				pagePlaceholder.positionX as number,
 				pagePlaceholder.positionY as number,
-				isDragging
+				isDragging,
+				currPagePlaceholder.current.color as string
 			)}
 			onDrag={() => {
 				setPagePlaceholderDrag(currPagePlaceholder.current);
@@ -101,6 +104,7 @@ export const PdfPlaceholder = ({
 					width: pagePlaceholder.width || 100,
 					height: pagePlaceholder.height || 30,
 				}}
+				style={{ background: currPagePlaceholder.current.color }}
 				minHeight={30}
 				minWidth={100}
 				maxWidth={400}

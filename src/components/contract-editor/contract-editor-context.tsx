@@ -54,6 +54,8 @@ export type TContractEditorContextType = {
 	setRefreshRecipients: (refreshRecipients: number) => void;
 	refreshPlaceholders: number;
 	setRefreshPlaceholders: (refreshPlaceholders: number) => void;
+	refreshOnlyPlaceholders: number;
+	setRefreshOnlyPlaceholders: (refreshPlaceholders: number) => void;
 	placeholder: Placeholder[];
 	setPlaceholder: (placeholder: Placeholder[]) => void;
 	pagePlaceholder: PagePlaceholder[];
@@ -68,6 +70,8 @@ export type TContractEditorContextType = {
 	setContinueDisable: (continueDisable: boolean) => void;
 	continueLoad: boolean;
 	setContinueLoad: (continueDisable: boolean) => void;
+	fillPlaceholderLoad: boolean;
+	setFillPlaceholderLoad: (fillPlaceholderLoad: boolean) => void;
 	editorVisible: boolean;
 	setEditorVisible: (editorVisible: boolean) => void;
 	readonly: boolean;
@@ -86,10 +90,6 @@ export type TContractEditorContextType = {
 	setContractEvents: (contractEvents: Array<any>) => void;
 	fillPlaceholder: boolean;
 	setFillPlaceholder: (fillPlaceholder: boolean) => void;
-	refreshPlaceholderRecipients: number;
-	setRefreshPlaceholderRecipients: (
-		refreshPlaceholderRecipients: number
-	) => void;
 	currentData: StepChangeProps;
 	setCurrentData: (currentData: StepChangeProps) => void;
 	documentCurrentSaved: boolean;

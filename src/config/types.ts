@@ -167,6 +167,7 @@ export type Recipient = {
 	recipientKey?: string;
 	isDone?: boolean;
 	shareLink?: string;
+	color?: string;
 };
 export type Placeholder = {
 	templateKey?: string;
@@ -181,6 +182,7 @@ export type Placeholder = {
 	externalRecipientKey?: string;
 	view?: PlaceholderView;
 	insertion?: Insertion[];
+	color?: string;
 };
 export type Insertion = {
 	pageId?: number;
@@ -190,6 +192,7 @@ export type Insertion = {
 	positionX?: number;
 	positionY?: number;
 	action?: Action;
+	color?: string;
 };
 export type PagePlaceholder = {
 	pageId?: number;
@@ -203,6 +206,7 @@ export type PagePlaceholder = {
 	height?: number;
 	view?: PlaceholderView;
 	base64?: string;
+	color?: string;
 };
 export type Row = {
 	json?: any;

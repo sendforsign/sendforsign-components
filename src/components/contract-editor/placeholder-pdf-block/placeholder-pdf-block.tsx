@@ -11,6 +11,7 @@ import {
 	Col,
 	Popover,
 	Divider,
+	Select,
 } from 'antd';
 import { useContractEditorContext } from '../contract-editor-context';
 import { BASE_URL } from '../../../config/config';
@@ -19,6 +20,7 @@ import {
 	ApiEntity,
 	ContractType,
 	ContractTypeText,
+	PlaceholderColor,
 	PlaceholderFill,
 	PlaceholderTypeText,
 	PlaceholderView,
@@ -27,6 +29,7 @@ import axios from 'axios';
 import { Placeholder, Recipient } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+	faCircle,
 	faCircleQuestion,
 	faClose,
 	faFont,
@@ -40,6 +43,7 @@ type Props = {
 	// quillRef: React.MutableRefObject<QuillNamespace | undefined>;
 };
 
+type Option = { value: string; label: React.JSX.Element };
 export const PlaceholderPdfBlock = () => {
 	const {
 		apiKey,
@@ -54,9 +58,9 @@ export const PlaceholderPdfBlock = () => {
 		setPlaceholderChange,
 		setPlaceholderDelete,
 		refreshPlaceholders,
+		refreshOnlyPlaceholders,
 		setPlaceholderVisible,
 		placeholderVisible,
-		refreshPlaceholderRecipients,
 		setNotification,
 		contractPlaceholderCount,
 		setContractPlaceholderCount,
@@ -64,10 +68,17 @@ export const PlaceholderPdfBlock = () => {
 	} = useContractEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
-	const [placeholderRecipients, setPlaceholderRecipients] = useState<
-		Recipient[]
+	// const [placeholderRecipients, setPlaceholderRecipients] = useState<
+	// 	Recipient[]
+	// >([]);
+	const [selectPlaceholder, setSelectPlaceholder] = useState<Option[]>([]);
+	const [selectedPlaceholders, setSelectedPlaceholders] = useState<
+		Placeholder[]
 	>([]);
+	const [selectedOtion, setSelectedOtion] = useState('0');
+	const random = useRef(0);
 	const readonlyCurrent = useRef(false);
+	const placeholderRecipients = useRef<Recipient[]>([]);
 
 	const { Title, Text } = Typography;
 	const getPlaceholders = async (load = true) => {
@@ -89,6 +100,7 @@ export const PlaceholderPdfBlock = () => {
 					'Content-Type': 'application/vnd.api+json',
 					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
 					Authorization: token ? `Bearer ${token}` : undefined,
+					'x-sendforsign-component': true,
 				},
 				responseType: 'json',
 			})
@@ -102,10 +114,16 @@ export const PlaceholderPdfBlock = () => {
 						index < payload.data.placeholders.length;
 						index++
 					) {
-						placeholderTmp.push(payload.data.placeholders[index]);
+						placeholderTmp.push({
+							...payload.data.placeholders[index],
+							color: payload.data.placeholders[index].color
+								? payload.data.placeholders[index].color
+								: PlaceholderColor.OTHER,
+						});
 					}
 					setPlaceholder(placeholderTmp);
 					setContractPlaceholderCount(placeholderTmp.length);
+					handleChangeSelect(selectedOtion, placeholderTmp);
 				} else {
 					setContractPlaceholderCount(0);
 				}
@@ -139,14 +157,55 @@ export const PlaceholderPdfBlock = () => {
 					'Content-Type': 'application/vnd.api+json',
 					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
 					Authorization: token ? `Bearer ${token}` : undefined,
+					'x-sendforsign-component': true,
 				},
 				responseType: 'json',
 			})
 			.then((payload: any) => {
-				//console.log('getShareLinks read', payload);
+				let selectOptions: Option[] = [
+					{
+						value: '0',
+						label: (
+							<span>
+								<FontAwesomeIcon
+									icon={faCircle}
+									color={PlaceholderColor.OTHER}
+									size='sm'
+								/>{' '}
+								All placeholders
+							</span>
+						),
+					},
+					{
+						value: '1',
+						label: (
+							<span>
+								<FontAwesomeIcon
+									icon={faCircle}
+									color={PlaceholderColor.OWNER}
+									size='sm'
+								/>{' '}
+								Contract owner
+							</span>
+						),
+					},
+				];
 				if (payload.data.recipients && payload.data.recipients.length > 0) {
-					setPlaceholderRecipients(
-						payload.data.recipients.map((recipient: Recipient) => {
+					placeholderRecipients.current = payload.data.recipients.map(
+						(recipient: Recipient) => {
+							selectOptions.push({
+								value: recipient.recipientKey as string,
+								label: (
+									<span>
+										<FontAwesomeIcon
+											icon={faCircle}
+											color={recipient.color}
+											size='sm'
+										/>{' '}
+										{recipient.fullname}
+									</span>
+								),
+							});
 							return {
 								id: recipient.id,
 								fullname: recipient.fullname,
@@ -155,10 +214,12 @@ export const PlaceholderPdfBlock = () => {
 								position: recipient.position,
 								action: recipient.action,
 								recipientKey: recipient.recipientKey,
+								color: recipient.color,
 							};
-						})
+						}
 					);
 				}
+				setSelectPlaceholder(selectOptions);
 			})
 			.catch((error) => {
 				setNotification({
@@ -169,19 +230,6 @@ export const PlaceholderPdfBlock = () => {
 				});
 			});
 	};
-	useEffect(() => {
-		let isMounted = true;
-		if (
-			contractType.toString() === ContractType.PDF.toString() &&
-			contractKey &&
-			(clientKey || token)
-		) {
-			getRecipients();
-		}
-		return () => {
-			isMounted = false;
-		};
-	}, [refreshPlaceholderRecipients]);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -204,6 +252,11 @@ export const PlaceholderPdfBlock = () => {
 		};
 	}, [refreshPlaceholders, placeholderVisible]);
 	useEffect(() => {
+		if (refreshOnlyPlaceholders) {
+			getPlaceholders(false);
+		}
+	}, [refreshOnlyPlaceholders]);
+	useEffect(() => {
 		if (signs && signs.length > 0) {
 			readonlyCurrent.current = true;
 		}
@@ -215,7 +268,14 @@ export const PlaceholderPdfBlock = () => {
 			name: `Name${contractPlaceholderCount + 1}`,
 			value: '',
 			type: PlaceholderTypeText.INTERNAL,
-			fillingType: PlaceholderFill.NONE,
+			fillingType:
+				selectedOtion === '1'
+					? PlaceholderFill.CREATOR
+					: selectedOtion !== '0'
+					? PlaceholderFill.SPECIFIC
+					: PlaceholderFill.NONE,
+			externalRecipientKey:
+				selectedOtion !== '0' && selectedOtion !== '1' ? selectedOtion : '',
 		});
 
 		let body = {
@@ -227,6 +287,14 @@ export const PlaceholderPdfBlock = () => {
 					name: `Name${placeholdersTmp.length}`,
 					value: '',
 					type: PlaceholderTypeText.INTERNAL,
+					fillingType:
+						selectedOtion === '1'
+							? PlaceholderFill.CREATOR
+							: selectedOtion !== '0'
+							? PlaceholderFill.SPECIFIC
+							: PlaceholderFill.NONE,
+					externalRecipientKey:
+						selectedOtion !== '0' && selectedOtion !== '1' ? selectedOtion : '',
 				},
 			},
 		};
@@ -263,17 +331,52 @@ export const PlaceholderPdfBlock = () => {
 				});
 			});
 	};
-	const handleChange = (placeholderChange: Placeholder, index: number) => {
+	const handleChange = (placeholderChange: Placeholder, id: number) => {
 		let placeholderTmp = [...placeholder];
-		placeholderTmp[index] = placeholderChange;
+		const holderIndex = placeholder.findIndex(
+			(pl) => pl.id?.toString() === id.toString()
+		);
+		placeholderTmp[holderIndex] = placeholderChange;
 		setPlaceholderChange(placeholderChange);
 		setPlaceholder(placeholderTmp);
 	};
-	const handleDelete = (placeholderDelete: Placeholder, index: number) => {
+	const handleDelete = (placeholderDelete: Placeholder, id: number) => {
 		let placeholderTmp = [...placeholder];
-		placeholderTmp.splice(index, 1);
+		const holderIndex = placeholder.findIndex(
+			(pl) => pl.id?.toString() === id.toString()
+		);
+		placeholderTmp.splice(holderIndex, 1);
 		setPlaceholderDelete(placeholderDelete.placeholderKey as string);
 		setPlaceholder(placeholderTmp);
+	};
+
+	const handleChangeSelect = (e: any, placeholderUpdate?: Placeholder[]) => {
+		setPlaceholderLoad(true);
+		const placeholderTmp = placeholderUpdate || placeholder;
+		switch (e) {
+			case '0':
+				setSelectedPlaceholders(placeholderTmp);
+				random.current = Math.random();
+				break;
+			case '1':
+				const placeholdersOwner = placeholderTmp.filter(
+					(holder) =>
+						holder.fillingType?.toString() ===
+						PlaceholderFill.CREATOR.toString()
+				);
+				setSelectedPlaceholders(placeholdersOwner);
+				random.current = Math.random();
+				break;
+			default:
+				const placeholdersFilter = placeholderTmp.filter(
+					(holder) => holder.externalRecipientKey === e
+				);
+				setSelectedPlaceholders(placeholdersFilter);
+				random.current = Math.random();
+				break;
+		}
+		setPlaceholderLoad(false);
+		setSelectedOtion(e);
 	};
 	// console.log('readonly', readonly, readonlyCurrent.current);
 	return (
@@ -299,23 +402,36 @@ export const PlaceholderPdfBlock = () => {
 					</Space>
 					<Text type='secondary'>Add reusable text to the content.</Text>
 				</Space>
-				{placeholder &&
-					placeholder.map((holder, index) => {
-						return (
-							<PlaceholderDrag
-								placeholder={holder}
-								recipients={placeholderRecipients}
-								readonly={readonlyCurrent.current}
-								onChange={(e: any) => {
-									handleChange(e.placeholder, index);
-								}}
-								onDelete={(e: any) => {
-									handleDelete(e.placeholder, index);
-								}}
-							/>
-						);
-					})}
-
+				<Select
+					// defaultValue='All placeholders'
+					value={selectedOtion}
+					style={{ width: '100%' }}
+					onChange={(e) => handleChangeSelect(e)}
+					options={selectPlaceholder}
+				/>
+				<div>
+					{placeholder &&
+						placeholder.map((holder) => {
+							const find = selectedPlaceholders.find(
+								(selectedPlaceholder) =>
+									selectedPlaceholder.placeholderKey === holder.placeholderKey
+							);
+							return (
+								<PlaceholderDrag
+									placeholder={holder}
+									recipients={placeholderRecipients.current}
+									readonly={readonlyCurrent.current}
+									style={!find ? { display: 'none' } : undefined}
+									onChange={(e: any) => {
+										handleChange(e.placeholder, holder.id as number);
+									}}
+									onDelete={(e: any) => {
+										handleDelete(e.placeholder, holder.id as number);
+									}}
+								/>
+							);
+						})}
+				</div>
 				<Space direction='vertical' size={2} style={{ display: 'flex' }}>
 					<Button
 						disabled={readonlyCurrent.current}

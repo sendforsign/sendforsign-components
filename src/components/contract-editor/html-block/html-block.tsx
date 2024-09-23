@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './html-block.css';
 import QuillNamespace from 'quill';
 import QuillBetterTable from 'quill-better-table';
@@ -8,8 +8,14 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { useContractEditorContext } from '../contract-editor-context';
 import { BASE_URL } from '../../../config/config';
-import { Action, ApiEntity } from '../../../config/enum';
+import {
+	Action,
+	ApiEntity,
+	PlaceholderColor,
+	PlaceholderView,
+} from '../../../config/enum';
 import { addBlotClass } from '../../../utils';
+import { Placeholder, Recipient } from '../../../config/types';
 
 //env.config();
 type Props = {
@@ -44,11 +50,14 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		setReadonly,
 		setSignCount,
 		refreshPlaceholders,
+		placeholder,
 		setLoad,
 		setRefreshPlaceholders,
 		setDocumentCurrentSaved,
 	} = useContractEditorContext();
 	const container = document.querySelector('#contract-editor-container');
+	const placeholderRecipients = useRef<Recipient[]>([]);
+	const placeholderClassFill = useRef(false);
 
 	useEffect(() => {
 		if (document.querySelector('#contract-editor-container')) {
@@ -132,11 +141,17 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		}
 	}, [container]);
 	useEffect(() => {
-		if (value && quillRef?.current) {
+		const setValue = async () => {
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(value);
 			// debugger;
 			setLoad(false);
 			setRefreshPlaceholders(refreshPlaceholders + 1);
+			if (!placeholderClassFill.current) {
+				await getPlaceholders();
+			}
+		};
+		if (value && quillRef?.current) {
+			setValue();
 		}
 	}, [value]);
 	useEffect(() => {
@@ -204,6 +219,87 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		};
 	}, [refreshSign]);
 
+	const getPlaceholders = async () => {
+		if (placeholder && placeholder.length > 0) {
+			for (let index = 0; index < placeholder.length; index++) {
+				if (
+					placeholder[index].view?.toString() !==
+					PlaceholderView.SIGNATURE.toString()
+				) {
+					const elements = document.getElementsByTagName(
+						`placeholder${placeholder[index].id}`
+					);
+					for (let i = 0; i < elements.length; i++) {
+						let element: any = elements[i];
+						element.style.background = placeholder[index].color
+							? placeholder[index].color
+							: PlaceholderColor.OTHER;
+					}
+				}
+			}
+			placeholderClassFill.current = true;
+		} else {
+			const body = {
+				data: {
+					action: Action.LIST,
+					clientKey: !token ? clientKey : undefined,
+					contractKey: contractKey,
+				},
+			};
+			await axios
+				.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
+					headers: {
+						Accept: 'application/vnd.api+json',
+						'Content-Type': 'application/vnd.api+json',
+						'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: token ? `Bearer ${token}` : undefined,
+						'x-sendforsign-component': true,
+					},
+					responseType: 'json',
+				})
+				.then((payload: any) => {
+					//console.log('getPlaceholders read', payload);
+
+					if (
+						payload.data.placeholders &&
+						payload.data.placeholders.length > 0
+					) {
+						for (
+							let index = 0;
+							index < payload.data.placeholders.length;
+							index++
+						) {
+							if (
+								payload.data.placeholders[index].view.toString() !==
+								PlaceholderView.SIGNATURE.toString()
+							) {
+								const elements = document.getElementsByTagName(
+									`placeholder${payload.data.placeholders[index].id}`
+								);
+								for (let i = 0; i < elements.length; i++) {
+									let element: any = elements[i];
+									element.style.background = payload.data.placeholders[index]
+										.color
+										? payload.data.placeholders[index].color
+										: PlaceholderColor.OTHER;
+								}
+							}
+						}
+						placeholderClassFill.current = true;
+					}
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
+				});
+		}
+	};
 	const addTable = () => {
 		quillRef?.current?.getModule('better-table').insertTable(3, 3);
 	};
