@@ -25,7 +25,7 @@ export const ModalView = () => {
 
 	useEffect(() => {
 		if (templateModal) {
-			if (templateKey !== currentKey) {
+			if (templateKey !== currentKey || templateKey === '') {
 				setCurrentKey(templateKey);
 				setLoad(true);
 				setTimeout(() => {

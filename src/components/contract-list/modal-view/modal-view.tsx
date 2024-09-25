@@ -27,7 +27,7 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 
 	useEffect(() => {
 		if (contractModal) {
-			if (contractKey !== currentKey) {
+			if (contractKey !== currentKey || contractKey === '') {
 				setCurrentKey(contractKey);
 				setLoad(true);
 				setTimeout(() => {
@@ -69,7 +69,8 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 									Select a document to be signed
 								</Title>
 								<Text type='secondary'>
-									Draft a document from scratch, use a template, or upload a file.
+									Draft a document from scratch, use a template, or upload a
+									file.
 								</Text>
 							</Space>
 						</Space>
