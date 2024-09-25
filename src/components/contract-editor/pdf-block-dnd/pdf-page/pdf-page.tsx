@@ -59,6 +59,8 @@ export const PdfPage = ({
 		setNotification,
 		placeholderPdf,
 		setPlaceholderPdf,
+		refreshPagePlaceholders,
+		setRefreshPagePlaceholders,
 	} = useContractEditorContext();
 	const currPagePl = useRef<PagePlaceholder[]>([]);
 	const [currPagePlaceholder, setCurrPagePlaceholder] = useState<
@@ -281,6 +283,10 @@ export const PdfPage = ({
 				if (pagePlaceholderIndex >= 0) {
 					pagePlaceholderTmp[pagePlaceholderIndex].value =
 						placeholderChange.value;
+					pagePlaceholderTmp[pagePlaceholderIndex].name =
+						placeholderChange.name;
+					pagePlaceholderTmp[pagePlaceholderIndex].color =
+						placeholderChange.color;
 				}
 			}
 			setCurrPagePlaceholder(pagePlaceholderTmp);
@@ -484,11 +490,6 @@ export const PdfPage = ({
 													e.pagePlaceholder;
 												currPagePl.current = pagePlaceholderTmp;
 												setCurrPagePlaceholder(pagePlaceholderTmp);
-												// console.log(
-												// 	'setCurrPagePlaceholder3',
-												// 	pagePlaceholderTmp,
-												// 	currPagePl.current
-												// );
 
 												const insertionIndex = insertion.current.findIndex(
 													(insert) =>
@@ -548,11 +549,7 @@ export const PdfPage = ({
 												}
 												currPagePl.current = currPagePlaceholderTmp;
 												setCurrPagePlaceholder(currPagePlaceholderTmp);
-												// console.log(
-												// 	'setCurrPagePlaceholder4',
-												// 	currPagePlaceholderTmp,
-												// 	currPagePl.current
-												// );
+
 												insertion.current.push({
 													placeholderKey: e.pagePlaceholder.placeholderKey,
 													pageId: e.pagePlaceholder.pageId,

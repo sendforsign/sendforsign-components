@@ -17,6 +17,7 @@ import { BASE_URL } from '../../../../config/config';
 import {
 	Action,
 	ApiEntity,
+	PlaceholderColor,
 	PlaceholderFill,
 	PlaceholderView,
 } from '../../../../config/enum';
@@ -225,11 +226,22 @@ export const PlaceholderDrag = ({
 			body.data.placeholder.fillingType = e.target.value;
 			currPlaceholder.current.externalRecipientKey = '';
 			body.data.placeholder.externalRecipientKey = '';
+			if (e.target.value.toString() === PlaceholderFill.CREATOR.toString()) {
+				currPlaceholder.current.color = PlaceholderColor.OWNER;
+			} else {
+				currPlaceholder.current.color = PlaceholderColor.OTHER;
+			}
 		} else {
 			currPlaceholder.current.fillingType = PlaceholderFill.SPECIFIC;
 			currPlaceholder.current.externalRecipientKey = e.target.value;
 			body.data.placeholder.fillingType = PlaceholderFill.SPECIFIC;
 			body.data.placeholder.externalRecipientKey = e.target.value;
+			const recipientFind = recipients?.find(
+				(recipient) => recipient.recipientKey === e.target.value
+			);
+			if (recipientFind) {
+				currPlaceholder.current.color = recipientFind.color;
+			}
 		}
 		if (onChange) {
 			onChange({ placeholder: currPlaceholder.current });

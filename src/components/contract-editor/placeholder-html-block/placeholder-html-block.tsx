@@ -115,7 +115,12 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 							const elements = document.getElementsByTagName(
 								`placeholder${payload.data.placeholders[index].id}`
 							);
-							placeholderTmp.push(payload.data.placeholders[index]);
+							placeholderTmp.push({
+								...payload.data.placeholders[index],
+								color: payload.data.placeholders[index].color
+									? payload.data.placeholders[index].color
+									: PlaceholderColor.OTHER,
+							});
 							for (let i = 0; i < elements.length; i++) {
 								let element: any = elements[i];
 								element.style.background = payload.data.placeholders[index]
@@ -317,13 +322,34 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			for (let i = 0; i < array.length; i++) {
 				if (array.length > 1) {
 					if (i === 0) {
-						resultText += array[i];
+						let findSpan = array[i];
+						let posStart = findSpan.length - 60;
+						if (posStart <= 0) {
+							resultText += findSpan;
+						} else {
+							let posSpan = findSpan.lastIndexOf('<span style=');
+							if (posSpan < posStart) {
+								resultText += findSpan;
+							} else {
+								resultText += findSpan.substring(0, posSpan);
+							}
+						}
 					} else {
 						tag = `</placeholder${id}>`;
 						const lineArr = array[i].split(tag);
 						for (let j = 0; j < lineArr.length; j++) {
 							if (j > 0) {
-								resultText += lineArr[j];
+								let findSpan = lineArr[j];
+								if (j === 1) {
+									let posSpan = findSpan.indexOf('</span>');
+									if (posSpan !== 0) {
+										resultText += findSpan;
+									} else {
+										resultText += findSpan.substring(7, findSpan.length);
+									}
+								} else {
+									resultText += findSpan;
+								}
 							}
 						}
 					}

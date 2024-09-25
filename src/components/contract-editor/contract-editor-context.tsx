@@ -55,7 +55,9 @@ export type TContractEditorContextType = {
 	refreshPlaceholders: number;
 	setRefreshPlaceholders: (refreshPlaceholders: number) => void;
 	refreshOnlyPlaceholders: number;
-	setRefreshOnlyPlaceholders: (refreshPlaceholders: number) => void;
+	setRefreshOnlyPlaceholders: (refreshOnlyPlaceholders: number) => void;
+	refreshPagePlaceholders: number;
+	setRefreshPagePlaceholders: (refreshPagePlaceholders: number) => void;
 	placeholder: Placeholder[];
 	setPlaceholder: (placeholder: Placeholder[]) => void;
 	pagePlaceholder: PagePlaceholder[];
