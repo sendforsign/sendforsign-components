@@ -9,7 +9,7 @@ import {
 	Spin,
 	MenuProps,
 	Dropdown,
-	Empty
+	Empty,
 } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -52,6 +52,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 	const [templateModal, setTemplateModal] = useState(false);
 	const [refreshTemplate, setRefreshTemplate] = useState(0);
 	const [spinLoad, setSpinLoad] = useState(false);
+	const [templatesLoad, setTemplatesLoad] = useState(false);
 	const [data, setData] = useState<DataType[]>([]);
 	const currentRecord = useRef<DataType>({});
 	const { Title } = Typography;
@@ -186,6 +187,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 			},
 		};
 		const getTemplate = async () => {
+			setTemplatesLoad(true);
 			await axios
 				.post(BASE_URL + ApiEntity.TEMPLATE, body, {
 					headers: {
@@ -217,6 +219,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 						}
 					);
 					setData(array);
+					setTemplatesLoad(false);
 				});
 		};
 		if (currApiKey || currToken) {
@@ -231,10 +234,15 @@ export const TemplateList: FC<TemplateListProps> = ({
 	}, [refreshTemplate]);
 
 	const toggleButton = (
-		<Button type="primary" onClick={() => {chooseTemplate('');}}>
-		  Add template
+		<Button
+			type='primary'
+			onClick={() => {
+				chooseTemplate('');
+			}}
+		>
+			Add template
 		</Button>
-	  );
+	);
 
 	return (
 		<TemplateListContext.Provider
@@ -263,10 +271,20 @@ export const TemplateList: FC<TemplateListProps> = ({
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 					<Card style={{ overflow: 'auto' }}>
 						<Table
+							loading={templatesLoad}
 							style={{ minWidth: 600 }}
 							columns={columns}
 							dataSource={data}
-							locale={{emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="You haven't created any templates yet">{toggleButton}</Empty>}}
+							locale={{
+								emptyText: (
+									<Empty
+										image={Empty.PRESENTED_IMAGE_SIMPLE}
+										description="You haven't created any templates yet"
+									>
+										{toggleButton}
+									</Empty>
+								),
+							}}
 							title={() => (
 								<Row>
 									<Col>
