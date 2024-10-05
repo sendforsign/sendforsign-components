@@ -20,6 +20,7 @@ import {
 	PlaceholderColor,
 	PlaceholderFill,
 	PlaceholderView,
+	SpecialType,
 } from '../../../../config/enum';
 import axios from 'axios';
 import { Placeholder, Recipient } from '../../../../config/types';
@@ -113,6 +114,9 @@ export const PlaceholderDrag = ({
 			});
 	};
 	const handleChange = (e: any) => {
+		if (currPlaceholder.current.isSpecial) {
+			return;
+		}
 		switch (e.target.id) {
 			case 'PlaceholderName':
 				currPlaceholder.current.name = e.target.value;
@@ -129,6 +133,9 @@ export const PlaceholderDrag = ({
 		}
 	};
 	const handleBlur = async (e: any) => {
+		if (currPlaceholder.current.isSpecial) {
+			return;
+		}
 		switch (e.target.id) {
 			case 'PlaceholderName':
 				let body = {
@@ -170,6 +177,9 @@ export const PlaceholderDrag = ({
 		}
 	};
 	const changeValue = async () => {
+		if (currPlaceholder.current.isSpecial) {
+			return;
+		}
 		let body = {
 			data: {
 				action: Action.UPDATE,
@@ -309,7 +319,9 @@ export const PlaceholderDrag = ({
 										<FontAwesomeIcon
 											icon={
 												currPlaceholder.current.view?.toString() !==
-												PlaceholderView.SIGNATURE.toString()
+													PlaceholderView.SIGNATURE.toString() &&
+												currPlaceholder.current.specialType?.toString() !==
+													SpecialType.SIGN.toString()
 													? faFont
 													: faSignature
 											}
@@ -328,7 +340,9 @@ export const PlaceholderDrag = ({
 							id='PlaceholderName'
 							readOnly={
 								currPlaceholder.current.view?.toString() !==
-									PlaceholderView.SIGNATURE.toString() && !readonly
+									PlaceholderView.SIGNATURE.toString() &&
+								!currPlaceholder.current.isSpecial &&
+								!readonly
 									? false
 									: true
 							}
@@ -435,17 +449,18 @@ export const PlaceholderDrag = ({
 					)}
 				</Row>
 				{currPlaceholder.current.view?.toString() !==
-					PlaceholderView.SIGNATURE.toString() && (
-					<Input
-						id='PlaceholderValue'
-						placeholder='Enter value'
-						readOnly={readonly}
-						value={currPlaceholder.current.value}
-						onChange={(e: any) => handleChange(e)}
-						onBlur={(e: any) => handleBlur(e)}
-						onPressEnter={() => handleEnter()}
-					/>
-				)}
+					PlaceholderView.SIGNATURE.toString() &&
+					!currPlaceholder.current.isSpecial && (
+						<Input
+							id='PlaceholderValue'
+							placeholder='Enter value'
+							readOnly={readonly}
+							value={currPlaceholder.current.value}
+							onChange={(e: any) => handleChange(e)}
+							onBlur={(e: any) => handleBlur(e)}
+							onPressEnter={() => handleEnter()}
+						/>
+					)}
 			</Space>
 		</div>
 	);

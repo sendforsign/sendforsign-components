@@ -3,6 +3,8 @@ import {
 	PlaceholderView,
 	ShareLinkView,
 	ShareLinkViewText,
+	SignType,
+	SpecialType,
 } from './enum';
 
 export type Contract = {
@@ -94,6 +96,7 @@ export type ContractSign = {
 	owner?: boolean;
 	base64?: string;
 	userId?: string;
+	signTypeId?: SignType;
 };
 export type ContractSignAi = {
 	fullName?: string;
@@ -183,6 +186,8 @@ export type Placeholder = {
 	view?: PlaceholderView;
 	insertion?: Insertion[];
 	color?: string;
+	isSpecial?: boolean;
+	specialType?: SpecialType;
 };
 export type Insertion = {
 	pageId?: number;

@@ -104,3 +104,14 @@ export const enum PlaceholderColor {
 	// FOURTH = '#ffe175',
 	// FIFTH = '#51d474',
 }
+export const enum SignType {
+	SIGN = 1,
+	INITIALS = 2,
+}
+export const enum SpecialType {
+	DATE = 1,
+	FULLNAME = 2,
+	EMAIL = 3,
+	SIGN = 4,
+	INITIALS = 5,
+}

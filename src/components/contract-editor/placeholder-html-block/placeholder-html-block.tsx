@@ -25,6 +25,7 @@ import {
 	PlaceholderFill,
 	PlaceholderTypeText,
 	PlaceholderView,
+	SpecialType,
 } from '../../../config/enum';
 import axios from 'axios';
 import { Placeholder, Recipient } from '../../../config/types';
@@ -33,9 +34,12 @@ import {
 	faCircle,
 	faCircleQuestion,
 	faClose,
+	faFont,
 	faGear,
 	faLeftLong,
+	faSignature,
 } from '@fortawesome/free-solid-svg-icons';
+import { parseDate } from 'pdf-lib';
 
 type Props = {
 	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
@@ -269,45 +273,96 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 
 	const updatePlaceholderClass = ({
 		id,
+		specialType,
 		recipientKey,
 		owner,
 		deleteClass,
 	}: {
 		id: number;
+		specialType?: number;
 		recipientKey?: string;
 		owner?: boolean;
 		deleteClass?: boolean;
 	}) => {
-		const placeholderFind = placeholder.find(
-			(pl) => pl.id?.toString() === id.toString()
-		);
-		if (placeholderFind) {
-			const elements = document.getElementsByTagName(
-				`placeholder${placeholderFind.id}`
-			);
-			if (!deleteClass) {
-				let color = '';
-				if (owner) {
-					color = PlaceholderColor.OWNER;
-				} else {
-					if (recipientKey) {
-						const recipientFind = placeholderRecipients.current.find(
-							(recipient) => recipient.recipientKey === recipientKey
-						);
-						if (recipientFind) {
-							color = recipientFind.color as string;
+		if (!specialType) {
+			let placeholderFind = placeholder.find(
+				(pl) => pl.id?.toString() === id.toString() && !pl.isSpecial
+			) as Placeholder;
+
+			if (placeholderFind && placeholderFind.id) {
+				const elements = document.getElementsByTagName(
+					`placeholder${placeholderFind.id}`
+				);
+				if (!deleteClass) {
+					let color = '';
+					if (owner) {
+						color = PlaceholderColor.OWNER;
+					} else {
+						if (recipientKey) {
+							const recipientFind = placeholderRecipients.current.find(
+								(recipient) => recipient.recipientKey === recipientKey
+							);
+							if (recipientFind) {
+								color = recipientFind.color as string;
+							}
 						}
 					}
+					for (let i = 0; i < elements.length; i++) {
+						let element: any = elements[i];
+						element.style.background = color ? color : PlaceholderColor.OTHER;
+					}
+				} else {
+					for (let i = 0; i < elements.length; i++) {
+						let element: any = elements[i];
+						element.style.removeProperty('background');
+					}
 				}
-				for (let i = 0; i < elements.length; i++) {
-					let element: any = elements[i];
-					element.style.background = color ? color : PlaceholderColor.OTHER;
+				quillRef?.current?.clipboard.dangerouslyPasteHTML(0, '', 'user');
+			}
+		} else {
+			let elements: HTMLCollectionOf<Element> = {
+				item: function (index: number): Element | null {
+					throw new Error('Function not implemented.');
+				},
+				namedItem: function (name: string): Element | null {
+					throw new Error('Function not implemented.');
+				},
+				length: 0,
+			};
+			switch (specialType) {
+				case SpecialType.DATE:
+					elements = document.getElementsByTagName(`date${id}`);
+
+					break;
+
+				case SpecialType.FULLNAME:
+					elements = document.getElementsByTagName(`fullname${id}`);
+					break;
+
+				case SpecialType.EMAIL:
+					elements = document.getElementsByTagName(`email${id}`);
+					break;
+
+				case SpecialType.SIGN:
+					elements = document.getElementsByTagName(`sign${id}`);
+					break;
+
+				case SpecialType.INITIALS:
+					elements = document.getElementsByTagName(`initials${id}`);
+					break;
+			}
+			let color = '';
+			if (recipientKey) {
+				const recipientFind = placeholderRecipients.current.find(
+					(recipient) => recipient.recipientKey === recipientKey
+				);
+				if (recipientFind) {
+					color = recipientFind.color as string;
 				}
-			} else {
-				for (let i = 0; i < elements.length; i++) {
-					let element: any = elements[i];
-					element.style.removeProperty('background');
-				}
+			}
+			for (let i = 0; i < elements.length; i++) {
+				let element: any = elements[i];
+				element.style.background = color ? color : PlaceholderColor.OTHER;
 			}
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(0, '', 'user');
 		}
@@ -383,8 +438,8 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 						for (let j = 0; j < lineArr.length; j++) {
 							if (j === 0) {
 								tag = contenteditable
-									? `"placeholderClass${id}" contenteditable="false">`
-									: `"placeholderClass${id}">`;
+									? `"placeholderClass${id}" contenteditable="false"`
+									: `"placeholderClass${id}"`;
 								const elArray = lineArr[j].split(tag);
 								for (let k = 0; k < elArray.length; k++) {
 									if (k === 0) {
@@ -410,10 +465,13 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		}
 		//console.log('changeValueInTag', quillRef?.current?.root.innerHTML);
 	};
-	const changeValue = async (id: number) => {
+	const changeValue = async (placeholderChange: Placeholder) => {
+		if (placeholderChange.isSpecial) {
+			return;
+		}
 		let placeholdersTmp = [...placeholder];
 		const holderIndex = placeholdersTmp.findIndex(
-			(holder) => holder.id?.toString() === id.toString()
+			(holder) => holder.id?.toString() === placeholderChange.id?.toString()
 		);
 		if (placeholdersTmp[holderIndex].name) {
 			changeValueInTag(
@@ -522,36 +580,101 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				});
 			});
 	};
-	const handleInsertPlaceholder = (id: number) => {
+	const handleInsertPlaceholder = (holderInsert: Placeholder) => {
 		const position = quillRef?.current?.getSelection();
 		//console.log('position', position, quillRef);
+		if (!holderInsert.isSpecial) {
+			const holderIndex = placeholder.findIndex(
+				(holder) =>
+					holder.id?.toString() === holderInsert.id?.toString() &&
+					!holderInsert.isSpecial
+			);
+			const empty = holderInsert.value
+				? holderInsert.value?.replace(/\s/g, '')
+				: '';
 
-		const holderIndex = placeholder.findIndex(
-			(holder) => holder.id?.toString() === id.toString()
-		);
-		const empty = placeholder[holderIndex].value
-			? placeholder[holderIndex].value?.replace(/\s/g, '')
-			: '';
+			quillRef?.current?.clipboard.dangerouslyPasteHTML(
+				position ? position?.index : 0,
+				`<placeholder${holderInsert.id} className={placeholderClass${
+					holderInsert.id
+				}} contenteditable="false">${
+					empty ? holderInsert.value : `{{{${holderInsert.name}}}}`
+				}</placeholder${holderInsert.id}>`,
+				'user'
+			);
+			updatePlaceholderClass({
+				id: holderInsert.id as number,
+				owner:
+					holderInsert.fillingType === PlaceholderFill.CREATOR ? true : false,
+				recipientKey: holderInsert.externalRecipientKey,
+			});
+		} else {
+			let tag = '';
+			switch (holderInsert.specialType) {
+				case SpecialType.DATE:
+					const date = holderInsert.value ? parseDate(holderInsert.value) : '';
+					tag = `<date${holderInsert.id} className={dateClass${
+						holderInsert.id
+					}} contenteditable="false">${
+						date ? date : `{{{${holderInsert.name}}}}`
+					}</date${holderInsert.id}>`;
+					break;
 
-		quillRef?.current?.clipboard.dangerouslyPasteHTML(
-			position ? position?.index : 0,
-			`<placeholder${placeholder[holderIndex].id} className={placeholderClass${
-				placeholder[holderIndex].id
-			}} contenteditable="false">${
-				empty
-					? placeholder[holderIndex].value
-					: `{{{${placeholder[holderIndex].name}}}}`
-			}</placeholder${placeholder[holderIndex].id}>`,
-			'user'
-		);
-		updatePlaceholderClass({
-			id: placeholder[holderIndex].id as number,
-			owner:
-				placeholder[holderIndex].fillingType === PlaceholderFill.CREATOR
-					? true
-					: false,
-			recipientKey: placeholder[holderIndex].externalRecipientKey,
-		});
+				case SpecialType.FULLNAME:
+					tag = `<fullname${holderInsert.id} className={fullnameClass${
+						holderInsert.id
+					}} contenteditable="false">${
+						holderInsert.value
+							? holderInsert.value
+							: `{{{${holderInsert.name}}}}`
+					}</fullname${holderInsert.id}>`;
+					break;
+
+				case SpecialType.EMAIL:
+					tag = `<email${holderInsert.id} className={emailClass${
+						holderInsert.id
+					}} contenteditable="false">${
+						holderInsert.value
+							? holderInsert.value
+							: `{{{${holderInsert.name}}}}`
+					}</email${holderInsert.id}>`;
+					break;
+
+				case SpecialType.SIGN:
+					tag = `<sign${holderInsert.id} className={signClass${
+						holderInsert.id
+					}} contenteditable="false">${`{{{${holderInsert.name}}}}`}</sign${
+						holderInsert.id
+					}>`;
+					break;
+
+				case SpecialType.INITIALS:
+					tag = `<initials${holderInsert.id} className={initialsClass${
+						holderInsert.id
+					}} contenteditable="false">${
+						holderInsert.value
+							? `<img
+									alt='initials'
+									src={${holderInsert.value}} 
+									style={{ objectFit: 'contain' }}
+								/>`
+							: `{{{${holderInsert.name}}}}`
+					}</initials${holderInsert.id}>`;
+					break;
+			}
+			quillRef?.current?.clipboard.dangerouslyPasteHTML(
+				position ? position?.index : 0,
+				tag,
+				'user'
+			);
+			updatePlaceholderClass({
+				id: holderInsert.id as number,
+				specialType: holderInsert.specialType,
+				owner:
+					holderInsert.fillingType === PlaceholderFill.CREATOR ? true : false,
+				recipientKey: holderInsert.externalRecipientKey,
+			});
+		}
 	};
 	const handleDeletePlaceholder = async (id: number) => {
 		setDelLoad(true);
@@ -615,12 +738,15 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		}
 		setPlaceholder(placeholderTmp);
 	};
-	const handleBlur = async (e: any, id: number) => {
+	const handleBlur = async (e: any, placeholderChange: Placeholder) => {
+		if (placeholderChange.isSpecial) {
+			return;
+		}
 		switch (e.target.id) {
 			case 'PlaceholderName':
 				let placeholdersTmp = [...placeholder];
 				const holderIndex = placeholdersTmp.findIndex(
-					(holder) => holder.id?.toString() === id.toString()
+					(holder) => holder.id?.toString() === placeholderChange.id?.toString()
 				);
 				let body = {
 					data: {
@@ -660,12 +786,12 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				break;
 
 			case 'PlaceholderValue':
-				changeValue(id);
+				changeValue(placeholderChange);
 				break;
 		}
 	};
-	const handleEnter = (id: number) => {
-		changeValue(id);
+	const handleEnter = (placeholderChange: Placeholder) => {
+		changeValue(placeholderChange);
 	};
 	const handleChangeFilling = async (e: any, id: number) => {
 		// console.log('handleChangeFilling', e);
@@ -815,10 +941,17 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 													type='text'
 													icon={
 														<FontAwesomeIcon
-															icon={faLeftLong}
+															icon={
+																holder.view?.toString() !==
+																	PlaceholderView.SIGNATURE.toString() &&
+																holder.specialType?.toString() !==
+																	SpecialType.SIGN.toString()
+																	? faFont
+																	: faSignature
+															}
 															size='sm'
 															onClick={() => {
-																handleInsertPlaceholder(holder.id as number);
+																handleInsertPlaceholder(holder);
 															}}
 														/>
 													}
@@ -831,6 +964,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 											readOnly={
 												holder.view?.toString() !==
 													PlaceholderView.SIGNATURE.toString() &&
+												!holder.isSpecial &&
 												!readonlyCurrent.current
 													? false
 													: true
@@ -842,131 +976,137 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 											onChange={(e: any) =>
 												handleChange(e, holder.id as number)
 											}
-											onBlur={(e: any) => handleBlur(e, holder.id as number)}
+											onBlur={(e: any) => handleBlur(e, holder)}
 										/>
 									</Col>
 									<Col flex={'auto'}></Col>
 									{holder.view?.toString() !==
-										PlaceholderView.SIGNATURE.toString() && (
-										<Col flex='24px'>
-											<Popover
-												content={
-													<Space
-														direction='vertical'
-														style={{ display: 'flex' }}
-													>
-														<Space>
-															<Text type='secondary'>
-																Who fills in this field:
-															</Text>
-															<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
-																<div>
-																	<Button
-																		disabled={readonlyCurrent.current}
-																		size='small'
-																		icon={
-																			<FontAwesomeIcon
-																				icon={faCircleQuestion}
-																				size='xs'
-																			/>
-																		}
-																		type='text'
-																	></Button>
-																</div>
-															</Tooltip>
-														</Space>
-														<Radio.Group
-															size='small'
-															value={
-																holder.fillingType &&
-																holder.fillingType.toString() !==
-																	PlaceholderFill.SPECIFIC.toString()
-																	? holder.fillingType?.toString()
-																	: holder.fillingType &&
-																	  holder.fillingType.toString() ===
-																			PlaceholderFill.SPECIFIC.toString() &&
-																	  holder.externalRecipientKey &&
-																	  placeholderRecipients.current &&
-																	  placeholderRecipients.current.length > 0
-																	? placeholderRecipients.current.find(
-																			(placeholderRecipient) =>
-																				placeholderRecipient.recipientKey?.includes(
-																					holder.externalRecipientKey as string
-																				)
-																	  )?.recipientKey
-																	: '1'
-															}
-															onChange={(e: any) =>
-																handleChangeFilling(e, holder.id as number)
-															}
+										PlaceholderView.SIGNATURE.toString() &&
+										!holder.isSpecial && (
+											<Col flex='24px'>
+												<Popover
+													content={
+														<Space
+															direction='vertical'
+															style={{ display: 'flex' }}
 														>
-															<Space direction='vertical'>
-																<Radio value={PlaceholderFill.NONE.toString()}>
-																	None
-																</Radio>
-																<Radio
-																	value={PlaceholderFill.CREATOR.toString()}
-																>
-																	Contract owner
-																</Radio>
-																{placeholderRecipients.current &&
-																	placeholderRecipients.current.length > 0 &&
-																	placeholderRecipients.current.map(
-																		(placeholderRecipient) => {
-																			return (
-																				<Radio
-																					value={
-																						placeholderRecipient.recipientKey
-																					}
-																				>
-																					{placeholderRecipient.fullname}
-																				</Radio>
-																			);
-																		}
-																	)}
+															<Space>
+																<Text type='secondary'>
+																	Who fills in this field:
+																</Text>
+																<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
+																	<div>
+																		<Button
+																			disabled={readonlyCurrent.current}
+																			size='small'
+																			icon={
+																				<FontAwesomeIcon
+																					icon={faCircleQuestion}
+																					size='xs'
+																				/>
+																			}
+																			type='text'
+																		></Button>
+																	</div>
+																</Tooltip>
 															</Space>
-														</Radio.Group>
-														<Divider style={{ margin: 0 }} />
+															<Radio.Group
+																size='small'
+																value={
+																	holder.fillingType &&
+																	holder.fillingType.toString() !==
+																		PlaceholderFill.SPECIFIC.toString()
+																		? holder.fillingType?.toString()
+																		: holder.fillingType &&
+																		  holder.fillingType.toString() ===
+																				PlaceholderFill.SPECIFIC.toString() &&
+																		  holder.externalRecipientKey &&
+																		  placeholderRecipients.current &&
+																		  placeholderRecipients.current.length > 0
+																		? placeholderRecipients.current.find(
+																				(placeholderRecipient) =>
+																					placeholderRecipient.recipientKey?.includes(
+																						holder.externalRecipientKey as string
+																					)
+																		  )?.recipientKey
+																		: '1'
+																}
+																onChange={(e: any) =>
+																	handleChangeFilling(e, holder.id as number)
+																}
+															>
+																<Space direction='vertical'>
+																	<Radio
+																		value={PlaceholderFill.NONE.toString()}
+																	>
+																		None
+																	</Radio>
+																	<Radio
+																		value={PlaceholderFill.CREATOR.toString()}
+																	>
+																		Contract owner
+																	</Radio>
+																	{placeholderRecipients.current &&
+																		placeholderRecipients.current.length > 0 &&
+																		placeholderRecipients.current.map(
+																			(placeholderRecipient) => {
+																				return (
+																					<Radio
+																						value={
+																							placeholderRecipient.recipientKey
+																						}
+																					>
+																						{placeholderRecipient.fullname}
+																					</Radio>
+																				);
+																			}
+																		)}
+																</Space>
+															</Radio.Group>
+															<Divider style={{ margin: 0 }} />
+															<Button
+																disabled={readonlyCurrent.current}
+																loading={delLoad}
+																block
+																danger
+																type='text'
+																onClick={() => {
+																	handleDeletePlaceholder(holder.id as number);
+																}}
+															>
+																Delete
+															</Button>
+														</Space>
+													}
+													trigger='click'
+												>
+													<div>
 														<Button
 															disabled={readonlyCurrent.current}
-															loading={delLoad}
-															block
-															danger
+															size='small'
 															type='text'
-															onClick={() => {
-																handleDeletePlaceholder(holder.id as number);
-															}}
-														>
-															Delete
-														</Button>
-													</Space>
-												}
-												trigger='click'
-											>
-												<div>
-													<Button
-														disabled={readonlyCurrent.current}
-														size='small'
-														type='text'
-														icon={<FontAwesomeIcon icon={faGear} size='xs' />}
-													/>
-												</div>
-											</Popover>
-										</Col>
-									)}
+															icon={<FontAwesomeIcon icon={faGear} size='xs' />}
+														/>
+													</div>
+												</Popover>
+											</Col>
+										)}
 								</Row>
 								{holder.view?.toString() !==
-									PlaceholderView.SIGNATURE.toString() && (
-									<Input
-										readOnly={readonlyCurrent.current}
-										id='PlaceholderValue'
-										placeholder='Enter value'
-										value={holder.value}
-										onChange={(e: any) => handleChange(e, holder.id as number)}
-										onBlur={(e: any) => handleBlur(e, holder.id as number)}
-										onPressEnter={() => handleEnter(holder.id as number)}
-									/>
-								)}
+									PlaceholderView.SIGNATURE.toString() &&
+									!holder.isSpecial && (
+										<Input
+											readOnly={readonlyCurrent.current}
+											id='PlaceholderValue'
+											placeholder='Enter value'
+											value={holder.value}
+											onChange={(e: any) =>
+												handleChange(e, holder.id as number)
+											}
+											onBlur={(e: any) => handleBlur(e, holder)}
+											onPressEnter={() => handleEnter(holder)}
+										/>
+									)}
 							</Space>
 						);
 					})}

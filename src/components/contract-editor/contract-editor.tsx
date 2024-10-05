@@ -27,6 +27,7 @@ import { PlaceholderPdfBlock } from './placeholder-pdf-block';
 import { PdfBlockDnd } from './pdf-block-dnd';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { delColorFromHtml } from '../../utils';
 
 export interface StepChangeProps {
 	currentStep?: ContractSteps;
@@ -217,9 +218,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					setContinueLoad(false);
 				} else {
 					// debugger;
-					setContractValue(
-						contractTmp.value ? contractTmp.value : '<div></div>'
-					);
+					const value = contractTmp.value
+						? delColorFromHtml(contractTmp.value)
+						: '<div></div>';
+					setContractValue(value);
 					setContinueLoad(false);
 				}
 				setContractType(
