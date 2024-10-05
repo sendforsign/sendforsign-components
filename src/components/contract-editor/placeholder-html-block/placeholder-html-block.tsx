@@ -411,6 +411,9 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		//console.log('changeValueInTag', quillRef?.current?.root.innerHTML);
 	};
 	const changeValue = async (id: number) => {
+		if (readonlyCurrent.current) {
+			return;
+		}
 		let placeholdersTmp = [...placeholder];
 		const holderIndex = placeholdersTmp.findIndex(
 			(holder) => holder.id?.toString() === id.toString()
@@ -598,6 +601,9 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			});
 	};
 	const handleChange = (e: any, id: number) => {
+		if (readonlyCurrent.current) {
+			return;
+		}
 		let placeholderTmp = [...placeholder];
 		const holderIndex = placeholderTmp.findIndex(
 			(holder) => holder.id?.toString() === id.toString()
@@ -616,6 +622,9 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		setPlaceholder(placeholderTmp);
 	};
 	const handleBlur = async (e: any, id: number) => {
+		if (readonlyCurrent.current) {
+			return;
+		}
 		switch (e.target.id) {
 			case 'PlaceholderName':
 				let placeholdersTmp = [...placeholder];
