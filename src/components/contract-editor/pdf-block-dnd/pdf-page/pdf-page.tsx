@@ -30,6 +30,8 @@ type PlaceholderInsertion = {
 	pageId?: number;
 	id?: number;
 	placeholderKey?: string;
+	isSpecial?: boolean;
+	specialType?: number;
 	action?: Action;
 	width?: number;
 	height?: number;
@@ -59,8 +61,6 @@ export const PdfPage = ({
 		setNotification,
 		placeholderPdf,
 		setPlaceholderPdf,
-		refreshPagePlaceholders,
-		setRefreshPagePlaceholders,
 	} = useContractEditorContext();
 	const currPagePl = useRef<PagePlaceholder[]>([]);
 	const [currPagePlaceholder, setCurrPagePlaceholder] = useState<
@@ -144,6 +144,8 @@ export const PdfPage = ({
 							id: pagePlaceholderDrag.id,
 							width: pagePlaceholderDrag.width,
 							height: pagePlaceholderDrag.height,
+							isSpecial: pagePlaceholderDrag.isSpecial,
+							specialType: pagePlaceholderDrag.specialType,
 							positionX: left,
 							positionY: top,
 							action: Action.UPDATE,
@@ -155,6 +157,8 @@ export const PdfPage = ({
 							id: pagePlaceholderDrag.id,
 							width: pagePlaceholderDrag.width,
 							height: pagePlaceholderDrag.height,
+							isSpecial: pagePlaceholderDrag.isSpecial,
+							specialType: pagePlaceholderDrag.specialType,
 							positionX: left,
 							positionY: top,
 							action: Action.UPDATE,
@@ -241,6 +245,8 @@ export const PdfPage = ({
 						placeholderKey: currentId.current.placeholderKey,
 						pageId: currentId.current.pageId,
 						id: currentId.current.id,
+						isSpecial: currentId.current.isSpecial,
+						specialType: currentId.current.specialType,
 						width: currentId.current.width,
 						height: currentId.current.height,
 						positionX: currentId.current.positionX,
@@ -316,6 +322,10 @@ export const PdfPage = ({
 				if (insertion.current[index].action === Action.UPDATE) {
 					resultPlaceholders.push({
 						placeholderKey: insertion.current[index].placeholderKey,
+						isSpecial: insertion.current[index].isSpecial,
+						specialType: insertion.current[index].isSpecial
+							? insertion.current[index].specialType
+							: undefined,
 						insertion: [
 							{
 								pageId: insertion.current[index].pageId,
@@ -331,6 +341,10 @@ export const PdfPage = ({
 				} else {
 					resultPlaceholders.push({
 						placeholderKey: insertion.current[index].placeholderKey,
+						isSpecial: insertion.current[index].isSpecial,
+						specialType: insertion.current[index].isSpecial
+							? insertion.current[index].specialType
+							: undefined,
 						insertion: [
 							{
 								pageId: insertion.current[index].pageId,
@@ -507,6 +521,8 @@ export const PdfPage = ({
 														placeholderKey: e.pagePlaceholder.placeholderKey,
 														pageId: e.pagePlaceholder.pageId,
 														id: e.pagePlaceholder.id,
+														isSpecial: e.pagePlaceholder.isSpecial,
+														specialType: e.pagePlaceholder.specialType,
 														width: e.pagePlaceholder.width,
 														height: e.pagePlaceholder.height,
 														positionX: e.pagePlaceholder.positionX,
@@ -518,6 +534,8 @@ export const PdfPage = ({
 														placeholderKey: e.pagePlaceholder.placeholderKey,
 														pageId: e.pagePlaceholder.pageId,
 														id: e.pagePlaceholder.id,
+														isSpecial: e.pagePlaceholder.isSpecial,
+														specialType: e.pagePlaceholder.specialType,
 														width: e.pagePlaceholder.width,
 														height: e.pagePlaceholder.height,
 														positionX: e.pagePlaceholder.positionX,
@@ -556,6 +574,8 @@ export const PdfPage = ({
 													placeholderKey: e.pagePlaceholder.placeholderKey,
 													pageId: e.pagePlaceholder.pageId,
 													id: e.pagePlaceholder.id,
+													isSpecial: e.pagePlaceholder.isSpecial,
+													specialType: e.pagePlaceholder.specialType,
 													action: Action.DELETE,
 												});
 												needUpdate.current = true;

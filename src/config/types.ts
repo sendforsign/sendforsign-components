@@ -187,7 +187,7 @@ export type Placeholder = {
 	insertion?: Insertion[];
 	color?: string;
 	isSpecial?: boolean;
-	specialType?: SpecialType;
+	specialType?: SpecialType | undefined;
 };
 export type Insertion = {
 	pageId?: number;
@@ -213,7 +213,7 @@ export type PagePlaceholder = {
 	base64?: string;
 	color?: string;
 	isSpecial?: boolean;
-	specialType?: SpecialType;
+	specialType?: SpecialType | undefined;
 };
 export type Row = {
 	json?: any;
