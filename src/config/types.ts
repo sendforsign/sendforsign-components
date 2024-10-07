@@ -212,6 +212,8 @@ export type PagePlaceholder = {
 	view?: PlaceholderView;
 	base64?: string;
 	color?: string;
+	isSpecial?: boolean;
+	specialType?: SpecialType;
 };
 export type Row = {
 	json?: any;

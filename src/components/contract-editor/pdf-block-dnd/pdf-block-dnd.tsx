@@ -14,6 +14,7 @@ import {
 	ApiEntity,
 	EventStatuses,
 	PlaceholderView,
+	SpecialType,
 } from '../../../config/enum';
 import { BASE_URL } from '../../../config/config';
 import {
@@ -382,8 +383,18 @@ export const PdfBlockDnd = () => {
 									width: insertion[j].width as number,
 									height: insertion[j].height as number,
 									view: placeholder[i].view as PlaceholderView,
-									base64: base64,
+									base64:
+										placeholder[i].isSpecial &&
+										placeholder[i].value &&
+										(placeholder[i].specialType?.toString() ===
+											SpecialType.INITIALS.toString() ||
+											placeholder[i].specialType?.toString() ===
+												SpecialType.SIGN.toString())
+											? placeholder[i].value
+											: base64,
 									color: placeholder[i].color,
+									specialType: placeholder[i].specialType,
+									isSpecial: placeholder[i].isSpecial,
 								});
 							}
 						}

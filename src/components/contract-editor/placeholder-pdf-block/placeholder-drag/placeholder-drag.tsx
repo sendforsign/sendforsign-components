@@ -114,7 +114,7 @@ export const PlaceholderDrag = ({
 			});
 	};
 	const handleChange = (e: any) => {
-		if (currPlaceholder.current.isSpecial) {
+		if (currPlaceholder.current.isSpecial || readonly) {
 			return;
 		}
 		switch (e.target.id) {
@@ -133,7 +133,7 @@ export const PlaceholderDrag = ({
 		}
 	};
 	const handleBlur = async (e: any) => {
-		if (currPlaceholder.current.isSpecial) {
+		if (currPlaceholder.current.isSpecial || readonly) {
 			return;
 		}
 		switch (e.target.id) {
@@ -177,7 +177,7 @@ export const PlaceholderDrag = ({
 		}
 	};
 	const changeValue = async () => {
-		if (currPlaceholder.current.isSpecial) {
+		if (currPlaceholder.current.isSpecial || readonly) {
 			return;
 		}
 		let body = {

@@ -414,6 +414,8 @@ export const PdfPage = ({
 								pageId: pageNumber,
 								id: idMax,
 								placeholderKey: placeholderKey,
+								specialType: currPlaceholder.specialType,
+								isSpecial: currPlaceholder.isSpecial,
 								value: currPlaceholder.value as string,
 								name: currPlaceholder.name as string,
 								view: currPlaceholder.view as PlaceholderView,

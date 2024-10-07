@@ -466,7 +466,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		//console.log('changeValueInTag', quillRef?.current?.root.innerHTML);
 	};
 	const changeValue = async (placeholderChange: Placeholder) => {
-		if (placeholderChange.isSpecial) {
+		if (placeholderChange.isSpecial || readonlyCurrent.current) {
 			return;
 		}
 		let placeholdersTmp = [...placeholder];
@@ -739,7 +739,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		setPlaceholder(placeholderTmp);
 	};
 	const handleBlur = async (e: any, placeholderChange: Placeholder) => {
-		if (placeholderChange.isSpecial) {
+		if (placeholderChange.isSpecial || readonlyCurrent.current) {
 			return;
 		}
 		switch (e.target.id) {
