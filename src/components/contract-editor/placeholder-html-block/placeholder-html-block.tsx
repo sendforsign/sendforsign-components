@@ -584,11 +584,6 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		const position = quillRef?.current?.getSelection();
 		//console.log('position', position, quillRef);
 		if (!holderInsert.isSpecial) {
-			const holderIndex = placeholder.findIndex(
-				(holder) =>
-					holder.id?.toString() === holderInsert.id?.toString() &&
-					!holderInsert.isSpecial
-			);
 			const empty = holderInsert.value
 				? holderInsert.value?.replace(/\s/g, '')
 				: '';
@@ -720,10 +715,13 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				setDelLoad(false);
 			});
 	};
-	const handleChange = (e: any, id: number) => {
+	const handleChange = (e: any, placeholderChange: Placeholder) => {
+		if (placeholderChange.isSpecial || readonlyCurrent.current) {
+			return;
+		}
 		let placeholderTmp = [...placeholder];
 		const holderIndex = placeholderTmp.findIndex(
-			(holder) => holder.id?.toString() === id.toString()
+			(holder) => holder.id?.toString() === placeholderChange.id?.toString()
 		);
 		switch (e.target.id) {
 			case 'PlaceholderName':
@@ -973,9 +971,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 											placeholder='Enter placeholder name'
 											variant='borderless'
 											value={holder.name}
-											onChange={(e: any) =>
-												handleChange(e, holder.id as number)
-											}
+											onChange={(e: any) => handleChange(e, holder)}
 											onBlur={(e: any) => handleBlur(e, holder)}
 										/>
 									</Col>
@@ -1100,9 +1096,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 											id='PlaceholderValue'
 											placeholder='Enter value'
 											value={holder.value}
-											onChange={(e: any) =>
-												handleChange(e, holder.id as number)
-											}
+											onChange={(e: any) => handleChange(e, holder)}
 											onBlur={(e: any) => handleBlur(e, holder)}
 											onPressEnter={() => handleEnter(holder)}
 										/>
