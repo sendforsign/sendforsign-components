@@ -799,17 +799,19 @@ export const SendModal = () => {
 														}
 													/>
 												</Col>
-												<Col flex='32px'>
-													<Tooltip title='Delete recipient.'>
-														<div>
-															<Button
-																type='text'
-																icon={<FontAwesomeIcon icon={faTrash} />}
-																onClick={() => handleDelete(index)}
-															/>
-														</div>
-													</Tooltip>
-												</Col>
+												{!recipient.isDone && (
+													<Col flex='32px'>
+														<Tooltip title='Delete recipient.'>
+															<div>
+																<Button
+																	type='text'
+																	icon={<FontAwesomeIcon icon={faTrash} />}
+																	onClick={() => handleDelete(index)}
+																/>
+															</div>
+														</Tooltip>
+													</Col>
+												)}
 											</>
 										)}
 										{/* {index !== 0 && ( */}

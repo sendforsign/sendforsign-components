@@ -253,9 +253,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			contractKey &&
 			(clientKey || token) &&
 			placeholderVisible &&
-			(currPlaceholder !== refreshPlaceholders ||
-				!placeholder ||
-				placeholder.length === 0)
+			(refreshPlaceholders || !placeholder || placeholder.length === 0)
 		) {
 			setCurrPlaceholder(refreshPlaceholders);
 			getRecipients();
