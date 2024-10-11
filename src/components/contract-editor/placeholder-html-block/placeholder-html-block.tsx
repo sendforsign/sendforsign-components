@@ -796,7 +796,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 
 		let placeholderTmp = [...placeholder];
 		const holderIndex = placeholderTmp.findIndex(
-			(holder) => holder.id?.toString() === id.toString()
+			(holder) => holder.id?.toString() === id.toString() && !holder.isSpecial
 		);
 		let body = {
 			data: {
