@@ -395,6 +395,7 @@ export const PdfBlockDnd = () => {
 									color: placeholder[i].color,
 									specialType: placeholder[i].specialType,
 									isSpecial: placeholder[i].isSpecial,
+									externalRecipientKey: placeholder[i].externalRecipientKey,
 								});
 							}
 						}

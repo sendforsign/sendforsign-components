@@ -214,6 +214,7 @@ export type PagePlaceholder = {
 	color?: string;
 	isSpecial?: boolean;
 	specialType?: SpecialType | undefined;
+	externalRecipientKey?: string;
 };
 export type Row = {
 	json?: any;

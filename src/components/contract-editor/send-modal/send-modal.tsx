@@ -54,6 +54,7 @@ export const SendModal = () => {
 		setRefreshEvent,
 		setResultModal,
 		setNotification,
+		setRefreshPagePlaceholders,
 	} = useContractEditorContext();
 	const [sendLoad, setSendLoad] = useState(false);
 	const [dataLoad, setDataLoad] = useState(false);
@@ -369,6 +370,7 @@ export const SendModal = () => {
 		}
 		if (deleteRecipient.length > 0) {
 			setSaveLoad(true);
+			let refreshPage: string[] = [];
 			for (let index = 0; index < deleteRecipient.length; index++) {
 				const body = {
 					data: {
@@ -395,6 +397,8 @@ export const SendModal = () => {
 						isSave.current = true;
 						if (!isPdf) {
 							removeClasses(deleteRecipient[index].recipientKey as string);
+						} else {
+							refreshPage.push(deleteRecipient[index].recipientKey as string);
 						}
 					})
 					.catch((error) => {
@@ -407,6 +411,9 @@ export const SendModal = () => {
 									: error.message,
 						});
 					});
+			}
+			if (refreshPage.length > 0) {
+				setRefreshPagePlaceholders(refreshPage);
 			}
 		}
 		if (insertRecipient.length > 0) {
@@ -662,14 +669,6 @@ export const SendModal = () => {
 									value={''}
 								/>
 							</Col>
-							{/* <Col flex='8px' />
-							<Col>
-								<Tooltip title='Set signing order.'>
-									<div>
-										<InputNumber min={1} max={10} style={{ width: '56px' }} />
-									</div>
-								</Tooltip>
-							</Col> */}
 						</Row>
 					</Card>
 				</Space>
@@ -814,8 +813,6 @@ export const SendModal = () => {
 												)}
 											</>
 										)}
-										{/* {index !== 0 && ( */}
-										{/* )} */}
 									</Row>
 								</Card>
 							);

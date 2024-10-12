@@ -61,6 +61,8 @@ export const PdfPage = ({
 		setNotification,
 		placeholderPdf,
 		setPlaceholderPdf,
+		refreshPagePlaceholders,
+		setRefreshPagePlaceholders,
 	} = useContractEditorContext();
 	const currPagePl = useRef<PagePlaceholder[]>([]);
 	const [currPagePlaceholder, setCurrPagePlaceholder] = useState<
@@ -312,6 +314,22 @@ export const PdfPage = ({
 			setCurrPagePlaceholder(pagePlaceholderFilter);
 		}
 	}, [placeholderDelete]);
+	useEffect(() => {
+		if (
+			refreshPagePlaceholders &&
+			refreshPagePlaceholders.length > 0 &&
+			currPagePlaceholder &&
+			currPagePlaceholder.length > 0
+		) {
+			setRefreshPagePlaceholders([]);
+			let pagePlaceholderTmp = currPagePlaceholder.filter((pagePl) => {
+				return !refreshPagePlaceholders.includes(
+					pagePl.externalRecipientKey as string
+				);
+			});
+			setCurrPagePlaceholder(pagePlaceholderTmp);
+		}
+	}, [refreshPagePlaceholders]);
 	const save = async () => {
 		if (needUpdate.current && !readonly) {
 			// debugger;
@@ -438,6 +456,7 @@ export const PdfPage = ({
 								width: 100,
 								height: 50,
 								color: currPlaceholder.color,
+								externalRecipientKey: currPlaceholder.externalRecipientKey,
 							};
 							currentId.current = newPlaceholderPosition;
 							finishDrop.current = true;

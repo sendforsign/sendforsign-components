@@ -105,7 +105,9 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [refreshRecipients, setRefreshRecipients] = useState(0);
 	const [refreshPlaceholders, setRefreshPlaceholders] = useState(0);
 	const [refreshOnlyPlaceholders, setRefreshOnlyPlaceholders] = useState(0);
-	const [refreshPagePlaceholders, setRefreshPagePlaceholders] = useState(0);
+	const [refreshPagePlaceholders, setRefreshPagePlaceholders] = useState<
+		string[]
+	>([]);
 
 	const [signCount, setSignCount] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
