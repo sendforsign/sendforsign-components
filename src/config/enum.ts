@@ -115,3 +115,11 @@ export const enum SpecialType {
 	SIGN = 4,
 	INITIALS = 5,
 }
+export const enum Tags {
+	PLACEHOLDER = 'placeholder',
+	DATE = 'date',
+	FULLNAME = 'fullname',
+	EMAIL = 'email',
+	SIGN = 'sign',
+	INITIALS = 'initials',
+}

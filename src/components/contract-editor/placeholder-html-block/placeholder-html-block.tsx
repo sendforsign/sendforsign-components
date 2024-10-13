@@ -26,6 +26,7 @@ import {
 	PlaceholderTypeText,
 	PlaceholderView,
 	SpecialType,
+	Tags,
 } from '../../../config/enum';
 import axios from 'axios';
 import { Placeholder, Recipient } from '../../../config/types';
@@ -40,6 +41,7 @@ import {
 	faSignature,
 } from '@fortawesome/free-solid-svg-icons';
 import { parseDate } from 'pdf-lib';
+import { addActualColors } from '../../../utils';
 
 type Props = {
 	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
@@ -112,28 +114,48 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 						index < payload.data.placeholders.length;
 						index++
 					) {
-						if (
-							payload.data.placeholders[index].view.toString() !==
-							PlaceholderView.SIGNATURE.toString()
-						) {
-							const elements = document.getElementsByTagName(
-								`placeholder${payload.data.placeholders[index].id}`
-							);
-							placeholderTmp.push({
-								...payload.data.placeholders[index],
-								color: payload.data.placeholders[index].color
-									? payload.data.placeholders[index].color
-									: PlaceholderColor.OTHER,
-							});
-							for (let i = 0; i < elements.length; i++) {
-								let element: any = elements[i];
-								element.style.background = payload.data.placeholders[index]
-									.color
-									? payload.data.placeholders[index].color
-									: PlaceholderColor.OTHER;
+						let tag = '';
+						if (payload.data.placeholders[index].isSpecial) {
+							switch (payload.data.placeholders[index].specialType) {
+								case SpecialType.DATE:
+									tag = Tags.DATE;
+									break;
+								case SpecialType.FULLNAME:
+									tag = Tags.FULLNAME;
+									break;
+								case SpecialType.EMAIL:
+									tag = Tags.EMAIL;
+									break;
+								case SpecialType.SIGN:
+									tag = Tags.SIGN;
+									break;
+								case SpecialType.INITIALS:
+									tag = Tags.INITIALS;
+									break;
 							}
+						} else {
+							tag = Tags.PLACEHOLDER;
+						}
+						let elements = document.getElementsByTagName(
+							`${tag}${payload.data.placeholders[index].id}`
+						);
+						placeholderTmp.push({
+							...payload.data.placeholders[index],
+							color: payload.data.placeholders[index].color
+								? payload.data.placeholders[index].color
+								: PlaceholderColor.OTHER,
+						});
+						for (let i = 0; i < elements.length; i++) {
+							let element: any = elements[i];
+							element.style.background = payload.data.placeholders[index].color
+								? payload.data.placeholders[index].color
+								: PlaceholderColor.OTHER;
 						}
 					}
+					// let text = quillRef?.current?.root.innerHTML;
+					// text = addActualColors(text as string, placeholderTmp);
+					// quillRef?.current?.clipboard.dangerouslyPasteHTML(text, 'user');
+					// quillRef?.current?.blur();
 					setPlaceholder(placeholderTmp);
 					setContractPlaceholderCount(placeholderTmp.length);
 					handleChangeSelect(selectedOtion, placeholderTmp);

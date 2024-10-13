@@ -147,18 +147,15 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	}, [userKey]);
 	useEffect(() => {
 		let isMounted = true;
-		async function getContract() {
-			// console.log('contractKey 4', currContractKey);
+		async function getContract() { 
 			let contractTmp: {
 				contractType?: number;
 				value?: string;
-				name?: string;
-				// preCreated?: boolean;
+				name?: string; 
 			} = {
 				contractType: 0,
 				value: '',
-				name: '',
-				// preCreated: false,
+				name: '', 
 			};
 			let body = {
 				data: {

@@ -1,6 +1,8 @@
 import * as Mammoth from 'mammoth/mammoth.browser';
 import QuillNamespace from 'quill';
 import Inline from 'quill/blots/inline';
+import { Placeholder } from '../config/types';
+import { SpecialType, Tags } from '../config/enum';
 // const Inline = QuillNamespace.import('blots/inline');
 
 export const docx2html = (content: ArrayBuffer, callback?: any) => {
@@ -1783,34 +1785,209 @@ export const snapToGrid = (x: number, y: number): [number, number] => {
 	return [snappedX, snappedY];
 };
 export const delColorFromHtml = (value: string) => {
-	let textTmp = value; 
+	let textTmp = value;
+	// return value;
+	let tag = `<span style="`;
+	let array = textTmp?.split(tag);
+	let resultText = '';
+	if (array) {
+		for (let i = 0; i < array.length; i++) {
+			if (array.length > 1) {
+				if (i === 0) {
+					resultText += array[i];
+				} else {
+					resultText += `<span style="`;
+					let lineArr: string[] = [];
+					for (let k = 0; k <= 5; k++) {
+						switch (k) {
+							case 0:
+								tag = `;"><placeholder`;
+								break;
+							case 1:
+								tag = `;"><date`;
+								break;
+							case 2:
+								tag = `;"><fullname`;
+								break;
+							case 3:
+								tag = `;"><email`;
+								break;
+							case 4:
+								tag = `;"><sign`;
+								break;
+							case 5:
+								tag = `;"><initials`;
+								break;
+						}
+						lineArr = array[i].split(tag);
+						if (lineArr.length === 2) {
+							break;
+						}
+					}
+					if (lineArr.length === 2) {
+						for (let j = 0; j < lineArr.length; j++) {
+							if (j === 0) {
+								resultText += tag;
+							} else {
+								resultText += lineArr[j];
+							}
+						}
+					} else {
+						resultText += array[i];
+					}
+				}
+			} else {
+				resultText = array[i];
+			}
+		}
+		textTmp = resultText;
+	}
+	let count = 0;
+	for (let tagId = 0; tagId < 5; tagId++) {
+		switch (tagId) {
+			case 0:
+				tag = `placeholder`;
+				count = 40;
+				break;
+			case 1:
+				tag = `date`;
+				count = 20;
+				break;
+			case 2:
+				tag = `fullname`;
+				count = 20;
+				break;
+			case 3:
+				tag = `email`;
+				count = 20;
+				break;
+			case 4:
+				tag = `sign`;
+				count = 20;
+				break;
+		}
+		for (let id = 1; id <= count; id++) {
+			let tagFind = `<${tag}${id} class=`;
+			array = textTmp?.split(tagFind);
+			resultText = '';
+			if (array) {
+				for (let i = 0; i < array.length; i++) {
+					if (array.length > 1) {
+						if (i === 0) {
+							resultText += array[i];
+						} else {
+							resultText += `<${tag}${id} class=`;
+							tagFind = `</${tag}${id}>`;
+							const lineArr = array[i].split(tagFind);
+							for (let j = 0; j < lineArr.length; j++) {
+								if (j === 0) {
+									tagFind = `"${tag}Class${id}" contenteditable="false"`;
+									const elArray = lineArr[j].split(tagFind);
+									for (let k = 0; k < elArray.length; k++) {
+										if (k === 0) {
+											resultText += `${elArray[k]}${tagFind}>`;
+										} else {
+											let valueTmp = elArray[k].split('>');
+											resultText += `${valueTmp[1]}</${tag}${id}>`;
+										}
+									}
+								} else {
+									resultText += lineArr[j];
+								}
+							}
+						}
+					} else {
+						resultText = array[i];
+					}
+				}
+				textTmp = resultText;
+			}
+		}
+	}
 
-	// let tag = `<span style="`;
-	// let array = textTmp?.split(tag);
-	// let resultText = '';
-	// if (array) {
-	// 	for (let i = 0; i < array.length; i++) {
-	// 		if (array.length > 1) {
-	// 			if (i === 0) {
-	// 				resultText += array[i];
-	// 			} else {
-	// 				resultText += `<span style="`;
-	// 				tag = `;">`;
-	// 				const lineArr = array[i].split(tag);
-	// 				for (let j = 0; j < lineArr.length; j++) {
-	// 					if (j === 0) {
-	// 						resultText += `">`;
-	// 					} else {
-	// 						resultText += lineArr[j];
-	// 					}
-	// 				}
-	// 			}
-	// 		} else {
-	// 			resultText = array[i];
-	// 		}
-	// 	}
-	// 	textTmp = resultText;
-	// }
-	
+	return textTmp;
+};
+export const addActualColors = (value: string, placeholders: Placeholder[]) => {
+	let textTmp = value;
+	for (let i = 0; i < placeholders.length; i++) {
+		if (placeholders[i].isSpecial) {
+			if (placeholders[i].specialType) {
+				let tag = '';
+				switch (placeholders[i].specialType) {
+					case SpecialType.DATE:
+						tag = Tags.DATE;
+						break;
+					case SpecialType.FULLNAME:
+						tag = Tags.FULLNAME;
+						break;
+					case SpecialType.EMAIL:
+						tag = Tags.EMAIL;
+						break;
+					case SpecialType.SIGN:
+						tag = Tags.SIGN;
+						break;
+					case SpecialType.INITIALS:
+						tag = Tags.INITIALS;
+						break;
+				}
+				textTmp = changeColorInTag(
+					tag,
+					placeholders[i].id ? (placeholders[i].id as number) : 0,
+					textTmp,
+					placeholders[i].color as string
+				);
+			}
+		} else {
+			textTmp = changeColorInTag(
+				Tags.PLACEHOLDER,
+				placeholders[i].id ? (placeholders[i].id as number) : 0,
+				textTmp,
+				placeholders[i].color as string
+			);
+		}
+	}
+	return textTmp;
+};
+export const changeColorInTag = (
+	tagFind: string,
+	id: number,
+	text: string,
+	color: string
+) => {
+	let textTmp = text;
+	let tag = `<${tagFind}${id} class=`;
+	let array = textTmp?.split(tag);
+	let resultText = '';
+	if (array) {
+		for (let i = 0; i < array.length; i++) {
+			if (array.length > 1) {
+				if (i === 0) {
+					resultText += array[i];
+				} else {
+					resultText += `<${tagFind}${id} class=`;
+					tag = `</${tagFind}${id}>`;
+					const lineArr = array[i].split(tag);
+					for (let j = 0; j < lineArr.length; j++) {
+						if (j === 0) {
+							tag = `"${tagFind}Class${id}" contenteditable="false"`;
+							const elArray = lineArr[j].split(tag);
+							for (let k = 0; k < elArray.length; k++) {
+								if (k === 0) {
+									resultText += `${elArray[k]}"${tagFind}Class${id}" contenteditable="false" style="background-color:${color};"`;
+								} else {
+									resultText += `${elArray[k]}</${tagFind}${id}>`;
+								}
+							}
+						} else {
+							resultText += lineArr[j];
+						}
+					}
+				}
+			} else {
+				resultText = array[i];
+			}
+		}
+		textTmp = resultText;
+	}
 	return textTmp;
 };
