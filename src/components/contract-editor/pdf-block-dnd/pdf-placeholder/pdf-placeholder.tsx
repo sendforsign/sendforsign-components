@@ -3,7 +3,7 @@ import './pdf-placeholder.css';
 import { Resizable } from 're-resizable';
 import { faSignature } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { PlaceholderView } from '../../../../config/enum';
+import { PlaceholderView, SpecialType } from '../../../../config/enum';
 import { PagePlaceholder } from '../../../../config/types';
 import { Button, Popover, Space } from 'antd';
 import { useDrag } from 'react-dnd';
@@ -155,7 +155,10 @@ export const PdfPlaceholder = ({
 							trigger='contextMenu'
 						>
 							{pagePlaceholder.view?.toString() ===
-							PlaceholderView.SIGNATURE.toString() ? (
+								PlaceholderView.SIGNATURE.toString() ||
+							(pagePlaceholder.isSpecial &&
+								pagePlaceholder.specialType?.toString() ===
+									SpecialType.SIGN.toString()) ? (
 								pagePlaceholder.base64 ? (
 									<img
 										alt='signature'
@@ -195,7 +198,10 @@ export const PdfPlaceholder = ({
 						}}
 					>
 						{pagePlaceholder.view?.toString() ===
-						PlaceholderView.SIGNATURE.toString() ? (
+							PlaceholderView.SIGNATURE.toString() ||
+						(pagePlaceholder.isSpecial &&
+							pagePlaceholder.specialType?.toString() ===
+								SpecialType.SIGN.toString()) ? (
 							pagePlaceholder.base64 ? (
 								<img
 									alt='signature'
