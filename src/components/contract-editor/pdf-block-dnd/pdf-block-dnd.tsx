@@ -356,6 +356,7 @@ export const PdfBlockDnd = () => {
 					) {
 						const insertion = placeholder[i]?.insertion;
 						let base64 = '';
+						let value = placeholder[i].value;
 						if (
 							contractSigns &&
 							contractSigns.length > 0 &&
@@ -370,13 +371,20 @@ export const PdfBlockDnd = () => {
 								base64 = findSign.base64 as string;
 							}
 						}
+						if (
+							placeholder[i].isSpecial &&
+							placeholder[i].specialType?.toString() ===
+								SpecialType.DATE.toString()
+						) {
+							value = `${dayjs(value).format('YYYY-MM-DD @ HH:mm:ss')} GMT`;
+						}
 						if (insertion) {
 							for (let j = 0; j < insertion.length; j++) {
 								pagePlaceholderTmp.push({
 									pageId: insertion[j].pageId as number,
 									id: insertion[j].id as number,
 									placeholderKey: placeholder[i].placeholderKey as string,
-									value: placeholder[i].value as string,
+									value: value,
 									name: placeholder[i].name as string,
 									positionX: insertion[j].positionX as number,
 									positionY: insertion[j].positionY as number,
