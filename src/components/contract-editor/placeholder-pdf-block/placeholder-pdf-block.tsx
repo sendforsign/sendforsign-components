@@ -94,7 +94,8 @@ export const PlaceholderPdfBlock = () => {
 			},
 		};
 		await axios
-			.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
+			// .post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
+			.post('http://localhost:5000/api/' + ApiEntity.PLACEHOLDER, body, {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
@@ -332,7 +333,7 @@ export const PlaceholderPdfBlock = () => {
 	const handleChange = (placeholderChange: Placeholder, id: number) => {
 		let placeholderTmp = [...placeholder];
 		const holderIndex = placeholder.findIndex(
-			(pl) => pl.id?.toString() === id.toString()
+			(pl) => pl.id?.toString() === id.toString() && !pl.isSpecial
 		);
 		placeholderTmp[holderIndex] = placeholderChange;
 		setPlaceholderChange(placeholderChange);
@@ -341,7 +342,7 @@ export const PlaceholderPdfBlock = () => {
 	const handleDelete = (placeholderDelete: Placeholder, id: number) => {
 		let placeholderTmp = [...placeholder];
 		const holderIndex = placeholder.findIndex(
-			(pl) => pl.id?.toString() === id.toString()
+			(pl) => pl.id?.toString() === id.toString() && !pl.isSpecial
 		);
 		placeholderTmp.splice(holderIndex, 1);
 		setPlaceholderDelete(placeholderDelete.placeholderKey as string);
