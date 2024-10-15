@@ -32,6 +32,7 @@ import {
 	faSignature,
 } from '@fortawesome/free-solid-svg-icons';
 import { useDrag } from 'react-dnd';
+import { getIcon } from '../../../../utils';
 
 type Props = {
 	style?: any;
@@ -317,14 +318,7 @@ export const PlaceholderDrag = ({
 									disabled={readonly}
 									icon={
 										<FontAwesomeIcon
-											icon={
-												currPlaceholder.current.view?.toString() !==
-													PlaceholderView.SIGNATURE.toString() &&
-												currPlaceholder.current.specialType?.toString() !==
-													SpecialType.SIGN.toString()
-													? faFont
-													: faSignature
-											}
+											icon={getIcon(currPlaceholder.current)}
 											size='sm'
 											onClick={() => {
 												handleInsertPlaceholder();

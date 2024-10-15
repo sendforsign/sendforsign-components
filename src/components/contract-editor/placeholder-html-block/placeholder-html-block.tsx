@@ -41,7 +41,7 @@ import {
 	faSignature,
 } from '@fortawesome/free-solid-svg-icons';
 import { parseDate } from 'pdf-lib';
-import { addActualColors } from '../../../utils';
+import { addActualColors, changeValueInTag, getIcon } from '../../../utils';
 
 type Props = {
 	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
@@ -436,73 +436,33 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			quillRef?.current?.blur();
 		}
 	};
-	const changeValueInTag = (id: number, value: string) => {
-		let text = quillRef?.current?.root.innerHTML;
-		let contenteditable = false;
-		if (text?.includes('contenteditable')) {
-			contenteditable = true;
-		}
-		let tag = `<placeholder${id} class=`;
-		let array = text?.split(tag);
-		let resultText = '';
-		// debugger;
-		if (array) {
-			for (let i = 0; i < array.length; i++) {
-				if (array.length > 1) {
-					if (i === 0) {
-						resultText += array[i];
-					} else {
-						resultText += `<placeholder${id} class=`;
-						tag = `</placeholder${id}>`;
-						const lineArr = array[i].split(tag);
-						for (let j = 0; j < lineArr.length; j++) {
-							if (j === 0) {
-								tag = contenteditable
-									? `"placeholderClass${id}" contenteditable="false"`
-									: `"placeholderClass${id}"`;
-								const elArray = lineArr[j].split(tag);
-								for (let k = 0; k < elArray.length; k++) {
-									if (k === 0) {
-										resultText += contenteditable
-											? `${elArray[k]}"placeholderClass${id}" contenteditable="false">`
-											: `${elArray[k]}"placeholderClass${id}">`;
-									} else {
-										resultText += `${value}</placeholder${id}>`;
-									}
-								}
-							} else {
-								resultText += lineArr[j];
-							}
-						}
-					}
-				} else {
-					resultText = array[i];
-				}
-			}
-			quillRef?.current?.clipboard.dangerouslyPasteHTML(resultText, 'user');
-			// handleChangeText(resultText, false);
-			quillRef?.current?.blur();
-		}
-		//console.log('changeValueInTag', quillRef?.current?.root.innerHTML);
-	};
+
 	const changeValue = async (placeholderChange: Placeholder) => {
 		if (placeholderChange.isSpecial || readonlyCurrent.current) {
 			return;
 		}
-		let placeholdersTmp = [...placeholder];
-		const holderIndex = placeholdersTmp.findIndex(
-			(holder) => holder.id?.toString() === placeholderChange.id?.toString()
+		let text = quillRef?.current?.root.innerHTML;
+		text = changeValueInTag(
+			placeholderChange.isSpecial
+				? placeholderChange.specialType === SpecialType.DATE
+					? Tags.DATE
+					: placeholderChange.specialType === SpecialType.FULLNAME
+					? Tags.FULLNAME
+					: placeholderChange.specialType === SpecialType.EMAIL
+					? Tags.EMAIL
+					: Tags.SIGN
+				: Tags.PLACEHOLDER,
+			placeholderChange.id ? (placeholderChange.id as number) : 0,
+			placeholderChange.value
+				? (placeholderChange.value as string)
+				: `{{{${placeholderChange.name as string}}}}`,
+			placeholderChange.color
+				? placeholderChange.color
+				: PlaceholderColor.OTHER,
+			text as string
 		);
-		if (placeholdersTmp[holderIndex].name) {
-			changeValueInTag(
-				placeholdersTmp[holderIndex].id
-					? (placeholdersTmp[holderIndex].id as number)
-					: 0,
-				placeholdersTmp[holderIndex].value
-					? (placeholdersTmp[holderIndex].value as string)
-					: `{{{${placeholdersTmp[holderIndex].name as string}}}}`
-			);
-		}
+		quillRef?.current?.clipboard.dangerouslyPasteHTML(text, 'user');
+		quillRef?.current?.blur();
 
 		let body = {
 			data: {
@@ -510,8 +470,8 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				clientKey: !token ? clientKey : undefined,
 				contractKey: contractKey,
 				placeholder: {
-					placeholderKey: placeholdersTmp[holderIndex].placeholderKey,
-					value: placeholdersTmp[holderIndex].value,
+					placeholderKey: placeholderChange.placeholderKey,
+					value: placeholderChange.value,
 				},
 			},
 		};
@@ -691,11 +651,13 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			});
 		}
 	};
-	const handleDeletePlaceholder = async (id: number) => {
+	const handleDeletePlaceholder = async (holderDelete: Placeholder) => {
 		setDelLoad(true);
 		let placeholdersTmp = [...placeholder];
 		const holderIndex = placeholdersTmp.findIndex(
-			(holder) => holder.id?.toString() === id.toString()
+			(holder) =>
+				holder.id?.toString() === holderDelete.id?.toString() &&
+				!holder.isSpecial
 		);
 		let body = {
 			data: {
@@ -707,7 +669,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				},
 			},
 		};
-		deleteTag(id);
+		deleteTag(holderDelete.id as number);
 		placeholdersTmp.splice(holderIndex, 1);
 		setPlaceholder(placeholdersTmp);
 		await axios
@@ -741,7 +703,9 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		}
 		let placeholderTmp = [...placeholder];
 		const holderIndex = placeholderTmp.findIndex(
-			(holder) => holder.id?.toString() === placeholderChange.id?.toString()
+			(holder) =>
+				holder.id?.toString() === placeholderChange.id?.toString() &&
+				!holder.isSpecial
 		);
 		switch (e.target.id) {
 			case 'PlaceholderName':
@@ -764,7 +728,9 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			case 'PlaceholderName':
 				let placeholdersTmp = [...placeholder];
 				const holderIndex = placeholdersTmp.findIndex(
-					(holder) => holder.id?.toString() === placeholderChange.id?.toString()
+					(holder) =>
+						holder.id?.toString() === placeholderChange.id?.toString() &&
+						!holder.isSpecial
 				);
 				let body = {
 					data: {
@@ -959,14 +925,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 													type='text'
 													icon={
 														<FontAwesomeIcon
-															icon={
-																holder.view?.toString() !==
-																	PlaceholderView.SIGNATURE.toString() &&
-																holder.specialType?.toString() !==
-																	SpecialType.SIGN.toString()
-																	? faFont
-																	: faSignature
-															}
+															icon={getIcon(holder)}
 															size='sm'
 															onClick={() => {
 																handleInsertPlaceholder(holder);
@@ -1087,7 +1046,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 																danger
 																type='text'
 																onClick={() => {
-																	handleDeletePlaceholder(holder.id as number);
+																	handleDeletePlaceholder(holder);
 																}}
 															>
 																Delete

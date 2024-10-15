@@ -2,7 +2,14 @@ import * as Mammoth from 'mammoth/mammoth.browser';
 import QuillNamespace from 'quill';
 import Inline from 'quill/blots/inline';
 import { Placeholder } from '../config/types';
-import { SpecialType, Tags } from '../config/enum';
+import { PlaceholderView, SpecialType, Tags } from '../config/enum';
+import {
+	faAt,
+	faCalendarDays,
+	faFont,
+	faSignature,
+	faUser,
+} from '@fortawesome/free-solid-svg-icons';
 // const Inline = QuillNamespace.import('blots/inline');
 
 export const docx2html = (content: ArrayBuffer, callback?: any) => {
@@ -1990,4 +1997,89 @@ export const changeColorInTag = (
 		textTmp = resultText;
 	}
 	return textTmp;
+};
+export const changeValueInTag = (
+	tagName: string,
+	id: number,
+	value: string,
+	color: string,
+	text: string
+) => {
+	let textTmp = text;
+	let contenteditable = false;
+	if (textTmp?.includes('contenteditable')) {
+		contenteditable = true;
+	}
+	let tag = `<${tagName}${id} class=`;
+	let array = textTmp?.split(tag);
+	let resultText = '';
+	// debugger;
+	if (array) {
+		for (let i = 0; i < array.length; i++) {
+			if (array.length > 1) {
+				if (i === 0) {
+					resultText += array[i];
+				} else {
+					resultText += `<${tagName}${id} class=`;
+					tag = `</${tagName}${id}>`;
+					const lineArr = array[i].split(tag);
+					for (let j = 0; j < lineArr.length; j++) {
+						if (j === 0) {
+							tag = contenteditable
+								? `"${tagName}Class${id}" contenteditable="false"`
+								: `"${tagName}Class${id}"`;
+							const elArray = lineArr[j].split(tag);
+							for (let k = 0; k < elArray.length; k++) {
+								if (k === 0) {
+									resultText += contenteditable
+										? `${elArray[k]}"${tagName}Class${id}" contenteditable="false" style="background-color:${color};">`
+										: `${elArray[k]}"${tagName}Class${id}" style="background-color:${color};">`;
+								} else {
+									resultText += `${value}</${tagName}${id}>`;
+								}
+							}
+						} else {
+							resultText += lineArr[j];
+						}
+					}
+				}
+			} else {
+				resultText = array[i];
+			}
+		}
+		textTmp = resultText;
+	}
+	return textTmp;
+};
+export const getIcon = (placeholder: Placeholder) => {
+	if (
+		placeholder.view?.toString() === PlaceholderView.SIGNATURE.toString() ||
+		(placeholder.specialType &&
+			placeholder.specialType?.toString() === SpecialType.SIGN.toString())
+	) {
+		return faSignature;
+	}
+
+	if (
+		placeholder.specialType &&
+		placeholder.specialType?.toString() === SpecialType.DATE.toString()
+	) {
+		return faCalendarDays;
+	}
+
+	if (
+		placeholder.specialType &&
+		placeholder.specialType?.toString() === SpecialType.FULLNAME.toString()
+	) {
+		return faUser;
+	}
+
+	if (
+		placeholder.specialType &&
+		placeholder.specialType?.toString() === SpecialType.EMAIL.toString()
+	) {
+		return faAt;
+	}
+
+	return faFont;
 };
