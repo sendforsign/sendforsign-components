@@ -397,9 +397,8 @@ export const SendModal = () => {
 						isSave.current = true;
 						if (!isPdf) {
 							removeClasses(deleteRecipient[index].recipientKey as string);
-						} else {
-							refreshPage.push(deleteRecipient[index].recipientKey as string);
 						}
+						refreshPage.push(deleteRecipient[index].recipientKey as string);
 					})
 					.catch((error) => {
 						setNotification({
@@ -769,7 +768,7 @@ export const SendModal = () => {
 											</Spin>
 										</Col>
 										<Col flex='auto'></Col>
-										{recipient.shareLink && (
+										{recipient.shareLink && ( 
 											<>
 												<Col flex='32px'>
 													<Tooltip title='Send personal request.'>

@@ -65,6 +65,8 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		setNotification,
 		contractPlaceholderCount,
 		setContractPlaceholderCount,
+		refreshPagePlaceholders,
+		setRefreshPagePlaceholders,
 	} = useContractEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
@@ -290,7 +292,19 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			readonlyCurrent.current = true;
 		}
 	}, [readonly]);
-
+	useEffect(() => {
+		if (refreshPagePlaceholders && refreshPagePlaceholders.length > 0) {
+			setRefreshPagePlaceholders([]);
+			for (let i = 0; i < refreshPagePlaceholders.length; i++) {
+				const placeholderFilter = placeholder.filter(
+					(pl) => pl.externalRecipientKey === refreshPagePlaceholders[i]
+				);
+				for (let j = 0; j < placeholderFilter.length; j++) {
+					deleteTag(placeholderFilter[j]);
+				}
+			}
+		}
+	}, [refreshPagePlaceholders]);
 	const updatePlaceholderClass = ({
 		id,
 		specialType,
@@ -387,9 +401,35 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(0, '', 'user');
 		}
 	};
-	const deleteTag = (id: number) => {
+	const deleteTag = (placeholderDelete: Placeholder) => {
+		let tagName = '';
+		if (placeholderDelete.isSpecial) {
+			switch (placeholderDelete.specialType) {
+				case SpecialType.DATE:
+					tagName = Tags.DATE;
+					break;
+
+				case SpecialType.FULLNAME:
+					tagName = Tags.FULLNAME;
+					break;
+
+				case SpecialType.EMAIL:
+					tagName = Tags.EMAIL;
+					break;
+
+				case SpecialType.SIGN:
+					tagName = Tags.SIGN;
+					break;
+
+				case SpecialType.INITIALS:
+					tagName = Tags.INITIALS;
+					break;
+			}
+		} else {
+			tagName = Tags.PLACEHOLDER;
+		}
 		let text = quillRef?.current?.root.innerHTML;
-		let tag = `<placeholder${id} class=`;
+		let tag = `<${tagName}${placeholderDelete.id} class=`;
 		let array = text?.split(tag);
 		let resultText = '';
 		// debugger;
@@ -397,34 +437,13 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			for (let i = 0; i < array.length; i++) {
 				if (array.length > 1) {
 					if (i === 0) {
-						let findSpan = array[i];
-						let posStart = findSpan.length - 60;
-						if (posStart <= 0) {
-							resultText += findSpan;
-						} else {
-							let posSpan = findSpan.lastIndexOf('<span style=');
-							if (posSpan < posStart) {
-								resultText += findSpan;
-							} else {
-								resultText += findSpan.substring(0, posSpan);
-							}
-						}
+						resultText += array[i];
 					} else {
-						tag = `</placeholder${id}>`;
+						tag = `</${tagName}${placeholderDelete.id}>`;
 						const lineArr = array[i].split(tag);
 						for (let j = 0; j < lineArr.length; j++) {
 							if (j > 0) {
-								let findSpan = lineArr[j];
-								if (j === 1) {
-									let posSpan = findSpan.indexOf('</span>');
-									if (posSpan !== 0) {
-										resultText += findSpan;
-									} else {
-										resultText += findSpan.substring(7, findSpan.length);
-									}
-								} else {
-									resultText += findSpan;
-								}
+								resultText += lineArr[j];
 							}
 						}
 					}
@@ -669,7 +688,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				},
 			},
 		};
-		deleteTag(holderDelete.id as number);
+		deleteTag(holderDelete);
 		placeholdersTmp.splice(holderIndex, 1);
 		setPlaceholder(placeholdersTmp);
 		await axios

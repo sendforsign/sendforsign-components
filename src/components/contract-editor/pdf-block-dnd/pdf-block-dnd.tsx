@@ -315,9 +315,22 @@ export const PdfBlockDnd = () => {
 					);
 					if (placeholderFilter && placeholderFilter.length > 0) {
 						for (let j = 0; j < placeholderFilter.length; j++) {
-							placeholderFilter[j].value = placeholder[i].value as string;
-							placeholderFilter[j].name = placeholder[i].name as string;
-							placeholderFilter[j].color = placeholder[i].color;
+							const pagePlIndex = pagePlaceholder.findIndex(
+								(pagePl) =>
+									pagePl.id?.toString() ===
+										placeholderFilter[j].id?.toString() &&
+									pagePl.placeholderKey ===
+										placeholderFilter[j].placeholderKey &&
+									pagePl.pageId?.toString() ===
+										placeholderFilter[j].pageId?.toString()
+							);
+							if (pagePlIndex) {
+								pagePlaceholder[pagePlIndex].value = placeholder[i]
+									.value as string;
+								pagePlaceholder[pagePlIndex].name = placeholder[i]
+									.name as string;
+								pagePlaceholder[pagePlIndex].color = placeholder[i].color;
+							}
 						}
 					}
 				}
@@ -374,7 +387,8 @@ export const PdfBlockDnd = () => {
 						if (
 							placeholder[i].isSpecial &&
 							placeholder[i].specialType?.toString() ===
-								SpecialType.DATE.toString()
+								SpecialType.DATE.toString() &&
+							value
 						) {
 							value = `${dayjs(value).format('YYYY-MM-DD @ HH:mm:ss')} GMT`;
 						}

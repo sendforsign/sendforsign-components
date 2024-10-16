@@ -62,6 +62,7 @@ export const PdfPage = ({
 		placeholderPdf,
 		setPlaceholderPdf,
 		refreshPagePlaceholders,
+		refreshPlaceholders,
 		setRefreshPagePlaceholders,
 	} = useContractEditorContext();
 	const currPagePl = useRef<PagePlaceholder[]>([]);
@@ -298,6 +299,7 @@ export const PdfPage = ({
 				}
 			}
 			setCurrPagePlaceholder(pagePlaceholderTmp);
+			currPagePl.current = pagePlaceholderTmp;
 		}
 	}, [placeholderChange]);
 	useEffect(() => {
@@ -312,6 +314,7 @@ export const PdfPage = ({
 				(pagePl) => pagePl.placeholderKey !== placeholderDelete
 			);
 			setCurrPagePlaceholder(pagePlaceholderFilter);
+			currPagePl.current = pagePlaceholderFilter;
 		}
 	}, [placeholderDelete]);
 	useEffect(() => {
@@ -328,8 +331,29 @@ export const PdfPage = ({
 				);
 			});
 			setCurrPagePlaceholder(pagePlaceholderTmp);
+			currPagePl.current = pagePlaceholderTmp;
 		}
 	}, [refreshPagePlaceholders]);
+	useEffect(() => {
+		if (placeholder && placeholder.length > 0) {
+			let pagePlaceholderTmp = [...currPagePlaceholder];
+			for (let i = 0; i < placeholder.length; i++) {
+				const pagePlaceholderFilter = pagePlaceholderTmp.map((pagePl) => {
+					if (
+						pagePl.placeholderKey === placeholder[i].placeholderKey ||
+						pagePl.externalRecipientKey === placeholder[i].placeholderKey
+					) {
+						return { ...pagePl, color: placeholder[i].color };
+					} else {
+						return pagePl;
+					}
+				});
+				pagePlaceholderTmp = pagePlaceholderFilter;
+			}
+			setCurrPagePlaceholder(pagePlaceholderTmp);
+			currPagePl.current = pagePlaceholderTmp;
+		}
+	}, [placeholder]);
 	const save = async () => {
 		if (needUpdate.current && !readonly) {
 			// debugger;
@@ -384,6 +408,7 @@ export const PdfPage = ({
 			};
 			await axios
 				.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
+				// .post('http://localhost:5000/api/' + ApiEntity.PLACEHOLDER, body, {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
@@ -502,7 +527,7 @@ export const PdfPage = ({
 						>
 							{currPagePlaceholder &&
 								currPagePlaceholder.length > 0 &&
-								currPagePlaceholder.map((pagePl, index) => {
+								currPagePlaceholder.map((pagePl) => {
 									let random = Math.random();
 									return (
 										<PdfPlaceholder
