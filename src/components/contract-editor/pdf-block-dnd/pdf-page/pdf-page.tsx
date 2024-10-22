@@ -205,6 +205,7 @@ export const PdfPage = ({
 		let isMounted = true;
 
 		if (pagePlaceholder.length > 0 && isMounted && !first.current) {
+			// console.log('4');
 			// console.log('PdfPage pagePlaceholder', pagePlaceholder);
 			currPagePl.current = pagePlaceholder;
 			setCurrPagePlaceholder(pagePlaceholder);
@@ -278,6 +279,7 @@ export const PdfPage = ({
 			placeholderChange &&
 			placeholderChange.placeholderKey
 		) {
+			// console.log('3');
 			setPlaceholderChange({});
 			let pagePlaceholderTmp = [...currPagePlaceholder];
 			let pagePlaceholderFilter = pagePlaceholderTmp.filter(
@@ -308,6 +310,7 @@ export const PdfPage = ({
 			currPagePlaceholder.length > 0 &&
 			placeholderDelete
 		) {
+			// console.log('2');
 			setPlaceholderDelete('');
 			let pagePlaceholderTmp = [...currPagePlaceholder];
 			let pagePlaceholderFilter = pagePlaceholderTmp.filter(
@@ -324,6 +327,7 @@ export const PdfPage = ({
 			currPagePlaceholder &&
 			currPagePlaceholder.length > 0
 		) {
+			// console.log('1');
 			setRefreshPagePlaceholders([]);
 			let pagePlaceholderTmp = currPagePlaceholder.filter((pagePl) => {
 				return !refreshPagePlaceholders.includes(
@@ -335,7 +339,8 @@ export const PdfPage = ({
 		}
 	}, [refreshPagePlaceholders]);
 	useEffect(() => {
-		if (placeholder && placeholder.length > 0) {
+		if (placeholder && placeholder.length > 0 && !readonly) {
+			// console.log('placeholder', placeholder);
 			let pagePlaceholderTmp = [...currPagePlaceholder];
 			for (let i = 0; i < placeholder.length; i++) {
 				const pagePlaceholderFilter = pagePlaceholderTmp.map((pagePl) => {
@@ -408,7 +413,7 @@ export const PdfPage = ({
 			};
 			await axios
 				.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-				// .post('http://localhost:5000/api/' + ApiEntity.PLACEHOLDER, body, {
+					// .post('http://localhost:5000/api/' + ApiEntity.PLACEHOLDER, body, {
 					headers: {
 						Accept: 'application/vnd.api+json',
 						'Content-Type': 'application/vnd.api+json',
@@ -430,6 +435,7 @@ export const PdfPage = ({
 				});
 		}
 	};
+	// console.log('currPagePlaceholder', currPagePlaceholder);
 	return (
 		<Page
 			renderTextLayer={false}

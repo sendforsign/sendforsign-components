@@ -162,6 +162,7 @@ export const PdfBlockDnd = () => {
 			await setArrayBuffer('pdfFile', mergedPdf);
 			setPdfFileLoad(pdfFileLoad + 1);
 			if (sign) {
+				// console.log('5');
 				merger = new PDFMerger();
 				const pdfDoc = await PDFDocument.load(mergedPdf);
 				const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -306,6 +307,7 @@ export const PdfBlockDnd = () => {
 	}, [pdfFileLoad]);
 	useEffect(() => {
 		if (placeholder && placeholder.length > 0) {
+			// console.log('6');
 			// console.log('placeholder useEffect', placeholder);
 			let pagePlaceholderTmp: PagePlaceholder[] = [];
 			if (pagePlaceholder && pagePlaceholder.length > 0) {

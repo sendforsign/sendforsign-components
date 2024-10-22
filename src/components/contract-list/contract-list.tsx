@@ -254,7 +254,7 @@ export const ContractList: FC<ContractListProps> = ({
 		const getContracts = async () => {
 			setContractsLoad(true);
 			let eventStatusTmp: EventStatus[] = [];
-			console.log('axios', axios, BASE_URL, ApiEntity.EVENT_STATUS);
+			// console.log('axios', axios, BASE_URL, ApiEntity.EVENT_STATUS);
 			await axios
 				.get(BASE_URL + ApiEntity.EVENT_STATUS, {
 					headers: {
