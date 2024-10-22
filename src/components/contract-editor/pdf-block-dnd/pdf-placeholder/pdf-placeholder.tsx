@@ -168,7 +168,13 @@ export const PdfPlaceholder = ({
 										style={{ objectFit: 'contain' }}
 									/>
 								) : (
-									<div>
+									<div
+										style={{
+											fontFamily: 'Inter',
+											fontSize: 15,
+											fontWeight: 500,
+										}}
+									>
 										<FontAwesomeIcon icon={faSignature} />{' '}
 										{pagePlaceholder.name}
 									</div>
