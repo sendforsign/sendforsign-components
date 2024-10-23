@@ -32,6 +32,8 @@ export const ShareLinkBlock = () => {
 		setContractValue,
 		refreshRecipients,
 		setRefreshRecipients,
+		refreshPlaceholders,
+		setRefreshPlaceholders,
 		setNotification,
 		signCount,
 		refreshSign,
@@ -297,6 +299,7 @@ export const ShareLinkBlock = () => {
 									type='default'
 									icon={<FontAwesomeIcon icon={faObjectUngroup} />}
 									onClick={() => {
+										setRefreshPlaceholders(refreshPlaceholders + 1);
 										setPlaceholderVisible(!placeholderVisible);
 									}}
 								>
