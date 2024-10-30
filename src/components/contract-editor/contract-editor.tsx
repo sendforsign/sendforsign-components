@@ -147,15 +147,15 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	}, [userKey]);
 	useEffect(() => {
 		let isMounted = true;
-		async function getContract() { 
+		async function getContract() {
 			let contractTmp: {
 				contractType?: number;
 				value?: string;
-				name?: string; 
+				name?: string;
 			} = {
 				contractType: 0,
 				value: '',
-				name: '', 
+				name: '',
 			};
 			let body = {
 				data: {
@@ -298,7 +298,11 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 							name: contractName,
 							value: contractValue,
 							templateKey: templateKey,
-							contractType: templateKey ? '' : contractType,
+							contractType: templateKey
+								? isPdf
+									? ContractTypeText.PDF
+									: ContractTypeText.DOCX
+								: contractType,
 							// preCreated: true,
 						},
 						placeholders: fillPlaceholder
