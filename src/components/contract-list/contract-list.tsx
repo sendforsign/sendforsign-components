@@ -12,6 +12,10 @@ import {
 	Dropdown,
 	MenuProps,
 	Empty,
+	Statistic,
+	Input,
+	Select,
+	Tooltip
 } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -21,9 +25,12 @@ import Table from 'antd/es/table';
 import { ContractListContext } from './contract-list-context';
 import { ModalView } from './modal-view/modal-view';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisVertical, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faBookBookmark, faEllipsisVertical, faLightbulb, faPaperclip, faPlus, faQuestion, faSignature } from '@fortawesome/free-solid-svg-icons';
 import { EventStatus } from '../../config/types';
 import { Notification } from './notification/notification';
+
+const { Option } = Select;
+const { TextArea } = Input;
 
 interface DataType {
 	key?: string;
@@ -61,7 +68,7 @@ export const ContractList: FC<ContractListProps> = ({
 	const [spinLoad, setSpinLoad] = useState(false);
 	const [contractsLoad, setContractsLoad] = useState(false);
 	const currentRecord = useRef<DataType>({});
-	const { Title } = Typography;
+	const { Title, Text } = Typography;
 	const items: MenuProps['items'] = [
 		{
 			label: 'Archive',
@@ -400,6 +407,99 @@ export const ContractList: FC<ContractListProps> = ({
 			)}
 			<ModalView id={currContractKey ? currContractKey : 'New contract'} />
 			<Notification />
+
+			<Card style={{ overflow: 'auto' }}>
+			<Row style={{ margin: '0 0 16px 0' }}>
+        <Col>
+          <Title
+            level={3}
+            style={{
+              margin: '0',
+              display: 'flex',
+              textAlign: 'center',
+            }}
+          >
+            AI assistant
+          </Title>
+        </Col>
+        <Col flex={'auto'} />
+      </Row>
+	  <Row gutter={16} style={{ marginBottom: 32 }}>
+		<Col>
+			<p>1</p>
+			<p>2</p>
+		</Col>
+	  </Row>
+	  <Row gutter={16} style={{ marginBottom: 32 }}>
+		<Col flex={'auto'} style={{ marginBottom: 8 }}>
+			<TextArea autoSize={{ minRows: 1 }} style={{minWidth: 300}} placeholder="Message assistant..." />
+		</Col>
+		<Col style={{ marginBottom: 8 }}>
+			<Select 
+				placeholder='Add context'       
+				mode="multiple"
+				allowClear
+				style={{minWidth: 120, maxWidth: 300}}>
+	  			<Option value="1">Гражданское право</Option>
+	  			<Option value="2">Уголовный кодекс</Option>
+	  			<Option value="3">Трудовой кодекс</Option>
+			</Select>
+		</Col>
+		<Col>
+			<Button icon={<FontAwesomeIcon color='green' icon={faPaperclip} />} >2 files</Button>
+		</Col>
+		<Col flex={'80px'} style={{ marginBottom: 8 }}>
+			<Button type="primary">Submit</Button>
+		</Col>
+	  </Row>
+	  <Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
+		<Col flex={'auto'} />
+		<Col flex={'auto'} style={{display: 'flex', justifyContent: 'center'}}>
+		<Space wrap align='center'>
+			<Text type='secondary'>Get started with</Text>
+		</Space>
+		</Col>
+		<Col flex={'auto'} /> 
+	  </Row>
+	  <Row gutter={16} style={{ marginBottom: 32 }} wrap={false}>
+		<Col flex={'auto'} />
+		<Col flex={'auto'} style={{display: 'flex', justifyContent: 'center'}}>
+		<Space style={{minWidth: 100, maxWidth: 800, justifyContent: 'center'}} wrap align='center'>
+			<Button icon={<FontAwesomeIcon color='green' icon={faQuestion} />} shape='round'>Создай документ на основе существующих</Button>
+			<Button icon={<FontAwesomeIcon color='orange' icon={faLightbulb} />} shape='round'>Ответь на основе контекста</Button>
+			<Button icon={<FontAwesomeIcon color='orange' icon={faLightbulb} />} shape='round'>Подготовь саммари документа</Button>
+			<Button icon={<FontAwesomeIcon color='orange' icon={faLightbulb} />} shape='round'>Найди документы по имени подписанта</Button>
+
+		</Space>
+		</Col>
+		<Col flex={'auto'} /> 
+	  </Row>
+
+	  <Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
+		<Col flex={'auto'} />
+		<Col flex={'auto'} style={{display: 'flex', justifyContent: 'center'}}>
+		<Space wrap align='center'>
+			<Text type='secondary'>Add context</Text>
+		</Space>
+		</Col>
+		<Col flex={'auto'} /> 
+	  </Row>
+	  <Row gutter={16} style={{ marginBottom: 32 }} wrap={false}>
+		<Col flex={'auto'} />
+		<Col flex={'auto'} style={{display: 'flex', justifyContent: 'center'}}>
+		<Space style={{minWidth: 100, maxWidth: 800, justifyContent: 'center'}} wrap align='center'>
+			<Button icon={<FontAwesomeIcon color='green' icon={faBookBookmark} />} shape='round'>Гражданское право</Button>
+			<Button icon={<FontAwesomeIcon color='orange' icon={faBookBookmark} />} shape='round'>Уголовный кодекс</Button>
+			<Button icon={<FontAwesomeIcon color='orange' icon={faBookBookmark} />} shape='round'>Трудовой кодекс</Button>
+			<Tooltip title="Upload files to add your own context">
+				<Button icon={<FontAwesomeIcon color='grey' icon={faPlus} />} shape='round' type='dashed'></Button>
+			</Tooltip>
+		</Space>
+		</Col>
+		<Col flex={'auto'} /> 
+	  </Row>
+</Card>
+
 		</ContractListContext.Provider>
 	);
 };
