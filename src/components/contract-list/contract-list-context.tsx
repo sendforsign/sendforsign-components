@@ -1,5 +1,4 @@
 import { createContext, useContext } from 'react';
-import { ContractSign } from '../../config/types';
 
 export type TContractListContextType = {
 	contractModal: boolean;

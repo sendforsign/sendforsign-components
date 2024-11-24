@@ -223,6 +223,11 @@ export type Row = {
 	createTime?: string;
 	base64?: string;
 };
+export type Context = {
+	name?: string;
+	contextKey?: string;
+	createTime?: Date;
+};
 export interface DragItem {
 	id: string;
 	pagePlaceholder: PagePlaceholder;

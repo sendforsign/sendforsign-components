@@ -4,6 +4,13 @@ import {
 	ContractList,
 	TemplateEditor,
 	TemplateList,
+	AiAssistant,
 } from './components';
 
-export { ContractEditor, ContractList, TemplateEditor, TemplateList };
+export {
+	ContractEditor,
+	ContractList,
+	TemplateEditor,
+	TemplateList,
+	AiAssistant,
+};

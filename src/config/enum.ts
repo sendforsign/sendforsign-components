@@ -29,6 +29,9 @@ export const enum ApiEntity {
 	CHECK_CONTRACT_VALUE = 'check_contract_value',
 	UPDATE_CONTRACT_VALUE = 'update_contract_value',
 	PLACEHOLDER = 'placeholder',
+	CONTEXT = 'context',
+	CONTEXT_FILES = 'context_files',
+	CHAT = 'chat',
 }
 export const enum Action {
 	READ = 'read',
