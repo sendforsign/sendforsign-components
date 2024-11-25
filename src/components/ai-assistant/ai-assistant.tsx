@@ -208,39 +208,41 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							<Col flex={'auto'} />
 						</Row>
 						<Row gutter={16} style={{ marginBottom: 32 }}>
+							<ul style={{width: '100%', paddingLeft: 0, paddingRight: 0}}>
 							{messages.map((m, index) => {
 								console.log('m', m, index);
 								return (
-									<Space direction='vertical' size={8}>
+									<div style={{width: '100%'}}>
 										{m.role === 'user' ? (
-											<div
+											<li
 												key={m.id}
 												style={{ display: 'flex', flexDirection: 'row' }}
 											>
-												<p className='text-primary'>{m.content}</p>
-											</div>
+												<div style={{display: 'flex', padding: '8px', borderRadius: '0.75rem' }}>
+													<Text className='text-primary'>{m.content}</Text>
+												</div>
+											</li>
 										) : (
-											<div
+											<li
 												key={m.id}
 												style={{
-													display: 'flex',
-													flexDirection: 'row-reverse',
+													display: 'flex', flexDirection: 'row-reverse',
 												}}
 											>
-												<p className='text-primary'>{m.content}</p>
-											</div>
+												<div style={{display: 'flex', padding: '8px', borderRadius: '0.75rem', width: '75%', background: '#f5f5f5' }}>
+													<Text className='text-primary'>{m.content}</Text>
+												</div>
+											</li>
 										)}
-									</Space>
+									</div>
 								);
 							})}
+							</ul>
 						</Row>
 						<Row gutter={16} style={{ marginBottom: 32 }}>
-							<form onSubmit={handleSubmit}>
-								<Space
-									direction='horizontal'
-									style={{ display: 'flex' }}
-									size={8}
-								>
+							<form style={{width: '100%'}} onSubmit={handleSubmit}>
+								<Row gutter={16} style={{ marginBottom: 32 }}>
+								<Col flex={'auto'} style={{ marginBottom: 8 }}>
 									<TextArea
 										autoSize={{ minRows: 1 }}
 										style={{ minWidth: 300, width: '100%' }}
@@ -248,6 +250,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										value={input}
 										onChange={handleInputChange}
 									/>
+								</Col>
+								<Col style={{ marginBottom: 8 }}>
 									<Select
 										placeholder='Add context'
 										mode='multiple'
@@ -257,11 +261,15 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										onDeselect={handleDeselectContext}
 										options={selectData}
 									/>
+								</Col>
+								<Col>
 									<Button
 										icon={<FontAwesomeIcon color='green' icon={faPaperclip} />}
 									>
 										2 files
 									</Button>
+								</Col>
+								<Col flex={'80px'} style={{ marginBottom: 8 }}>
 									<Button
 										type='primary'
 										htmlType='submit'
@@ -274,7 +282,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									>
 										Submit
 									</Button>
-								</Space>
+								</Col>
+								</Row>
 							</form>
 						</Row>
 						<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
