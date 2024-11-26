@@ -208,6 +208,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							<Col flex={'auto'} />
 						</Row>
 						<Row gutter={16} style={{ marginBottom: 32 }}>
+							<Col flex={'auto'}></Col>
+							<Col flex="768px">
 							<ul style={{width: '100%', paddingLeft: 0, paddingRight: 0}}>
 							{messages.map((m, index) => {
 								console.log('m', m, index);
@@ -216,9 +218,9 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										{m.role === 'user' ? (
 											<li
 												key={m.id}
-												style={{ display: 'flex', flexDirection: 'row' }}
+												style={{ display: 'flex', flexDirection: 'row-reverse' }}
 											>
-												<div style={{display: 'flex', padding: '8px', borderRadius: '0.75rem' }}>
+												<div style={{display: 'flex', padding: '8px', borderRadius: '0.75rem', background: '#f5f5f5' }}>
 													<Text className='text-primary'>{m.content}</Text>
 												</div>
 											</li>
@@ -226,10 +228,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											<li
 												key={m.id}
 												style={{
-													display: 'flex', flexDirection: 'row-reverse',
+													display: 'flex', flexDirection: 'row',
 												}}
 											>
-												<div style={{display: 'flex', padding: '8px', borderRadius: '0.75rem', width: '75%', background: '#f5f5f5' }}>
+												<div style={{display: 'flex', padding: '8px', borderRadius: '0.75rem', width: '75%' }}>
 													<Text className='text-primary'>{m.content}</Text>
 												</div>
 											</li>
@@ -238,6 +240,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 								);
 							})}
 							</ul>
+							</Col>
+							<Col flex={'auto'}></Col>
 						</Row>
 						<Row gutter={16} style={{ marginBottom: 32 }}>
 							<form style={{width: '100%'}} onSubmit={handleSubmit}>
