@@ -10,11 +10,13 @@ import {
 	Spin,
 	Input,
 	Select,
-	Image,
+	Tooltip
 } from 'antd';
 import { AiAssistantContext } from './ai-assistant-context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+	faArrowUp,
+	faBook,
 	faLightbulb,
 	faPaperclip,
 	faQuestion,
@@ -58,8 +60,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const [spinLoad, setSpinLoad] = useState(false);
 	const [contextFromFile, setContextFromFile] = useState<string[]>([]);
 	const [spinContextLoad, setSpinContextLoad] = useState(false);
-	const [spinFileLoad, setSpinFileLoad] = useState(false);
 	const [selectData, setSelectData] = useState<SelectData[]>([]);
+	const [spinFileLoad, setSpinFileLoad] = useState(false);
 	const [contexts, setContexts] = useState<Context[]>([]);
 	const [selectedContexts, setSelectedContexts] = useState<string[]>([]);
 	const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -76,6 +78,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		},
 	});
 	const { Title, Text } = Typography;
+
+	const [tooltipFileVisible, setTooltipFileVisible] = useState(false);
+	const [tooltipContextVisible, setTooltipContextVisible] = useState(false);
+
 	const props: UploadProps = {
 		name: 'file',
 		multiple: true,
@@ -185,6 +191,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				});
 			});
 	};
+
+
 	useEffect(() => {
 		setCurrToken(token);
 		setRefreshContext(refreshContext + 1);
@@ -279,6 +287,20 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		setSelectedContexts(selectedContextsTmp);
 		body.current = { ...body.current, contexts: selectedContextsTmp };
 	};
+
+	const handleContextClick = (message: string, showFileTooltip: boolean, showContextTooltip: boolean) => {
+		setTooltipFileVisible(showFileTooltip);
+		setTooltipContextVisible(showContextTooltip);
+		handleInputChange({ target: { value: message } });
+	};
+
+	const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+	if (event.key === 'Enter' && !event.shiftKey) {
+		event.preventDefault(); // Prevents adding a new line
+		handleSubmit(); // Calls the submit function
+	}
+};
+
 	return (
 		<AiAssistantContext.Provider
 			value={{
@@ -324,146 +346,118 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 						</Row>
 						<Row gutter={16} style={{ marginBottom: 32 }}>
 							<Col flex={'auto'}></Col>
-							<Col flex='768px'>
-								<ul style={{ width: '100%', paddingLeft: 0, paddingRight: 0 }}>
-									{messages.map((m, index) => {
-										console.log('m', m, index);
-										return (
-											<div style={{ width: '100%' }}>
-												{m.role === 'user' ? (
-													<li
-														key={m.id}
-														style={{
-															display: 'flex',
-															flexDirection: 'row-reverse',
-														}}
-													>
-														<div
-															style={{
-																display: 'flex',
-																padding: '8px',
-																borderRadius: '0.75rem',
-																background: '#f5f5f5',
-															}}
-														>
-															<Text className='text-primary'>{m.content}</Text>
-														</div>
-													</li>
-												) : (
-													<li
-														key={m.id}
-														style={{
-															display: 'flex',
-															flexDirection: 'row',
-														}}
-													>
-														<Space
-															align='start'
-															style={{
-																display: 'flex',
-																padding: '8px',
-																borderRadius: '0.75rem',
-																width: '75%',
-															}}
-														>
-															<svg
-																width='20'
-																height='20'
-																viewBox='0 0 20 20'
-																fill='none'
-																xmlns='http://www.w3.org/2000/svg'
-															>
-																<g clip-path='url(#clip0_4254_39676)'>
-																	<path
-																		d='M20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20C15.5228 20 20 15.5228 20 10Z'
-																		fill='black'
-																	/>
-																	<path
-																		d='M7.65914 11.859L10.4748 4.21477C10.5103 4.11845 10.6354 4.09438 10.7041 4.17065L15.7851 9.81373C15.8538 9.89 15.8168 10.012 15.7173 10.0372L7.82064 12.0383C7.71428 12.0653 7.62123 11.962 7.65914 11.859Z'
-																		fill='white'
-																	/>
-																	<path
-																		fill-rule='evenodd'
-																		clip-rule='evenodd'
-																		d='M10.6873 4.18589C10.63 4.12233 10.5257 4.14238 10.4962 4.22266L7.68053 11.8669C7.68053 11.8669 7.68053 11.8669 7.68053 11.8669C7.64894 11.9527 7.72648 12.0388 7.81512 12.0163L15.7118 10.0152C15.7947 9.99416 15.8255 9.89253 15.7683 9.82896L15.7852 9.81376L15.7683 9.82896L10.6873 4.18589ZM10.721 4.15547L10.7042 4.17064L10.721 4.15547L15.8021 9.79855C15.8822 9.88753 15.8391 10.0298 15.723 10.0592L7.82628 12.0604C7.7022 12.0918 7.59364 11.9713 7.63787 11.8512L7.63787 11.8512L10.4535 4.20694L10.4535 4.20694C10.4949 4.09458 10.6409 4.06648 10.721 4.15547Z'
-																		fill='black'
-																	/>
-																	<path
-																		d='M12.4339 7.72221C13.8953 9.34526 15.443 10.3342 15.8907 9.93105C16.3384 9.5279 15.5167 7.88534 14.0553 6.26229C12.5939 4.63923 11.0462 3.6503 10.5985 4.05345C10.1507 4.45659 10.9725 6.09915 12.4339 7.72221Z'
-																		fill='#EEEEEE'
-																	/>
-																</g>
-																<defs>
-																	<clipPath id='clip0_4254_39676'>
-																		<rect width='20' height='20' fill='white' />
-																	</clipPath>
-																</defs>
-															</svg>
-															<Text className='text-primary'>{m.content}</Text>
-														</Space>
-													</li>
-												)}
-											</div>
-										);
-									})}
-								</ul>
+							<Col flex="768px">
+							<ul style={{width: '100%', paddingLeft: 0, paddingRight: 0}}>
+							{messages.map((m, index) => {
+								console.log('m', m, index);
+								return (
+									<div style={{width: '100%'}}>
+										{m.role === 'user' ? (
+											<li
+												key={m.id}
+												style={{ display: 'flex', flexDirection: 'row-reverse' }}
+											>
+												<div style={{display: 'flex', padding: '8px', borderRadius: '0.75rem', background: '#f5f5f5' }}>
+													<Text className='text-primary'>{m.content}</Text>
+												</div>
+											</li>
+										) : (
+											<li
+												key={m.id}
+												style={{
+													display: 'flex', flexDirection: 'row',
+												}}
+											>
+												<Space align='start' style={{display: 'flex', padding: '8px', borderRadius: '0.75rem', width: '75%' }}>
+												<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<g clip-path="url(#clip0_4254_39676)">
+													<path d="M20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20C15.5228 20 20 15.5228 20 10Z" fill="black"/>
+													<path d="M7.65914 11.859L10.4748 4.21477C10.5103 4.11845 10.6354 4.09438 10.7041 4.17065L15.7851 9.81373C15.8538 9.89 15.8168 10.012 15.7173 10.0372L7.82064 12.0383C7.71428 12.0653 7.62123 11.962 7.65914 11.859Z" fill="white"/>
+													<path fill-rule="evenodd" clip-rule="evenodd" d="M10.6873 4.18589C10.63 4.12233 10.5257 4.14238 10.4962 4.22266L7.68053 11.8669C7.68053 11.8669 7.68053 11.8669 7.68053 11.8669C7.64894 11.9527 7.72648 12.0388 7.81512 12.0163L15.7118 10.0152C15.7947 9.99416 15.8255 9.89253 15.7683 9.82896L15.7852 9.81376L15.7683 9.82896L10.6873 4.18589ZM10.721 4.15547L10.7042 4.17064L10.721 4.15547L15.8021 9.79855C15.8822 9.88753 15.8391 10.0298 15.723 10.0592L7.82628 12.0604C7.7022 12.0918 7.59364 11.9713 7.63787 11.8512L7.63787 11.8512L10.4535 4.20694L10.4535 4.20694C10.4949 4.09458 10.6409 4.06648 10.721 4.15547Z" fill="black"/>
+													<path d="M12.4339 7.72221C13.8953 9.34526 15.443 10.3342 15.8907 9.93105C16.3384 9.5279 15.5167 7.88534 14.0553 6.26229C12.5939 4.63923 11.0462 3.6503 10.5985 4.05345C10.1507 4.45659 10.9725 6.09915 12.4339 7.72221Z" fill="#EEEEEE"/>
+													</g>
+													<defs>
+													<clipPath id="clip0_4254_39676">
+													<rect width="20" height="20" fill="white"/>
+													</clipPath>
+													</defs>
+												</svg>
+												<Text className='text-primary'>{m.content}</Text>
+												</Space>
+											</li>
+										)}
+									</div>
+								);
+							})}
+							</ul>
 							</Col>
 							<Col flex={'auto'}></Col>
 						</Row>
-						<Row gutter={16} style={{ marginBottom: 32 }}>
-							<form style={{ width: '100%' }} onSubmit={handleSubmit}>
-								<Row gutter={16} style={{ marginBottom: 32 }}>
-									<Col flex={'auto'} style={{ marginBottom: 8 }}>
-										<TextArea
-											autoSize={{ minRows: 1 }}
-											style={{ minWidth: 300, width: '100%' }}
-											placeholder='Message assistant...'
-											value={input}
-											onChange={handleInputChange}
-										/>
-									</Col>
-									<Col style={{ marginBottom: 8 }}>
-										<Select
-											placeholder='Add context'
-											mode='multiple'
-											allowClear
-											style={{ minWidth: 120, maxWidth: 300 }}
-											onSelect={handleSelectContext}
-											onDeselect={handleDeselectContext}
-											options={selectData}
-										/>
-									</Col>
-									<Col>
-										<Upload {...props}>
-											<Button
-												loading={spinFileLoad}
-												icon={
-													<FontAwesomeIcon color='green' icon={faPaperclip} />
-												}
-											>
-												{contextFromFile.length > 0
-													? `${contextFromFile.length} файлов`
-													: 'Загрузить'}
-											</Button>
+						<Row gutter={16} style={{ marginBottom: 16 }}>
+							<Col flex={'auto'}></Col>
+							<Col flex="768px">
+							<form onSubmit={handleSubmit} style={{width: '100%', borderRadius: '0.75rem', background: '#f5f5f5' }}>
+								<Row style={{padding: '8px'}}>
+								<Col flex={'auto'}>
+									<TextArea
+										autoSize={{ minRows: 1 }}
+										style={{ minWidth: 300, width: '100%' }}
+										placeholder='Message assistant...'
+										value={input}
+										onChange={handleInputChange}
+										variant='borderless'
+										onKeyDown={handleKeyDown} // Add this line
+
+									/>
+								</Col>
+								</Row>
+								<Row gutter={4} style={{padding: '0px 8px'}}>
+								<Col style={{ marginBottom: 8 }}>
+									<Tooltip title="Attach files" placement="left" open={tooltipFileVisible}>
+									<Upload {...props}>
+
+									<Button type='text' loading={spinFileLoad}
+										icon={<FontAwesomeIcon icon={faPaperclip} color='black'/>}
+									/ >
 										</Upload>
-									</Col>
-									<Col flex={'80px'} style={{ marginBottom: 8 }}>
-										<Button
-											type='primary'
-											htmlType='submit'
-											disabled={
-												input &&
-												(selectedContexts.length > 0 ||
-													contextFromFile.length > 0)
-													? false
-													: true
-											}
-										>
-											Submit
-										</Button>
-									</Col>
+									</Tooltip>
+								</Col>
+								<Col style={{ marginBottom: 8 }}>
+									<Tooltip title="Select context" placement="right" open={tooltipContextVisible}>
+									<Select
+										mode='multiple'
+										onSelect={handleSelectContext}
+										onDeselect={handleDeselectContext}
+										options={selectData}
+										variant="borderless"
+										popupMatchSelectWidth={false}
+										suffixIcon={<FontAwesomeIcon icon={faBook} color='black' size='lg' style={{paddingTop: '2px'}} />}
+									/>
+									</Tooltip>
+								</Col>
+								<Col flex={'auto'}></Col>
+								<Col style={{ marginBottom: 8 }}>
+									<Button
+										type='primary'
+										icon={<FontAwesomeIcon icon={faArrowUp} />}
+										htmlType='submit'
+										onClick={() => {
+											setTooltipFileVisible(false);
+											setTooltipContextVisible(false);
+										}}										
+										disabled={
+											input 
+											// && (selectedContexts.length > 0 || contextFromFile !== '')
+												? false
+												: true
+										}
+									>
+									</Button>
+								</Col>
 								</Row>
 							</form>
+							</Col>
+							<Col flex={'auto'}></Col>
 						</Row>
 						<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
 							<Col flex={'auto'} />
@@ -493,28 +487,20 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									align='center'
 								>
 									<Button
-										icon={<FontAwesomeIcon color='green' icon={faQuestion} />}
-										shape='round'
-									>
-										Создай документ на основе существующих
-									</Button>
-									<Button
 										icon={<FontAwesomeIcon color='orange' icon={faLightbulb} />}
 										shape='round'
+										id='Context1'
+										onClick={() => handleContextClick('Ответь на вопрос на основе контекста: ', false, true)}
 									>
 										Ответь на основе контекста
 									</Button>
 									<Button
 										icon={<FontAwesomeIcon color='orange' icon={faLightbulb} />}
 										shape='round'
+										id='Context2'
+										onClick={() => handleContextClick('Подготовь саммари документа', true, false)}
 									>
 										Подготовь саммари документа
-									</Button>
-									<Button
-										icon={<FontAwesomeIcon color='orange' icon={faLightbulb} />}
-										shape='round'
-									>
-										Найди документы по имени подписанта
 									</Button>
 								</Space>
 							</Col>
