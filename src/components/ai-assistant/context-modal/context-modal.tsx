@@ -8,7 +8,6 @@ import { ApiEntity, ContractSteps } from '../../../config/enum';
 import type { UploadFile, UploadProps } from 'antd';
 import { message, Upload } from 'antd';
 import { RcFile } from 'antd/es/upload';
-import { reject, set } from 'lodash';
 import useSaveArrayBuffer from '../../../hooks/use-save-array-buffer';
 
 export const ContextModal = () => {
@@ -173,6 +172,7 @@ export const ContextModal = () => {
 							placeholder='Enter context name'
 							value={contextName}
 							onChange={handleChange}
+							autoFocus
 						/>
 						<Dragger {...props}>
 							<p className='ant-upload-drag-icon'>
