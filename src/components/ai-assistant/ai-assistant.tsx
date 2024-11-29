@@ -416,10 +416,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											<Button key={file.uid} size='small' >
 												<span>{file.name}</span>
 												<Button
-													type="link"
+													type="text"
 													size='small'
 													onClick={() => handleRemoveFile(file)}
-													icon={<FontAwesomeIcon icon={faTrash} size='sm' color='grey'/>} 
+													icon={<FontAwesomeIcon icon={faTrash} size='sm'/>} 
 												>
 												</Button>
 											</Button>
