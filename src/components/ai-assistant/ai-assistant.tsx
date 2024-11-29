@@ -28,7 +28,7 @@ import { Action, ApiEntity } from '../../config/enum';
 import { Context } from '../../config/types';
 import axios from 'axios';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
-import { RcFile } from 'antd/es/upload';
+import Upload, { RcFile, UploadFile, UploadProps } from 'antd/es/upload';
 // import { CustomPDFLoader } from '../../utils/customPDFLoader';
 // import { BufferLoader } from 'langchain/document_loaders/fs/buffer';
 
