@@ -20,6 +20,7 @@ import {
 	faLightbulb,
 	faPaperclip,
 	faQuestion,
+	faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { Notification } from './notification/notification';
 import { ContextModal } from './context-modal';
@@ -87,7 +88,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		multiple: true,
 		accept: 'application/pdf',
 		listType: 'text',
-		showUploadList: true,
+		showUploadList: false,
 
 		onChange: async (info) => {
 			if (!info.file.status) {
@@ -98,6 +99,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 					await sendFiles();
 				}
 			}
+			setFileList(fileListRef.current); // Ensure fileList state is updated
+
 		},
 		onRemove: (file) => {
 			const index = fileListRef.current.indexOf(file);
@@ -123,6 +126,15 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			format: (percent) => percent && `${parseFloat(percent.toFixed(2))}%`,
 		},
 	};
+	
+	const handleRemoveFile = (file: UploadFile) => {
+		const index = fileListRef.current.indexOf(file);
+		const newFileList = fileListRef.current.slice();
+		newFileList.splice(index, 1);
+		fileListRef.current = newFileList;
+		setFileList(newFileList);
+	};
+
 	const saveArrayBuffer = (file: RcFile): Promise<boolean> =>
 		new Promise((resolve, reject) => {
 			const reader = new FileReader();
@@ -399,6 +411,20 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							<form onSubmit={handleSubmit} style={{width: '100%', borderRadius: '0.75rem', background: '#f5f5f5' }}>
 								<Row style={{padding: '8px'}}>
 								<Col flex={'auto'}>
+									<Space wrap style={{marginBottom: '8px'}}>
+										{fileList.map((file) => (
+											<Button key={file.uid} size='small' >
+												<span>{file.name}</span>
+												<Button
+													type="link"
+													size='small'
+													onClick={() => handleRemoveFile(file)}
+													icon={<FontAwesomeIcon icon={faTrash} size='sm' color='grey'/>} 
+												>
+												</Button>
+											</Button>
+										))}
+									</Space>
 									<TextArea
 										autoSize={{ minRows: 1 }}
 										style={{ minWidth: 300, width: '100%' }}
@@ -414,11 +440,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 								<Row gutter={4} style={{padding: '0px 8px'}}>
 								<Col style={{ marginBottom: 8 }}>
 									<Tooltip title="Attach files" placement="left" open={tooltipFileVisible}>
-									<Upload {...props}>
-
-									<Button type='text' loading={spinFileLoad}
-										icon={<FontAwesomeIcon icon={faPaperclip} color='black'/>}
-									/ >
+										<Upload {...props}>
+										<Button type='text' loading={spinFileLoad}
+											icon={<FontAwesomeIcon icon={faPaperclip} color='black'/>}
+										/ >
 										</Upload>
 									</Tooltip>
 								</Col>
