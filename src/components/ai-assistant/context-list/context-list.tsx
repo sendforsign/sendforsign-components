@@ -105,7 +105,7 @@ export const ContextList = () => {
 										<Button
 											id={context.contextKey}
 											icon={
-												<FontAwesomeIcon color='blue' icon={faBookBookmark} />
+												<FontAwesomeIcon color='green' icon={faBookBookmark} />
 											}
 											shape='round'
 											onClick={() => {
