@@ -80,6 +80,12 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	});
 	const { Title, Text } = Typography;
 
+	const chatEndRef = useRef<HTMLDivElement | null>(null);
+
+	useEffect(() => {
+		chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+	}, [messages]);
+
 	const [tooltipFileVisible, setTooltipFileVisible] = useState(false);
 	const [tooltipContextVisible, setTooltipContextVisible] = useState(false);
 
@@ -308,6 +314,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 
 	const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
 	if (event.key === 'Enter' && !event.shiftKey) {
+		setTooltipFileVisible(false);
+		setTooltipContextVisible(false);
 		event.preventDefault(); // Prevents adding a new line
 		handleSubmit(); // Calls the submit function
 	}
@@ -340,7 +348,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				<Spin spinning={spinLoad} fullscreen />
 			) : (
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-					<Card style={{ overflow: 'auto' }}>
+					<Card>
 						<Row style={{ margin: '0 0 16px 0' }}>
 							<Col>
 								<Title
@@ -358,7 +366,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 						</Row>
 						<Row gutter={16} style={{ marginBottom: 32 }}>
 							<Col flex={'auto'}></Col>
-							<Col flex="768px">
+							<Col flex="768px" style={{maxHeight: '60vh', overflow: 'auto'}} id='chat'>
 							<ul style={{width: '100%', paddingLeft: 0, paddingRight: 0}}>
 							{messages.map((m, index) => {
 								console.log('m', m, index);
@@ -401,6 +409,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									</div>
 								);
 							})}
+							<div ref={chatEndRef} />
 							</ul>
 							</Col>
 							<Col flex={'auto'}></Col>
