@@ -284,6 +284,16 @@ export const ContractList: FC<ContractListProps> = ({
 					//console.log('getEventStatus read', payload);
 					eventStatusTmp = payload.data;
 					setEventStatus(eventStatusTmp);
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
 				});
 			await axios
 				.post(BASE_URL + ApiEntity.CONTRACT, body, {
@@ -313,6 +323,16 @@ export const ContractList: FC<ContractListProps> = ({
 					);
 					setData(array);
 					setContractsLoad(false);
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
 				});
 		};
 		if (currApiKey || currToken) {

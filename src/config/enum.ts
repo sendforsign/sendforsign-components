@@ -73,6 +73,7 @@ export const enum PlaceholderFill {
 	SPECIFIC = 4,
 }
 export const enum EventStatus {
+	'FULLY SIGNED' = 6,
 	'SIGNED' = 5,
 	'APPROVED' = 4,
 	'SEEN' = 3,
@@ -89,6 +90,7 @@ export const enum PlaceholderView {
 	SIGNATURE = 2,
 }
 export const enum EventStatuses {
+	FULLY_SIGNED = '6',
 	SIGNED = '5',
 	APPROVED = '4',
 	SEEN = '3',

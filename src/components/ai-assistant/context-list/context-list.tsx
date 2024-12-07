@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Space, Row, Col, Button, Spin, Tooltip } from 'antd';
-import axios from 'axios';
-import { BASE_URL } from '../../../config/config';
-import { Action, ApiEntity } from '../../../config/enum';
+
 import { useAiAssistantContext } from '../ai-assistant-context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookBookmark, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -17,41 +15,6 @@ export const ContextList = () => {
 		currContexts.current = contexts;
 		setSpinContextLoad(false);
 	}, [contexts]);
-	// useEffect(() => {
-	// 	let isMounted = true;
-	// 	let body = {
-	// 		data: {
-	// 			action: Action.LIST,
-	// 			clientKey: !token ? clientKey : undefined,
-	// 			userKey: userKey,
-	// 		},
-	// 	};
-	// 	const getContexts = async () => {
-	// 		setSpinLoad(true);
-	// 		await axios
-	// 			.post(BASE_URL + ApiEntity.CONTEXT, body, {
-	// 				headers: {
-	// 					Accept: 'application/vnd.api+json',
-	// 					'Content-Type': 'application/vnd.api+json',
-	// 					'x-sendforsign-key': !token && apiKey ? apiKey : undefined,
-	// 					Authorization: token ? `Bearer ${token}` : undefined,
-	// 				},
-	// 				responseType: 'json',
-	// 			})
-	// 			.then((payload: any) => {
-	// 				setContexts(payload.data.contexts);
-	// 				setSpinLoad(false);
-	// 			});
-	// 	};
-	// 	if (apiKey || token) {
-	// 		getContexts();
-	// 	} else {
-	// 		setSpinLoad(true);
-	// 	}
-	// 	return () => {
-	// 		isMounted = false;
-	// 	};
-	// }, [refreshContext]);
 
 	const handleCreateContext = () => {
 		setContextModal(true);
