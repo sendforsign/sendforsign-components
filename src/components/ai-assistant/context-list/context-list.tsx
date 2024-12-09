@@ -43,7 +43,7 @@ export const ContextList = () => {
 							wrap
 							align='center'
 						>
-							<Button
+							{/* <Button
 								icon={<FontAwesomeIcon color='green' icon={faBookBookmark} />}
 								shape='round'
 							>
@@ -60,7 +60,7 @@ export const ContextList = () => {
 								shape='round'
 							>
 								Трудовой кодекс
-							</Button>
+							</Button> */}
 							{currContexts.current &&
 								currContexts.current.length > 0 &&
 								currContexts.current.map((context) => {
@@ -68,7 +68,10 @@ export const ContextList = () => {
 										<Button
 											id={context.contextKey}
 											icon={
-												<FontAwesomeIcon color='green' icon={faBookBookmark} />
+												<FontAwesomeIcon
+													color={context.general ? 'orange' : 'green'}
+													icon={faBookBookmark}
+												/>
 											}
 											shape='round'
 											onClick={() => {

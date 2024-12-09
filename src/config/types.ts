@@ -228,6 +228,7 @@ export type Context = {
 	name?: string;
 	contextKey?: string;
 	createTime?: Date;
+	general?: boolean;
 };
 export interface DragItem {
 	id: string;
