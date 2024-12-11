@@ -69,7 +69,7 @@ export const ContextList = () => {
 											id={context.contextKey}
 											icon={
 												<FontAwesomeIcon
-													color={context.general ? 'orange' : 'green'}
+													color={context.general ? '#088F8F' : 'red'}
 													icon={faBookBookmark}
 												/>
 											}

@@ -17,6 +17,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faArrowUp,
 	faBook,
+	faCommentDots,
 	faLightbulb,
 	faPaperclip,
 	faQuestion,
@@ -52,6 +53,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	userKey,
 }) => {
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
+	const [isThinking, setIsThinking] = useState(false);
 	const [currUserKey, setCurrUserKey] = useState(userKey);
 	const [currApiKey, setCurrApiKey] = useState(apiKey);
 	const [currToken, setCurrToken] = useState(token);
@@ -77,7 +79,11 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		headers: headers.current,
 		onError: (e) => {
 			console.log(e);
+			setIsThinking(false);
 		},
+		onResponse: () => {
+			setIsThinking(false); // Stop thinking when request completes
+		}
 	});
 	const { Title, Text } = Typography;
 
@@ -323,6 +329,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		if (event.key === 'Enter' && !event.shiftKey) {
 			setTooltipFileVisible(false);
 			setTooltipContextVisible(false);
+			setIsThinking(true);
 			event.preventDefault(); // Prevents adding a new line
 			handleSubmit(); // Calls the submit function
 		}
@@ -459,6 +466,59 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											</div>
 										);
 									})}
+									{isThinking && (
+										<li
+										style={{
+											display: 'flex',
+											flexDirection: 'row',
+										}}
+									>
+										<Space
+											align='start'
+											style={{
+												display: 'flex',
+												padding: '8px',
+												borderRadius: '0.75rem',
+												width: '75%',
+											}}
+										>
+											<svg
+																width='20'
+																height='20'
+																viewBox='0 0 20 20'
+																fill='none'
+																xmlns='http://www.w3.org/2000/svg'
+															>
+																<g clip-path='url(#clip0_4254_39676)'>
+																	<path
+																		d='M20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20C15.5228 20 20 15.5228 20 10Z'
+																		fill='black'
+																	/>
+																	<path
+																		d='M7.65914 11.859L10.4748 4.21477C10.5103 4.11845 10.6354 4.09438 10.7041 4.17065L15.7851 9.81373C15.8538 9.89 15.8168 10.012 15.7173 10.0372L7.82064 12.0383C7.71428 12.0653 7.62123 11.962 7.65914 11.859Z'
+																		fill='white'
+																	/>
+																	<path
+																		fill-rule='evenodd'
+																		clip-rule='evenodd'
+																		d='M10.6873 4.18589C10.63 4.12233 10.5257 4.14238 10.4962 4.22266L7.68053 11.8669C7.68053 11.8669 7.68053 11.8669 7.68053 11.8669C7.64894 11.9527 7.72648 12.0388 7.81512 12.0163L15.7118 10.0152C15.7947 9.99416 15.8255 9.89253 15.7683 9.82896L15.7852 9.81376L15.7683 9.82896L10.6873 4.18589ZM10.721 4.15547L10.7042 4.17064L10.721 4.15547L15.8021 9.79855C15.8822 9.88753 15.8391 10.0298 15.723 10.0592L7.82628 12.0604C7.7022 12.0918 7.59364 11.9713 7.63787 11.8512L7.63787 11.8512L10.4535 4.20694L10.4535 4.20694C10.4949 4.09458 10.6409 4.06648 10.721 4.15547Z'
+																		fill='black'
+																	/>
+																	<path
+																		d='M12.4339 7.72221C13.8953 9.34526 15.443 10.3342 15.8907 9.93105C16.3384 9.5279 15.5167 7.88534 14.0553 6.26229C12.5939 4.63923 11.0462 3.6503 10.5985 4.05345C10.1507 4.45659 10.9725 6.09915 12.4339 7.72221Z'
+																		fill='#EEEEEE'
+																	/>
+																</g>
+																<defs>
+																	<clipPath id='clip0_4254_39676'>
+																		<rect width='20' height='20' fill='white' />
+																	</clipPath>
+																</defs>
+															</svg>
+											<FontAwesomeIcon icon={faCommentDots} size='sm' className='fa-beat' />
+										</Space>
+									</li>
+									)}
 									<div ref={chatEndRef} />
 								</ul>
 							</Col>
@@ -557,6 +617,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 												onClick={() => {
 													setTooltipFileVisible(false);
 													setTooltipContextVisible(false);
+													setIsThinking(true);
 												}}
 												disabled={
 													input
@@ -625,6 +686,34 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										}
 									>
 										Подготовь саммари документа
+									</Button>
+									<Button
+										icon={<FontAwesomeIcon color='orange' icon={faLightbulb} />}
+										shape='round'
+										id='Context3'
+										onClick={() =>
+											handleContextClick(
+												'Создай новый Договор о неразглашении',
+												false,
+												false
+											)
+										}
+									>
+										Создай новый документ
+									</Button>
+									<Button
+										icon={<FontAwesomeIcon color='orange' icon={faLightbulb} />}
+										shape='round'
+										id='Context3'
+										onClick={() =>
+											handleContextClick(
+												'Создай новый Договор о неразглашении и отправь его Ивану Петрову ivan@ivan.com и Николаю Сидорову nick@nick.com',
+												false,
+												false
+											)
+										}
+									>
+										Создай и отправь новый документ
 									</Button>
 								</Space>
 							</Col>
