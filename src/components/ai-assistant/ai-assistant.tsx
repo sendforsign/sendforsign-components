@@ -33,6 +33,7 @@ import { Context } from '../../config/types';
 import axios from 'axios';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
 import Upload, { RcFile, UploadFile, UploadProps } from 'antd/es/upload';
+import ReactMarkdown from 'react-markdown';
 
 const { TextArea } = Input;
 
@@ -81,7 +82,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			console.log(e);
 			setIsThinking(false);
 		},
-		onResponse: () => {
+		onResponse: (response) => {
+			console.log('response', response);
 			setIsThinking(false); // Stop thinking when request completes
 		}
 	});
@@ -335,6 +337,22 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		}
 	};
 
+	const replaceTextWithElement = (text: string) => {
+		const parts = text.split(/{ContractKey: ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})}/g); 
+		return parts.map((part, index) => {
+			const match = part.match(/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/); 
+			return (
+				<>
+					{match ? (
+						<Button target="_blank" rel="noopener noreferrer" size='small' type='default' key={index} href={`https://components.sendforsign.com/?path=/story/marbella-contracteditor--primary&args=apiKey:re_api_ilia_Qws_qwe;clientKey:658599d9-bbbe-44ea-984e-0e5a766c2272;contractKey:${match[1]}`}>Open document</Button> 
+					) : (
+						<ReactMarkdown key={index}>{part}</ReactMarkdown> // Wrap non-button text with ReactMarkdown
+					)}
+				</>
+			);
+		});
+	};
+
 	return (
 		<AiAssistantContext.Provider
 			value={{
@@ -387,7 +405,6 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							>
 								<ul style={{ width: '100%', paddingLeft: 0, paddingRight: 0 }}>
 									{messages.map((m, index) => {
-										console.log('m', m, index);
 										return (
 											<div style={{ width: '100%' }}>
 												{m.role === 'user' ? (
@@ -396,6 +413,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 														style={{
 															display: 'flex',
 															flexDirection: 'row-reverse',
+															margin: '8px 0'
 														}}
 													>
 														<div
@@ -415,6 +433,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 														style={{
 															display: 'flex',
 															flexDirection: 'row',
+															margin: '8px 0'
 														}}
 													>
 														<Space
@@ -459,7 +478,11 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 																	</clipPath>
 																</defs>
 															</svg>
-															<Text className='text-primary'>{m.content}</Text>
+															<div style={{marginTop: '-1em'}}>
+																<Text className='text-primary'> 
+																	{replaceTextWithElement(m.content)} {/* Use the function here */}
+																</Text>
+															</div>
 														</Space>
 													</li>
 												)}
@@ -471,6 +494,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										style={{
 											display: 'flex',
 											flexDirection: 'row',
+											margin: '8px 0'
+
 										}}
 									>
 										<Space
