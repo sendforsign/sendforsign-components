@@ -18,7 +18,13 @@ import {
 	faArrowUp,
 	faBook,
 	faCommentDots,
+	faContactBook,
+	faFile,
+	faFileCirclePlus,
+	faFileContract,
+	faLegal,
 	faLightbulb,
+	faPager,
 	faPaperclip,
 	faQuestion,
 	faTrash,
@@ -346,7 +352,18 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 					{match ? (
 						<Button target="_blank" rel="noopener noreferrer" size='small' type='default' key={index} href={`https://components.sendforsign.com/?path=/story/marbella-contracteditor--primary&args=apiKey:re_api_ilia_Qws_qwe;clientKey:658599d9-bbbe-44ea-984e-0e5a766c2272;contractKey:${match[1]}`}>Open document</Button> 
 					) : (
-						<ReactMarkdown key={index}>{part}</ReactMarkdown> // Wrap non-button text with ReactMarkdown
+					<ReactMarkdown 
+						key={index} 
+						components={{
+							a: ({ node, ...props }) => (
+								<a {...props} target="_blank" rel="noopener noreferrer">
+									{props.children}
+								</a>
+							)
+						}}
+					>
+						{part}
+					</ReactMarkdown>
 					)}
 				</>
 			);
@@ -685,7 +702,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									align='center'
 								>
 									<Button
-										icon={<FontAwesomeIcon color='orange' icon={faLightbulb} />}
+										icon={<FontAwesomeIcon color='orange' icon={faBook} />}
 										shape='round'
 										id='Context1'
 										onClick={() =>
@@ -699,7 +716,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										Ответь на основе контекста
 									</Button>
 									<Button
-										icon={<FontAwesomeIcon color='orange' icon={faLightbulb} />}
+										icon={<FontAwesomeIcon color='orange' icon={faFile} />}
 										shape='round'
 										id='Context2'
 										onClick={() =>
@@ -713,7 +730,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										Подготовь саммари документа
 									</Button>
 									<Button
-										icon={<FontAwesomeIcon color='orange' icon={faLightbulb} />}
+										icon={<FontAwesomeIcon color='orange' icon={faFileCirclePlus} />}
 										shape='round'
 										id='Context3'
 										onClick={() =>
@@ -727,7 +744,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										Создай новый документ
 									</Button>
 									<Button
-										icon={<FontAwesomeIcon color='orange' icon={faLightbulb} />}
+										icon={<FontAwesomeIcon color='orange' icon={faFileContract} />}
 										shape='round'
 										id='Context3'
 										onClick={() =>
@@ -739,6 +756,20 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										}
 									>
 										Создай и отправь новый документ
+									</Button>
+									<Button
+										icon={<FontAwesomeIcon color='orange' icon={faLegal} />}
+										shape='round'
+										id='Context3'
+										onClick={() =>
+											handleContextClick(
+												'Найди судебную практику для кейса: ',
+												false,
+												false
+											)
+										}
+									>
+										Найди судебную практику для кейса
 									</Button>
 								</Space>
 							</Col>
