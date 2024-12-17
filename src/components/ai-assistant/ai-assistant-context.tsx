@@ -2,8 +2,8 @@ import { createContext, useContext } from 'react';
 import { Context } from '../../config/types';
 
 export type TAiAssistantContextType = {
-	contextModal: boolean;
-	setContextModal: (contextModal: boolean) => void;
+	contextModal: { open: boolean; context?: Context };
+	setContextModal: (contextModal: { open: boolean; context?: Context }) => void;
 	notification: { text?: any };
 	setNotification: (text: any) => void;
 	clientKey: string | undefined;

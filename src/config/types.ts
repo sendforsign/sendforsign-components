@@ -229,6 +229,13 @@ export type Context = {
 	contextKey?: string;
 	createTime?: Date;
 	general?: boolean;
+	documents?: ContextDocument[];
+};
+export type ContextDocument = {
+	id?: number;
+	createTime?: Date;
+	name?: string;
+	link?: string;
 };
 export interface DragItem {
 	id: string;

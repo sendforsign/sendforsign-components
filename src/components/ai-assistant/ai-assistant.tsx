@@ -58,7 +58,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const [currApiKey, setCurrApiKey] = useState(apiKey);
 	const [currToken, setCurrToken] = useState(token);
 	const [notification, setNotification] = useState({});
-	const [contextModal, setContextModal] = useState(false);
+	const [contextModal, setContextModal] = useState<{
+		open: boolean;
+		context?: Context;
+	}>({ open: false, context: {} });
 	const [refreshContext, setRefreshContext] = useState(0);
 	const [spinLoad, setSpinLoad] = useState(false);
 	const [spinContextLoad, setSpinContextLoad] = useState(false);
@@ -69,7 +72,6 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const [fileList, setFileList] = useState<UploadFile[]>([]);
 	const fileListRef = useRef<UploadFile[]>([]);
 	const contextFromFileRef = useRef<string[]>([]);
-	const firstRef = useRef(false);
 	const { setArrayBuffer, getArrayBuffer } = useSaveArrayBuffer();
 	const headers = useRef<any>({});
 	const body = useRef<any>({});
@@ -83,7 +85,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		},
 		onResponse: () => {
 			setIsThinking(false); // Stop thinking when request completes
-		}
+		},
 	});
 	const { Title, Text } = Typography;
 
@@ -97,10 +99,6 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const [tooltipContextVisible, setTooltipContextVisible] = useState(false);
 	useEffect(() => {
 		setCurrToken(token);
-		if (!firstRef.current) {
-			firstRef.current = true;
-			setRefreshContext(refreshContext + 1);
-		}
 		if (token) {
 			headers.current = {
 				Authorization: `Bearer ${currToken}`,
@@ -243,7 +241,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		setSpinFileLoad(true);
 
 		const formData: FormData = new FormData();
-		formData.append('returnText', 'true');
+		// formData.append('returnText', 'true');
+		formData.append('action', Action.READ);
 		for (let i = 0; i < fileList.length; i++) {
 			const pdfFile: ArrayBuffer = (await getArrayBuffer(
 				fileList[i].uid
@@ -468,56 +467,60 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									})}
 									{isThinking && (
 										<li
-										style={{
-											display: 'flex',
-											flexDirection: 'row',
-										}}
-									>
-										<Space
-											align='start'
 											style={{
 												display: 'flex',
-												padding: '8px',
-												borderRadius: '0.75rem',
-												width: '75%',
+												flexDirection: 'row',
 											}}
 										>
-											<svg
-																width='20'
-																height='20'
-																viewBox='0 0 20 20'
-																fill='none'
-																xmlns='http://www.w3.org/2000/svg'
-															>
-																<g clip-path='url(#clip0_4254_39676)'>
-																	<path
-																		d='M20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20C15.5228 20 20 15.5228 20 10Z'
-																		fill='black'
-																	/>
-																	<path
-																		d='M7.65914 11.859L10.4748 4.21477C10.5103 4.11845 10.6354 4.09438 10.7041 4.17065L15.7851 9.81373C15.8538 9.89 15.8168 10.012 15.7173 10.0372L7.82064 12.0383C7.71428 12.0653 7.62123 11.962 7.65914 11.859Z'
-																		fill='white'
-																	/>
-																	<path
-																		fill-rule='evenodd'
-																		clip-rule='evenodd'
-																		d='M10.6873 4.18589C10.63 4.12233 10.5257 4.14238 10.4962 4.22266L7.68053 11.8669C7.68053 11.8669 7.68053 11.8669 7.68053 11.8669C7.64894 11.9527 7.72648 12.0388 7.81512 12.0163L15.7118 10.0152C15.7947 9.99416 15.8255 9.89253 15.7683 9.82896L15.7852 9.81376L15.7683 9.82896L10.6873 4.18589ZM10.721 4.15547L10.7042 4.17064L10.721 4.15547L15.8021 9.79855C15.8822 9.88753 15.8391 10.0298 15.723 10.0592L7.82628 12.0604C7.7022 12.0918 7.59364 11.9713 7.63787 11.8512L7.63787 11.8512L10.4535 4.20694L10.4535 4.20694C10.4949 4.09458 10.6409 4.06648 10.721 4.15547Z'
-																		fill='black'
-																	/>
-																	<path
-																		d='M12.4339 7.72221C13.8953 9.34526 15.443 10.3342 15.8907 9.93105C16.3384 9.5279 15.5167 7.88534 14.0553 6.26229C12.5939 4.63923 11.0462 3.6503 10.5985 4.05345C10.1507 4.45659 10.9725 6.09915 12.4339 7.72221Z'
-																		fill='#EEEEEE'
-																	/>
-																</g>
-																<defs>
-																	<clipPath id='clip0_4254_39676'>
-																		<rect width='20' height='20' fill='white' />
-																	</clipPath>
-																</defs>
-															</svg>
-											<FontAwesomeIcon icon={faCommentDots} size='sm' className='fa-beat' />
-										</Space>
-									</li>
+											<Space
+												align='start'
+												style={{
+													display: 'flex',
+													padding: '8px',
+													borderRadius: '0.75rem',
+													width: '75%',
+												}}
+											>
+												<svg
+													width='20'
+													height='20'
+													viewBox='0 0 20 20'
+													fill='none'
+													xmlns='http://www.w3.org/2000/svg'
+												>
+													<g clip-path='url(#clip0_4254_39676)'>
+														<path
+															d='M20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20C15.5228 20 20 15.5228 20 10Z'
+															fill='black'
+														/>
+														<path
+															d='M7.65914 11.859L10.4748 4.21477C10.5103 4.11845 10.6354 4.09438 10.7041 4.17065L15.7851 9.81373C15.8538 9.89 15.8168 10.012 15.7173 10.0372L7.82064 12.0383C7.71428 12.0653 7.62123 11.962 7.65914 11.859Z'
+															fill='white'
+														/>
+														<path
+															fill-rule='evenodd'
+															clip-rule='evenodd'
+															d='M10.6873 4.18589C10.63 4.12233 10.5257 4.14238 10.4962 4.22266L7.68053 11.8669C7.68053 11.8669 7.68053 11.8669 7.68053 11.8669C7.64894 11.9527 7.72648 12.0388 7.81512 12.0163L15.7118 10.0152C15.7947 9.99416 15.8255 9.89253 15.7683 9.82896L15.7852 9.81376L15.7683 9.82896L10.6873 4.18589ZM10.721 4.15547L10.7042 4.17064L10.721 4.15547L15.8021 9.79855C15.8822 9.88753 15.8391 10.0298 15.723 10.0592L7.82628 12.0604C7.7022 12.0918 7.59364 11.9713 7.63787 11.8512L7.63787 11.8512L10.4535 4.20694L10.4535 4.20694C10.4949 4.09458 10.6409 4.06648 10.721 4.15547Z'
+															fill='black'
+														/>
+														<path
+															d='M12.4339 7.72221C13.8953 9.34526 15.443 10.3342 15.8907 9.93105C16.3384 9.5279 15.5167 7.88534 14.0553 6.26229C12.5939 4.63923 11.0462 3.6503 10.5985 4.05345C10.1507 4.45659 10.9725 6.09915 12.4339 7.72221Z'
+															fill='#EEEEEE'
+														/>
+													</g>
+													<defs>
+														<clipPath id='clip0_4254_39676'>
+															<rect width='20' height='20' fill='white' />
+														</clipPath>
+													</defs>
+												</svg>
+												<FontAwesomeIcon
+													icon={faCommentDots}
+													size='sm'
+													className='fa-beat'
+												/>
+											</Space>
+										</li>
 									)}
 									<div ref={chatEndRef} />
 								</ul>

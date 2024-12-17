@@ -17,9 +17,11 @@ export const ContextList = () => {
 	}, [contexts]);
 
 	const handleCreateContext = () => {
-		setContextModal(true);
+		setContextModal({ open: true, context: {} });
 	};
-	const handleContextChoose = (contextKey: string) => {};
+	const handleContextChoose = (context: Context) => {
+		setContextModal({ open: true, context: context });
+	};
 	return (
 		<div>
 			{spinContextLoad ? (
@@ -75,7 +77,7 @@ export const ContextList = () => {
 											}
 											shape='round'
 											onClick={() => {
-												handleContextChoose(context.contextKey as string);
+												handleContextChoose(context);
 											}}
 										>
 											{context.name}
