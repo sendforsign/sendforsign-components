@@ -4,6 +4,10 @@ import { Context } from '../../config/types';
 export type TAiAssistantContextType = {
 	contextModal: { open: boolean; context?: Context };
 	setContextModal: (contextModal: { open: boolean; context?: Context }) => void;
+	contractModal: boolean;
+	setContractModal: (contractModal: boolean) => void;
+	contractKey: string;
+	setContractKey: (contractKey: string) => void;
 	notification: { text?: any };
 	setNotification: (text: any) => void;
 	clientKey: string | undefined;

@@ -40,6 +40,7 @@ import axios from 'axios';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
 import Upload, { RcFile, UploadFile, UploadProps } from 'antd/es/upload';
 import ReactMarkdown from 'react-markdown';
+import { ModalView } from './modal-view';
 
 const { TextArea } = Input;
 
@@ -72,11 +73,13 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const [refreshContext, setRefreshContext] = useState(0);
 	const [spinLoad, setSpinLoad] = useState(false);
 	const [spinContextLoad, setSpinContextLoad] = useState(false);
+	const [contractModal, setContractModal] = useState(false);
 	const [selectData, setSelectData] = useState<SelectData[]>([]);
 	const [spinFileLoad, setSpinFileLoad] = useState(false);
 	const [contexts, setContexts] = useState<Context[]>([]);
 	const [selectedContexts, setSelectedContexts] = useState<string[]>([]);
 	const [fileList, setFileList] = useState<UploadFile[]>([]);
+	const [contractKey, setContractKey] = useState('');
 	const fileListRef = useRef<UploadFile[]>([]);
 	const contextFromFileRef = useRef<string[]>([]);
 	const { setArrayBuffer, getArrayBuffer } = useSaveArrayBuffer();
@@ -342,6 +345,11 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		}
 	};
 
+	const handleOpenDocument = (key: string) => {
+		setContractKey(key);
+		setContractModal(true);
+	};
+
 	const replaceTextWithElement = (text: string) => {
 		const parts = text.split(
 			/{ContractKey: ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})}/g
@@ -359,7 +367,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							size='small'
 							type='default'
 							key={index}
-							href={`https://components.sendforsign.com/?path=/story/marbella-contracteditor--primary&args=apiKey:re_api_ilia_Qws_qwe;clientKey:658599d9-bbbe-44ea-984e-0e5a766c2272;contractKey:${match[1]}`}
+							onClick={() => handleOpenDocument(match[1])}
 						>
 							Open document
 						</Button>
@@ -403,6 +411,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				setRefreshContext,
 				spinContextLoad,
 				setSpinContextLoad,
+				contractModal,
+				setContractModal,
+				contractKey,
+				setContractKey,
 			}}
 		>
 			{spinLoad ? (
@@ -823,6 +835,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 
 			<Notification />
 			<ContextModal />
+			<ModalView />
 		</AiAssistantContext.Provider>
 	);
 };
