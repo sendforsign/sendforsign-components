@@ -81,7 +81,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const [fileList, setFileList] = useState<UploadFile[]>([]);
 	const [contractKey, setContractKey] = useState('');
 	const fileListRef = useRef<UploadFile[]>([]);
-	const contextFromFileRef = useRef<string[]>([]);
+	const contextFromFileRef = useRef<{ filename: string; text: string }[]>([]);
 	const { setArrayBuffer, getArrayBuffer } = useSaveArrayBuffer();
 	const headers = useRef<any>({});
 	const body = useRef<any>({});
@@ -189,7 +189,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const props: UploadProps = {
 		name: 'file',
 		multiple: true,
-		accept: 'application/pdf',
+		accept:
+			'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 		listType: 'text',
 		showUploadList: false,
 
@@ -259,7 +260,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				fileList[i].uid
 			)) as ArrayBuffer;
 			const pdfFileBlob = new Blob([pdfFile as BlobPart], {
-				type: 'application/pdf',
+				type: fileList[i].type,
 			});
 			formData.append(
 				'files[]',
@@ -285,15 +286,19 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				setSpinFileLoad(false);
 				if (payload.data.fileContents && payload.data.fileContents.length > 0) {
 					contextFromFileRef.current = payload.data.fileContents.map(
-						(fileContent: string) => {
-							return fileContent;
+						(fileContent: string, index: number) => {
+							const filename = fileListRef.current[index]?.name;
+							return { filename: `File: ${filename}`, text: fileContent };
 						}
 					);
 					body.current = {
 						...body.current,
-						texts: payload.data.fileContents.map((fileContent: string) => {
-							return fileContent;
-						}),
+						texts: payload.data.fileContents.map(
+							(fileContent: string, index: number) => {
+								const filename = fileListRef.current[index]?.name;
+								return { filename: `File: ${filename}`, text: fileContent };
+							}
+						),
 					};
 				}
 			})
