@@ -21,12 +21,17 @@ import {
 	faContactBook,
 	faFile,
 	faFileCirclePlus,
+	faFileCircleQuestion,
 	faFileContract,
+	faGlobe,
+	faLanguage,
 	faLegal,
 	faLightbulb,
 	faPager,
 	faPaperclip,
 	faQuestion,
+	faRectangleList,
+	faSpellCheck,
 	faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { Notification } from './notification/notification';
@@ -526,8 +531,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 															</svg>
 															<div style={{ marginTop: '-1em' }}>
 																<Text className='text-primary'>
-																	{replaceTextWithElement(m.content)}{' '}
-																	{/* Use the function here */}
+																	{replaceTextWithElement(m.content)}
 																</Text>
 															</div>
 														</Space>
@@ -757,7 +761,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										Ответь на основе контекста
 									</Button>
 									<Button
-										icon={<FontAwesomeIcon color='orange' icon={faFile} />}
+										icon={<FontAwesomeIcon color='orange' icon={faRectangleList} />}
 										shape='round'
 										id='Context2'
 										onClick={() =>
@@ -778,7 +782,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										id='Context3'
 										onClick={() =>
 											handleContextClick(
-												'Создай новый Договор о неразглашении',
+												'Создай новый Договор о неразглашении в свободной форме, подписывающие стороны — Иван Петров ivan@ivan.com и Николай Сидоров nick@nick.com',
 												false,
 												false
 											)
@@ -788,24 +792,24 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									</Button>
 									<Button
 										icon={
-											<FontAwesomeIcon color='orange' icon={faFileContract} />
+											<FontAwesomeIcon color='orange' icon={faFileCircleQuestion} />
 										}
 										shape='round'
-										id='Context3'
+										id='Context4'
 										onClick={() =>
 											handleContextClick(
-												'Создай новый Договор о неразглашении и отправь его Ивану Петрову ivan@ivan.com и Николаю Сидорову nick@nick.com',
+												'Создай новый документ из шаблона',
 												false,
 												false
 											)
 										}
 									>
-										Создай и отправь новый документ
+										Создай новый документ из шаблона
 									</Button>
 									<Button
 										icon={<FontAwesomeIcon color='orange' icon={faLegal} />}
 										shape='round'
-										id='Context3'
+										id='Context5'
 										onClick={() =>
 											handleContextClick(
 												'Найди судебную практику для кейса: ',
@@ -815,6 +819,48 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										}
 									>
 										Найди судебную практику для кейса
+									</Button>
+									<Button
+										icon={<FontAwesomeIcon color='orange' icon={faGlobe} />}
+										shape='round'
+										id='Context5'
+										onClick={() =>
+											handleContextClick(
+												'Подготовь саммари веб-сайта по ссылке: ',
+												false,
+												false
+											)
+										}
+									>
+										Подготовь саммари веб-сайта
+									</Button>
+									<Button
+										icon={<FontAwesomeIcon color='orange' icon={faLanguage} />}
+										shape='round'
+										id='Context6'
+										onClick={() =>
+											handleContextClick(
+												'Переведи предоставленный документ на английский язык',
+												true,
+												false
+											)
+										}
+									>
+										Переведи документ на другой язык
+									</Button>
+									<Button
+										icon={<FontAwesomeIcon color='orange' icon={faSpellCheck} />}
+										shape='round'
+										id='Context6'
+										onClick={() =>
+											handleContextClick(
+												'Проверь документ на грамматические ошибки',
+												true,
+												false
+											)
+										}
+									>
+										Проверь грамматику 
 									</Button>
 								</Space>
 							</Col>
