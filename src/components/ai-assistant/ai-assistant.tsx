@@ -374,7 +374,6 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 						<Button
 							target='_blank'
 							rel='noopener noreferrer'
-							size='small'
 							type='default'
 							key={index}
 							onClick={() => handleOpenDocument(match[1])}
