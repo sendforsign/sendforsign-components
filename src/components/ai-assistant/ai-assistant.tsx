@@ -431,7 +431,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				<Spin spinning={spinLoad} fullscreen />
 			) : (
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-					<Card>
+					<Card style={{maxHeight: '95vh', overflow: 'auto'}}>
 						<Row style={{ margin: '0 0 16px 0' }}>
 							<Col>
 								<Title
@@ -447,7 +447,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							</Col>
 							<Col flex={'auto'} />
 						</Row>
-						<Row gutter={16} style={{ marginBottom: 32 }}>
+						<Row gutter={16}>
 							<Col flex={'auto'}></Col>
 							<Col
 								flex='768px'
