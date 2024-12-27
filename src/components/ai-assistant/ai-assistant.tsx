@@ -18,6 +18,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faArrowUp,
 	faBook,
+	faBookBookmark,
+	faBookmark,
 	faCommentDots,
 	faContactBook,
 	faFile,
@@ -528,7 +530,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 								>
 									{uiText[contextMessageKey].title}
 								</Title>
-								<Tooltip title='Assistant language'>
+								<Tooltip title='Assistant language' placement='left'>
 								<Select
 									defaultValue="eng"
 									id='Lang'
@@ -782,7 +784,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 													popupMatchSelectWidth={false}
 													suffixIcon={
 														<FontAwesomeIcon
-															icon={faBook}
+															icon={faBookBookmark}
 															color='black'
 															size='lg'
 															style={{ paddingTop: '2px' }}
@@ -858,7 +860,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									id='cases'
 								>
 									<Button
-									icon={<FontAwesomeIcon color='orange' icon={faBook} />}
+									icon={<FontAwesomeIcon icon={faBook} />}
 									shape='round'
 									id='Context1'
 									onClick={() =>
@@ -872,7 +874,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									{buttonTexts[contextMessageKey].context1} {/* Dynamic button text */}
 								</Button>
 								<Button
-									icon={<FontAwesomeIcon color='orange' icon={faRectangleList} />}
+									icon={<FontAwesomeIcon icon={faRectangleList} />}
 									shape='round'
 									id='Context2'
 									onClick={() =>
@@ -886,7 +888,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									{buttonTexts[contextMessageKey].context2} {/* Dynamic button text */}
 								</Button>
 								<Button
-									icon={<FontAwesomeIcon color='orange' icon={faFileCirclePlus} />}
+									icon={<FontAwesomeIcon icon={faFileCirclePlus} />}
 									shape='round'
 									id='Context3'
 									onClick={() =>
@@ -900,7 +902,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									{buttonTexts[contextMessageKey].context3} {/* Dynamic button text */}
 								</Button>
 								<Button
-									icon={<FontAwesomeIcon color='orange' icon={faFileCircleQuestion} />}
+									icon={<FontAwesomeIcon icon={faFileCircleQuestion} />}
 									shape='round'
 									id='Context4'
 									onClick={() =>
@@ -914,7 +916,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									{buttonTexts[contextMessageKey].context4} {/* Dynamic button text */}
 								</Button>
 								<Button
-									icon={<FontAwesomeIcon color='orange' icon={faLegal} />}
+									icon={<FontAwesomeIcon icon={faLegal} />}
 									shape='round'
 									id='Context5'
 									onClick={() =>
@@ -928,7 +930,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									{buttonTexts[contextMessageKey].context5} {/* Dynamic button text */}
 								</Button>
 								<Button
-									icon={<FontAwesomeIcon color='orange' icon={faGlobe} />}
+									icon={<FontAwesomeIcon icon={faGlobe} />}
 									shape='round'
 									id='Context6'
 									onClick={() =>
@@ -942,7 +944,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									{buttonTexts[contextMessageKey].context6} {/* Dynamic button text */}
 								</Button>
 								<Button
-									icon={<FontAwesomeIcon color='orange' icon={faLanguage} />}
+									icon={<FontAwesomeIcon icon={faLanguage} />}
 									shape='round'
 									id='Context7'
 									onClick={() =>
@@ -956,7 +958,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									{buttonTexts[contextMessageKey].context7} {/* Dynamic button text */}
 								</Button>
 								<Button
-									icon={<FontAwesomeIcon color='orange' icon={faSpellCheck} />}
+									icon={<FontAwesomeIcon icon={faSpellCheck} />}
 									shape='round'
 									id='Context8'
 									onClick={() =>
