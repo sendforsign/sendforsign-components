@@ -472,12 +472,14 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			context: 'Выбери контекст',
 			attach: 'Прикрепи файл',
 			newChat: 'Новый чат',
+			rag: 'Загрузи файлы для добавления собственного контекста',
 		},
 		eng: {
 			title: 'AI assistant',
 			context: 'Select context',
 			attach: 'Attach files',
 			newChat: 'New chat',
+			rag: 'Upload files to add your own context',
 		},
 	};
 
