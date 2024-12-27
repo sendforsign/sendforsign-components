@@ -12,6 +12,7 @@ import {
 	Select,
 	Tooltip,
 } from 'antd';
+import './ai-assistant.css'; // Import the CSS file
 import { AiAssistantContext } from './ai-assistant-context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -29,6 +30,7 @@ import {
 	faLightbulb,
 	faPager,
 	faPaperclip,
+	faPlus,
 	faQuestion,
 	faRectangleList,
 	faSpellCheck,
@@ -59,6 +61,9 @@ type SelectData = {
 	value: string;
 	label: string;
 };
+
+type Language = 'rus' | 'eng';
+
 export const AiAssistant: FC<AiAssistantProps> = ({
 	apiKey,
 	clientKey,
@@ -75,6 +80,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		open: boolean;
 		context?: Context;
 	}>({ open: false, context: {} });
+	const [isSubmitted, setIsSubmitted] = useState(false); 
 	const [refreshContext, setRefreshContext] = useState(0);
 	const [spinLoad, setSpinLoad] = useState(false);
 	const [spinContextLoad, setSpinContextLoad] = useState(false);
@@ -90,7 +96,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const { setArrayBuffer, getArrayBuffer } = useSaveArrayBuffer();
 	const headers = useRef<any>({});
 	const body = useRef<any>({});
-	const { messages, input, handleInputChange, handleSubmit } = useChat({
+	const [selectedLanguage, setSelectedLanguage] = useState('eng'); 
+	const { messages, input, handleInputChange, handleSubmit, setMessages } = useChat({
 		api: `${BASE_URL}${ApiEntity.CHAT}`,
 		body: body.current,
 		headers: headers.current,
@@ -104,6 +111,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		},
 	});
 	const { Title, Text } = Typography;
+
 
 	const chatEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -349,6 +357,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		if (event.key === 'Enter' && !event.shiftKey) {
 			setTooltipFileVisible(false);
 			setTooltipContextVisible(false);
+			setIsSubmitted(true);
 			setIsThinking(true);
 			event.preventDefault(); // Prevents adding a new line
 			handleSubmit(); // Calls the submit function
@@ -358,6 +367,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const handleOpenDocument = (key: string) => {
 		setContractKey(key);
 		setContractModal(true);
+	};
+
+	const handleLangChange = (value: Language) => {
+		setSelectedLanguage(value); 
 	};
 
 	const replaceTextWithElement = (text: string) => {
@@ -399,6 +412,75 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		});
 	};
 
+	const handleNewChat = () => {
+		setMessages([]);
+		setIsSubmitted(false); 
+	};
+
+	const contextMessageKey = selectedLanguage as keyof typeof contextMessages;
+
+	const buttonTexts = {
+		rus: {
+			context1: 'Ответь на основе контекста',
+			context2: 'Подготовь саммари документа',
+			context3: 'Создай новый документ',
+			context4: 'Создай новый документ из шаблона',
+			context5: 'Найди судебную практику для кейса',
+			context6: 'Подготовь саммари веб-сайта',
+			context7: 'Переведи документ на другой язык',
+			context8: 'Проверь грамматику',
+		},
+		eng: {
+			context1: 'Answer based on context',
+			context2: 'Prepare document summary',
+			context3: 'Create a new document',
+			context4: 'Create a new document from template',
+			context5: 'Find case law for the case',
+			context6: 'Prepare website summary',
+			context7: 'Translate document to another language',
+			context8: 'Check grammar',
+		},
+	};
+
+	// Message mapping for onClick actions
+	const contextMessages = {
+		rus: {
+			context1: 'Ответь на вопрос на основе контекста: ',
+			context2: 'Подготовь саммари документа',
+			context3: 'Создай новый Договор о неразглашении в свободной форме, подписывающие стороны — Иван Петров ivan@ivan.com и Николай Сидоров nick@nick.com',
+			context4: 'Создай новый документ из шаблона',
+			context5: 'Найди судебную практику для кейса: ',
+			context6: 'Подготовь саммари веб-сайта по ссылке: ',
+			context7: 'Переведи предоставленный документ на английский язык',
+			context8: 'Проверь документ на грамматические ошибки',
+		},
+		eng: {
+			context1: 'Answer based on context: ',
+			context2: 'Prepare document summary',
+			context3: 'Create a new non-disclosure agreement, parties — John Black john@john.com and Nick Rush nick@nick.com',
+			context4: 'Create a new document from template',
+			context5: 'Find case law for the case: ',
+			context6: 'Prepare website summary from the link: ',
+			context7: 'Translate the provided document into English',
+			context8: 'Check the document for grammatical errors',
+		},
+	};
+
+	const uiText = {
+		rus: {
+			title: 'ИИ ассистент',
+			context: 'Выбери контекст',
+			attach: 'Прикрепи файл',
+			newChat: 'Новый чат',
+		},
+		eng: {
+			title: 'AI assistant',
+			context: 'Select context',
+			attach: 'Attach files',
+			newChat: 'New chat',
+		},
+	};
+
 	return (
 		<AiAssistantContext.Provider
 			value={{
@@ -432,7 +514,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 					<Card style={{maxHeight: '95vh', overflow: 'auto'}}>
 						<Row style={{ margin: '0 0 16px 0' }}>
-							<Col>
+							<Col flex={'auto'}>
+							<Space style={{width: '100%', justifyContent: 'space-between'}}>
 								<Title
 									level={3}
 									style={{
@@ -441,10 +524,22 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										textAlign: 'center',
 									}}
 								>
-									AI assistant
+									{uiText[contextMessageKey].title}
 								</Title>
+								<Tooltip title='Assistant language'>
+								<Select
+									defaultValue="eng"
+									id='Lang'
+									style={{ width: 120 }}
+									onChange={handleLangChange}
+									options={[
+										{ value: 'eng', label: 'English' },
+										{ value: 'rus', label: 'Русский' },
+									]}
+									/>
+									</Tooltip>
+							</Space>
 							</Col>
-							<Col flex={'auto'} />
 						</Row>
 						<Row gutter={16}>
 							<Col flex={'auto'}></Col>
@@ -652,7 +747,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									<Row gutter={4} style={{ padding: '0px 8px' }}>
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
-												title='Attach files'
+												title={uiText[contextMessageKey].attach}
 												placement='left'
 												open={tooltipFileVisible}
 											>
@@ -672,7 +767,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										</Col>
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
-												title='Select context'
+												title={uiText[contextMessageKey].context}
 												placement='right'
 												open={tooltipContextVisible}
 											>
@@ -696,6 +791,18 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										</Col>
 										<Col flex={'auto'}></Col>
 										<Col style={{ marginBottom: 8 }}>
+											<Tooltip title={uiText[contextMessageKey].newChat}
+											placement='left'>
+												<Button 
+													id='newChat'
+													icon={<FontAwesomeIcon icon={faPlus} color='black'/>}
+													type='text'
+													className={isSubmitted ? 'showOnSubmit' : 'hideOnSubmit'}
+													onClick={handleNewChat}
+													/>
+											</Tooltip>
+										</Col>
+										<Col style={{ marginBottom: 8 }}>
 											<Button
 												type='primary'
 												icon={<FontAwesomeIcon icon={faArrowUp} />}
@@ -704,6 +811,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 													setTooltipFileVisible(false);
 													setTooltipContextVisible(false);
 													setIsThinking(true);
+													setIsSubmitted(true);
 												}}
 												disabled={
 													input
@@ -718,6 +826,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							</Col>
 							<Col flex={'auto'}></Col>
 						</Row>
+						<div className={isSubmitted ? 'hideOnSubmit' : ''}>
 						<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
 							<Col flex={'auto'} />
 							<Col
@@ -744,123 +853,120 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									}}
 									wrap
 									align='center'
+									id='cases'
 								>
 									<Button
-										icon={<FontAwesomeIcon color='orange' icon={faBook} />}
-										shape='round'
-										id='Context1'
-										onClick={() =>
-											handleContextClick(
-												'Ответь на вопрос на основе контекста: ',
-												false,
-												true
-											)
-										}
-									>
-										Ответь на основе контекста
-									</Button>
-									<Button
-										icon={<FontAwesomeIcon color='orange' icon={faRectangleList} />}
-										shape='round'
-										id='Context2'
-										onClick={() =>
-											handleContextClick(
-												'Подготовь саммари документа',
-												true,
-												false
-											)
-										}
-									>
-										Подготовь саммари документа
-									</Button>
-									<Button
-										icon={
-											<FontAwesomeIcon color='orange' icon={faFileCirclePlus} />
-										}
-										shape='round'
-										id='Context3'
-										onClick={() =>
-											handleContextClick(
-												'Создай новый Договор о неразглашении в свободной форме, подписывающие стороны — Иван Петров ivan@ivan.com и Николай Сидоров nick@nick.com',
-												false,
-												false
-											)
-										}
-									>
-										Создай новый документ
-									</Button>
-									<Button
-										icon={
-											<FontAwesomeIcon color='orange' icon={faFileCircleQuestion} />
-										}
-										shape='round'
-										id='Context4'
-										onClick={() =>
-											handleContextClick(
-												'Создай новый документ из шаблона',
-												false,
-												false
-											)
-										}
-									>
-										Создай новый документ из шаблона
-									</Button>
-									<Button
-										icon={<FontAwesomeIcon color='orange' icon={faLegal} />}
-										shape='round'
-										id='Context5'
-										onClick={() =>
-											handleContextClick(
-												'Найди судебную практику для кейса: ',
-												false,
-												false
-											)
-										}
-									>
-										Найди судебную практику для кейса
-									</Button>
-									<Button
-										icon={<FontAwesomeIcon color='orange' icon={faGlobe} />}
-										shape='round'
-										id='Context5'
-										onClick={() =>
-											handleContextClick(
-												'Подготовь саммари веб-сайта по ссылке: ',
-												false,
-												false
-											)
-										}
-									>
-										Подготовь саммари веб-сайта
-									</Button>
-									<Button
-										icon={<FontAwesomeIcon color='orange' icon={faLanguage} />}
-										shape='round'
-										id='Context6'
-										onClick={() =>
-											handleContextClick(
-												'Переведи предоставленный документ на английский язык',
-												true,
-												false
-											)
-										}
-									>
-										Переведи документ на другой язык
-									</Button>
-									<Button
-										icon={<FontAwesomeIcon color='orange' icon={faSpellCheck} />}
-										shape='round'
-										id='Context6'
-										onClick={() =>
-											handleContextClick(
-												'Проверь документ на грамматические ошибки',
-												true,
-												false
-											)
-										}
-									>
-										Проверь грамматику 
-									</Button>
+									icon={<FontAwesomeIcon color='orange' icon={faBook} />}
+									shape='round'
+									id='Context1'
+									onClick={() =>
+										handleContextClick(
+											contextMessages[contextMessageKey].context1,
+											false,
+											true
+										)
+									}
+								>
+									{buttonTexts[contextMessageKey].context1} {/* Dynamic button text */}
+								</Button>
+								<Button
+									icon={<FontAwesomeIcon color='orange' icon={faRectangleList} />}
+									shape='round'
+									id='Context2'
+									onClick={() =>
+										handleContextClick(
+											contextMessages[contextMessageKey].context2,
+											true,
+											false
+										)
+									}
+								>
+									{buttonTexts[contextMessageKey].context2} {/* Dynamic button text */}
+								</Button>
+								<Button
+									icon={<FontAwesomeIcon color='orange' icon={faFileCirclePlus} />}
+									shape='round'
+									id='Context3'
+									onClick={() =>
+										handleContextClick(
+											contextMessages[contextMessageKey].context3,
+											false,
+											false
+										)
+									}
+								>
+									{buttonTexts[contextMessageKey].context3} {/* Dynamic button text */}
+								</Button>
+								<Button
+									icon={<FontAwesomeIcon color='orange' icon={faFileCircleQuestion} />}
+									shape='round'
+									id='Context4'
+									onClick={() =>
+										handleContextClick(
+											contextMessages[contextMessageKey].context4,
+											false,
+											false
+										)
+									}
+								>
+									{buttonTexts[contextMessageKey].context4} {/* Dynamic button text */}
+								</Button>
+								<Button
+									icon={<FontAwesomeIcon color='orange' icon={faLegal} />}
+									shape='round'
+									id='Context5'
+									onClick={() =>
+										handleContextClick(
+											contextMessages[contextMessageKey].context5,
+											false,
+											false
+										)
+									}
+								>
+									{buttonTexts[contextMessageKey].context5} {/* Dynamic button text */}
+								</Button>
+								<Button
+									icon={<FontAwesomeIcon color='orange' icon={faGlobe} />}
+									shape='round'
+									id='Context6'
+									onClick={() =>
+										handleContextClick(
+											contextMessages[contextMessageKey].context6,
+											false,
+											false
+										)
+									}
+								>
+									{buttonTexts[contextMessageKey].context6} {/* Dynamic button text */}
+								</Button>
+								<Button
+									icon={<FontAwesomeIcon color='orange' icon={faLanguage} />}
+									shape='round'
+									id='Context7'
+									onClick={() =>
+										handleContextClick(
+											contextMessages[contextMessageKey].context7,
+											true,
+											false
+										)
+									}
+								>
+									{buttonTexts[contextMessageKey].context7} {/* Dynamic button text */}
+								</Button>
+								<Button
+									icon={<FontAwesomeIcon color='orange' icon={faSpellCheck} />}
+									shape='round'
+									id='Context8'
+									onClick={() =>
+										handleContextClick(
+											contextMessages[contextMessageKey].context8,
+											true,
+											false
+										)
+									}
+								>
+									{buttonTexts[contextMessageKey].context8} {/* Dynamic button text */}
+								</Button>
 								</Space>
 							</Col>
 							<Col flex={'auto'} />
@@ -879,6 +985,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							<Col flex={'auto'} />
 						</Row>
 						<ContextList />
+						</div>
 					</Card>
 				</Space>
 			)}
