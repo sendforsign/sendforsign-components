@@ -23,9 +23,11 @@ import {
 	faCommentDots,
 	faContactBook,
 	faFile,
+	faFileArrowUp,
 	faFileCirclePlus,
 	faFileCircleQuestion,
 	faFileContract,
+	faFileInvoice,
 	faGlobe,
 	faLanguage,
 	faLegal,
@@ -371,6 +373,16 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		setContractModal(true);
 	};
 
+	const handleOpenContractsList = () => {
+		setContractModal(true);
+		setContractKey('contracts');
+	};
+
+	const handleOpenTemplatesList = () => {
+		setContractModal(true);
+		setContractKey('templates');
+	};
+
 	const handleLangChange = (value: Language) => {
 		setSelectedLanguage(value); 
 	};
@@ -471,10 +483,12 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const uiText = {
 		rus: {
 			title: 'ИИ ассистент',
-			context: 'Выбери контекст',
-			attach: 'Прикрепи файл',
+			context: 'Выбрать контекст',
+			attach: 'Прикрепить файлы',
 			newChat: 'Новый чат',
-			rag: 'Загрузи файлы для добавления собственного контекста',
+			rag: 'Загрузить файлы для добавления собственного контекста',
+			contracts: 'Открыть контракты',
+			templates: 'Открыть темплейты'
 		},
 		eng: {
 			title: 'AI assistant',
@@ -482,6 +496,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			attach: 'Attach files',
 			newChat: 'New chat',
 			rag: 'Upload files to add your own context',
+			contracts: 'Open contracts',
+			templates: 'Open templates'
 		},
 	};
 
@@ -749,31 +765,12 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										</Col>
 									</Row>
 									<Row gutter={4} style={{ padding: '0px 8px' }}>
-										<Col style={{ marginBottom: 8 }}>
-											<Tooltip
-												title={uiText[contextMessageKey].attach}
-												placement='left'
-												open={tooltipFileVisible}
-											>
-												<Upload {...props}>
-													<Button
-														type='text'
-														loading={spinFileLoad}
-														icon={
-															<FontAwesomeIcon
-																icon={faPaperclip}
-																color='black'
-															/>
-														}
-													/>
-												</Upload>
-											</Tooltip>
-										</Col>
-										<Col style={{ marginBottom: 8 }}>
+									<Col style={{ marginBottom: 8 }}>
 											<Tooltip
 												title={uiText[contextMessageKey].context}
-												placement='right'
 												open={tooltipContextVisible}
+												placement='bottom'
+												onOpenChange={(visible) => setTooltipContextVisible(visible)} 
 											>
 												<Select
 													mode='multiple'
@@ -791,6 +788,53 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 														/>
 													}
 												/>
+											</Tooltip>
+										</Col>
+										<Col style={{ marginBottom: 8 }}>
+											<Tooltip
+												title={uiText[contextMessageKey].attach}
+												open={tooltipFileVisible}
+												placement='bottom'
+												onOpenChange={(visible) => setTooltipFileVisible(visible)} 
+											>
+												<Upload {...props}>
+													<Button
+														type='text'
+														loading={spinFileLoad}
+														icon={
+															<FontAwesomeIcon
+																icon={faFileArrowUp}
+																color='black'
+															/>
+														}
+													/>
+												</Upload>
+											</Tooltip>
+										</Col>
+										<Col style={{ marginBottom: 8 }}>
+											<Tooltip
+												title={uiText[contextMessageKey].contracts}
+												placement='bottom'
+											>
+												<Button
+													id='Contracts'
+													icon={<FontAwesomeIcon icon={faFileContract} color='black' />}
+													type='text'
+													onClick={handleOpenContractsList}
+												></Button>
+											</Tooltip>
+										</Col>
+										<Col style={{ marginBottom: 8 }}>
+											<Tooltip
+												title={uiText[contextMessageKey].templates}
+												placement='bottom'
+											>
+												<Button
+													id='Templates'
+													icon={<FontAwesomeIcon icon={faFileInvoice} color='black'/>}
+													type='text'
+													onClick={handleOpenTemplatesList}
+												></Button>
 											</Tooltip>
 										</Col>
 										<Col flex={'auto'}></Col>
