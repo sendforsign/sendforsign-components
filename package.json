@@ -1,6 +1,6 @@
 {
 	"name": "sendforsign",
-	"version": "1.1.5",
+	"version": "1.1.10",
 	"description": "Sendforsign components",
 	"main": "/dist/index",
 	"typings": "dist/index",
@@ -98,15 +98,11 @@
 		"react": "*",
 		"react-dom": "*"
 	},
+	"resolutions": {
+		"react": "17.x.x",
+		"react-dom": "17.x.x"
+	},
 	"files": [
 		"dist"
-	],
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/sendforsign/sendforsign-components.git"
-	},
-	"bugs": {
-		"url": "https://github.com/sendforsign/sendforsign-components/issues"
-	},
-	"homepage": "https://github.com/sendforsign/sendforsign-components#readme"
+	]
 }

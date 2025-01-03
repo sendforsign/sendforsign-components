@@ -22,10 +22,10 @@ module.exports = (args) => {
         //   runtimeChunk: true,
         // },
         resolve: {
-            extensions: [".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx", ".json", ".css"],
+            extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".css"], // Удалите ".jsx-runtime" из списка
             alias: {
-                "react/jsx-dev-runtime": "react/jsx-dev-runtime.js",
-                "react/jsx-runtime": "react/jsx-runtime.js"
+                "react/jsx-dev-runtime": "react/jsx-dev-runtime",
+                "react/jsx-runtime": "react/jsx-runtime"
             }
         },
         externals: {
