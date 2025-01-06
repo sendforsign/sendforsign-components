@@ -488,7 +488,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			newChat: 'Новый чат',
 			rag: 'Загрузить файлы для добавления собственного контекста',
 			contracts: 'Открыть контракты',
-			templates: 'Открыть темплейты'
+			templates: 'Открыть темплейты',
+			language: 'Язык ассистента'
 		},
 		eng: {
 			title: 'AI assistant',
@@ -497,7 +498,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			newChat: 'New chat',
 			rag: 'Upload files to add your own context',
 			contracts: 'Open contracts',
-			templates: 'Open templates'
+			templates: 'Open templates',
+			language: 'Assistant language'
 		},
 	};
 
@@ -546,7 +548,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 								>
 									{uiText[contextMessageKey].title}
 								</Title>
-								<Tooltip title='Assistant language' placement='left'>
+								<Tooltip title={uiText[contextMessageKey].language} placement='left'>
 								<Select
 									defaultValue="eng"
 									id='Lang'

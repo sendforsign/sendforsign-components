@@ -3,7 +3,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { Card, Space, Modal, Typography, Tag, Segmented } from 'antd';
 import { useAiAssistantContext } from '../ai-assistant-context';
 import { ContractEditor } from '../../contract-editor';
-import { ContractList } from '../../contract-list'; // Импортируйте компонент списка контрактов
+import { ContractList } from '../../contract-list'; 
 import { TemplateList } from '../../template-list';
 // import useSaveParams from '../../../hooks/use-save-params';
 export interface ModalViewProps {
