@@ -53,6 +53,7 @@
 		"react-resize-detector": "^9.1.0",
 		"react-signature-canvas": "^1.0.6",
 		"use-debounce": "^9.0.4",
+		"uuid": "^11.0.4",
 		"zod": "^3.23.8"
 	},
 	"devDependencies": {

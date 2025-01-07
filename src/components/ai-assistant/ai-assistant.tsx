@@ -12,6 +12,7 @@ import {
 	Select,
 	Tooltip,
 } from 'antd';
+import { v4 as uuid } from 'uuid';
 import './ai-assistant.css'; // Import the CSS file
 import { AiAssistantContext } from './ai-assistant-context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -65,6 +66,11 @@ type SelectData = {
 	value: string;
 	label: string;
 };
+type OptionsData = {
+	label: string;
+	title: string;
+	options: SelectData[];
+};
 
 type Language = 'rus' | 'eng';
 
@@ -84,47 +90,49 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		open: boolean;
 		context?: Context;
 	}>({ open: false, context: {} });
-	const [isSubmitted, setIsSubmitted] = useState(false); 
+	const [isSubmitted, setIsSubmitted] = useState(false);
 	const [refreshContext, setRefreshContext] = useState(0);
 	const [spinLoad, setSpinLoad] = useState(false);
 	const [spinContextLoad, setSpinContextLoad] = useState(false);
 	const [contractModal, setContractModal] = useState(false);
-	const [selectData, setSelectData] = useState<SelectData[]>([]);
+	const [contextSelectData, setContextSelectData] = useState<SelectData[]>([]);
+	const [optionsData, setOptionsData] = useState<OptionsData[]>([]);
 	const [spinFileLoad, setSpinFileLoad] = useState(false);
 	const [contexts, setContexts] = useState<Context[]>([]);
 	const [selectedContexts, setSelectedContexts] = useState<string[]>([]);
 	const [fileList, setFileList] = useState<UploadFile[]>([]);
 	const [contractKey, setContractKey] = useState('');
+	// const [currChatKey, setCurrChatKey] = useState(uuid());
+	const [tooltipFileVisible, setTooltipFileVisible] = useState(false);
+	const [tooltipContextVisible, setTooltipContextVisible] = useState(false);
 	const fileListRef = useRef<UploadFile[]>([]);
 	const contextFromFileRef = useRef<{ filename: string; text: string }[]>([]);
 	const { setArrayBuffer, getArrayBuffer } = useSaveArrayBuffer();
 	const headers = useRef<any>({});
-	const body = useRef<any>({});
-	const [selectedLanguage, setSelectedLanguage] = useState('eng'); 
-	const { messages, input, handleInputChange, handleSubmit, setMessages } = useChat({
-		api: `${BASE_URL}${ApiEntity.CHAT}`,
-		body: body.current,
-		headers: headers.current,
-		onError: (e) => {
-			console.log(e);
-			setIsThinking(false);
-		},
-		onResponse: (response) => {
-			console.log('response', response);
-			setIsThinking(false); // Stop thinking when request completes
-		},
-	});
+	const chatKey = useRef<string>(uuid());
+	const body = useRef<any>({ chatKey: chatKey.current });
+	const [selectedLanguage, setSelectedLanguage] = useState('eng');
+	const { messages, input, handleInputChange, handleSubmit, setMessages } =
+		useChat({
+			api: `${BASE_URL}${ApiEntity.CHAT}`,
+			body: body.current,
+			headers: headers.current,
+			onError: (e) => {
+				console.log(e);
+				setIsThinking(false);
+			},
+			onResponse: (response) => {
+				console.log('response', response);
+				setIsThinking(false); // Stop thinking when request completes
+			},
+		});
 	const { Title, Text } = Typography;
-
 
 	const chatEndRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
 		chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 	}, [messages]);
-
-	const [tooltipFileVisible, setTooltipFileVisible] = useState(false);
-	const [tooltipContextVisible, setTooltipContextVisible] = useState(false);
 	useEffect(() => {
 		setCurrToken(token);
 		if (token) {
@@ -169,6 +177,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			},
 		};
 		const getContexts = async () => {
+			let optionsDataTmp: OptionsData[] = optionsData;
 			setSpinContextLoad(true);
 			await axios
 				.post(BASE_URL + ApiEntity.CONTEXT, body, {
@@ -191,7 +200,13 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							value: context.contextKey as string,
 						});
 					});
-					setSelectData(selectDataTmp);
+					optionsDataTmp.push({
+						label: 'Contexts',
+						title: 'Contexts',
+						options: selectDataTmp,
+					});
+					setContextSelectData(selectDataTmp);
+					setOptionsData(optionsDataTmp);
 				});
 		};
 		if (currApiKey || currToken) {
@@ -330,12 +345,14 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	};
 
 	const handleSelectContext = (e: any) => {
+		debugger;
 		let selectedContextsTmp = [...selectedContexts];
 		selectedContextsTmp.push(e);
 		setSelectedContexts(selectedContextsTmp);
 		body.current = { ...body.current, contexts: selectedContextsTmp };
 	};
 	const handleDeselectContext = (e: any) => {
+		debugger;
 		let selectedContextsTmp = [...selectedContexts];
 		const findIndex = selectedContextsTmp.findIndex((selectedContext) =>
 			selectedContext.includes(e)
@@ -384,7 +401,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	};
 
 	const handleLangChange = (value: Language) => {
-		setSelectedLanguage(value); 
+		setSelectedLanguage(value);
 	};
 
 	const replaceTextWithElement = (text: string) => {
@@ -427,8 +444,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	};
 
 	const handleNewChat = () => {
+		chatKey.current = uuid();
+		body.current = { ...body.current, chatKey: chatKey.current };
 		setMessages([]);
-		setIsSubmitted(false); 
+		setIsSubmitted(false);
 	};
 
 	const contextMessageKey = selectedLanguage as keyof typeof contextMessages;
@@ -461,7 +480,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		rus: {
 			context1: 'Ответь на вопрос на основе контекста: ',
 			context2: 'Подготовь саммари документа',
-			context3: 'Создай новый Договор о неразглашении в свободной форме, подписывающие стороны — Иван Петров ivan@ivan.com и Николай Сидоров nick@nick.com',
+			context3:
+				'Создай новый Договор о неразглашении в свободной форме, подписывающие стороны — Иван Петров ivan@ivan.com и Николай Сидоров nick@nick.com',
 			context4: 'Создай новый документ из шаблона',
 			context5: 'Найди судебную практику для кейса: ',
 			context6: 'Подготовь саммари веб-сайта по ссылке: ',
@@ -471,7 +491,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		eng: {
 			context1: 'Answer based on context: ',
 			context2: 'Prepare document summary',
-			context3: 'Create a new non-disclosure agreement, parties — John Black john@john.com and Nick Rush nick@nick.com',
+			context3:
+				'Create a new non-disclosure agreement, parties — John Black john@john.com and Nick Rush nick@nick.com',
 			context4: 'Create a new document from template',
 			context5: 'Find case law for the case: ',
 			context6: 'Prepare website summary from the link: ',
@@ -489,7 +510,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			rag: 'Загрузить файлы для добавления собственного контекста',
 			contracts: 'Открыть контракты',
 			templates: 'Открыть темплейты',
-			language: 'Язык ассистента'
+			language: 'Язык ассистента',
 		},
 		eng: {
 			title: 'AI assistant',
@@ -499,7 +520,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			rag: 'Upload files to add your own context',
 			contracts: 'Open contracts',
 			templates: 'Open templates',
-			language: 'Assistant language'
+			language: 'Assistant language',
 		},
 	};
 
@@ -534,33 +555,38 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				<Spin spinning={spinLoad} fullscreen />
 			) : (
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-					<Card style={{maxHeight: '95vh', overflow: 'auto'}}>
+					<Card style={{ maxHeight: '95vh', overflow: 'auto' }}>
 						<Row style={{ margin: '0 0 16px 0' }}>
 							<Col flex={'auto'}>
-							<Space style={{width: '100%', justifyContent: 'space-between'}}>
-								<Title
-									level={3}
-									style={{
-										margin: '0',
-										display: 'flex',
-										textAlign: 'center',
-									}}
+								<Space
+									style={{ width: '100%', justifyContent: 'space-between' }}
 								>
-									{uiText[contextMessageKey].title}
-								</Title>
-								<Tooltip title={uiText[contextMessageKey].language} placement='left'>
-								<Select
-									defaultValue="eng"
-									id='Lang'
-									style={{ width: 120 }}
-									onChange={handleLangChange}
-									options={[
-										{ value: 'eng', label: 'English' },
-										{ value: 'rus', label: 'Русский' },
-									]}
-									/>
+									<Title
+										level={3}
+										style={{
+											margin: '0',
+											display: 'flex',
+											textAlign: 'center',
+										}}
+									>
+										{uiText[contextMessageKey].title}
+									</Title>
+									<Tooltip
+										title={uiText[contextMessageKey].language}
+										placement='left'
+									>
+										<Select
+											defaultValue='eng'
+											id='Lang'
+											style={{ width: 120 }}
+											onChange={handleLangChange}
+											options={[
+												{ value: 'eng', label: 'English' },
+												{ value: 'rus', label: 'Русский' },
+											]}
+										/>
 									</Tooltip>
-							</Space>
+								</Space>
 							</Col>
 						</Row>
 						<Row gutter={16}>
@@ -767,18 +793,20 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										</Col>
 									</Row>
 									<Row gutter={4} style={{ padding: '0px 8px' }}>
-									<Col style={{ marginBottom: 8 }}>
+										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
 												title={uiText[contextMessageKey].context}
 												open={tooltipContextVisible}
 												placement='bottom'
-												onOpenChange={(visible) => setTooltipContextVisible(visible)} 
+												onOpenChange={(visible) =>
+													setTooltipContextVisible(visible)
+												}
 											>
 												<Select
 													mode='multiple'
 													onSelect={handleSelectContext}
 													onDeselect={handleDeselectContext}
-													options={selectData}
+													options={contextSelectData}
 													variant='borderless'
 													popupMatchSelectWidth={false}
 													suffixIcon={
@@ -797,7 +825,9 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 												title={uiText[contextMessageKey].attach}
 												open={tooltipFileVisible}
 												placement='bottom'
-												onOpenChange={(visible) => setTooltipFileVisible(visible)} 
+												onOpenChange={(visible) =>
+													setTooltipFileVisible(visible)
+												}
 											>
 												<Upload {...props}>
 													<Button
@@ -820,7 +850,12 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											>
 												<Button
 													id='Contracts'
-													icon={<FontAwesomeIcon icon={faFileContract} color='black' />}
+													icon={
+														<FontAwesomeIcon
+															icon={faFileContract}
+															color='black'
+														/>
+													}
 													type='text'
 													onClick={handleOpenContractsList}
 												></Button>
@@ -833,7 +868,12 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											>
 												<Button
 													id='Templates'
-													icon={<FontAwesomeIcon icon={faFileInvoice} color='black'/>}
+													icon={
+														<FontAwesomeIcon
+															icon={faFileInvoice}
+															color='black'
+														/>
+													}
 													type='text'
 													onClick={handleOpenTemplatesList}
 												></Button>
@@ -841,15 +881,19 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										</Col>
 										<Col flex={'auto'}></Col>
 										<Col style={{ marginBottom: 8 }}>
-											<Tooltip title={uiText[contextMessageKey].newChat}
-											placement='left'>
-												<Button 
+											<Tooltip
+												title={uiText[contextMessageKey].newChat}
+												placement='left'
+											>
+												<Button
 													id='newChat'
-													icon={<FontAwesomeIcon icon={faPlus} color='black'/>}
+													icon={<FontAwesomeIcon icon={faPlus} color='black' />}
 													type='text'
-													className={isSubmitted ? 'showOnSubmit' : 'hideOnSubmit'}
+													className={
+														isSubmitted ? 'showOnSubmit' : 'hideOnSubmit'
+													}
 													onClick={handleNewChat}
-													/>
+												/>
 											</Tooltip>
 										</Col>
 										<Col style={{ marginBottom: 8 }}>
@@ -877,164 +921,172 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							<Col flex={'auto'}></Col>
 						</Row>
 						<div className={isSubmitted ? 'hideOnSubmit' : ''}>
-						<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
-							<Col flex={'auto'} />
-							<Col
-								flex={'auto'}
-								style={{ display: 'flex', justifyContent: 'center' }}
-							>
-								<Space wrap align='center'>
-									<Text type='secondary'>Get started with</Text>
-								</Space>
-							</Col>
-							<Col flex={'auto'} />
-						</Row>
-						<Row gutter={16} style={{ marginBottom: 32 }} wrap={false}>
-							<Col flex={'auto'} />
-							<Col
-								flex={'auto'}
-								style={{ display: 'flex', justifyContent: 'center' }}
-							>
-								<Space
-									style={{
-										minWidth: 100,
-										maxWidth: 800,
-										justifyContent: 'center',
-									}}
-									wrap
-									align='center'
-									id='cases'
+							<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
+								<Col flex={'auto'} />
+								<Col
+									flex={'auto'}
+									style={{ display: 'flex', justifyContent: 'center' }}
 								>
-									<Button
-									icon={<FontAwesomeIcon icon={faBook} />}
-									shape='round'
-									id='Context1'
-									onClick={() =>
-										handleContextClick(
-											contextMessages[contextMessageKey].context1,
-											false,
-											true
-										)
-									}
+									<Space wrap align='center'>
+										<Text type='secondary'>Get started with</Text>
+									</Space>
+								</Col>
+								<Col flex={'auto'} />
+							</Row>
+							<Row gutter={16} style={{ marginBottom: 32 }} wrap={false}>
+								<Col flex={'auto'} />
+								<Col
+									flex={'auto'}
+									style={{ display: 'flex', justifyContent: 'center' }}
 								>
-									{buttonTexts[contextMessageKey].context1} {/* Dynamic button text */}
-								</Button>
-								<Button
-									icon={<FontAwesomeIcon icon={faRectangleList} />}
-									shape='round'
-									id='Context2'
-									onClick={() =>
-										handleContextClick(
-											contextMessages[contextMessageKey].context2,
-											true,
-											false
-										)
-									}
-								>
-									{buttonTexts[contextMessageKey].context2} {/* Dynamic button text */}
-								</Button>
-								<Button
-									icon={<FontAwesomeIcon icon={faFileCirclePlus} />}
-									shape='round'
-									id='Context3'
-									onClick={() =>
-										handleContextClick(
-											contextMessages[contextMessageKey].context3,
-											false,
-											false
-										)
-									}
-								>
-									{buttonTexts[contextMessageKey].context3} {/* Dynamic button text */}
-								</Button>
-								<Button
-									icon={<FontAwesomeIcon icon={faFileCircleQuestion} />}
-									shape='round'
-									id='Context4'
-									onClick={() =>
-										handleContextClick(
-											contextMessages[contextMessageKey].context4,
-											false,
-											false
-										)
-									}
-								>
-									{buttonTexts[contextMessageKey].context4} {/* Dynamic button text */}
-								</Button>
-								<Button
-									icon={<FontAwesomeIcon icon={faLegal} />}
-									shape='round'
-									id='Context5'
-									onClick={() =>
-										handleContextClick(
-											contextMessages[contextMessageKey].context5,
-											false,
-											false
-										)
-									}
-								>
-									{buttonTexts[contextMessageKey].context5} {/* Dynamic button text */}
-								</Button>
-								<Button
-									icon={<FontAwesomeIcon icon={faGlobe} />}
-									shape='round'
-									id='Context6'
-									onClick={() =>
-										handleContextClick(
-											contextMessages[contextMessageKey].context6,
-											false,
-											false
-										)
-									}
-								>
-									{buttonTexts[contextMessageKey].context6} {/* Dynamic button text */}
-								</Button>
-								<Button
-									icon={<FontAwesomeIcon icon={faLanguage} />}
-									shape='round'
-									id='Context7'
-									onClick={() =>
-										handleContextClick(
-											contextMessages[contextMessageKey].context7,
-											true,
-											false
-										)
-									}
-								>
-									{buttonTexts[contextMessageKey].context7} {/* Dynamic button text */}
-								</Button>
-								<Button
-									icon={<FontAwesomeIcon icon={faSpellCheck} />}
-									shape='round'
-									id='Context8'
-									onClick={() =>
-										handleContextClick(
-											contextMessages[contextMessageKey].context8,
-											true,
-											false
-										)
-									}
-								>
-									{buttonTexts[contextMessageKey].context8} {/* Dynamic button text */}
-								</Button>
-								</Space>
-							</Col>
-							<Col flex={'auto'} />
-						</Row>
+									<Space
+										style={{
+											minWidth: 100,
+											maxWidth: 800,
+											justifyContent: 'center',
+										}}
+										wrap
+										align='center'
+										id='cases'
+									>
+										<Button
+											icon={<FontAwesomeIcon icon={faBook} />}
+											shape='round'
+											id='Context1'
+											onClick={() =>
+												handleContextClick(
+													contextMessages[contextMessageKey].context1,
+													false,
+													true
+												)
+											}
+										>
+											{buttonTexts[contextMessageKey].context1}{' '}
+											{/* Dynamic button text */}
+										</Button>
+										<Button
+											icon={<FontAwesomeIcon icon={faRectangleList} />}
+											shape='round'
+											id='Context2'
+											onClick={() =>
+												handleContextClick(
+													contextMessages[contextMessageKey].context2,
+													true,
+													false
+												)
+											}
+										>
+											{buttonTexts[contextMessageKey].context2}{' '}
+											{/* Dynamic button text */}
+										</Button>
+										<Button
+											icon={<FontAwesomeIcon icon={faFileCirclePlus} />}
+											shape='round'
+											id='Context3'
+											onClick={() =>
+												handleContextClick(
+													contextMessages[contextMessageKey].context3,
+													false,
+													false
+												)
+											}
+										>
+											{buttonTexts[contextMessageKey].context3}{' '}
+											{/* Dynamic button text */}
+										</Button>
+										<Button
+											icon={<FontAwesomeIcon icon={faFileCircleQuestion} />}
+											shape='round'
+											id='Context4'
+											onClick={() =>
+												handleContextClick(
+													contextMessages[contextMessageKey].context4,
+													false,
+													false
+												)
+											}
+										>
+											{buttonTexts[contextMessageKey].context4}{' '}
+											{/* Dynamic button text */}
+										</Button>
+										<Button
+											icon={<FontAwesomeIcon icon={faLegal} />}
+											shape='round'
+											id='Context5'
+											onClick={() =>
+												handleContextClick(
+													contextMessages[contextMessageKey].context5,
+													false,
+													false
+												)
+											}
+										>
+											{buttonTexts[contextMessageKey].context5}{' '}
+											{/* Dynamic button text */}
+										</Button>
+										<Button
+											icon={<FontAwesomeIcon icon={faGlobe} />}
+											shape='round'
+											id='Context6'
+											onClick={() =>
+												handleContextClick(
+													contextMessages[contextMessageKey].context6,
+													false,
+													false
+												)
+											}
+										>
+											{buttonTexts[contextMessageKey].context6}{' '}
+											{/* Dynamic button text */}
+										</Button>
+										<Button
+											icon={<FontAwesomeIcon icon={faLanguage} />}
+											shape='round'
+											id='Context7'
+											onClick={() =>
+												handleContextClick(
+													contextMessages[contextMessageKey].context7,
+													true,
+													false
+												)
+											}
+										>
+											{buttonTexts[contextMessageKey].context7}{' '}
+											{/* Dynamic button text */}
+										</Button>
+										<Button
+											icon={<FontAwesomeIcon icon={faSpellCheck} />}
+											shape='round'
+											id='Context8'
+											onClick={() =>
+												handleContextClick(
+													contextMessages[contextMessageKey].context8,
+													true,
+													false
+												)
+											}
+										>
+											{buttonTexts[contextMessageKey].context8}{' '}
+											{/* Dynamic button text */}
+										</Button>
+									</Space>
+								</Col>
+								<Col flex={'auto'} />
+							</Row>
 
-						<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
-							<Col flex={'auto'} />
-							<Col
-								flex={'auto'}
-								style={{ display: 'flex', justifyContent: 'center' }}
-							>
-								<Space wrap align='center'>
-									<Text type='secondary'>Add context</Text>
-								</Space>
-							</Col>
-							<Col flex={'auto'} />
-						</Row>
-						<ContextList />
+							<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
+								<Col flex={'auto'} />
+								<Col
+									flex={'auto'}
+									style={{ display: 'flex', justifyContent: 'center' }}
+								>
+									<Space wrap align='center'>
+										<Text type='secondary'>Add context</Text>
+									</Space>
+								</Col>
+								<Col flex={'auto'} />
+							</Row>
+							<ContextList />
 						</div>
 					</Card>
 				</Space>
