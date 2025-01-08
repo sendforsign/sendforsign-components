@@ -47,7 +47,7 @@ import { ContextList } from './context-list';
 import { useChat } from 'ai/react';
 import { BASE_URL } from '../../config/config';
 import { Action, ApiEntity } from '../../config/enum';
-import { Context } from '../../config/types';
+import { Context, Contract } from '../../config/types';
 import axios from 'axios';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
 import Upload, { RcFile, UploadFile, UploadProps } from 'antd/es/upload';
@@ -67,9 +67,9 @@ type SelectData = {
 	label: string;
 };
 type OptionsData = {
-	label: string;
-	title: string;
-	options: SelectData[];
+	label?: string;
+	title?: string;
+	options?: SelectData[];
 };
 
 type Language = 'rus' | 'eng';
@@ -100,9 +100,9 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const [spinFileLoad, setSpinFileLoad] = useState(false);
 	const [contexts, setContexts] = useState<Context[]>([]);
 	const [selectedContexts, setSelectedContexts] = useState<string[]>([]);
+	const [selectedContracts, setSelectedContracts] = useState<string[]>([]);
 	const [fileList, setFileList] = useState<UploadFile[]>([]);
 	const [contractKey, setContractKey] = useState('');
-	// const [currChatKey, setCurrChatKey] = useState(uuid());
 	const [tooltipFileVisible, setTooltipFileVisible] = useState(false);
 	const [tooltipContextVisible, setTooltipContextVisible] = useState(false);
 	const fileListRef = useRef<UploadFile[]>([]);
@@ -176,9 +176,48 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				userKey: currUserKey,
 			},
 		};
+		let optionsDataContractsTmp: OptionsData = {};
+		let optionsDataContextsTmp: OptionsData = {};
+		let optionsDataTmp: OptionsData[] = [];
+		const getContracts = async () => {
+			await axios
+				.post(BASE_URL + ApiEntity.CONTRACT, body, {
+					headers: {
+						Accept: 'application/vnd.api+json',
+						'Content-Type': 'application/vnd.api+json',
+						'x-sendforsign-key': !currToken && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+						Authorization: currToken ? `Bearer ${currToken}` : undefined,
+					},
+					responseType: 'json',
+				})
+				.then((payload: any) => {
+					if (payload.data.contracts && payload.data.contracts.length > 0) {
+						let selectDataTmp: SelectData[] = [];
+						payload.data.contracts.forEach((contract: any) => {
+							selectDataTmp.push({
+								label: contract.name as string,
+								value: `contract_${contract.contractKey as string}`,
+							});
+						});
+						optionsDataContractsTmp = {
+							label: 'Contracts',
+							title: 'Contracts',
+							options: selectDataTmp,
+						};
+					}
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+							error.response.data &&
+							error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
+				});
+		};
 		const getContexts = async () => {
-			let optionsDataTmp: OptionsData[] = optionsData;
-			setSpinContextLoad(true);
 			await axios
 				.post(BASE_URL + ApiEntity.CONTEXT, body, {
 					headers: {
@@ -197,20 +236,42 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 					contextsTmp.forEach((context) => {
 						selectDataTmp.push({
 							label: context.name as string,
-							value: context.contextKey as string,
+							value: `context_${context.contextKey as string}`,
 						});
 					});
-					optionsDataTmp.push({
+					optionsDataContextsTmp = {
 						label: 'Contexts',
 						title: 'Contexts',
 						options: selectDataTmp,
-					});
-					setContextSelectData(selectDataTmp);
-					setOptionsData(optionsDataTmp);
+					};
 				});
 		};
+		const getData = async () => {
+			await getContexts().then(() => {
+				if (
+					optionsDataContextsTmp &&
+					optionsDataContextsTmp.options &&
+					optionsDataContextsTmp.options.length > 0
+				) {
+					optionsDataTmp.push(optionsDataContextsTmp);
+				}
+			});
+			await getContracts().then(() => {
+				if (
+					optionsDataContractsTmp &&
+					optionsDataContractsTmp.options &&
+					optionsDataContractsTmp.options.length > 0
+				) {
+					optionsDataTmp.push(optionsDataContractsTmp);
+				}
+			});
+		};
 		if (currApiKey || currToken) {
-			getContexts();
+			setSpinContextLoad(true);
+			getData().then(() => {
+				// debugger;
+				setOptionsData(optionsDataTmp);
+			});
 		} else {
 			setSpinLoad(true);
 		}
@@ -345,21 +406,46 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	};
 
 	const handleSelectContext = (e: any) => {
-		debugger;
-		let selectedContextsTmp = [...selectedContexts];
-		selectedContextsTmp.push(e);
-		setSelectedContexts(selectedContextsTmp);
-		body.current = { ...body.current, contexts: selectedContextsTmp };
+		const arr = (e as string).split('_');
+		switch (arr[0]) {
+			case 'context':
+				let selectedContextsTmp = [...selectedContexts];
+				selectedContextsTmp.push(arr[1]);
+				setSelectedContexts(selectedContextsTmp);
+				body.current = { ...body.current, contexts: selectedContextsTmp };
+				break;
+
+			case 'contract':
+				let selectedContractsTmp = [...selectedContracts];
+				selectedContractsTmp.push(arr[1]);
+				setSelectedContracts(selectedContractsTmp);
+				body.current = { ...body.current, contracts: selectedContractsTmp };
+				break;
+		}
 	};
 	const handleDeselectContext = (e: any) => {
-		debugger;
-		let selectedContextsTmp = [...selectedContexts];
-		const findIndex = selectedContextsTmp.findIndex((selectedContext) =>
-			selectedContext.includes(e)
-		);
-		selectedContextsTmp.splice(findIndex, 1);
-		setSelectedContexts(selectedContextsTmp);
-		body.current = { ...body.current, contexts: selectedContextsTmp };
+		const arr = (e as string).split('_');
+		switch (arr[0]) {
+			case 'context':
+				let selectedContextsTmp = [...selectedContexts];
+				let findIndex = selectedContextsTmp.findIndex((selectedContext) =>
+					selectedContext.includes(arr[1])
+				);
+				selectedContextsTmp.splice(findIndex, 1);
+				setSelectedContexts(selectedContextsTmp);
+				body.current = { ...body.current, contexts: selectedContextsTmp };
+				break;
+
+			case 'contract':
+				let selectedContractsTmp = [...selectedContracts];
+				findIndex = selectedContractsTmp.findIndex((selectedContract) =>
+					selectedContract.includes(arr[1])
+				);
+				selectedContractsTmp.splice(findIndex, 1);
+				setSelectedContracts(selectedContractsTmp);
+				body.current = { ...body.current, contracts: selectedContractsTmp };
+				break;
+		}
 	};
 
 	const handleContextClick = (
@@ -805,8 +891,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 												<Select
 													mode='multiple'
 													onSelect={handleSelectContext}
-													onDeselect={handleDeselectContext}
-													options={contextSelectData}
+													onDeselect={handleDeselectContext} 
+													options={optionsData}
 													variant='borderless'
 													popupMatchSelectWidth={false}
 													suffixIcon={
