@@ -95,7 +95,6 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const [spinLoad, setSpinLoad] = useState(false);
 	const [spinContextLoad, setSpinContextLoad] = useState(false);
 	const [contractModal, setContractModal] = useState(false);
-	const [contextSelectData, setContextSelectData] = useState<SelectData[]>([]);
 	const [optionsData, setOptionsData] = useState<OptionsData[]>([]);
 	const [spinFileLoad, setSpinFileLoad] = useState(false);
 	const [contexts, setContexts] = useState<Context[]>([]);
@@ -531,8 +530,15 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 
 	const handleNewChat = () => {
 		chatKey.current = uuid();
-		body.current = { ...body.current, chatKey: chatKey.current };
+		setSelectedContexts([]);
+		setSelectedContracts([]);
 		setMessages([]);
+		body.current = {
+			...body.current,
+			chatKey: chatKey.current,
+			contracts: [],
+			contexts: [],
+		};
 		setIsSubmitted(false);
 	};
 
@@ -891,7 +897,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 												<Select
 													mode='multiple'
 													onSelect={handleSelectContext}
-													onDeselect={handleDeselectContext} 
+													onDeselect={handleDeselectContext}
 													options={optionsData}
 													variant='borderless'
 													popupMatchSelectWidth={false}
