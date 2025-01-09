@@ -507,7 +507,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							key={index}
 							onClick={() => handleOpenDocument(match[1])}
 						>
-							Open document
+							{uiText[contextMessageKey].openDoc}
 						</Button>
 					) : (
 						<ReactMarkdown
@@ -603,6 +603,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			contracts: 'Открыть контракты',
 			templates: 'Открыть темплейты',
 			language: 'Язык ассистента',
+			openDoc: 'Открыть документ'
 		},
 		eng: {
 			title: 'AI assistant',
@@ -613,6 +614,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			contracts: 'Open contracts',
 			templates: 'Open templates',
 			language: 'Assistant language',
+			openDoc: 'Open document'
 		},
 	};
 
