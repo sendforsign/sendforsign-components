@@ -100,6 +100,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const [contexts, setContexts] = useState<Context[]>([]);
 	const [selectedContexts, setSelectedContexts] = useState<string[]>([]);
 	const [selectedContracts, setSelectedContracts] = useState<string[]>([]);
+	const [selectedValues, setSelectedValues] = useState<string[]>([]);
 	const [fileList, setFileList] = useState<UploadFile[]>([]);
 	const [contractKey, setContractKey] = useState('');
 	const [tooltipFileVisible, setTooltipFileVisible] = useState(false);
@@ -405,6 +406,9 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	};
 
 	const handleSelectContext = (e: any) => {
+		let selectedValuesTmp = [...selectedValues];
+		selectedValuesTmp.push(e);
+		setSelectedValues(selectedValuesTmp);
 		const arr = (e as string).split('_');
 		switch (arr[0]) {
 			case 'context':
@@ -424,13 +428,19 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		}
 	};
 	const handleDeselectContext = (e: any) => {
+		let selectedValuesTmp: string[] = [];
+		for (let i = 0; i < selectedValues.length; i++) {
+			if (!selectedValues[i].includes(e)) {
+				selectedValuesTmp.push(selectedValues[i]);
+			}
+		}
+		setSelectedValues(selectedValuesTmp);
 		const arr = (e as string).split('_');
 		switch (arr[0]) {
 			case 'context':
 				let selectedContextsTmp: string[] = [];
 				for (let i = 0; i < selectedContexts.length; i++) {
-					if (selectedContexts[i].includes(arr[1])) {
-					} else {
+					if (!selectedContexts[i].includes(arr[1])) {
 						selectedContextsTmp.push(selectedContexts[i]);
 					}
 				}
@@ -442,11 +452,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				body.current = { ...body.current, contexts: selectedContextsTmp };
 				break;
 
-			case 'contract': 
+			case 'contract':
 				let selectedContractsTmp: string[] = [];
 				for (let i = 0; i < selectedContracts.length; i++) {
-					if (selectedContracts[i].includes(arr[1])) {
-					} else {
+					if (!selectedContracts[i].includes(arr[1])) {
 						selectedContractsTmp.push(selectedContracts[i]);
 					}
 				}
@@ -539,6 +548,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 
 	const handleNewChat = () => {
 		chatKey.current = uuid();
+		setSelectedValues([]);
 		setSelectedContexts([]);
 		setSelectedContracts([]);
 		setMessages([]);
@@ -612,7 +622,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			contracts: 'Открыть контракты',
 			templates: 'Открыть темплейты',
 			language: 'Язык ассистента',
-			openDoc: 'Открыть документ'
+			openDoc: 'Открыть документ',
 		},
 		eng: {
 			title: 'AI assistant',
@@ -623,7 +633,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			contracts: 'Open contracts',
 			templates: 'Open templates',
 			language: 'Assistant language',
-			openDoc: 'Open document'
+			openDoc: 'Open document',
 		},
 	};
 
@@ -910,6 +920,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 													onSelect={handleSelectContext}
 													onDeselect={handleDeselectContext}
 													options={optionsData}
+													value={selectedValues}
 													variant='borderless'
 													popupMatchSelectWidth={false}
 													suffixIcon={
