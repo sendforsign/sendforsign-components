@@ -419,6 +419,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				selectedContractsTmp.push(arr[1]);
 				setSelectedContracts(selectedContractsTmp);
 				body.current = { ...body.current, contracts: selectedContractsTmp };
+				// console.log('contract +', e, arr, selectedContractsTmp, body.current);
 				break;
 		}
 	};
@@ -426,21 +427,29 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		const arr = (e as string).split('_');
 		switch (arr[0]) {
 			case 'context':
-				let selectedContextsTmp = [...selectedContexts];
-				let findIndex = selectedContextsTmp.findIndex((selectedContext) =>
-					selectedContext.includes(arr[1])
-				);
-				selectedContextsTmp.splice(findIndex, 1);
+				let selectedContextsTmp: string[] = [];
+				for (let i = 0; i < selectedContexts.length; i++) {
+					if (selectedContexts[i].includes(arr[1])) {
+					} else {
+						selectedContextsTmp.push(selectedContexts[i]);
+					}
+				}
+				// let findIndex = selectedContexts.findIndex((selectedContext) =>
+				// 	selectedContext.includes(arr[1])
+				// );
+				// selectedContextsTmp.splice(findIndex, 1);
 				setSelectedContexts(selectedContextsTmp);
 				body.current = { ...body.current, contexts: selectedContextsTmp };
 				break;
 
-			case 'contract':
-				let selectedContractsTmp = [...selectedContracts];
-				findIndex = selectedContractsTmp.findIndex((selectedContract) =>
-					selectedContract.includes(arr[1])
-				);
-				selectedContractsTmp.splice(findIndex, 1);
+			case 'contract': 
+				let selectedContractsTmp: string[] = [];
+				for (let i = 0; i < selectedContracts.length; i++) {
+					if (selectedContracts[i].includes(arr[1])) {
+					} else {
+						selectedContractsTmp.push(selectedContracts[i]);
+					}
+				}
 				setSelectedContracts(selectedContractsTmp);
 				body.current = { ...body.current, contracts: selectedContractsTmp };
 				break;
