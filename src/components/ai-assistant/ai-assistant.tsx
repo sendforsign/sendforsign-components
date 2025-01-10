@@ -548,6 +548,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 
 	const handleNewChat = () => {
 		chatKey.current = uuid();
+		// setSelectedContexts([]);
+		// setSelectedContracts([]);
 		setSelectedValues([]);
 		setSelectedContexts([]);
 		setSelectedContracts([]);
@@ -620,7 +622,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			newChat: 'Новый чат',
 			rag: 'Загрузить файлы для добавления собственного контекста',
 			contracts: 'Открыть контракты',
-			templates: 'Открыть темплейты',
+			templates: 'Открыть шаблоны',
 			language: 'Язык ассистента',
 			openDoc: 'Открыть документ',
 		},
