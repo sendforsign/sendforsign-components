@@ -1328,7 +1328,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									<Space wrap align='center'>
 										<Text type='secondary'>{uiText[contextMessageKey].infoContext}</Text>
 										<Tooltip title={uiText[contextMessageKey].infoContextHelp}>
-											<FontAwesomeIcon icon={faQuestionCircle} />									
+											<FontAwesomeIcon icon={faQuestionCircle} size='sm'/>									
 										</Tooltip>
 									</Space>
 								</Col>
