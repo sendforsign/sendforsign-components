@@ -314,7 +314,7 @@ export const ShareLinkBlock = () => {
 								</Button>
 							</div>
 						</Tooltip>
-						<Tooltip title='Ask AI assistant.'>
+						{/* <Tooltip title='Ask AI assistant.'>
 							<div>
 								<Button
 									id='AskAI'
@@ -331,7 +331,7 @@ export const ShareLinkBlock = () => {
 									AI Assistant
 								</Button>
 							</div>
-						</Tooltip>
+						</Tooltip> */}
 						<Tooltip title='Download PDF.'>
 							<div>
 								<Button
