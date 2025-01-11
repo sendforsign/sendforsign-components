@@ -66,6 +66,8 @@ export type TContractEditorContextType = {
 	setPlaceholderPdf: (placeholder: Placeholder) => void;
 	placeholderVisible: boolean;
 	setPlaceholderVisible: (placeholderVisible: boolean) => void;
+	AiVisible: boolean;
+	setAiVisible: (placeholderVisible: boolean) => void;
 	isPdf: boolean;
 	setIsPdf: (isPdf: boolean) => void;
 	continueDisable: boolean;

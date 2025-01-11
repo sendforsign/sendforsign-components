@@ -904,21 +904,12 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 						<Title level={4} style={{ margin: '0 0 0 0' }}>
 							Placeholders
 						</Title>
-						<Tooltip title='Close sidebar.'>
-							<Button
-								size='small'
-								icon={<FontAwesomeIcon icon={faClose} />}
-								onClick={() => {
-									setPlaceholderVisible(!placeholderVisible);
-								}}
-							/>
-						</Tooltip>
 					</Space>
 					<Text type='secondary'>Add reusable text to the content.</Text>
 				</Space>
 				<Select
 					defaultValue='All placeholders'
-					style={{ width: '100%' }}
+					style={{ width: '242px' }}
 					onChange={(e) => handleChangeSelect(e)}
 					options={selectPlaceholder}
 				/>
@@ -955,7 +946,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 											</div>
 										</Tooltip>
 									</Col>
-									<Col>
+									<Col flex={'auto'}>
 										<Input
 											readOnly={
 												holder.view?.toString() !==

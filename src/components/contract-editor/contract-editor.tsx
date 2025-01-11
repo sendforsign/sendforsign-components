@@ -23,6 +23,7 @@ import { DocumentTimilineBlock } from './document-timeline-block/document-timeli
 import { ChooseContractType } from './choose-contract-type/choose-contract-type';
 import { ShareLinkBlock } from './share-link-block/share-link-block';
 import { PlaceholderHtmlBlock } from './placeholder-html-block/placeholder-html-block';
+import { AiHtmlBlock } from './ai-html-block';
 import { PlaceholderPdfBlock } from './placeholder-pdf-block';
 import { PdfBlockDnd } from './pdf-block-dnd';
 import { DndProvider } from 'react-dnd';
@@ -96,7 +97,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [pdfDownload, setPdfDownload] = useState(false);
 	const [load, setLoad] = useState(false);
 	const [fillType, setFillType] = useState(false);
-	const [placeholderVisible, setPlaceholderVisible] = useState(true);
+	const [placeholderVisible, setPlaceholderVisible] = useState(false);
+	const [AiVisible, setAiVisible] = useState(false);
 	const [sign, setSign] = useState('');
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
 	const [refreshSign, setRefreshSign] = useState(0);
@@ -126,11 +128,29 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [contractPlaceholderCount, setContractPlaceholderCount] = useState(0);
 	const [pagePlaceholderDrag, setPagePlaceholderDrag] =
 		useState<PagePlaceholder>({});
+	const contractEditorRef = useRef<HTMLDivElement>(null);
+
 	const quillRef = useRef<any>();
 	const contractKeyRef = useRef(contractKey);
 	const first = useRef(false);
 	const { Title, Text } = Typography;
 	// console.log('contractKey ContractEditor', contractKey, currClientKey);
+
+	useEffect(() => {
+        const handleResize = () => {
+            if (contractEditorRef.current) {
+                const width = contractEditorRef.current.offsetWidth;
+                setPlaceholderVisible(width >= 500);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial check
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
 	useEffect(() => {
 		setCurrToken(token);
@@ -454,6 +474,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		}
 	}, [documentCurrentSaved]);
 	return (
+		<div ref={contractEditorRef}>
 		<ContractEditorContext.Provider
 			value={{
 				signModal,
@@ -504,6 +525,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				setPlaceholderPdf,
 				placeholderVisible,
 				setPlaceholderVisible,
+				AiVisible,
+				setAiVisible,
 				contractValue,
 				setContractValue,
 				createContract,
@@ -610,7 +633,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 											</Space>
 										</Col>
 										{fillType && !isPdf && placeholderVisible && (
-											<Col flex='300px' style={{ display: 'block' }}>
+											<Col flex='350px' style={{ display: 'block' }}>
 												<Space
 													direction='vertical'
 													style={{
@@ -625,8 +648,24 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 												</Space>
 											</Col>
 										)}
+										{AiVisible && (
+											<Col flex='350px' style={{ display: 'block' }}>
+											<Space
+												direction='vertical'
+												style={{
+													display: 'flex',
+													top: 10,
+													position: 'sticky',
+													maxHeight: '80vh',
+													overflow: 'auto',
+												}}
+											>
+												<AiHtmlBlock quillRef={quillRef} />
+											</Space>
+										</Col>
+										)}
 										{fillType && isPdf && placeholderVisible && (
-											<Col flex='300px' style={{ display: 'block' }}>
+											<Col flex='350px' style={{ display: 'block' }}>
 												<Space
 													direction='vertical'
 													style={{
@@ -657,5 +696,6 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			<ResultModal />
 			<Notification />
 		</ContractEditorContext.Provider>
+		</div>
 	);
 };

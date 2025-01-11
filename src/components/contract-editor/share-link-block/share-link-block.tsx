@@ -9,6 +9,7 @@ import axios from 'axios';
 import { BASE_URL } from '../../../config/config';
 import {
 	faDownload,
+	faHatWizard,
 	faObjectUngroup,
 	faPaperPlane,
 	faSignature,
@@ -40,6 +41,8 @@ export const ShareLinkBlock = () => {
 		setRefreshSign,
 		placeholderVisible,
 		setPlaceholderVisible,
+		AiVisible,
+		setAiVisible,
 		setIpInfo,
 		contractName,
 	} = useContractEditorContext();
@@ -301,9 +304,31 @@ export const ShareLinkBlock = () => {
 									onClick={() => {
 										setRefreshPlaceholders(refreshPlaceholders + 1);
 										setPlaceholderVisible(!placeholderVisible);
+										setAiVisible(false);
+									}}
+									style={{
+										backgroundColor: placeholderVisible ? '#e6f7ff' : 'inherit', // Highlight when visible
 									}}
 								>
 									Placeholders
+								</Button>
+							</div>
+						</Tooltip>
+						<Tooltip title='Ask AI assistant.'>
+							<div>
+								<Button
+									id='AskAI'
+									type='default'
+									icon={<FontAwesomeIcon icon={faHatWizard} />}
+									onClick={() => {
+										setAiVisible(!AiVisible);
+										setPlaceholderVisible(false);
+									}}
+									style={{
+										backgroundColor: AiVisible ? '#e6f7ff' : 'inherit', // Highlight when visible
+									}}
+								>
+									AI Assistant
 								</Button>
 							</div>
 						</Tooltip>

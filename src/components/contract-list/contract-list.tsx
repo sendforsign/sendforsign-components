@@ -405,7 +405,7 @@ export const ContractList: FC<ContractListProps> = ({
 								<Row>
 									<Col>
 										<Title
-											level={3}
+											level={4}
 											style={{
 												margin: '0',
 												display: 'flex',

@@ -131,7 +131,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const chatEndRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
-		chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+		chatEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 	}, [messages]);
 	useEffect(() => {
 		setCurrToken(token);
@@ -617,6 +617,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const uiText = {
 		rus: {
 			title: 'ИИ ассистент',
+			subtitle: 'Создавай, модифицируй, проверяй с ИИ.',
 			context: 'Выбрать контекст',
 			attach: 'Прикрепить файлы',
 			newChat: 'Новый чат',
@@ -628,6 +629,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		},
 		eng: {
 			title: 'AI assistant',
+			subtitle: 'Create, modify, assess and more.',
 			context: 'Select context',
 			attach: 'Attach files',
 			newChat: 'New chat',
@@ -675,9 +677,12 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							<Col flex={'auto'}>
 								<Space
 									style={{ width: '100%', justifyContent: 'space-between' }}
+									wrap
+									size={16}
 								>
+									<Space direction='vertical' size={2}>
 									<Title
-										level={3}
+										level={4}
 										style={{
 											margin: '0',
 											display: 'flex',
@@ -686,6 +691,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									>
 										{uiText[contextMessageKey].title}
 									</Title>
+									<Text type='secondary'>{uiText[contextMessageKey].subtitle}</Text>
+									</Space>
 									<Tooltip
 										title={uiText[contextMessageKey].language}
 										placement='left'
@@ -693,7 +700,6 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										<Select
 											defaultValue='eng'
 											id='Lang'
-											style={{ width: 120 }}
 											onChange={handleLangChange}
 											options={[
 												{ value: 'eng', label: 'English' },
@@ -898,7 +904,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											</Space>
 											<TextArea
 												autoSize={{ minRows: 1 }}
-												style={{ minWidth: 300, width: '100%' }}
+												style={{ width: '100%' }}
 												placeholder='Message assistant...'
 												value={input}
 												onChange={handleInputChange}
