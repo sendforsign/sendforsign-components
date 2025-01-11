@@ -37,6 +37,7 @@ import {
 	faPaperclip,
 	faPlus,
 	faQuestion,
+	faQuestionCircle,
 	faRectangleList,
 	faSpellCheck,
 	faTrash,
@@ -689,6 +690,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			templates: 'Открыть шаблоны',
 			language: 'Язык ассистента',
 			openDoc: 'Открыть документ',
+			infoStartWith: 'Начните с',
+			infoContext: 'Добавьте контекст',
+			messageAI: 'Напишите ассистенту...',
+			infoContextHelp: 'Контекст — это долговременная память вашего ассистента. Добавьте сюда ваши часто используемые данные, в этом случае ассистент сможет отвечать на их основе.',
 		},
 		eng: {
 			title: 'AI assistant',
@@ -701,6 +706,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			templates: 'Open templates',
 			language: 'Assistant language',
 			openDoc: 'Open document',
+			infoStartWith: 'Get started with',
+			infoContext: 'Add context',
+			messageAI: 'Message assistant...',
+			infoContextHelp: 'Context is your assistant\'s long-term memory. Add your frequently used data here, so the assistant can respond based on it.',
 		},
 		esp: {
 			title: 'Asistente de IA',
@@ -713,6 +722,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			templates: 'Abrir plantillas',
 			language: 'Idioma del asistente',
 			openDoc: 'Abrir documento',
+			infoStartWith: 'Comienza con',
+			infoContext: 'Añadir contexto',
+			messageAI: 'Mensaje al asistente...',
+			infoContextHelp: 'El contexto es la memoria a largo plazo de tu asistente. Añade aquí tus datos de uso frecuente para que el asistente pueda responder en base a ellos.',
 		},
 		deu: {
 			title: 'KI-Assistent',
@@ -725,6 +738,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			templates: 'Vorlagen öffnen',
 			language: 'Assistentensprache',
 			openDoc: 'Dokument öffnen',
+			infoStartWith: 'Beginnen Sie mit',
+			infoContext: 'Kontext hinzufügen',
+			messageAI: 'Nachricht an den Assistenten...',
+			infoContextHelp: 'Kontext ist das Langzeitgedächtnis Ihres Assistenten. Fügen Sie hier Ihre häufig verwendeten Daten hinzu, damit der Assistent darauf basierend antworten kann.',
 		},
 		fra: {
 			title: 'Assistant IA',
@@ -737,6 +754,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			templates: 'Ouvrir les modèles',
 			language: 'Langue de l\'assistant',
 			openDoc: 'Ouvrir le document',
+			infoStartWith: 'Commencez par',
+			infoContext: 'Ajouter un contexte',
+			messageAI: 'Message à l\'assistant...',
+			infoContextHelp: 'Le contexte est la mémoire à long terme de votre assistant. Ajoutez ici vos données fréquemment utilisées pour que l\'assistant puisse répondre en fonction de celles-ci.',
 		},
 	};
 
@@ -802,10 +823,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											onChange={handleLangChange}
 											options={[
 												{ value: 'eng', label: 'English' },
-												{ value: 'rus', label: 'Русский' },
 												{ value: 'esp', label: 'Español' },
 												{ value: 'deu', label: 'Deutsch' },
 												{ value: 'fra', label: 'Français' },
+												{ value: 'rus', label: 'Русский' },
 											]}
 										/>
 									</Tooltip>
@@ -1007,7 +1028,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											<TextArea
 												autoSize={{ minRows: 1 }}
 												style={{ width: '100%' }}
-												placeholder='Message assistant...'
+												placeholder={uiText[contextMessageKey].messageAI}
 												value={input}
 												onChange={handleInputChange}
 												variant='borderless'
@@ -1152,7 +1173,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									style={{ display: 'flex', justifyContent: 'center' }}
 								>
 									<Space wrap align='center'>
-										<Text type='secondary'>Get started with</Text>
+										<Text type='secondary'>{uiText[contextMessageKey].infoStartWith}</Text>
 									</Space>
 								</Col>
 								<Col flex={'auto'} />
@@ -1305,7 +1326,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									style={{ display: 'flex', justifyContent: 'center' }}
 								>
 									<Space wrap align='center'>
-										<Text type='secondary'>Add context</Text>
+										<Text type='secondary'>{uiText[contextMessageKey].infoContext}</Text>
+										<Tooltip title={uiText[contextMessageKey].infoContextHelp}>
+											<FontAwesomeIcon icon={faQuestionCircle} />									
+										</Tooltip>
 									</Space>
 								</Col>
 								<Col flex={'auto'} />
