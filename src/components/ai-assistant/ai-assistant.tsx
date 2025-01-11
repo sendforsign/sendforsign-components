@@ -72,7 +72,7 @@ type OptionsData = {
 	options?: SelectData[];
 };
 
-type Language = 'rus' | 'eng';
+type Language = 'rus' | 'eng' | 'esp' | 'deu' | 'fra';
 
 export const AiAssistant: FC<AiAssistantProps> = ({
 	apiKey,
@@ -586,6 +586,36 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			context7: 'Translate document to another language',
 			context8: 'Check grammar',
 		},
+		esp: {
+			context1: 'Responder basado en el contexto',
+			context2: 'Preparar resumen del documento',
+			context3: 'Crear un nuevo documento',
+			context4: 'Crear un nuevo documento a partir de una plantilla',
+			context5: 'Encontrar jurisprudencia para el caso',
+			context6: 'Preparar resumen del sitio web',
+			context7: 'Traducir documento a otro idioma',
+			context8: 'Revisar gramática',
+		},
+		deu: {
+			context1: 'Antwort basierend auf Kontext',
+			context2: 'Dokumentzusammenfassung vorbereiten',
+			context3: 'Neues Dokument erstellen',
+			context4: 'Neues Dokument aus Vorlage erstellen',
+			context5: 'Rechtsprechung für den Fall finden',
+			context6: 'Webseiten-Zusammenfassung vorbereiten',
+			context7: 'Dokument in eine andere Sprache übersetzen',
+			context8: 'Grammatik überprüfen',
+		},
+		fra: {
+			context1: 'Répondre en fonction du contexte',
+			context2: 'Préparer le résumé du document',
+			context3: 'Créer un nouveau document',
+			context4: 'Créer un nouveau document à partir d\'un modèle',
+			context5: 'Trouver la jurisprudence pour le cas',
+			context6: 'Préparer le résumé du site web',
+			context7: 'Traduire le document dans une autre langue',
+			context8: 'Vérifier la grammaire',
+		},
 	};
 
 	// Message mapping for onClick actions
@@ -611,6 +641,39 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			context6: 'Prepare website summary from the link: ',
 			context7: 'Translate the provided document into English',
 			context8: 'Check the document for grammatical errors',
+		},
+		esp: {
+			context1: 'Responder basado en el contexto: ',
+			context2: 'Preparar resumen del documento',
+			context3:
+				'Crear un nuevo acuerdo de confidencialidad, partes — Juan Negro juan@juan.com y Nick Rush nick@nick.com',
+			context4: 'Crear un nuevo documento a partir de una plantilla',
+			context5: 'Encontrar jurisprudencia para el caso: ',
+			context6: 'Preparar resumen del sitio web desde el enlace: ',
+			context7: 'Traducir el documento proporcionado al inglés',
+			context8: 'Revisar el documento para errores gramaticales',
+		},
+		deu: {
+			context1: 'Antwort basierend auf Kontext: ',
+			context2: 'Dokumentzusammenfassung vorbereiten',
+			context3:
+				'Erstellen Sie eine neue Geheimhaltungsvereinbarung, Parteien — John Schwarz john@john.com und Nick Rush nick@nick.com',
+			context4: 'Neues Dokument aus Vorlage erstellen',
+			context5: 'Rechtsprechung für den Fall finden: ',
+			context6: 'Webseiten-Zusammenfassung vom Link vorbereiten: ',
+			context7: 'Übersetzen Sie das bereitgestellte Dokument ins Englische',
+			context8: 'Überprüfen Sie das Dokument auf grammatikalische Fehler',
+		},
+		fra: {
+			context1: 'Répondre en fonction du contexte: ',
+			context2: 'Préparer le résumé du document',
+			context3:
+				'Créer un nouvel accord de non-divulgation, parties — John Noir john@john.com et Nick Rush nick@nick.com',
+			context4: 'Créer un nouveau document à partir d\'un modèle',
+			context5: 'Trouver la jurisprudence pour le cas: ',
+			context6: 'Préparer le résumé du site web à partir du lien: ',
+			context7: 'Traduire le document fourni en anglais',
+			context8: 'Vérifier le document pour les erreurs grammaticales',
 		},
 	};
 
@@ -639,6 +702,42 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			language: 'Assistant language',
 			openDoc: 'Open document',
 		},
+		esp: {
+			title: 'Asistente de IA',
+			subtitle: 'Crear, modificar, evaluar y más.',
+			context: 'Seleccionar contexto',
+			attach: 'Adjuntar archivos',
+			newChat: 'Nuevo chat',
+			rag: 'Subir archivos para agregar tu propio contexto',
+			contracts: 'Abrir contratos',
+			templates: 'Abrir plantillas',
+			language: 'Idioma del asistente',
+			openDoc: 'Abrir documento',
+		},
+		deu: {
+			title: 'KI-Assistent',
+			subtitle: 'Erstellen, ändern, bewerten und mehr.',
+			context: 'Kontext auswählen',
+			attach: 'Dateien anhängen',
+			newChat: 'Neuer Chat',
+			rag: 'Dateien hochladen, um eigenen Kontext hinzuzufügen',
+			contracts: 'Verträge öffnen',
+			templates: 'Vorlagen öffnen',
+			language: 'Assistentensprache',
+			openDoc: 'Dokument öffnen',
+		},
+		fra: {
+			title: 'Assistant IA',
+			subtitle: 'Créer, modifier, évaluer et plus.',
+			context: 'Sélectionner le contexte',
+			attach: 'Joindre des fichiers',
+			newChat: 'Nouveau chat',
+			rag: 'Télécharger des fichiers pour ajouter votre propre contexte',
+			contracts: 'Ouvrir les contrats',
+			templates: 'Ouvrir les modèles',
+			language: 'Langue de l\'assistant',
+			openDoc: 'Ouvrir le document',
+		},
 	};
 
 	return (
@@ -646,26 +745,26 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			value={{
 				clientKey: currClientKey,
 				setClientKey: setCurrClientKey,
-				userKey: currUserKey,
-				setUserKey: setCurrUserKey,
-				token: currToken,
-				setToken: setCurrToken,
-				apiKey: currApiKey,
-				setApiKey: setCurrApiKey,
-				notification,
-				setNotification,
-				contextModal,
-				setContextModal,
-				contexts,
-				setContexts,
-				refreshContext,
-				setRefreshContext,
-				spinContextLoad,
-				setSpinContextLoad,
-				contractModal,
-				setContractModal,
-				contractKey,
-				setContractKey,
+					userKey: currUserKey,
+					setUserKey: setCurrUserKey,
+					token: currToken,
+					setToken: setCurrToken,
+					apiKey: currApiKey,
+					setApiKey: setCurrApiKey,
+					notification,
+					setNotification,
+					contextModal,
+					setContextModal,
+					contexts,
+					setContexts,
+					refreshContext,
+					setRefreshContext,
+					spinContextLoad,
+					setSpinContextLoad,
+					contractModal,
+					setContractModal,
+					contractKey,
+					setContractKey,
 			}}
 		>
 			{spinLoad ? (
@@ -704,6 +803,9 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											options={[
 												{ value: 'eng', label: 'English' },
 												{ value: 'rus', label: 'Русский' },
+												{ value: 'esp', label: 'Español' },
+												{ value: 'deu', label: 'Deutsch' },
+												{ value: 'fra', label: 'Français' },
 											]}
 										/>
 									</Tooltip>

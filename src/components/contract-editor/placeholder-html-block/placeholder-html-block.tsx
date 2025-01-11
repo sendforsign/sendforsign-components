@@ -909,7 +909,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				</Space>
 				<Select
 					defaultValue='All placeholders'
-					style={{ width: '242px' }}
+					style={{ width: '100%' }}
 					onChange={(e) => handleChangeSelect(e)}
 					options={selectPlaceholder}
 				/>
