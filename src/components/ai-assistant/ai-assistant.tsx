@@ -569,7 +569,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const buttonTexts = {
 		rus: {
 			context1: 'Ответь на основе контекста',
-			context2: 'Подготовь саммари документа',
+			context2: 'Подготовь саммари файла',
 			context3: 'Создай новый документ',
 			context4: 'Создай новый документ из шаблона',
 			context5: 'Найди судебную практику для кейса',
@@ -579,7 +579,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		},
 		eng: {
 			context1: 'Answer based on context',
-			context2: 'Prepare document summary',
+			context2: 'Prepare a file summary',
 			context3: 'Create a new document',
 			context4: 'Create a new document from template',
 			context5: 'Find case law for the case',
@@ -861,7 +861,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 																background: '#f5f5f5',
 															}}
 														>
-															<Text className='text-primary'>{m.content}</Text>
+															<ReactMarkdown className='text-primary'>{m.content}</ReactMarkdown>
 														</div>
 													</li>
 												) : (
