@@ -54,6 +54,7 @@ import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
 import Upload, { RcFile, UploadFile, UploadProps } from 'antd/es/upload';
 import ReactMarkdown from 'react-markdown';
 import { ModalView } from './modal-view';
+import { AiAssistantLocalization } from '../../config/localization';
 
 const { TextArea } = Input;
 
@@ -102,12 +103,14 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const [selectedContexts, setSelectedContexts] = useState<string[]>([]);
 	const [selectedContracts, setSelectedContracts] = useState<string[]>([]);
 	const [selectedValues, setSelectedValues] = useState<string[]>([]);
-	const [fileList, setFileList] = useState<UploadFile[]>([]);
+	// const [fileList, setFileList] = useState<UploadFile[]>([]);
 	const [contractKey, setContractKey] = useState('');
 	const [tooltipFileVisible, setTooltipFileVisible] = useState(false);
 	const [tooltipContextVisible, setTooltipContextVisible] = useState(false);
 	const fileListRef = useRef<UploadFile[]>([]);
 	const contextFromFileRef = useRef<{ filename: string; text: string }[]>([]);
+	const buttonRef = useRef<React.ReactNode[]>([]);
+	const [button, setButton] = useState<React.ReactNode[]>([]);
 	const { setArrayBuffer, getArrayBuffer } = useSaveArrayBuffer();
 	const headers = useRef<any>({});
 	const chatKey = useRef<string>(uuid());
@@ -132,7 +135,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const chatEndRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
-		chatEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+		chatEndRef.current?.scrollIntoView({
+			behavior: 'smooth',
+			block: 'nearest',
+		});
 	}, [messages]);
 	useEffect(() => {
 		setCurrToken(token);
@@ -297,12 +303,25 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 					await sendFiles();
 				}
 			}
-			setFileList(fileListRef.current); // Ensure fileList state is updated
+			// setFileList(fileListRef.current); // Ensure fileList state is updated
 		},
 		beforeUpload: async (file) => {
 			const newFileList = fileListRef.current.slice();
 			fileListRef.current = [...newFileList, file];
-			setFileList(fileListRef.current);
+			buttonRef.current = fileListRef.current.map((file) => {
+				return (
+					<Button key={file.uid} size='small'>
+						<span>{file.name}</span>
+						<Button
+							type='text'
+							size='small'
+							onClick={() => handleRemoveFile(file)}
+							icon={<FontAwesomeIcon icon={faTrash} size='sm' />}
+						></Button>
+					</Button>
+				);
+			});
+			setButton(buttonRef.current);
 			await saveArrayBuffer(file);
 
 			return false;
@@ -322,7 +341,21 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		const newFileList = fileListRef.current.slice();
 		newFileList.splice(index, 1);
 		fileListRef.current = newFileList;
-		setFileList(newFileList);
+		buttonRef.current = fileListRef.current.map((file) => {
+			return (
+				<Button key={file.uid} size='small'>
+					<span>{file.name}</span>
+					<Button
+						type='text'
+						size='small'
+						onClick={() => handleRemoveFile(file)}
+						icon={<FontAwesomeIcon icon={faTrash} size='sm' />}
+					></Button>
+				</Button>
+			);
+		});
+		setButton(buttonRef.current);
+		// setFileList(newFileList);
 		const newTextFromFiles = contextFromFileRef.current.slice();
 		newTextFromFiles.splice(index, 1);
 		contextFromFileRef.current = newTextFromFiles;
@@ -349,17 +382,18 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		const formData: FormData = new FormData();
 		// formData.append('returnText', 'true');
 		formData.append('action', Action.READ);
-		for (let i = 0; i < fileList.length; i++) {
+		// debugger;
+		for (let i = 0; i < fileListRef.current.length; i++) {
 			const pdfFile: ArrayBuffer = (await getArrayBuffer(
-				fileList[i].uid
+				fileListRef.current[i].uid
 			)) as ArrayBuffer;
 			const pdfFileBlob = new Blob([pdfFile as BlobPart], {
-				type: fileList[i].type,
+				type: fileListRef.current[i].type,
 			});
 			formData.append(
 				'files[]',
 				pdfFileBlob,
-				encodeURIComponent(fileList[i].name)
+				encodeURIComponent(fileListRef.current[i].name)
 			);
 		}
 		let url = `${BASE_URL}${ApiEntity.CONTEXT_FILES}`;
@@ -397,6 +431,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				}
 			})
 			.catch((error) => {
+				setSpinFileLoad(false);
+				contextFromFileRef.current = [];
 				setNotification({
 					text:
 						error.response && error.response.data && error.response.data.message
@@ -445,10 +481,6 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 						selectedContextsTmp.push(selectedContexts[i]);
 					}
 				}
-				// let findIndex = selectedContexts.findIndex((selectedContext) =>
-				// 	selectedContext.includes(arr[1])
-				// );
-				// selectedContextsTmp.splice(findIndex, 1);
 				setSelectedContexts(selectedContextsTmp);
 				body.current = { ...body.current, contexts: selectedContextsTmp };
 				break;
@@ -526,7 +558,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							key={index}
 							onClick={() => handleOpenDocument(match[1])}
 						>
-							{uiText[contextMessageKey].openDoc}
+							{AiAssistantLocalization.uiText[contextMessageKey].openDoc}
 						</Button>
 					) : (
 						<ReactMarkdown
@@ -549,243 +581,49 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 
 	const handleNewChat = () => {
 		chatKey.current = uuid();
-		// setSelectedContexts([]);
-		// setSelectedContracts([]);
 		setSelectedValues([]);
 		setSelectedContexts([]);
 		setSelectedContracts([]);
+		contextFromFileRef.current = [];
 		setMessages([]);
 		body.current = {
 			...body.current,
 			chatKey: chatKey.current,
 			contracts: [],
 			contexts: [],
+			texts: [],
 		};
 		setIsSubmitted(false);
 	};
 
-	const contextMessageKey = selectedLanguage as keyof typeof contextMessages;
-
-	const buttonTexts = {
-		rus: {
-			context1: 'Ответь на основе контекста',
-			context2: 'Подготовь саммари файла',
-			context3: 'Создай новый документ',
-			context4: 'Создай новый документ из шаблона',
-			context5: 'Найди судебную практику для кейса',
-			context6: 'Подготовь саммари веб-сайта',
-			context7: 'Переведи документ на другой язык',
-			context8: 'Проверь грамматику',
-		},
-		eng: {
-			context1: 'Answer based on context',
-			context2: 'Prepare a file summary',
-			context3: 'Create a new document',
-			context4: 'Create a new document from template',
-			context5: 'Find case law for the case',
-			context6: 'Prepare website summary',
-			context7: 'Translate document to another language',
-			context8: 'Check grammar',
-		},
-		esp: {
-			context1: 'Responder basado en el contexto',
-			context2: 'Preparar resumen del documento',
-			context3: 'Crear un nuevo documento',
-			context4: 'Crear un nuevo documento a partir de una plantilla',
-			context5: 'Encontrar jurisprudencia para el caso',
-			context6: 'Preparar resumen del sitio web',
-			context7: 'Traducir documento a otro idioma',
-			context8: 'Revisar gramática',
-		},
-		deu: {
-			context1: 'Antwort basierend auf Kontext',
-			context2: 'Dokumentzusammenfassung vorbereiten',
-			context3: 'Neues Dokument erstellen',
-			context4: 'Neues Dokument aus Vorlage erstellen',
-			context5: 'Rechtsprechung für den Fall finden',
-			context6: 'Webseiten-Zusammenfassung vorbereiten',
-			context7: 'Dokument in eine andere Sprache übersetzen',
-			context8: 'Grammatik überprüfen',
-		},
-		fra: {
-			context1: 'Répondre en fonction du contexte',
-			context2: 'Préparer le résumé du document',
-			context3: 'Créer un nouveau document',
-			context4: 'Créer un nouveau document à partir d\'un modèle',
-			context5: 'Trouver la jurisprudence pour le cas',
-			context6: 'Préparer le résumé du site web',
-			context7: 'Traduire le document dans une autre langue',
-			context8: 'Vérifier la grammaire',
-		},
-	};
-
-	// Message mapping for onClick actions
-	const contextMessages = {
-		rus: {
-			context1: 'Ответь на вопрос на основе контекста: ',
-			context2: 'Подготовь саммари документа',
-			context3:
-				'Создай новый Договор о неразглашении в свободной форме, подписывающие стороны — Иван Петров ivan@ivan.com и Николай Сидоров nick@nick.com',
-			context4: 'Создай новый документ из шаблона',
-			context5: 'Найди судебную практику для кейса: ',
-			context6: 'Подготовь саммари веб-сайта по ссылке: ',
-			context7: 'Переведи предоставленный документ на английский язык',
-			context8: 'Проверь документ на грамматические ошибки',
-		},
-		eng: {
-			context1: 'Answer based on context: ',
-			context2: 'Prepare document summary',
-			context3:
-				'Create a new non-disclosure agreement, parties — John Black john@john.com and Nick Rush nick@nick.com',
-			context4: 'Create a new document from template',
-			context5: 'Find case law for the case: ',
-			context6: 'Prepare website summary from the link: ',
-			context7: 'Translate the provided document into English',
-			context8: 'Check the document for grammatical errors',
-		},
-		esp: {
-			context1: 'Responder basado en el contexto: ',
-			context2: 'Preparar resumen del documento',
-			context3:
-				'Crear un nuevo acuerdo de confidencialidad, partes — Juan Negro juan@juan.com y Nick Rush nick@nick.com',
-			context4: 'Crear un nuevo documento a partir de una plantilla',
-			context5: 'Encontrar jurisprudencia para el caso: ',
-			context6: 'Preparar resumen del sitio web desde el enlace: ',
-			context7: 'Traducir el documento proporcionado al inglés',
-			context8: 'Revisar el documento para errores gramaticales',
-		},
-		deu: {
-			context1: 'Antwort basierend auf Kontext: ',
-			context2: 'Dokumentzusammenfassung vorbereiten',
-			context3:
-				'Erstellen Sie eine neue Geheimhaltungsvereinbarung, Parteien — John Schwarz john@john.com und Nick Rush nick@nick.com',
-			context4: 'Neues Dokument aus Vorlage erstellen',
-			context5: 'Rechtsprechung für den Fall finden: ',
-			context6: 'Webseiten-Zusammenfassung vom Link vorbereiten: ',
-			context7: 'Übersetzen Sie das bereitgestellte Dokument ins Englische',
-			context8: 'Überprüfen Sie das Dokument auf grammatikalische Fehler',
-		},
-		fra: {
-			context1: 'Répondre en fonction du contexte: ',
-			context2: 'Préparer le résumé du document',
-			context3:
-				'Créer un nouvel accord de non-divulgation, parties — John Noir john@john.com et Nick Rush nick@nick.com',
-			context4: 'Créer un nouveau document à partir d\'un modèle',
-			context5: 'Trouver la jurisprudence pour le cas: ',
-			context6: 'Préparer le résumé du site web à partir du lien: ',
-			context7: 'Traduire le document fourni en anglais',
-			context8: 'Vérifier le document pour les erreurs grammaticales',
-		},
-	};
-
-	const uiText = {
-		rus: {
-			title: 'ИИ ассистент',
-			subtitle: 'Создавай, модифицируй, проверяй с ИИ.',
-			context: 'Выбрать контекст',
-			attach: 'Прикрепить файлы',
-			newChat: 'Новый чат',
-			rag: 'Загрузить файлы для добавления собственного контекста',
-			contracts: 'Открыть контракты',
-			templates: 'Открыть шаблоны',
-			language: 'Язык ассистента',
-			openDoc: 'Открыть документ',
-			infoStartWith: 'Начните с',
-			infoContext: 'Добавьте контекст',
-			messageAI: 'Напишите ассистенту...',
-			infoContextHelp: 'Контекст — это долговременная память вашего ассистента. Добавьте сюда ваши часто используемые данные, в этом случае ассистент сможет отвечать на их основе.',
-		},
-		eng: {
-			title: 'AI assistant',
-			subtitle: 'Create, modify, assess and more.',
-			context: 'Select context',
-			attach: 'Attach files',
-			newChat: 'New chat',
-			rag: 'Upload files to add your own context',
-			contracts: 'Open contracts',
-			templates: 'Open templates',
-			language: 'Assistant language',
-			openDoc: 'Open document',
-			infoStartWith: 'Get started with',
-			infoContext: 'Add context',
-			messageAI: 'Message assistant...',
-			infoContextHelp: 'Context is your assistant\'s long-term memory. Add your frequently used data here, so the assistant can respond based on it.',
-		},
-		esp: {
-			title: 'Asistente de IA',
-			subtitle: 'Crear, modificar, evaluar y más.',
-			context: 'Seleccionar contexto',
-			attach: 'Adjuntar archivos',
-			newChat: 'Nuevo chat',
-			rag: 'Subir archivos para agregar tu propio contexto',
-			contracts: 'Abrir contratos',
-			templates: 'Abrir plantillas',
-			language: 'Idioma del asistente',
-			openDoc: 'Abrir documento',
-			infoStartWith: 'Comienza con',
-			infoContext: 'Añadir contexto',
-			messageAI: 'Mensaje al asistente...',
-			infoContextHelp: 'El contexto es la memoria a largo plazo de tu asistente. Añade aquí tus datos de uso frecuente para que el asistente pueda responder en base a ellos.',
-		},
-		deu: {
-			title: 'KI-Assistent',
-			subtitle: 'Erstellen, ändern, bewerten und mehr.',
-			context: 'Kontext auswählen',
-			attach: 'Dateien anhängen',
-			newChat: 'Neuer Chat',
-			rag: 'Dateien hochladen, um eigenen Kontext hinzuzufügen',
-			contracts: 'Verträge öffnen',
-			templates: 'Vorlagen öffnen',
-			language: 'Assistentensprache',
-			openDoc: 'Dokument öffnen',
-			infoStartWith: 'Beginnen Sie mit',
-			infoContext: 'Kontext hinzufügen',
-			messageAI: 'Nachricht an den Assistenten...',
-			infoContextHelp: 'Kontext ist das Langzeitgedächtnis Ihres Assistenten. Fügen Sie hier Ihre häufig verwendeten Daten hinzu, damit der Assistent darauf basierend antworten kann.',
-		},
-		fra: {
-			title: 'Assistant IA',
-			subtitle: 'Créer, modifier, évaluer et plus.',
-			context: 'Sélectionner le contexte',
-			attach: 'Joindre des fichiers',
-			newChat: 'Nouveau chat',
-			rag: 'Télécharger des fichiers pour ajouter votre propre contexte',
-			contracts: 'Ouvrir les contrats',
-			templates: 'Ouvrir les modèles',
-			language: 'Langue de l\'assistant',
-			openDoc: 'Ouvrir le document',
-			infoStartWith: 'Commencez par',
-			infoContext: 'Ajouter un contexte',
-			messageAI: 'Message à l\'assistant...',
-			infoContextHelp: 'Le contexte est la mémoire à long terme de votre assistant. Ajoutez ici vos données fréquemment utilisées pour que l\'assistant puisse répondre en fonction de celles-ci.',
-		},
-	};
+	const contextMessageKey =
+		selectedLanguage as keyof typeof AiAssistantLocalization.contextMessages;
 
 	return (
 		<AiAssistantContext.Provider
 			value={{
 				clientKey: currClientKey,
 				setClientKey: setCurrClientKey,
-					userKey: currUserKey,
-					setUserKey: setCurrUserKey,
-					token: currToken,
-					setToken: setCurrToken,
-					apiKey: currApiKey,
-					setApiKey: setCurrApiKey,
-					notification,
-					setNotification,
-					contextModal,
-					setContextModal,
-					contexts,
-					setContexts,
-					refreshContext,
-					setRefreshContext,
-					spinContextLoad,
-					setSpinContextLoad,
-					contractModal,
-					setContractModal,
-					contractKey,
-					setContractKey,
+				userKey: currUserKey,
+				setUserKey: setCurrUserKey,
+				token: currToken,
+				setToken: setCurrToken,
+				apiKey: currApiKey,
+				setApiKey: setCurrApiKey,
+				notification,
+				setNotification,
+				contextModal,
+				setContextModal,
+				contexts,
+				setContexts,
+				refreshContext,
+				setRefreshContext,
+				spinContextLoad,
+				setSpinContextLoad,
+				contractModal,
+				setContractModal,
+				contractKey,
+				setContractKey,
 			}}
 		>
 			{spinLoad ? (
@@ -801,20 +639,27 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									size={16}
 								>
 									<Space direction='vertical' size={2}>
-									<Title
-										level={4}
-										style={{
-											margin: '0',
-											display: 'flex',
-											textAlign: 'center',
-										}}
-									>
-										{uiText[contextMessageKey].title}
-									</Title>
-									<Text type='secondary'>{uiText[contextMessageKey].subtitle}</Text>
+										<Title
+											level={4}
+											style={{
+												margin: '0',
+												display: 'flex',
+												textAlign: 'center',
+											}}
+										>
+											{AiAssistantLocalization.uiText[contextMessageKey].title}
+										</Title>
+										<Text type='secondary'>
+											{
+												AiAssistantLocalization.uiText[contextMessageKey]
+													.subtitle
+											}
+										</Text>
 									</Space>
 									<Tooltip
-										title={uiText[contextMessageKey].language}
+										title={
+											AiAssistantLocalization.uiText[contextMessageKey].language
+										}
 										placement='left'
 									>
 										<Select
@@ -861,7 +706,9 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 																background: '#f5f5f5',
 															}}
 														>
-															<ReactMarkdown className='text-primary'>{m.content}</ReactMarkdown>
+															<ReactMarkdown className='text-primary'>
+																{m.content}
+															</ReactMarkdown>
 														</div>
 													</li>
 												) : (
@@ -1011,7 +858,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									<Row style={{ padding: '8px' }}>
 										<Col flex={'auto'}>
 											<Space wrap style={{ marginBottom: '8px' }}>
-												{fileList.map((file) => (
+												{button}
+												{/* {fileListRef.current.map((file) => (
 													<Button key={file.uid} size='small'>
 														<span>{file.name}</span>
 														<Button
@@ -1023,12 +871,15 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 															}
 														></Button>
 													</Button>
-												))}
+												))} */}
 											</Space>
 											<TextArea
 												autoSize={{ minRows: 1 }}
 												style={{ width: '100%' }}
-												placeholder={uiText[contextMessageKey].messageAI}
+												placeholder={
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.messageAI
+												}
 												value={input}
 												onChange={handleInputChange}
 												variant='borderless'
@@ -1039,7 +890,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									<Row gutter={4} style={{ padding: '0px 8px' }}>
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
-												title={uiText[contextMessageKey].context}
+												title={
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.context
+												}
 												open={tooltipContextVisible}
 												placement='bottom'
 												onOpenChange={(visible) =>
@@ -1067,7 +921,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										</Col>
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
-												title={uiText[contextMessageKey].attach}
+												title={
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.attach
+												}
 												open={tooltipFileVisible}
 												placement='bottom'
 												onOpenChange={(visible) =>
@@ -1090,7 +947,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										</Col>
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
-												title={uiText[contextMessageKey].contracts}
+												title={
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.contracts
+												}
 												placement='bottom'
 											>
 												<Button
@@ -1108,7 +968,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										</Col>
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
-												title={uiText[contextMessageKey].templates}
+												title={
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.templates
+												}
 												placement='bottom'
 											>
 												<Button
@@ -1127,7 +990,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										<Col flex={'auto'}></Col>
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
-												title={uiText[contextMessageKey].newChat}
+												title={
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.newChat
+												}
 												placement='left'
 											>
 												<Button
@@ -1173,7 +1039,12 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									style={{ display: 'flex', justifyContent: 'center' }}
 								>
 									<Space wrap align='center'>
-										<Text type='secondary'>{uiText[contextMessageKey].infoStartWith}</Text>
+										<Text type='secondary'>
+											{
+												AiAssistantLocalization.uiText[contextMessageKey]
+													.infoStartWith
+											}
+										</Text>
 									</Space>
 								</Col>
 								<Col flex={'auto'} />
@@ -1200,13 +1071,18 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											id='Context1'
 											onClick={() =>
 												handleContextClick(
-													contextMessages[contextMessageKey].context1,
+													AiAssistantLocalization.contextMessages[
+														contextMessageKey
+													].context1,
 													false,
 													true
 												)
 											}
 										>
-											{buttonTexts[contextMessageKey].context1}{' '}
+											{
+												AiAssistantLocalization.buttonTexts[contextMessageKey]
+													.context1
+											}{' '}
 											{/* Dynamic button text */}
 										</Button>
 										<Button
@@ -1215,13 +1091,18 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											id='Context2'
 											onClick={() =>
 												handleContextClick(
-													contextMessages[contextMessageKey].context2,
+													AiAssistantLocalization.contextMessages[
+														contextMessageKey
+													].context2,
 													true,
 													false
 												)
 											}
 										>
-											{buttonTexts[contextMessageKey].context2}{' '}
+											{
+												AiAssistantLocalization.buttonTexts[contextMessageKey]
+													.context2
+											}{' '}
 											{/* Dynamic button text */}
 										</Button>
 										<Button
@@ -1230,13 +1111,18 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											id='Context3'
 											onClick={() =>
 												handleContextClick(
-													contextMessages[contextMessageKey].context3,
+													AiAssistantLocalization.contextMessages[
+														contextMessageKey
+													].context3,
 													false,
 													false
 												)
 											}
 										>
-											{buttonTexts[contextMessageKey].context3}{' '}
+											{
+												AiAssistantLocalization.buttonTexts[contextMessageKey]
+													.context3
+											}{' '}
 											{/* Dynamic button text */}
 										</Button>
 										<Button
@@ -1245,13 +1131,18 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											id='Context4'
 											onClick={() =>
 												handleContextClick(
-													contextMessages[contextMessageKey].context4,
+													AiAssistantLocalization.contextMessages[
+														contextMessageKey
+													].context4,
 													false,
 													false
 												)
 											}
 										>
-											{buttonTexts[contextMessageKey].context4}{' '}
+											{
+												AiAssistantLocalization.buttonTexts[contextMessageKey]
+													.context4
+											}{' '}
 											{/* Dynamic button text */}
 										</Button>
 										<Button
@@ -1260,13 +1151,18 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											id='Context5'
 											onClick={() =>
 												handleContextClick(
-													contextMessages[contextMessageKey].context5,
+													AiAssistantLocalization.contextMessages[
+														contextMessageKey
+													].context5,
 													false,
 													false
 												)
 											}
 										>
-											{buttonTexts[contextMessageKey].context5}{' '}
+											{
+												AiAssistantLocalization.buttonTexts[contextMessageKey]
+													.context5
+											}{' '}
 											{/* Dynamic button text */}
 										</Button>
 										<Button
@@ -1275,13 +1171,18 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											id='Context6'
 											onClick={() =>
 												handleContextClick(
-													contextMessages[contextMessageKey].context6,
+													AiAssistantLocalization.contextMessages[
+														contextMessageKey
+													].context6,
 													false,
 													false
 												)
 											}
 										>
-											{buttonTexts[contextMessageKey].context6}{' '}
+											{
+												AiAssistantLocalization.buttonTexts[contextMessageKey]
+													.context6
+											}{' '}
 											{/* Dynamic button text */}
 										</Button>
 										<Button
@@ -1290,13 +1191,18 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											id='Context7'
 											onClick={() =>
 												handleContextClick(
-													contextMessages[contextMessageKey].context7,
+													AiAssistantLocalization.contextMessages[
+														contextMessageKey
+													].context7,
 													true,
 													false
 												)
 											}
 										>
-											{buttonTexts[contextMessageKey].context7}{' '}
+											{
+												AiAssistantLocalization.buttonTexts[contextMessageKey]
+													.context7
+											}{' '}
 											{/* Dynamic button text */}
 										</Button>
 										<Button
@@ -1305,13 +1211,18 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											id='Context8'
 											onClick={() =>
 												handleContextClick(
-													contextMessages[contextMessageKey].context8,
+													AiAssistantLocalization.contextMessages[
+														contextMessageKey
+													].context8,
 													true,
 													false
 												)
 											}
 										>
-											{buttonTexts[contextMessageKey].context8}{' '}
+											{
+												AiAssistantLocalization.buttonTexts[contextMessageKey]
+													.context8
+											}{' '}
 											{/* Dynamic button text */}
 										</Button>
 									</Space>
@@ -1326,9 +1237,19 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									style={{ display: 'flex', justifyContent: 'center' }}
 								>
 									<Space wrap align='center'>
-										<Text type='secondary'>{uiText[contextMessageKey].infoContext}</Text>
-										<Tooltip title={uiText[contextMessageKey].infoContextHelp}>
-											<FontAwesomeIcon icon={faQuestionCircle} size='sm'/>									
+										<Text type='secondary'>
+											{
+												AiAssistantLocalization.uiText[contextMessageKey]
+													.infoContext
+											}
+										</Text>
+										<Tooltip
+											title={
+												AiAssistantLocalization.uiText[contextMessageKey]
+													.infoContextHelp
+											}
+										>
+											<FontAwesomeIcon icon={faQuestionCircle} size='sm' />
 										</Tooltip>
 									</Space>
 								</Col>

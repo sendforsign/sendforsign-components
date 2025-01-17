@@ -41,7 +41,7 @@ export const PdfPlaceholder = ({
 	onChange,
 	onDelete,
 }: Props) => {
-	const { setPagePlaceholderDrag } = useContractEditorContext();
+	const { setPagePlaceholderDrag, ready } = useContractEditorContext();
 	// console.log('pagePlaceholder PdfPlaceholder', pagePlaceholder);
 	const currPagePlaceholder = useRef<PagePlaceholder>(pagePlaceholder);
 	const [{ isDragging }, drag, preview] = useDrag(
@@ -62,7 +62,9 @@ export const PdfPlaceholder = ({
 		currPagePlaceholder.current = pagePlaceholder;
 		// console.log('useEffect currPagePlaceholder', currPagePlaceholder.current);
 	}, [pagePlaceholder]);
-
+	useEffect(() => {
+		adjustTextSize(currPagePlaceholder.current);
+	}, [pagePlaceholder, ready]);
 	const handleResize = (size: any) => {
 		// console.log('handleResize', size);
 
@@ -82,6 +84,34 @@ export const PdfPlaceholder = ({
 		if (onChange) {
 			onChange({ pagePlaceholder: plTmp });
 		}
+	};
+
+	const adjustTextSize = (pagePlaceholder: PagePlaceholder) => {
+		// const div = document.getElementById(`${pagePlaceholder.id}_div`); // Получаем все элементы с классом 'hola'
+		const divs = document.getElementsByClassName('hola'); // Получаем все элементы с классом 'hola'
+		if (divs.length === 0) return; // Проверяем, существуют ли элементы
+
+		console.log('adjustTextSize', divs);
+
+		Array.from(divs).forEach((div) => {
+			if (div.id !== `${id}_div`) {
+				return;
+			}
+			// Применяем логику к каждому элементу
+			const element = div as HTMLElement; // Cast to HTMLElement
+			element.style.fontFamily = 'sans-serif';
+			const fontSize = 14;
+			let currentFontSize = fontSize;
+
+			// Проверяем, помещается ли текст
+			while (element.scrollHeight > (pagePlaceholder?.height as number)) {
+				currentFontSize -= 1;
+				element.style.fontSize = `${currentFontSize}px`; // Use the casted element
+				if (currentFontSize <= 1) {
+					break; // Предотвращаем бесконечный цикл
+				}
+			}
+		});
 	};
 	// console.log('currPagePlaceholder', currPagePlaceholder.current);
 	return (
@@ -128,7 +158,16 @@ export const PdfPlaceholder = ({
 			>
 				{!readonly ? (
 					<div
+						id={`${id}_div`}
+						className='hola'
 						style={{
+							fontFamily: 'Inter',
+							fontWeight: 500,
+							color: 'black',
+							wordBreak: 'break-word', // Break long words onto the next line
+							overflowWrap: 'break-word',
+							whiteSpace: 'normal', // Allow text to wrap
+							maxHeight: '100%', // Ensure it doesn't exceed the container
 							width: `${(pagePlaceholder?.width as number) - 1}px`,
 							height: `${(pagePlaceholder?.height as number) - 1}px`,
 						}}
@@ -168,13 +207,7 @@ export const PdfPlaceholder = ({
 										style={{ objectFit: 'contain' }}
 									/>
 								) : (
-									<div
-										style={{
-											fontFamily: 'Inter',
-											fontSize: 15,
-											fontWeight: 500,
-										}}
-									>
+									<div>
 										<FontAwesomeIcon icon={faSignature} />{' '}
 										{pagePlaceholder.name}
 									</div>
@@ -182,9 +215,6 @@ export const PdfPlaceholder = ({
 							) : (
 								<div
 									style={{
-										fontFamily: 'Inter',
-										fontSize: 15,
-										fontWeight: 500,
 										width: `${(pagePlaceholder?.width as number) - 1}px`,
 										height: `${(pagePlaceholder?.height as number) - 1}px`,
 									}}
@@ -198,7 +228,16 @@ export const PdfPlaceholder = ({
 					</div>
 				) : (
 					<div
+						id={`${id}_div`}
+						className='hola'
 						style={{
+							fontFamily: 'Inter',
+							fontWeight: 500,
+							color: 'black',
+							wordBreak: 'break-word', // Break long words onto the next line
+							overflowWrap: 'break-word',
+							whiteSpace: 'normal', // Allow text to wrap
+							maxHeight: '100%', // Ensure it doesn't exceed the container
 							width: `${(pagePlaceholder.width as number) - 1}px`,
 							height: `${(pagePlaceholder.height as number) - 1}px`,
 						}}
@@ -220,13 +259,7 @@ export const PdfPlaceholder = ({
 								<FontAwesomeIcon icon={faSignature} />
 							)
 						) : (
-							<div
-								style={{
-									fontFamily: 'Inter',
-									fontSize: 15,
-									fontWeight: 500,
-								}}
-							>
+							<div>
 								{pagePlaceholder.value
 									? pagePlaceholder.value
 									: pagePlaceholder.name}

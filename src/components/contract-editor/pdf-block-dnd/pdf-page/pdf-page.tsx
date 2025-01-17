@@ -62,14 +62,15 @@ export const PdfPage = ({
 		placeholderPdf,
 		setPlaceholderPdf,
 		refreshPagePlaceholders,
-		refreshPlaceholders,
 		setRefreshPagePlaceholders,
+		ready,
+		setReady,
 	} = useContractEditorContext();
 	const currPagePl = useRef<PagePlaceholder[]>([]);
 	const [currPagePlaceholder, setCurrPagePlaceholder] = useState<
 		PagePlaceholder[]
 	>([]);
-	const [pageDetail, setPageDetail] = useState<any>({});
+	// const [pageDetail, setPageDetail] = useState<any>({});
 	// const [finishDrop, setFinishDrop] = useState(false);
 	const finishDrop = useRef(false);
 	const currentPage = useRef(0);
@@ -80,7 +81,7 @@ export const PdfPage = ({
 	const first = useRef(false);
 
 	const div = document.getElementById(`page_${pageNumber}`);
-	const [ready, setReady] = useState(false);
+	// const [ready, setReady] = useState(false);
 
 	const [, drop] = useDrop(
 		() => ({
@@ -434,7 +435,7 @@ export const PdfPage = ({
 					});
 				});
 		}
-	};
+	}; 
 	// console.log('currPagePlaceholder', currPagePlaceholder);
 	return (
 		<Page
@@ -444,9 +445,8 @@ export const PdfPage = ({
 			pageNumber={pageNumber + 1}
 			// scale={scale}
 			onLoadSuccess={(e) => {
-				// console.log('onLoadSuccess', e);
-				setReady(true);
-				setPageDetail(e);
+				console.log('onLoadSuccess', new Date().getMilliseconds());
+				setReady(true); 
 			}}
 			onDragOver={(e) => {
 				e.preventDefault();

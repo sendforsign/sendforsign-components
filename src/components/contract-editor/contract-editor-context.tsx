@@ -108,6 +108,8 @@ export type TContractEditorContextType = {
 	setPlaceholderDelete: (placeholderDelete: string) => void;
 	contractPlaceholderCount: number;
 	setContractPlaceholderCount: (contractPlaceholderCount: number) => void;
+	ready: boolean;
+	setReady: (ready: boolean) => void;
 };
 export const ContractEditorContext = createContext<
 	TContractEditorContextType | undefined

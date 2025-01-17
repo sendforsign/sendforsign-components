@@ -96,6 +96,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [readonly, setReadonly] = useState(false);
 	const [pdfDownload, setPdfDownload] = useState(false);
 	const [load, setLoad] = useState(false);
+	const [ready, setReady] = useState(false);
 	const [fillType, setFillType] = useState(false);
 	const [placeholderVisible, setPlaceholderVisible] = useState(false);
 	const [AiVisible, setAiVisible] = useState(false);
@@ -137,20 +138,20 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	// console.log('contractKey ContractEditor', contractKey, currClientKey);
 
 	useEffect(() => {
-        const handleResize = () => {
-            if (contractEditorRef.current) {
-                const width = contractEditorRef.current.offsetWidth;
-                setPlaceholderVisible(width >= 500);
-            }
-        };
+		const handleResize = () => {
+			if (contractEditorRef.current) {
+				const width = contractEditorRef.current.offsetWidth;
+				setPlaceholderVisible(width >= 500);
+			}
+		};
 
-        window.addEventListener('resize', handleResize);
-        handleResize(); // Initial check
+		window.addEventListener('resize', handleResize);
+		handleResize(); // Initial check
 
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
+	}, []);
 
 	useEffect(() => {
 		setCurrToken(token);
@@ -475,227 +476,229 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	}, [documentCurrentSaved]);
 	return (
 		<div ref={contractEditorRef}>
-		<ContractEditorContext.Provider
-			value={{
-				signModal,
-				setSignModal,
-				sendModal,
-				setSendModal,
-				approveModal,
-				setApproveModal,
-				resultModal,
-				setResultModal,
-				notification,
-				setNotification,
-				contractKey: currContractKey,
-				setContractKey: setCurrContractKey,
-				contractName,
-				setContractName,
-				contractType,
-				setContractType,
-				templateKey,
-				setTemplateKey,
-				clientKey: currClientKey,
-				setClientKey: setCurrClientKey,
-				userKey: currUserKey,
-				setUserKey: setCurrUserKey,
-				token: currToken,
-				setToken: setCurrToken,
-				sign,
-				setSign,
-				signs,
-				setSigns,
-				contractSign,
-				setContractSign,
-				pdfFileLoad,
-				setPdfFileLoad,
-				refreshSign,
-				setRefreshSign,
-				refreshEvent,
-				setRefreshEvent,
-				refreshShareLink,
-				setRefreshShareLink,
-				refreshRecipients,
-				setRefreshRecipients,
-				refreshPlaceholders,
-				setRefreshPlaceholders,
-				placeholder,
-				setPlaceholder,
-				placeholderPdf,
-				setPlaceholderPdf,
-				placeholderVisible,
-				setPlaceholderVisible,
-				AiVisible,
-				setAiVisible,
-				contractValue,
-				setContractValue,
-				createContract,
-				setCreateContract,
-				isPdf,
-				setIsPdf,
-				continueDisable,
-				setContinueDisable,
-				continueLoad,
-				setContinueLoad,
-				editorVisible,
-				setEditorVisible,
-				readonly,
-				setReadonly,
-				signCount,
-				setSignCount,
-				pdfDownload,
-				setPdfDownload,
-				apiKey: currApiKey,
-				setApiKey: setCurrApiKey,
-				beforeCreated,
-				setBeforeCreated,
-				ipInfo,
-				setIpInfo,
-				contractEvents,
-				setContractEvents,
-				fillPlaceholder,
-				setFillPlaceholder,
-				currentData,
-				setCurrentData,
-				documentCurrentSaved,
-				setDocumentCurrentSaved,
-				load,
-				setLoad,
-				contractPlaceholderCount,
-				setContractPlaceholderCount,
-				pagePlaceholder,
-				setPagePlaceholder,
-				pagePlaceholderDrag,
-				setPagePlaceholderDrag,
-				placeholderChange,
-				setPlaceholderChange,
-				placeholderDelete,
-				setPlaceholderDelete,
-				fillPlaceholderLoad,
-				setFillPlaceholderLoad,
-				refreshOnlyPlaceholders,
-				setRefreshOnlyPlaceholders,
-				refreshPagePlaceholders,
-				setRefreshPagePlaceholders,
-			}}
-		>
-			{spinLoad ? (
-				<Spin spinning={spinLoad} fullscreen />
-			) : (
-				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-					{isNew || beforeCreated ? (
-						<ChooseContractType allowPdf={pdf} />
-					) : (
-						<>{showTimeline && <DocumentTimilineBlock />}</>
-					)}
-					{!isNew && !beforeCreated && (
-						<>
-							{editorVisible && (
-								<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false}>
-									<DndProvider backend={HTML5Backend}>
-										<Col flex='auto'>
-											<Space direction='vertical' style={{ display: 'flex' }}>
-												<Card loading={continueLoad || fillPlaceholderLoad}>
-													<Space
-														direction='vertical'
-														size={16}
-														style={{ display: 'flex' }}
-													>
+			<ContractEditorContext.Provider
+				value={{
+					signModal,
+					setSignModal,
+					sendModal,
+					setSendModal,
+					approveModal,
+					setApproveModal,
+					resultModal,
+					setResultModal,
+					notification,
+					setNotification,
+					contractKey: currContractKey,
+					setContractKey: setCurrContractKey,
+					contractName,
+					setContractName,
+					contractType,
+					setContractType,
+					templateKey,
+					setTemplateKey,
+					clientKey: currClientKey,
+					setClientKey: setCurrClientKey,
+					userKey: currUserKey,
+					setUserKey: setCurrUserKey,
+					token: currToken,
+					setToken: setCurrToken,
+					sign,
+					setSign,
+					signs,
+					setSigns,
+					contractSign,
+					setContractSign,
+					pdfFileLoad,
+					setPdfFileLoad,
+					refreshSign,
+					setRefreshSign,
+					refreshEvent,
+					setRefreshEvent,
+					refreshShareLink,
+					setRefreshShareLink,
+					refreshRecipients,
+					setRefreshRecipients,
+					refreshPlaceholders,
+					setRefreshPlaceholders,
+					placeholder,
+					setPlaceholder,
+					placeholderPdf,
+					setPlaceholderPdf,
+					placeholderVisible,
+					setPlaceholderVisible,
+					AiVisible,
+					setAiVisible,
+					contractValue,
+					setContractValue,
+					createContract,
+					setCreateContract,
+					isPdf,
+					setIsPdf,
+					continueDisable,
+					setContinueDisable,
+					continueLoad,
+					setContinueLoad,
+					editorVisible,
+					setEditorVisible,
+					readonly,
+					setReadonly,
+					signCount,
+					setSignCount,
+					pdfDownload,
+					setPdfDownload,
+					apiKey: currApiKey,
+					setApiKey: setCurrApiKey,
+					beforeCreated,
+					setBeforeCreated,
+					ipInfo,
+					setIpInfo,
+					contractEvents,
+					setContractEvents,
+					fillPlaceholder,
+					setFillPlaceholder,
+					currentData,
+					setCurrentData,
+					documentCurrentSaved,
+					setDocumentCurrentSaved,
+					load,
+					setLoad,
+					ready,
+					setReady,
+					contractPlaceholderCount,
+					setContractPlaceholderCount,
+					pagePlaceholder,
+					setPagePlaceholder,
+					pagePlaceholderDrag,
+					setPagePlaceholderDrag,
+					placeholderChange,
+					setPlaceholderChange,
+					placeholderDelete,
+					setPlaceholderDelete,
+					fillPlaceholderLoad,
+					setFillPlaceholderLoad,
+					refreshOnlyPlaceholders,
+					setRefreshOnlyPlaceholders,
+					refreshPagePlaceholders,
+					setRefreshPagePlaceholders,
+				}}
+			>
+				{spinLoad ? (
+					<Spin spinning={spinLoad} fullscreen />
+				) : (
+					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
+						{isNew || beforeCreated ? (
+							<ChooseContractType allowPdf={pdf} />
+						) : (
+							<>{showTimeline && <DocumentTimilineBlock />}</>
+						)}
+						{!isNew && !beforeCreated && (
+							<>
+								{editorVisible && (
+									<Row gutter={{ xs: 8, sm: 8, md: 8, lg: 8 }} wrap={false}>
+										<DndProvider backend={HTML5Backend}>
+											<Col flex='auto'>
+												<Space direction='vertical' style={{ display: 'flex' }}>
+													<Card loading={continueLoad || fillPlaceholderLoad}>
 														<Space
 															direction='vertical'
-															size={2}
-															className='SharingDocHeader'
+															size={16}
+															style={{ display: 'flex' }}
 														>
-															<Title level={4} style={{ margin: '0 0 0 0' }}>
-																Review your document
-															</Title>
-															{!isPdf && (
-																<Text type='secondary'>
-																	Highlight text to see options.
-																</Text>
+															<Space
+																direction='vertical'
+																size={2}
+																className='SharingDocHeader'
+															>
+																<Title level={4} style={{ margin: '0 0 0 0' }}>
+																	Review your document
+																</Title>
+																{!isPdf && (
+																	<Text type='secondary'>
+																		Highlight text to see options.
+																	</Text>
+																)}
+															</Space>
+															{!isPdf ? (
+																<>
+																	{contractValue && (
+																		<HtmlBlock
+																			value={contractValue}
+																			quillRef={quillRef}
+																		/>
+																	)}
+																</>
+															) : (
+																// <PdfBlock />
+																<PdfBlockDnd />
 															)}
 														</Space>
-														{!isPdf ? (
-															<>
-																{contractValue && (
-																	<HtmlBlock
-																		value={contractValue}
-																		quillRef={quillRef}
-																	/>
-																)}
-															</>
-														) : (
-															// <PdfBlock />
-															<PdfBlockDnd />
-														)}
+													</Card>
+												</Space>
+											</Col>
+											{fillType && !isPdf && placeholderVisible && (
+												<Col flex='350px' style={{ display: 'block' }}>
+													<Space
+														direction='vertical'
+														style={{
+															display: 'flex',
+															top: 10,
+															position: 'sticky',
+															maxHeight: '80vh',
+															overflow: 'auto',
+														}}
+													>
+														<PlaceholderHtmlBlock quillRef={quillRef} />
 													</Space>
-												</Card>
-											</Space>
-										</Col>
-										{fillType && !isPdf && placeholderVisible && (
-											<Col flex='350px' style={{ display: 'block' }}>
-												<Space
-													direction='vertical'
-													style={{
-														display: 'flex',
-														top: 10,
-														position: 'sticky',
-														maxHeight: '80vh',
-														overflow: 'auto',
-													}}
-												>
-													<PlaceholderHtmlBlock quillRef={quillRef} />
-												</Space>
-											</Col>
-										)}
-										{AiVisible && (
-											<Col flex='350px' style={{ display: 'block' }}>
-											<Space
-												direction='vertical'
-												style={{
-													display: 'flex',
-													top: 10,
-													position: 'sticky',
-													maxHeight: '80vh',
-													overflow: 'auto',
-												}}
-											>
-												<AiHtmlBlock quillRef={quillRef} />
-											</Space>
-										</Col>
-										)}
-										{fillType && isPdf && placeholderVisible && (
-											<Col flex='350px' style={{ display: 'block' }}>
-												<Space
-													direction='vertical'
-													style={{
-														display: 'flex',
-														top: 10,
-														position: 'sticky',
-														maxHeight: '80vh',
-														overflow: 'auto',
-													}}
-												>
-													<PlaceholderPdfBlock />
-												</Space>
-											</Col>
-										)}
-									</DndProvider>
-								</Row>
-							)}
-							<div id='contractActionsFooter'>
-								{showActionsBar && <ShareLinkBlock />}
-							</div>
-						</>
-					)}
-				</Space>
-			)}
-			<SignModal />
-			<SendModal />
-			<ApproveModal />
-			<ResultModal />
-			<Notification />
-		</ContractEditorContext.Provider>
+												</Col>
+											)}
+											{AiVisible && (
+												<Col flex='350px' style={{ display: 'block' }}>
+													<Space
+														direction='vertical'
+														style={{
+															display: 'flex',
+															top: 10,
+															position: 'sticky',
+															maxHeight: '80vh',
+															overflow: 'auto',
+														}}
+													>
+														<AiHtmlBlock quillRef={quillRef} />
+													</Space>
+												</Col>
+											)}
+											{fillType && isPdf && placeholderVisible && (
+												<Col flex='350px' style={{ display: 'block' }}>
+													<Space
+														direction='vertical'
+														style={{
+															display: 'flex',
+															top: 10,
+															position: 'sticky',
+															maxHeight: '80vh',
+															overflow: 'auto',
+														}}
+													>
+														<PlaceholderPdfBlock />
+													</Space>
+												</Col>
+											)}
+										</DndProvider>
+									</Row>
+								)}
+								<div id='contractActionsFooter'>
+									{showActionsBar && <ShareLinkBlock />}
+								</div>
+							</>
+						)}
+					</Space>
+				)}
+				<SignModal />
+				<SendModal />
+				<ApproveModal />
+				<ResultModal />
+				<Notification />
+			</ContractEditorContext.Provider>
 		</div>
 	);
 };
