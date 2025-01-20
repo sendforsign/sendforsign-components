@@ -663,7 +663,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 															overflow: 'auto',
 														}}
 													>
-														<AiHtmlBlock quillRef={quillRef} />
+														<AiHtmlBlock />
 													</Space>
 												</Col>
 											)}

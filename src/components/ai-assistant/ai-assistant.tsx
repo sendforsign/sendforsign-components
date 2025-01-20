@@ -59,10 +59,10 @@ import { AiAssistantLocalization } from '../../config/localization';
 const { TextArea } = Input;
 
 export interface AiAssistantProps {
-	apiKey?: string;
-	clientKey?: string;
-	token?: string;
-	userKey?: string;
+	apiKey: string;
+	clientKey: string;
+	token: string;
+	userKey: string;
 }
 type SelectData = {
 	value: string;
@@ -77,10 +77,10 @@ type OptionsData = {
 type Language = 'rus' | 'eng' | 'esp' | 'deu' | 'fra';
 
 export const AiAssistant: FC<AiAssistantProps> = ({
-	apiKey,
-	clientKey,
-	token,
-	userKey,
+	apiKey = '',
+	clientKey = '',
+	token = '',
+	userKey = '',
 }) => {
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [isThinking, setIsThinking] = useState(false);
@@ -103,7 +103,6 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const [selectedContexts, setSelectedContexts] = useState<string[]>([]);
 	const [selectedContracts, setSelectedContracts] = useState<string[]>([]);
 	const [selectedValues, setSelectedValues] = useState<string[]>([]);
-	// const [fileList, setFileList] = useState<UploadFile[]>([]);
 	const [contractKey, setContractKey] = useState('');
 	const [tooltipFileVisible, setTooltipFileVisible] = useState(false);
 	const [tooltipContextVisible, setTooltipContextVisible] = useState(false);
@@ -116,6 +115,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const chatKey = useRef<string>(uuid());
 	const body = useRef<any>({ chatKey: chatKey.current });
 	const [selectedLanguage, setSelectedLanguage] = useState('eng');
+
 	const { messages, input, handleInputChange, handleSubmit, setMessages } =
 		useChat({
 			api: `${BASE_URL}${ApiEntity.CHAT}`,
@@ -141,7 +141,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		});
 	}, [messages]);
 	useEffect(() => {
-		setCurrToken(token);
+		setCurrToken(token || '');
 		if (token) {
 			headers.current = {
 				Authorization: `Bearer ${currToken}`,
@@ -151,16 +151,16 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		}
 	}, [token]);
 	useEffect(() => {
-		setCurrApiKey(apiKey);
+		setCurrApiKey(apiKey || '');
 	}, [apiKey]);
 	useEffect(() => {
-		setCurrClientKey(clientKey);
+		setCurrClientKey(clientKey || '');
 		if (clientKey) {
 			body.current = { ...body.current, clientKey: clientKey };
 		}
 	}, [clientKey]);
 	useEffect(() => {
-		setCurrUserKey(userKey);
+		setCurrUserKey(userKey || '');
 		if (userKey) {
 			body.current = { ...body.current, userKey: userKey };
 		}
@@ -412,6 +412,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			})
 			.then((payload: any) => {
 				setSpinFileLoad(false);
+				console.log('payload CONTEXT_FILES', payload);
 				if (payload.data.fileContents && payload.data.fileContents.length > 0) {
 					contextFromFileRef.current = payload.data.fileContents.map(
 						(fileContent: string, index: number) => {
@@ -429,6 +430,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 						),
 					};
 				}
+				console.log('payload body.current', body.current);
 			})
 			.catch((error) => {
 				setSpinFileLoad(false);
@@ -524,13 +526,17 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const handleCreateDocument = () => {
 		// Set the input value to the desired phrase
 		handleInputChange({
-			target: { value: uiText[contextMessageKey].basedOnText },
+			target: {
+				value: AiAssistantLocalization.uiText[contextMessageKey].basedOnText,
+			},
 		} as React.ChangeEvent<HTMLTextAreaElement>);
 	};
 
 	// Add a useEffect to handle the submission after the input is set
 	useEffect(() => {
-		if (input === uiText[contextMessageKey].basedOnText) {
+		if (
+			input === AiAssistantLocalization.uiText[contextMessageKey].basedOnText
+		) {
 			setIsThinking(true);
 			setIsSubmitted(true);
 			handleSubmit();
@@ -612,208 +618,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		setIsSubmitted(false);
 	};
 
-	const contextMessageKey = selectedLanguage as keyof typeof contextMessages;
-
-	const buttonTexts = {
-		rus: {
-			context1: 'Ответь на основе контекста',
-			context2: 'Подготовь саммари файла',
-			context3: 'Создай новый документ',
-			context4: 'Создай новый документ из шаблона',
-			context5: 'Найди судебную практику для кейса',
-			context6: 'Подготовь саммари веб-сайта',
-			context7: 'Переведи документ на другой язык',
-			context8: 'Проверь грамматику',
-		},
-		eng: {
-			context1: 'Answer based on context',
-			context2: 'Prepare a file summary',
-			context3: 'Create a new document',
-			context4: 'Create a new document from template',
-			context5: 'Find case law for the case',
-			context6: 'Prepare website summary',
-			context7: 'Translate document to another language',
-			context8: 'Check grammar',
-		},
-		esp: {
-			context1: 'Responder basado en el contexto',
-			context2: 'Preparar resumen del documento',
-			context3: 'Crear un nuevo documento',
-			context4: 'Crear un nuevo documento a partir de una plantilla',
-			context5: 'Encontrar jurisprudencia para el caso',
-			context6: 'Preparar resumen del sitio web',
-			context7: 'Traducir documento a otro idioma',
-			context8: 'Revisar gramática',
-		},
-		deu: {
-			context1: 'Antwort basierend auf Kontext',
-			context2: 'Dokumentzusammenfassung vorbereiten',
-			context3: 'Neues Dokument erstellen',
-			context4: 'Neues Dokument aus Vorlage erstellen',
-			context5: 'Rechtsprechung für den Fall finden',
-			context6: 'Webseiten-Zusammenfassung vorbereiten',
-			context7: 'Dokument in eine andere Sprache übersetzen',
-			context8: 'Grammatik überprüfen',
-		},
-		fra: {
-			context1: 'Répondre en fonction du contexte',
-			context2: 'Préparer le résumé du document',
-			context3: 'Créer un nouveau document',
-			context4: 'Créer un nouveau document à partir d\'un modèle',
-			context5: 'Trouver la jurisprudence pour le cas',
-			context6: 'Préparer le résumé du site web',
-			context7: 'Traduire le document dans une autre langue',
-			context8: 'Vérifier la grammaire',
-		},
-	};
-
-	// Message mapping for onClick actions
-	const contextMessages = {
-		rus: {
-			context1: 'Ответь на вопрос на основе контекста: ',
-			context2: 'Подготовь саммари документа',
-			context3:
-				'Создай новый Договор о неразглашении в свободной форме, подписывающие стороны — Иван Петров ivan@ivan.com и Николай Сидоров nick@nick.com',
-			context4: 'Создай новый документ из шаблона',
-			context5: 'Найди судебную практику для кейса: ',
-			context6: 'Подготовь саммари веб-сайта по ссылке: ',
-			context7: 'Переведи предоставленный документ на английский язык',
-			context8: 'Проверь документ на грамматические ошибки',
-		},
-		eng: {
-			context1: 'Answer based on context: ',
-			context2: 'Prepare document summary',
-			context3:
-				'Create a new non-disclosure agreement, parties — John Black john@john.com and Nick Rush nick@nick.com',
-			context4: 'Create a new document from template',
-			context5: 'Find case law for the case: ',
-			context6: 'Prepare website summary from the link: ',
-			context7: 'Translate the provided document into English',
-			context8: 'Check the document for grammatical errors',
-		},
-		esp: {
-			context1: 'Responder basado en el contexto: ',
-			context2: 'Preparar resumen del documento',
-			context3:
-				'Crear un nuevo acuerdo de confidencialidad, partes — Juan Negro juan@juan.com y Nick Rush nick@nick.com',
-			context4: 'Crear un nuevo documento a partir de una plantilla',
-			context5: 'Encontrar jurisprudencia para el caso: ',
-			context6: 'Preparar resumen del sitio web desde el enlace: ',
-			context7: 'Traducir el documento proporcionado al inglés',
-			context8: 'Revisar el documento para errores gramaticales',
-		},
-		deu: {
-			context1: 'Antwort basierend auf Kontext: ',
-			context2: 'Dokumentzusammenfassung vorbereiten',
-			context3:
-				'Erstellen Sie eine neue Geheimhaltungsvereinbarung, Parteien — John Schwarz john@john.com und Nick Rush nick@nick.com',
-			context4: 'Neues Dokument aus Vorlage erstellen',
-			context5: 'Rechtsprechung für den Fall finden: ',
-			context6: 'Webseiten-Zusammenfassung vom Link vorbereiten: ',
-			context7: 'Übersetzen Sie das bereitgestellte Dokument ins Englische',
-			context8: 'Überprüfen Sie das Dokument auf grammatikalische Fehler',
-		},
-		fra: {
-			context1: 'Répondre en fonction du contexte: ',
-			context2: 'Préparer le résumé du document',
-			context3:
-				'Créer un nouvel accord de non-divulgation, parties — John Noir john@john.com et Nick Rush nick@nick.com',
-			context4: 'Créer un nouveau document à partir d\'un modèle',
-			context5: 'Trouver la jurisprudence pour le cas: ',
-			context6: 'Préparer le résumé du site web à partir du lien: ',
-			context7: 'Traduire le document fourni en anglais',
-			context8: 'Vérifier le document pour les erreurs grammaticales',
-		},
-	};
-
-	const uiText = {
-		rus: {
-			title: 'ИИ ассистент',
-			subtitle: 'Создавай, модифицируй, проверяй с ИИ.',
-			context: 'Выбрать контекст',
-			attach: 'Прикрепить файлы',
-			newChat: 'Новый чат',
-			rag: 'Загрузить файлы для добавления собственного контекста',
-			contracts: 'Открыть контракты',
-			templates: 'Открыть шаблоны',
-			language: 'Язык ассистента',
-			openDoc: 'Открыть документ',
-			infoStartWith: 'Начните с',
-			infoContext: 'Добавьте контекст',
-			messageAI: 'Напишите ассистенту...',
-			infoContextHelp: 'Контекст — это долговременная память вашего ассистента. Добавьте сюда ваши часто используемые данные, в этом случае ассистент сможет отвечать на их основе.',
-			basedOnText: 'На снове нашего общения, создай новый документ',
-		},
-		eng: {
-			title: 'AI assistant',
-			subtitle: 'Create, modify, assess and more.',
-			context: 'Select context',
-			attach: 'Attach files',
-			newChat: 'New chat',
-			rag: 'Upload files to add your own context',
-			contracts: 'Open contracts',
-			templates: 'Open templates',
-			language: 'Assistant language',
-			openDoc: 'Open document',
-			infoStartWith: 'Get started with',
-			infoContext: 'Add context',
-			messageAI: 'Message assistant...',
-			infoContextHelp: 'Context is your assistant\'s long-term memory. Add your frequently used data here, so the assistant can respond based on it.',
-			basedOnText: 'Based on our conversation, create a new document',
-		},
-		esp: {
-			title: 'Asistente de IA',
-			subtitle: 'Crear, modificar, evaluar y más.',
-			context: 'Seleccionar contexto',
-			attach: 'Adjuntar archivos',
-			newChat: 'Nuevo chat',
-			rag: 'Subir archivos para agregar tu propio contexto',
-			contracts: 'Abrir contratos',
-			templates: 'Abrir plantillas',
-			language: 'Idioma del asistente',
-			openDoc: 'Abrir documento',
-			infoStartWith: 'Comienza con',
-			infoContext: 'Añadir contexto',
-			messageAI: 'Mensaje al asistente...',
-			infoContextHelp: 'El contexto es la memoria a largo plazo de tu asistente. Añade aquí tus datos de uso frecuente para que el asistente pueda responder en base a ellos.',
-			basedOnText: 'Basado en nuestra conversación, crea un nuevo documento',
-		},
-		deu: {
-			title: 'KI-Assistent',
-			subtitle: 'Erstellen, ändern, bewerten und mehr.',
-			context: 'Kontext auswählen',
-			attach: 'Dateien anhängen',
-			newChat: 'Neuer Chat',
-			rag: 'Dateien hochladen, um eigenen Kontext hinzuzufügen',
-			contracts: 'Verträge öffnen',
-			templates: 'Vorlagen öffnen',
-			language: 'Assistentensprache',
-			openDoc: 'Dokument öffnen',
-			infoStartWith: 'Beginnen Sie mit',
-			infoContext: 'Kontext hinzufügen',
-			messageAI: 'Nachricht an den Assistenten...',
-			infoContextHelp: 'Kontext ist das Langzeitgedächtnis Ihres Assistenten. Fügen Sie hier Ihre häufig verwendeten Daten hinzu, damit der Assistent darauf basierend antworten kann.',
-			basedOnText: 'Basierend auf unserem Gespräch, erstelle ein neues Dokument',
-
-		},
-		fra: {
-			title: 'Assistant IA',
-			subtitle: 'Créer, modifier, évaluer et plus.',
-			context: 'Sélectionner le contexte',
-			attach: 'Joindre des fichiers',
-			newChat: 'Nouveau chat',
-			rag: 'Télécharger des fichiers pour ajouter votre propre contexte',
-			contracts: 'Ouvrir les contrats',
-			templates: 'Ouvrir les modèles',
-			language: 'Langue de l\'assistant',
-			openDoc: 'Ouvrir le document',
-			infoStartWith: 'Commencez par',
-			infoContext: 'Ajouter un contexte',
-			messageAI: 'Message à l\'assistant...',
-			infoContextHelp: 'Le contexte est la mémoire à long terme de votre assistant. Ajoutez ici vos données fréquemment utilisées pour que l\'assistant puisse répondre en fonction de celles-ci.',
-			basedOnText: 'Sur la base de notre conversation, créez un nouveau document',
-		},
-	};
+	const contextMessageKey =
+		selectedLanguage as keyof typeof AiAssistantLocalization.contextMessages;
 
 	return (
 		<AiAssistantContext.Provider
@@ -983,17 +789,27 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 																	{replaceTextWithElement(m.content)}
 																</Text>
 																{!m.content.includes('{ContractKey') && (
-																	<Tooltip title={uiText[contextMessageKey].basedOnText}>
+																	<Tooltip
+																		title={
+																			AiAssistantLocalization.uiText[
+																				contextMessageKey
+																			].basedOnText
+																		}
+																	>
 																		<Button
 																			type='text'
 																			size='small'
 																			onClick={() => handleCreateDocument()}
 																			icon={
-																				<FontAwesomeIcon icon={faFileCirclePlus} size='sm' color='#5d5d5d' />
+																				<FontAwesomeIcon
+																					icon={faFileCirclePlus}
+																					size='sm'
+																					color='#5d5d5d'
+																				/>
 																			}
 																		></Button>
 																	</Tooltip>
-																)}															
+																)}
 															</div>
 														</Space>
 													</li>
