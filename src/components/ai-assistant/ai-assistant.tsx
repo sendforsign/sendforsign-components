@@ -412,7 +412,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			})
 			.then((payload: any) => {
 				setSpinFileLoad(false);
-				console.log('payload CONTEXT_FILES', payload);
+				// console.log('payload CONTEXT_FILES', payload);
 				if (payload.data.fileContents && payload.data.fileContents.length > 0) {
 					contextFromFileRef.current = payload.data.fileContents.map(
 						(fileContent: string, index: number) => {
@@ -430,7 +430,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 						),
 					};
 				}
-				console.log('payload body.current', body.current);
+				// console.log('payload body.current', body.current);
 			})
 			.catch((error) => {
 				setSpinFileLoad(false);
