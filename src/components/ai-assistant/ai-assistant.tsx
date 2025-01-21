@@ -59,10 +59,10 @@ import { AiAssistantLocalization } from '../../config/localization';
 const { TextArea } = Input;
 
 export interface AiAssistantProps {
-	apiKey: string;
-	clientKey: string;
-	token: string;
-	userKey: string;
+	apiKey?: string;
+	clientKey?: string;
+	token?: string;
+	userKey?: string;
 }
 type SelectData = {
 	value: string;
