@@ -135,10 +135,13 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const chatEndRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
-		chatEndRef.current?.scrollIntoView({
-			behavior: 'smooth',
-			block: 'nearest',
-		});
+		// Check if the last message is being added
+		if (messages.length > 0) {
+			chatEndRef.current?.scrollIntoView({
+				behavior: 'smooth',
+				block: 'nearest',
+			});
+		}
 	}, [messages]);
 	useEffect(() => {
 		setCurrToken(token || '');
