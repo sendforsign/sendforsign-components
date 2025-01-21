@@ -277,6 +277,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			});
 		};
 		if (currApiKey || currToken) {
+			setSpinLoad(false);
 			setSpinContextLoad(true);
 			getData().then(() => {
 				// debugger;
