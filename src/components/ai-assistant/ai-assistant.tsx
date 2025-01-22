@@ -638,7 +638,6 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			(option) => option.value === selectedLanguage
 		)?.label;
 		body.current = { ...body.current, language: selectedLanguageLabel }; // Update with the label
-		console.log('body.current', body.current);
 	}, [selectedLanguage]);
 
 	return (
