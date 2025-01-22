@@ -625,6 +625,20 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const contextMessageKey =
 		selectedLanguage as keyof typeof AiAssistantLocalization.contextMessages;
 
+	const languageOptions = [
+		{ value: 'eng', label: 'English' },
+		{ value: 'esp', label: 'Español' },
+		{ value: 'deu', label: 'Deutsch' },
+		{ value: 'fra', label: 'Français' },
+		{ value: 'rus', label: 'Русский' },
+	];
+
+	useEffect(() => {
+		const selectedLanguageLabel = languageOptions.find(option => option.value === selectedLanguage)?.label;
+		body.current = { ...body.current, language: selectedLanguageLabel }; // Update with the label
+		console.log('body.current', body.current);
+	}, [selectedLanguage]);
+
 	return (
 		<AiAssistantContext.Provider
 			value={{
