@@ -71,7 +71,8 @@ export const ContextModal = () => {
 	const props: UploadProps = {
 		name: 'file',
 		multiple: true,
-		accept: 'application/pdf',
+		accept:
+			'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 		listType: 'text',
 		disabled:
 			contextModal.context && contextModal.context.general ? true : false,
@@ -154,6 +155,8 @@ export const ContextModal = () => {
 			});
 	};
 	const handleOk = async () => {
+		debugger;
+
 		setSpinLoad(true);
 		setDisableLoad(true);
 		if (edit) {
@@ -176,7 +179,7 @@ export const ContextModal = () => {
 							fileListInsert[i].uid
 						)) as ArrayBuffer;
 						const pdfFileBlob = new Blob([pdfFile as BlobPart], {
-							type: 'application/pdf',
+							type: fileListInsert[i].type,
 						});
 						formData.append(
 							'files[]',
@@ -267,7 +270,7 @@ export const ContextModal = () => {
 					fileList[i].uid
 				)) as ArrayBuffer;
 				const pdfFileBlob = new Blob([pdfFile as BlobPart], {
-					type: 'application/pdf',
+					type: fileList[i].type,
 				});
 				formData.append(
 					'files[]',

@@ -294,7 +294,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		name: 'file',
 		multiple: true,
 		accept:
-			'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+			'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/rtf,text/csv',
 		listType: 'text',
 		showUploadList: false,
 
@@ -634,7 +634,9 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	];
 
 	useEffect(() => {
-		const selectedLanguageLabel = languageOptions.find(option => option.value === selectedLanguage)?.label;
+		const selectedLanguageLabel = languageOptions.find(
+			(option) => option.value === selectedLanguage
+		)?.label;
 		body.current = { ...body.current, language: selectedLanguageLabel }; // Update with the label
 		console.log('body.current', body.current);
 	}, [selectedLanguage]);
