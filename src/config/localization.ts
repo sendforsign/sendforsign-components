@@ -126,6 +126,7 @@ export const AiAssistantLocalization = {
 			infoContextHelp:
 				'Контекст — это долговременная память вашего ассистента. Добавьте сюда ваши часто используемые данные, в этом случае ассистент сможет отвечать на их основе.',
 			basedOnText: 'На снове нашего общения, создай новый документ',
+			model: 'LLM модель'
 		},
 		eng: {
 			title: 'AI assistant',
@@ -144,6 +145,7 @@ export const AiAssistantLocalization = {
 			infoContextHelp:
 				"Context is your assistant's long-term memory. Add your frequently used data here, so the assistant can respond based on it.",
 			basedOnText: 'Based on our conversation, create a new document',
+			model: 'LLM model'
 		},
 		esp: {
 			title: 'Asistente de IA',
@@ -162,6 +164,7 @@ export const AiAssistantLocalization = {
 			infoContextHelp:
 				'El contexto es la memoria a largo plazo de tu asistente. Añade aquí tus datos de uso frecuente para que el asistente pueda responder en base a ellos.',
 			basedOnText: 'Basado en nuestra conversación, crea un nuevo documento',
+			model: 'modelo LLM'
 		},
 		deu: {
 			title: 'KI-Assistent',
@@ -181,6 +184,7 @@ export const AiAssistantLocalization = {
 				'Kontext ist das Langzeitgedächtnis Ihres Assistenten. Fügen Sie hier Ihre häufig verwendeten Daten hinzu, damit der Assistent darauf basierend antworten kann.',
 			basedOnText:
 				'Basierend auf unserem Gespräch, erstelle ein neues Dokument',
+			model: 'LLM Modell'
 		},
 		fra: {
 			title: 'Assistant IA',
@@ -200,6 +204,7 @@ export const AiAssistantLocalization = {
 				"Le contexte est la mémoire à long terme de votre assistant. Ajoutez ici vos données fréquemment utilisées pour que l'assistant puisse répondre en fonction de celles-ci.",
 			basedOnText:
 				'Sur la base de notre conversation, créez un nouveau document',
+			model: 'modèle LLM'
 		},
 	},
 };

@@ -640,6 +640,11 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		body.current = { ...body.current, language: selectedLanguageLabel }; // Update with the label
 	}, [selectedLanguage]);
 
+	// Add this useEffect to update body.current whenever the model is set
+	useEffect(() => {
+		body.current = { ...body.current, model: 'gpt-4o-mini' }; // Set the default model
+	}, []);
+
 	return (
 		<AiAssistantContext.Provider
 			value={{
@@ -1051,6 +1056,46 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											</Tooltip>
 										</Col>
 										<Col flex={'auto'}></Col>
+										<Col style={{ marginBottom: 8 }}>
+											<Tooltip
+												title={
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.model
+												}
+												placement='left'
+											>
+												<Select
+													defaultValue='gpt-4o-mini'
+													id='Model'
+													onChange={(value) => {
+														body.current = { ...body.current, model: value }; // Update body.current with the selected model
+													}}
+													variant='borderless'
+													popupMatchSelectWidth={false}
+													options={[
+														{ value: 'gpt-4o-mini', label: 'gpt-4o-mini' },
+														{ 
+															value: 'gpt-4o', 
+															label: (
+																<Space>
+																gpt-4o
+																<Tag>Premium</Tag>
+																</Space>
+															) 
+														},
+														{ 
+															value: 'perplexity', 
+															label: (
+																<Space>
+																perplexity
+																<Tag>Premium</Tag>
+																</Space>
+															) 
+														},
+													]}
+												/>
+											</Tooltip>
+										</Col>
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
 												title={
