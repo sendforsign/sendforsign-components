@@ -294,7 +294,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		name: 'file',
 		multiple: true,
 		accept:
-			'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/rtf,text/csv',
+			'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv',
 		listType: 'text',
 		showUploadList: false,
 
