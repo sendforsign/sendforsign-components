@@ -1074,21 +1074,22 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 													popupMatchSelectWidth={false}
 													options={[
 														{ value: 'gpt-4o-mini', label: 'gpt-4o-mini' },
+														{ value: 'sonar', label: 'sonar' },
 														{ 
 															value: 'gpt-4o', 
 															label: (
-																<Space>
+																<Space style={{width: '100%', justifyContent: 'space-between'}}>
 																gpt-4o
-																<Tag>Premium</Tag>
+																<Tag style={{margin: 0}}>Premium</Tag>
 																</Space>
 															) 
 														},
 														{ 
-															value: 'perplexity', 
+															value: 'sonar-pro', 
 															label: (
-																<Space>
-																perplexity
-																<Tag>Premium</Tag>
+																<Space style={{width: '100%', justifyContent: 'space-between'}}>
+																sonar-pro
+																<Tag style={{margin: 0}}>Premium</Tag>
 																</Space>
 															) 
 														},
