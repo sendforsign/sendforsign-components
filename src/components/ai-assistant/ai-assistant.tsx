@@ -1089,7 +1089,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 															label: (
 																<Space style={{width: '100%', justifyContent: 'space-between'}}>
 																sonar-pro
-																<Tag style={{margin: 0}}>Premium</Tag>
+																<Tag style={{margin: 0}}>Premium</Tag> 
 																</Space>
 															) 
 														},
