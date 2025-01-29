@@ -282,7 +282,6 @@ export const ShareLinkBlock = () => {
 		  icon: <FontAwesomeIcon icon={faFilePdf} />,
 		  label: (
 			<a
-				// loading={downloadPdfSpin}
 				onClick={handleDownloadClick}
 			>
 				PDF
@@ -294,7 +293,6 @@ export const ShareLinkBlock = () => {
 			icon: <FontAwesomeIcon icon={faFileWord} />,
 			label: (
 				<a
-					// loading={downloadDocxSpin}
 					onClick={handleDownloadDocxClick}
 				>
 					DOCX
@@ -428,7 +426,7 @@ export const ShareLinkBlock = () => {
 							menu={{ items }}
 							trigger={['click']}
 						>
-							<Button loading={downloadPdfSpin || downloadDocxSpin} icon={<FontAwesomeIcon icon={faDownload} />}></Button>
+							<Button loading={downloadPdfSpin || downloadDocxSpin} icon={<FontAwesomeIcon icon={faDownload} />}>Download</Button>
 						</Dropdown>
 					</Space>
 				</Space>
