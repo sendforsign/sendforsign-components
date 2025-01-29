@@ -279,30 +279,26 @@ export const ShareLinkBlock = () => {
 	const items: MenuProps['items'] = [
 		{
 		  key: '1',
+		  icon: <FontAwesomeIcon icon={faFilePdf} />,
 		  label: (
-			<Button
-				id='DownloadPdf'
-				type='text'
-				loading={downloadPdfSpin}
-				icon={<FontAwesomeIcon icon={faFilePdf} />}
+			<a
+				// loading={downloadPdfSpin}
 				onClick={handleDownloadClick}
 			>
 				PDF
-			</Button>
+			</a>
 		  ),
 		},
 		...(isPdf ? [] : [{
 			key: '2',
+			icon: <FontAwesomeIcon icon={faFileWord} />,
 			label: (
-				<Button
-					id='DownloadDOCX'
-					type='text'
-					loading={downloadDocxSpin}
-					icon={<FontAwesomeIcon icon={faFileWord} />}
+				<a
+					// loading={downloadDocxSpin}
 					onClick={handleDownloadDocxClick}
 				>
 					DOCX
-				</Button>
+				</a>
 			),
 		}]),
 	  ];
