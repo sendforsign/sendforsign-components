@@ -18,6 +18,7 @@ export const enum ApiEntity {
 	RECIPIENT = 'recipient',
 	UPLOAD_PDF = 'upload_pdf',
 	DOWNLOAD_PDF = 'download_pdf',
+	DOWNLOAD_DOCX = 'download_docx',
 	CONTRACT_SHARE_LINK = 'contract_share_link',
 	CONTRACT_SIGN = 'contract_sign',
 	CONTRACT_APPROVE = 'contract_approve',

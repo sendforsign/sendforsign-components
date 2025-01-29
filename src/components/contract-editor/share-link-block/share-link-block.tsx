@@ -24,6 +24,7 @@ export const ShareLinkBlock = () => {
 		contractKey,
 		clientKey,
 		userKey,
+		isPdf,
 		continueLoad,
 		setSignModal,
 		setSendModal,
@@ -54,6 +55,7 @@ export const ShareLinkBlock = () => {
 	const [signSpin, setSignSpin] = useState(false);
 	const [approveSpin, setApproveSpin] = useState(false);
 	const [downloadPdfSpin, setDownloadPdfSpin] = useState(false);
+	const [downloadDocxSpin, setDownloadDocxSpin] = useState(false);
 
 	useEffect(() => {
 		setShareLinks([]);
@@ -239,6 +241,37 @@ export const ShareLinkBlock = () => {
 				});
 			});
 	};
+	const handleDownloadDocxClick = async () => {
+		setDownloadDocxSpin(true);
+		let url = `${BASE_URL}${ApiEntity.DOWNLOAD_DOCX}?contractKey=${contractKey}&clientKey=${clientKey}`;
+
+		await axios
+			.get(url, {
+				headers: {
+					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+					Authorization: token ? `Bearer ${token}` : undefined,
+				},
+				responseType: 'blob',
+			})
+			.then((payload) => {
+				const encodedUri = window.URL.createObjectURL(payload.data as Blob);
+				const link = document.createElement('a');
+
+				link.setAttribute('href', encodedUri);
+				link.setAttribute('download', `${contractName}.docx`);
+
+				link.click();
+				setDownloadDocxSpin(false);
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
+			});
+	};
 	return (
 		<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 			<Card
@@ -269,7 +302,7 @@ export const ShareLinkBlock = () => {
 								</Button>
 							</div>
 						</Tooltip>
-						<Tooltip title='Sign the document from your side.'>
+						{/* <Tooltip title='Sign the document from your side.'>
 							<div>
 								<Button
 									id='SignContract'
@@ -294,7 +327,7 @@ export const ShareLinkBlock = () => {
 									Approve
 								</Button>
 							</div>
-						</Tooltip>
+						</Tooltip> */}
 						<Tooltip title='Manage reusable fields.'>
 							<div>
 								<Button
@@ -345,6 +378,21 @@ export const ShareLinkBlock = () => {
 								</Button>
 							</div>
 						</Tooltip>
+						{!isPdf && (
+							<Tooltip title='Download DOCX.'>
+								<div>
+									<Button
+										id='DownloadDOCX'
+										type='default'
+										loading={downloadDocxSpin}
+										icon={<FontAwesomeIcon icon={faDownload} />}
+										onClick={handleDownloadDocxClick}
+									>
+										Download DOCX
+									</Button>
+								</div>
+							</Tooltip>
+						)}
 					</Space>
 				</Space>
 			</Card>
