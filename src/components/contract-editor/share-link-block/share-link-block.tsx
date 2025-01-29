@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Tooltip, Card, Space } from 'antd';
+import { Button, Tooltip, Card, Space, Dropdown } from 'antd';
+import type { MenuProps } from 'antd';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { ApiEntity } from '../../../config/enum';
@@ -9,6 +10,8 @@ import axios from 'axios';
 import { BASE_URL } from '../../../config/config';
 import {
 	faDownload,
+	faFilePdf,
+	faFileWord,
 	faHatWizard,
 	faObjectUngroup,
 	faPaperPlane,
@@ -272,6 +275,38 @@ export const ShareLinkBlock = () => {
 				});
 			});
 	};
+
+	const items: MenuProps['items'] = [
+		{
+		  key: '1',
+		  label: (
+			<Button
+				id='DownloadPdf'
+				type='text'
+				loading={downloadPdfSpin}
+				icon={<FontAwesomeIcon icon={faFilePdf} />}
+				onClick={handleDownloadClick}
+			>
+				PDF
+			</Button>
+		  ),
+		},
+		...(isPdf ? [] : [{
+			key: '2',
+			label: (
+				<Button
+					id='DownloadDOCX'
+					type='text'
+					loading={downloadDocxSpin}
+					icon={<FontAwesomeIcon icon={faFileWord} />}
+					onClick={handleDownloadDocxClick}
+				>
+					DOCX
+				</Button>
+			),
+		}]),
+	  ];
+
 	return (
 		<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 			<Card
@@ -365,7 +400,7 @@ export const ShareLinkBlock = () => {
 								</Button>
 							</div>
 						</Tooltip> */}
-						<Tooltip title='Download PDF.'>
+						{/* <Tooltip title='Download PDF.'>
 							<div>
 								<Button
 									id='DownloadPdf'
@@ -392,7 +427,13 @@ export const ShareLinkBlock = () => {
 									</Button>
 								</div>
 							</Tooltip>
-						)}
+						)} */}
+						<Dropdown
+							menu={{ items }}
+							trigger={['click']}
+						>
+							<Button loading={downloadPdfSpin || downloadDocxSpin} icon={<FontAwesomeIcon icon={faDownload} />}></Button>
+						</Dropdown>
 					</Space>
 				</Space>
 			</Card>
