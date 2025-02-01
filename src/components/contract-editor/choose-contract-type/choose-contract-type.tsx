@@ -26,6 +26,8 @@ import {
 import { BASE_URL } from '../../../config/config';
 import { docx2html } from '../../../utils';
 import { Placeholder, Template } from '../../../config/types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHatWizard } from '@fortawesome/free-solid-svg-icons';
 
 type Props = {
 	allowPdf: boolean;
@@ -117,10 +119,10 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 									lineHeight: '20px',
 								}}
 							>
-								<Tag style={{ margin: '4px 0' }} color={'orange'}>
+								<Tag style={{ margin: '4px 0' }} color={'orange'} >
 									AI
 								</Tag>
-								<div style={{ padding: '4px 0' }}>Draft with AI</div>
+								<div style={{ padding: '4px 0' }}>Draft with<br></br>AI</div>
 							</div>
 						),
 						value: ContractTypeText.AI,
