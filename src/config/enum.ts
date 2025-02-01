@@ -53,6 +53,7 @@ export const enum ContractTypeText {
 	DOCX = 'docx',
 	PDF = 'pdf',
 	EMPTY = 'empty',
+	AI = 'ai',
 }
 export const enum ContractAction {
 	SIGN = 'sign',
@@ -85,6 +86,7 @@ export const enum ContractSteps {
 	TYPE_CHOOSE_STEP = 'TypeChooseStep',
 	QN_A_STEP = 'QnAStep',
 	CONTRACT_EDITOR_STEP = 'ContractEditorStep',
+	AI_STEP = 'AIStep',
 }
 export const enum PlaceholderView {
 	OTHER = 1,
@@ -128,4 +130,12 @@ export const enum Tags {
 	EMAIL = 'email',
 	SIGN = 'sign',
 	INITIALS = 'initials',
+}
+
+export const enum AiTypes {
+	REGULAR = 'regular',
+	CONTRACT_CHOOSE = 'contract_choose',
+	TEMPLATE_CHOOSE = 'template_choose',
+	CONTRACT_SIDEBAR = 'contract_sidebar',
+	TEMPLATE_SIDEBAR = 'template_sidebar',
 }

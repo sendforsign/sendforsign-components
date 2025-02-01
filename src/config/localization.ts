@@ -9,6 +9,10 @@ export const AiAssistantLocalization = {
 			context6: 'Подготовь саммари веб-сайта',
 			context7: 'Переведи документ на другой язык',
 			context8: 'Проверь грамматику',
+			context9: 'Договор аренды',
+			context10: 'Счет',
+			context11: 'Фриланс-контракт',
+			context12: 'Договор о неразглашении'
 		},
 		eng: {
 			context1: 'Answer based on context',
@@ -19,6 +23,10 @@ export const AiAssistantLocalization = {
 			context6: 'Prepare website summary',
 			context7: 'Translate document to another language',
 			context8: 'Check grammar',
+			context9: 'Lease agreement',
+			context10: 'Invoice',
+			context11: 'Freelance contract',
+			context12: 'Non-disclosure agreement',
 		},
 		esp: {
 			context1: 'Responder basado en el contexto',
@@ -29,6 +37,10 @@ export const AiAssistantLocalization = {
 			context6: 'Preparar resumen del sitio web',
 			context7: 'Traducir documento a otro idioma',
 			context8: 'Revisar gramática',
+			context9: 'Contrato de arrendamiento',
+			context10: 'Factura',
+			context11: 'Contrato freelance',
+			context12: 'Acuerdo de confidencialidad',
 		},
 		deu: {
 			context1: 'Antwort basierend auf Kontext',
@@ -39,6 +51,10 @@ export const AiAssistantLocalization = {
 			context6: 'Webseiten-Zusammenfassung vorbereiten',
 			context7: 'Dokument in eine andere Sprache übersetzen',
 			context8: 'Grammatik überprüfen',
+			context9: 'Mietvertrag',
+			context10: 'Rechnung',
+			context11: 'Freelance-Vertrag',
+			context12: 'Geheimhaltungsvereinbarung',
 		},
 		fra: {
 			context1: 'Répondre en fonction du contexte',
@@ -49,6 +65,10 @@ export const AiAssistantLocalization = {
 			context6: 'Préparer le résumé du site web',
 			context7: 'Traduire le document dans une autre langue',
 			context8: 'Vérifier la grammaire',
+			context9: 'Contrat de location',
+			context10: 'Facture',
+			context11: 'Contrat freelance',
+			context12: 'Accord de non-divulgation',
 		},
 	},
 	contextMessages: {
@@ -62,6 +82,10 @@ export const AiAssistantLocalization = {
 			context6: 'Подготовь саммари веб-сайта по ссылке: ',
 			context7: 'Переведи предоставленный документ на английский язык',
 			context8: 'Проверь документ на грамматические ошибки',
+			context9: 'Договор аренды квартиры в свободной форме, $500 в месяц, подписывающие стороны — Иван Петров ivan@ivan.com и Николай Сидоров nick@nick.com',
+			context10: 'Счёт-фактура для моей орагнизации Acme, получатель - SuperInc',
+			context11: 'Фриланс-контракт в свободной форме, обязанности: разработка сайта, подписывающие стороны — Иван Петров ivan@ivan.com и Николай Сидоров nick@nick.com',
+			context12: 'Договор о неразглашении в свободной форме, подписывающие стороны — Иван Петров ivan@ivan.com и Николай Сидоров nick@nick.com'
 		},
 		eng: {
 			context1: 'Answer based on context: ',
@@ -73,6 +97,10 @@ export const AiAssistantLocalization = {
 			context6: 'Prepare website summary from the link: ',
 			context7: 'Translate the provided document into English',
 			context8: 'Check the document for grammatical errors',
+			context9: 'Lease agreement for an apartment in free form, $500 per month, parties — John Black john@john.com and Nick Rush nick@nick.com',
+			context10: 'Invoice for my organization Acme, recipient - SuperInc',
+			context11: 'Freelance contract in free form, duties: website development, parties — John Black john@john.com and Nick Rush nick@nick.com',
+			context12: 'Non-disclosure agreement in free form, parties — John Black john@john.com and Nick Rush nick@nick.com',
 		},
 		esp: {
 			context1: 'Responder basado en el contexto: ',
@@ -84,6 +112,10 @@ export const AiAssistantLocalization = {
 			context6: 'Preparar resumen del sitio web desde el enlace: ',
 			context7: 'Traducir el documento proporcionado al inglés',
 			context8: 'Revisar el documento para errores gramaticales',
+			context9: 'Contrato de arrendamiento de un apartamento en forma libre, $500 al mes, partes — Juan Negro juan@juan.com y Nick Rush nick@nick.com',
+			context10: 'Factura para mi organización Acme, destinatario - SuperInc',
+			context11: 'Contrato freelance en forma libre, deberes: desarrollo de sitios web, partes — Juan Negro juan@juan.com y Nick Rush nick@nick.com',
+			context12: 'Acuerdo de confidencialidad en forma libre, partes — Juan Negro juan@juan.com y Nick Rush nick@nick.com',
 		},
 		deu: {
 			context1: 'Antwort basierend auf Kontext: ',
@@ -95,6 +127,10 @@ export const AiAssistantLocalization = {
 			context6: 'Webseiten-Zusammenfassung vom Link vorbereiten: ',
 			context7: 'Übersetzen Sie das bereitgestellte Dokument ins Englische',
 			context8: 'Überprüfen Sie das Dokument auf grammatikalische Fehler',
+			context9: 'Mietvertrag für eine Wohnung in freier Form, $500 pro Monat, Parteien — John Schwarz john@john.com und Nick Rush nick@nick.com',
+			context10: 'Rechnung für meine Organisation Acme, Empfänger - SuperInc',
+			context11: 'Freelance-Vertrag in freier Form, Pflichten: Webentwicklung, Parteien — John Schwarz john@john.com und Nick Rush nick@nick.com',
+			context12: 'Geheimhaltungsvereinbarung in freier Form, Parteien — John Schwarz john@john.com und Nick Rush nick@nick.com',
 		},
 		fra: {
 			context1: 'Répondre en fonction du contexte: ',
@@ -106,6 +142,10 @@ export const AiAssistantLocalization = {
 			context6: 'Préparer le résumé du site web à partir du lien: ',
 			context7: 'Traduire le document fourni en anglais',
 			context8: 'Vérifier le document pour les erreurs grammaticales',
+			context9: 'Contrat de location d\'un appartement en forme libre, 500 $ par mois, parties — John Noir john@john.com et Nick Rush nick@nick.com',
+			context10: 'Facture pour mon organisation Acme, destinataire - SuperInc',
+			context11: 'Contrat freelance en forme libre, devoirs : développement de sites Web, parties — John Noir john@john.com et Nick Rush nick@nick.com',
+			context12: 'Accord de non-divulgation en forme libre, parties — John Noir john@john.com et Nick Rush nick@nick.com',
 		},
 	},
 	uiText: {
@@ -126,7 +166,8 @@ export const AiAssistantLocalization = {
 			infoContextHelp:
 				'Контекст — это долговременная память вашего ассистента. Добавьте сюда ваши часто используемые данные, в этом случае ассистент сможет отвечать на их основе.',
 			basedOnText: 'На снове нашего общения, создай новый документ',
-			model: 'LLM модель'
+			model: 'LLM модель',
+			contextHelp: 'Ваши документы и контексты появятся здесь'
 		},
 		eng: {
 			title: 'AI assistant',
@@ -145,7 +186,8 @@ export const AiAssistantLocalization = {
 			infoContextHelp:
 				"Context is your assistant's long-term memory. Add your frequently used data here, so the assistant can respond based on it.",
 			basedOnText: 'Based on our conversation, create a new document',
-			model: 'LLM model'
+			model: 'LLM model',
+			contextHelp: 'Your documents and contexts will appear here'
 		},
 		esp: {
 			title: 'Asistente de IA',
@@ -164,7 +206,8 @@ export const AiAssistantLocalization = {
 			infoContextHelp:
 				'El contexto es la memoria a largo plazo de tu asistente. Añade aquí tus datos de uso frecuente para que el asistente pueda responder en base a ellos.',
 			basedOnText: 'Basado en nuestra conversación, crea un nuevo documento',
-			model: 'modelo LLM'
+			model: 'modelo LLM',
+			contextHelp: 'Tus documentos y contextos aparecerán aquí'
 		},
 		deu: {
 			title: 'KI-Assistent',
@@ -184,7 +227,8 @@ export const AiAssistantLocalization = {
 				'Kontext ist das Langzeitgedächtnis Ihres Assistenten. Fügen Sie hier Ihre häufig verwendeten Daten hinzu, damit der Assistent darauf basierend antworten kann.',
 			basedOnText:
 				'Basierend auf unserem Gespräch, erstelle ein neues Dokument',
-			model: 'LLM Modell'
+			model: 'LLM Modell',
+			contextHelp: 'Ihre Dokumente und Kontexte werden hier angezeigt'
 		},
 		fra: {
 			title: 'Assistant IA',
@@ -204,7 +248,8 @@ export const AiAssistantLocalization = {
 				"Le contexte est la mémoire à long terme de votre assistant. Ajoutez ici vos données fréquemment utilisées pour que l'assistant puisse répondre en fonction de celles-ci.",
 			basedOnText:
 				'Sur la base de notre conversation, créez un nouveau document',
-			model: 'modèle LLM'
+			model: 'modèle LLM',
+			contextHelp: 'Vos documents et contextes apparaîtront ici'
 		},
 	},
 };

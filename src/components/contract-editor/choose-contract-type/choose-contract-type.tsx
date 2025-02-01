@@ -8,13 +8,16 @@ import {
 	Input,
 	Steps,
 	theme,
+	Tooltip,
 } from 'antd';
 import axios from 'axios';
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented';
 import { useContractEditorContext } from '../contract-editor-context';
 import useSaveArrayBuffer from '../../../hooks/use-save-array-buffer';
+import { AiAssistant } from '../../ai-assistant';
 import {
 	Action,
+	AiTypes,
 	ApiEntity,
 	ContractSteps,
 	ContractTypeText,
@@ -61,6 +64,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 	const currPlaceholder = useRef(placeholder);
 	const [createDisable, setCreateDisable] = useState(true);
 	const [fieldBlockVisible, setFieldBlockVisible] = useState(false);
+	const [aiBlockVisible, setAiBlockVisible] = useState(false);
 	const [loadSegmented, setLoadSegmented] = useState(false);
 	const [chooseTemplate, setChooseTemplate] = useState(0);
 	const [segmentedValue, setSegmentedValue] = useState('');
@@ -103,6 +107,24 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					//console.log('editor read', payload);
 					let array: SegmentedLabeledOption[] = [];
 					setCurrentData({ currentStep: ContractSteps.TYPE_CHOOSE_STEP });
+					array.push({
+						label: (
+							<div
+								style={{
+									paddingTop: '8px',
+									width: 100,
+									whiteSpace: 'normal',
+									lineHeight: '20px',
+								}}
+							>
+								<Tag style={{ margin: '4px 0' }} color={'orange'}>
+									AI
+								</Tag>
+								<div style={{ padding: '4px 0' }}>Draft with AI</div>
+							</div>
+						),
+						value: ContractTypeText.AI,
+					});
 					array.push({
 						label: (
 							<div
@@ -201,9 +223,10 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 	}, []);
 
 	const handleCreate = async () => {
-		// debugger;
+		debugger;
 		if (contractType && !templateKey) {
 			let input = null;
+			console.log('contractType', contractType);
 			switch (contractType) {
 				case ContractTypeText.DOCX.toString():
 					setLoad(true);
@@ -299,6 +322,11 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 						setCreateDisable(true);
 					}
 					// debugger;
+					break;
+					case ContractTypeText.AI.toString():
+						setAiBlockVisible(true);
+						setCurrentData({ currentStep: ContractSteps.AI_STEP });
+						// debugger;
 					break;
 				default:
 					break;
@@ -415,6 +443,8 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 	const handleChoose = async (e: any) => {
 		// debugger;
 		let contractTypeTmp = e.toString().split('_');
+		console.log ('e',e);
+		console.log ('contractTypeTmp',contractTypeTmp[1]);
 		if (
 			contractTypeTmp[1] === ContractTypeText.DOCX.toString() ||
 			contractTypeTmp[1] === ContractTypeText.PDF.toString()
@@ -426,7 +456,12 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 		if (contractTypeTmp[1]) {
 			setContractType(contractTypeTmp[1]);
 			setTemplateKey('');
-		} else {
+		} else 
+		if (e === ContractTypeText.AI.toString()) {
+			setContractType(e);
+		}
+		else
+		{
 			setTemplateKey(e);
 			setContractType('');
 		}
@@ -532,6 +567,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 
 	return (
 		<Space direction='vertical' size={16} style={{ display: 'flex' }}>
+			{!fieldBlockVisible && !aiBlockVisible && (
 			<Card loading={loadSegmented}>
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 					<Space direction='vertical' size={2}>
@@ -557,6 +593,26 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					</Button>
 				</Space>
 			</Card>
+			)}
+			{aiBlockVisible && (
+				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
+										<Space direction='vertical' size={2}>
+						<Title level={4} style={{ margin: '0' }}>
+							Generate agreement with AI
+						</Title>
+						<Text type='secondary'>
+							Generate from a simple prompt, upload a Word or PDF for reference, add existing documents as context.						
+						</Text>
+					</Space>
+					<AiAssistant
+							apiKey={apiKey ? apiKey : ''}
+							clientKey={clientKey ? clientKey : ''}
+							token={currToken ? currToken : ''}
+							userKey={userKey ? userKey : ''}
+							aitype={AiTypes.CONTRACT_CHOOSE}
+						/>
+				</Space>
+			)}
 			{fieldBlockVisible && (
 				<Card bordered={true}>
 					<Space direction='vertical' size={16} style={{ display: 'flex' }}>

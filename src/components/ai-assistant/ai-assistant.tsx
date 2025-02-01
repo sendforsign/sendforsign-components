@@ -47,7 +47,7 @@ import { ContextModal } from './context-modal';
 import { ContextList } from './context-list';
 import { useChat } from 'ai/react';
 import { BASE_URL } from '../../config/config';
-import { Action, ApiEntity } from '../../config/enum';
+import { Action, AiTypes, ApiEntity } from '../../config/enum';
 import { Context, Contract } from '../../config/types';
 import axios from 'axios';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
@@ -63,6 +63,7 @@ export interface AiAssistantProps {
 	clientKey?: string;
 	token?: string;
 	userKey?: string;
+	aitype?: AiTypes;
 }
 type SelectData = {
 	value: string;
@@ -81,6 +82,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	clientKey = '',
 	token = '',
 	userKey = '',
+	aitype = AiTypes.REGULAR
 }) => {
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [isThinking, setIsThinking] = useState(false);
@@ -153,6 +155,9 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			};
 		}
 	}, [token]);
+	useEffect(() => {
+		body.current = { ...body.current, aitype: aitype }; 
+	}, []);
 	useEffect(() => {
 		setCurrApiKey(apiKey || '');
 	}, [apiKey]);
@@ -677,13 +682,14 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			) : (
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 					<Card style={{ maxHeight: '95vh', overflow: 'auto' }}>
+					{(aitype === AiTypes.REGULAR || aitype === AiTypes.CONTRACT_SIDEBAR || aitype === AiTypes.TEMPLATE_SIDEBAR) && (
 						<Row style={{ margin: '0 0 16px 0' }}>
 							<Col flex={'auto'}>
 								<Space
 									style={{ width: '100%', justifyContent: 'space-between' }}
 									wrap
 									size={16}
-								>
+								>		
 									<Space direction='vertical' size={2}>
 										<Title
 											level={4}
@@ -702,28 +708,11 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											}
 										</Text>
 									</Space>
-									<Tooltip
-										title={
-											AiAssistantLocalization.uiText[contextMessageKey].language
-										}
-										placement='left'
-									>
-										<Select
-											defaultValue='eng'
-											id='Lang'
-											onChange={handleLangChange}
-											options={[
-												{ value: 'eng', label: 'English' },
-												{ value: 'esp', label: 'Español' },
-												{ value: 'deu', label: 'Deutsch' },
-												{ value: 'fra', label: 'Français' },
-												{ value: 'rus', label: 'Русский' },
-											]}
-										/>
-									</Tooltip>
+									
 								</Space>
 							</Col>
 						</Row>
+						)}
 						<Row gutter={16}>
 							<Col flex={'auto'}></Col>
 							<Col
@@ -984,6 +973,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 															style={{ paddingTop: '2px' }}
 														/>
 													}
+													notFoundContent={
+														AiAssistantLocalization.uiText[contextMessageKey]
+															.contextHelp
+													}
 												/>
 											</Tooltip>
 										</Col>
@@ -1013,56 +1006,84 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 												</Upload>
 											</Tooltip>
 										</Col>
-										<Col style={{ marginBottom: 8 }}>
-											<Tooltip
-												title={
-													AiAssistantLocalization.uiText[contextMessageKey]
-														.contracts
-												}
-												placement='bottom'
-											>
-												<Button
-													id='Contracts'
-													icon={
-														<FontAwesomeIcon
-															icon={faFileContract}
-															color='black'
-														/>
+										{(aitype === AiTypes.REGULAR) && (
+											<Col style={{ marginBottom: 8 }}>
+												<Tooltip
+													title={
+														AiAssistantLocalization.uiText[contextMessageKey]
+															.contracts
 													}
-													type='text'
-													onClick={handleOpenContractsList}
-												></Button>
-											</Tooltip>
-										</Col>
-										<Col style={{ marginBottom: 8 }}>
-											<Tooltip
-												title={
-													AiAssistantLocalization.uiText[contextMessageKey]
-														.templates
-												}
-												placement='bottom'
-											>
-												<Button
-													id='Templates'
-													icon={
-														<FontAwesomeIcon
-															icon={faFileInvoice}
-															color='black'
-														/>
+													placement='bottom'
+												>
+													<Button
+														id='Contracts'
+														icon={
+															<FontAwesomeIcon
+																icon={faFileContract}
+																color='black'
+															/>
+														}
+														type='text'
+														onClick={handleOpenContractsList}
+													></Button>
+												</Tooltip>
+											</Col> 
+										)}
+										{(aitype === AiTypes.REGULAR) && (
+											<Col style={{ marginBottom: 8 }}>
+												<Tooltip
+													title={
+														AiAssistantLocalization.uiText[contextMessageKey]
+															.templates
 													}
-													type='text'
-													onClick={handleOpenTemplatesList}
-												></Button>
-											</Tooltip>
-										</Col>
+													placement='bottom'
+												>
+													<Button
+														id='Templates'
+														icon={
+															<FontAwesomeIcon
+																icon={faFileInvoice}
+																color='black'
+															/>
+														}
+														type='text'
+														onClick={handleOpenTemplatesList}
+													></Button>
+												</Tooltip>
+											</Col> 
+										)}
+										
 										<Col flex={'auto'}></Col>
+										<Col>
+											<Tooltip
+												title={
+													AiAssistantLocalization.uiText[contextMessageKey].language
+												}
+												placement='bottom'
+											>
+												<Select
+													defaultValue='eng'
+													id='Lang'
+													onChange={handleLangChange}
+													variant='borderless'
+													popupMatchSelectWidth={false}
+													options={[
+														{ value: 'eng', label: 'English' },
+														{ value: 'esp', label: 'Español' },
+														{ value: 'deu', label: 'Deutsch' },
+														{ value: 'fra', label: 'Français' },
+														{ value: 'rus', label: 'Русский' },
+													]}
+												/>
+											</Tooltip>
+										</Col>
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
 												title={
 													AiAssistantLocalization.uiText[contextMessageKey]
 														.model
 												}
-												placement='left'
+												placement='bottom'
 											>
 												<Select
 													defaultValue='gpt-4o-mini'
@@ -1140,232 +1161,347 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							</Col>
 							<Col flex={'auto'}></Col>
 						</Row>
-						<div className={isSubmitted ? 'hideOnSubmit' : ''}>
-							<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
-								<Col flex={'auto'} />
-								<Col
-									flex={'auto'}
-									style={{ display: 'flex', justifyContent: 'center' }}
-								>
-									<Space wrap align='center'>
-										<Text type='secondary'>
-											{
-												AiAssistantLocalization.uiText[contextMessageKey]
-													.infoStartWith
-											}
-										</Text>
-									</Space>
-								</Col>
-								<Col flex={'auto'} />
-							</Row>
-							<Row gutter={16} style={{ marginBottom: 32 }} wrap={false}>
-								<Col flex={'auto'} />
-								<Col
-									flex={'auto'}
-									style={{ display: 'flex', justifyContent: 'center' }}
-								>
-									<Space
-										style={{
-											minWidth: 100,
-											maxWidth: 800,
-											justifyContent: 'center',
-										}}
-										wrap
-										align='center'
-										id='cases'
+						{(aitype === AiTypes.REGULAR) && (
+							<div className={isSubmitted ? 'hideOnSubmit' : ''}>
+								<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
+									<Col flex={'auto'} />
+									<Col
+										flex={'auto'}
+										style={{ display: 'flex', justifyContent: 'center' }}
 									>
-										<Button
-											icon={<FontAwesomeIcon icon={faBook} />}
-											shape='round'
-											id='Context1'
-											onClick={() =>
-												handleContextClick(
-													AiAssistantLocalization.contextMessages[
-														contextMessageKey
-													].context1,
-													false,
-													true
-												)
-											}
+										<Space wrap align='center'>
+											<Text type='secondary'>
+												{
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.infoStartWith
+												}
+											</Text>
+										</Space>
+									</Col>
+									<Col flex={'auto'} />
+								</Row>
+								<Row gutter={16} style={{ marginBottom: 32 }} wrap={false}>
+									<Col flex={'auto'} />
+									<Col
+										flex={'auto'}
+										style={{ display: 'flex', justifyContent: 'center' }}
+									>
+										<Space
+											style={{
+												minWidth: 100,
+												maxWidth: 800,
+												justifyContent: 'center',
+											}}
+											wrap
+											align='center'
+											id='cases'
 										>
-											{
-												AiAssistantLocalization.buttonTexts[contextMessageKey]
-													.context1
-											}{' '}
-											{/* Dynamic button text */}
-										</Button>
-										<Button
-											icon={<FontAwesomeIcon icon={faRectangleList} />}
-											shape='round'
-											id='Context2'
-											onClick={() =>
-												handleContextClick(
-													AiAssistantLocalization.contextMessages[
-														contextMessageKey
-													].context2,
-													true,
-													false
-												)
-											}
-										>
-											{
-												AiAssistantLocalization.buttonTexts[contextMessageKey]
-													.context2
-											}{' '}
-											{/* Dynamic button text */}
-										</Button>
-										<Button
-											icon={<FontAwesomeIcon icon={faFileCirclePlus} />}
-											shape='round'
-											id='Context3'
-											onClick={() =>
-												handleContextClick(
-													AiAssistantLocalization.contextMessages[
-														contextMessageKey
-													].context3,
-													false,
-													false
-												)
-											}
-										>
-											{
-												AiAssistantLocalization.buttonTexts[contextMessageKey]
-													.context3
-											}{' '}
-											{/* Dynamic button text */}
-										</Button>
-										<Button
-											icon={<FontAwesomeIcon icon={faFileCircleQuestion} />}
-											shape='round'
-											id='Context4'
-											onClick={() =>
-												handleContextClick(
-													AiAssistantLocalization.contextMessages[
-														contextMessageKey
-													].context4,
-													false,
-													false
-												)
-											}
-										>
-											{
-												AiAssistantLocalization.buttonTexts[contextMessageKey]
-													.context4
-											}{' '}
-											{/* Dynamic button text */}
-										</Button>
-										<Button
-											icon={<FontAwesomeIcon icon={faLegal} />}
-											shape='round'
-											id='Context5'
-											onClick={() =>
-												handleContextClick(
-													AiAssistantLocalization.contextMessages[
-														contextMessageKey
-													].context5,
-													false,
-													false
-												)
-											}
-										>
-											{
-												AiAssistantLocalization.buttonTexts[contextMessageKey]
-													.context5
-											}{' '}
-											{/* Dynamic button text */}
-										</Button>
-										<Button
-											icon={<FontAwesomeIcon icon={faGlobe} />}
-											shape='round'
-											id='Context6'
-											onClick={() =>
-												handleContextClick(
-													AiAssistantLocalization.contextMessages[
-														contextMessageKey
-													].context6,
-													false,
-													false
-												)
-											}
-										>
-											{
-												AiAssistantLocalization.buttonTexts[contextMessageKey]
-													.context6
-											}{' '}
-											{/* Dynamic button text */}
-										</Button>
-										<Button
-											icon={<FontAwesomeIcon icon={faLanguage} />}
-											shape='round'
-											id='Context7'
-											onClick={() =>
-												handleContextClick(
-													AiAssistantLocalization.contextMessages[
-														contextMessageKey
-													].context7,
-													true,
-													false
-												)
-											}
-										>
-											{
-												AiAssistantLocalization.buttonTexts[contextMessageKey]
-													.context7
-											}{' '}
-											{/* Dynamic button text */}
-										</Button>
-										<Button
-											icon={<FontAwesomeIcon icon={faSpellCheck} />}
-											shape='round'
-											id='Context8'
-											onClick={() =>
-												handleContextClick(
-													AiAssistantLocalization.contextMessages[
-														contextMessageKey
-													].context8,
-													true,
-													false
-												)
-											}
-										>
-											{
-												AiAssistantLocalization.buttonTexts[contextMessageKey]
-													.context8
-											}{' '}
-											{/* Dynamic button text */}
-										</Button>
-									</Space>
-								</Col>
-								<Col flex={'auto'} />
-							</Row>
+											<Button
+												icon={<FontAwesomeIcon icon={faBook} />}
+												shape='round'
+												id='Context1'
+												onClick={() =>
+													handleContextClick(
+														AiAssistantLocalization.contextMessages[
+															contextMessageKey
+														].context1,
+														false,
+														true
+													)
+												}
+											>
+												{
+													AiAssistantLocalization.buttonTexts[contextMessageKey]
+														.context1
+												}{' '}
+												{/* Dynamic button text */}
+											</Button>
+											<Button
+												icon={<FontAwesomeIcon icon={faRectangleList} />}
+												shape='round'
+												id='Context2'
+												onClick={() =>
+													handleContextClick(
+														AiAssistantLocalization.contextMessages[
+															contextMessageKey
+														].context2,
+														true,
+														false
+													)
+												}
+											>
+												{
+													AiAssistantLocalization.buttonTexts[contextMessageKey]
+														.context2
+												}{' '}
+												{/* Dynamic button text */}
+											</Button>
+											<Button
+												icon={<FontAwesomeIcon icon={faFileCirclePlus} />}
+												shape='round'
+												id='Context3'
+												onClick={() =>
+													handleContextClick(
+														AiAssistantLocalization.contextMessages[
+															contextMessageKey
+														].context3,
+														false,
+														false
+													)
+												}
+											>
+												{
+													AiAssistantLocalization.buttonTexts[contextMessageKey]
+														.context3
+												}{' '}
+												{/* Dynamic button text */}
+											</Button>
+											<Button
+												icon={<FontAwesomeIcon icon={faFileCircleQuestion} />}
+												shape='round'
+												id='Context4'
+												onClick={() =>
+													handleContextClick(
+														AiAssistantLocalization.contextMessages[
+															contextMessageKey
+														].context4,
+														false,
+														false
+													)
+												}
+											>
+												{
+													AiAssistantLocalization.buttonTexts[contextMessageKey]
+														.context4
+												}{' '}
+												{/* Dynamic button text */}
+											</Button>
+											<Button
+												icon={<FontAwesomeIcon icon={faLegal} />}
+												shape='round'
+												id='Context5'
+												onClick={() =>
+													handleContextClick(
+														AiAssistantLocalization.contextMessages[
+															contextMessageKey
+														].context5,
+														false,
+														false
+													)
+												}
+											>
+												{
+													AiAssistantLocalization.buttonTexts[contextMessageKey]
+														.context5
+												}{' '}
+												{/* Dynamic button text */}
+											</Button>
+											<Button
+												icon={<FontAwesomeIcon icon={faGlobe} />}
+												shape='round'
+												id='Context6'
+												onClick={() =>
+													handleContextClick(
+														AiAssistantLocalization.contextMessages[
+															contextMessageKey
+														].context6,
+														false,
+														false
+													)
+												}
+											>
+												{
+													AiAssistantLocalization.buttonTexts[contextMessageKey]
+														.context6
+												}{' '}
+												{/* Dynamic button text */}
+											</Button>
+											<Button
+												icon={<FontAwesomeIcon icon={faLanguage} />}
+												shape='round'
+												id='Context7'
+												onClick={() =>
+													handleContextClick(
+														AiAssistantLocalization.contextMessages[
+															contextMessageKey
+														].context7,
+														true,
+														false
+													)
+												}
+											>
+												{
+													AiAssistantLocalization.buttonTexts[contextMessageKey]
+														.context7
+												}{' '}
+												{/* Dynamic button text */}
+											</Button>
+											<Button
+												icon={<FontAwesomeIcon icon={faSpellCheck} />}
+												shape='round'
+												id='Context8'
+												onClick={() =>
+													handleContextClick(
+														AiAssistantLocalization.contextMessages[
+															contextMessageKey
+														].context8,
+														true,
+														false
+													)
+												}
+											>
+												{
+													AiAssistantLocalization.buttonTexts[contextMessageKey]
+														.context8
+												}{' '}
+												{/* Dynamic button text */}
+											</Button>
+										</Space>
+									</Col>
+									<Col flex={'auto'} />
+								</Row>
 
-							<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
-								<Col flex={'auto'} />
-								<Col
-									flex={'auto'}
-									style={{ display: 'flex', justifyContent: 'center' }}
-								>
-									<Space wrap align='center'>
-										<Text type='secondary'>
-											{
-												AiAssistantLocalization.uiText[contextMessageKey]
-													.infoContext
-											}
-										</Text>
-										<Tooltip
-											title={
-												AiAssistantLocalization.uiText[contextMessageKey]
-													.infoContextHelp
-											}
+								<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
+									<Col flex={'auto'} />
+									<Col
+										flex={'auto'}
+										style={{ display: 'flex', justifyContent: 'center' }}
+									>
+										<Space wrap align='center'>
+											<Text type='secondary'>
+												{
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.infoContext
+												}
+											</Text>
+											<Tooltip
+												title={
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.infoContextHelp
+												}
+											>
+												<FontAwesomeIcon icon={faQuestionCircle} size='sm' />
+											</Tooltip>
+										</Space>
+									</Col>
+									<Col flex={'auto'} />
+								</Row>
+								<ContextList />
+							</div>
+						)}
+						{(aitype === AiTypes.CONTRACT_CHOOSE) && (
+							<div className={isSubmitted ? 'hideOnSubmit' : ''}>
+								<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
+									<Col flex={'auto'} />
+									<Col
+										flex={'auto'}
+										style={{ display: 'flex', justifyContent: 'center' }}
+									>
+										<Space wrap align='center'>
+											<Text type='secondary'>
+												{
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.infoStartWith
+												}
+											</Text>
+										</Space>
+									</Col>
+									<Col flex={'auto'} />
+								</Row>
+								<Row gutter={16} style={{ marginBottom: 32 }} wrap={false}>
+									<Col flex={'auto'} />
+									<Col
+										flex={'auto'}
+										style={{ display: 'flex', justifyContent: 'center' }}
+									>
+										<Space
+											style={{
+												minWidth: 100,
+												maxWidth: 800,
+												justifyContent: 'center',
+											}}
+											wrap
+											align='center'
+											id='cases'
 										>
-											<FontAwesomeIcon icon={faQuestionCircle} size='sm' />
-										</Tooltip>
-									</Space>
-								</Col>
-								<Col flex={'auto'} />
-							</Row>
-							<ContextList />
-						</div>
+											<Button
+												shape='round'
+												id='Context9'
+												onClick={() =>
+													handleContextClick(
+														AiAssistantLocalization.contextMessages[
+															contextMessageKey
+														].context9,
+														false,
+														false
+													)
+												}
+											>
+												{
+													AiAssistantLocalization.buttonTexts[contextMessageKey]
+														.context9
+												}
+											</Button>
+											<Button
+												shape='round'
+												id='Context10'
+												onClick={() =>
+													handleContextClick(
+														AiAssistantLocalization.contextMessages[
+															contextMessageKey
+														].context10,
+														false,
+														false
+													)
+												}
+											>
+												{
+													AiAssistantLocalization.buttonTexts[contextMessageKey]
+														.context10
+												}
+											</Button>
+											<Button
+												shape='round'
+												id='Context11'
+												onClick={() =>
+													handleContextClick(
+														AiAssistantLocalization.contextMessages[
+															contextMessageKey
+														].context11,
+														false,
+														false
+													)
+												}
+											>
+												{
+													AiAssistantLocalization.buttonTexts[contextMessageKey]
+														.context11
+												}
+											</Button>
+											<Button
+												shape='round'
+												id='Context12'
+												onClick={() =>
+													handleContextClick(
+														AiAssistantLocalization.contextMessages[
+															contextMessageKey
+														].context12,
+														false,
+														false
+													)
+												}
+											>
+												{
+													AiAssistantLocalization.buttonTexts[contextMessageKey]
+														.context12
+												}
+											</Button>
+										</Space>
+									</Col>
+									<Col flex={'auto'} />
+								</Row>
+							</div>
+						)}
 					</Card>
 				</Space>
 			)}
