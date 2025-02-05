@@ -122,7 +122,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 								<Tag style={{ margin: '4px 0' }} color={'orange'} >
 									AI
 								</Tag>
-								<div style={{ padding: '4px 0' }}>Draft with<br></br>AI</div>
+								<div style={{ padding: '4px 0' }}>Generate<br></br>with AI</div>
 							</div>
 						),
 						value: ContractTypeText.AI,
@@ -603,7 +603,7 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 							Generate agreement with AI
 						</Title>
 						<Text type='secondary'>
-							Generate from a simple prompt, upload a Word or PDF for reference, add existing documents as context.						
+							Generate from a simple prompt, attach a Word or PDF for reference, or add context.						
 						</Text>
 					</Space>
 					<AiAssistant

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AiAssistant } from '../../ai-assistant';
 import { useContractEditorContext } from '../contract-editor-context';
-import { ContractType, ContractTypeText } from '../../../config/enum';
+import { AiTypes, ContractType, ContractTypeText } from '../../../config/enum';
 
 export const AiHtmlBlock = () => {
 	const {
@@ -47,6 +47,7 @@ export const AiHtmlBlock = () => {
 			clientKey={clientKey ? clientKey : ''}
 			token={token ? token : ''}
 			userKey={userKey ? userKey : ''}
+			aitype={AiTypes.CONTRACT_SIDEBAR}
 		/>
 	);
 };

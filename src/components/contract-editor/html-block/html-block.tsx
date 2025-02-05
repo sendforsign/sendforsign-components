@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import './html-block.css';
 import QuillNamespace from 'quill';
+import Inline from 'quill/blots/inline';
 import QuillBetterTable from 'quill-better-table';
 import { useDebouncedCallback } from 'use-debounce';
 import axios from 'axios';
@@ -17,6 +18,30 @@ import {
 import { addBlotClass } from '../../../utils';
 import { Placeholder, Recipient } from '../../../config/types';
 
+
+class AiLineBlot extends Inline {
+	static create(value: string) {
+		const node = super.create();
+		node.setAttribute("value", value);
+		return node;
+	}
+	static blotName = "ailine"; 
+	static tagName = "ailine"; 
+
+	static formats(node: HTMLElement) {
+		return node.getAttribute("value");
+	  }
+
+	format(name: string, value: string) {
+		if (name === "ailine" && value) {
+			this.domNode.setAttribute("value", value);
+		}
+	}
+}
+  
+QuillNamespace.register(AiLineBlot);
+  
+
 //env.config();
 type Props = {
 	value: string;
@@ -31,6 +56,8 @@ QuillNamespace.register(
 for (let index = 1; index <= 40; index++) {
 	addBlotClass(index);
 }
+
+
 export const HtmlBlock = ({ value, quillRef }: Props) => {
 	dayjs.extend(utc);
 	const {
@@ -140,9 +167,43 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			}
 		}
 	}, [container]);
+
+	// Обновленная функция wrapTextNodes
+	const wrapTextNodes = (html: string) => {
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(html, 'text/html');
+		let valueCounter = 1;
+debugger;
+		const traverseNodes = (node: Node) => {
+			if (node.nodeType === Node.TEXT_NODE) {
+				const textContent = node.textContent?.trim();
+				if (textContent && 
+					!textContent.startsWith('{{{') && 
+					!textContent.endsWith('}}}') && 
+					!node.parentNode?.nodeName.toLowerCase().startsWith('placeholder') &&
+					!node.parentNode?.nodeName.toLowerCase().startsWith('sign') &&
+					!node.parentNode?.nodeName.toLowerCase().startsWith('fullname') &&
+					!node.parentNode?.nodeName.toLowerCase().startsWith('date') &&
+					!node.parentNode?.nodeName.toLowerCase().startsWith('email')) {
+					const wrappedNode = doc.createElement('ailine');
+					wrappedNode.setAttribute('value', valueCounter.toString());
+					wrappedNode.textContent = node.textContent || '';
+					node.parentNode?.replaceChild(wrappedNode, node);
+					valueCounter++;
+				}
+			} else {
+				node.childNodes.forEach(traverseNodes);
+			}
+		};
+
+		traverseNodes(doc.body);
+		return doc.body.innerHTML;
+	};
+
 	useEffect(() => {
 		const setValue = async () => {
-			quillRef?.current?.clipboard.dangerouslyPasteHTML(value);
+			const processedValue = wrapTextNodes(value); // Обрабатываем HTML
+			quillRef?.current?.clipboard.dangerouslyPasteHTML(processedValue);
 			// debugger;
 			setLoad(false);
 			setRefreshPlaceholders(refreshPlaceholders + 1);
@@ -310,6 +371,23 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			needCheck: boolean = true,
 			email: boolean = false
 		) => {
+			// Remove <ailine>
+			const removeAilineTags = (html: string) => {
+				const parser = new DOMParser();
+				const doc = parser.parseFromString(html, 'text/html');
+				const ailineElements = doc.querySelectorAll('ailine');
+				ailineElements.forEach((element) => {
+					const parent = element.parentNode;
+					if (parent) {
+						const textNode = document.createTextNode(element.textContent || '');
+						parent.replaceChild(textNode, element);
+					}
+				});
+				return doc.body.innerHTML;
+			};
+
+			content = removeAilineTags(content); // Удаляем теги перед сохранением
+
 			let body = {};
 			let changed = false;
 			let contractValueTmp = '';
