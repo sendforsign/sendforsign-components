@@ -34,14 +34,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faCircle,
 	faCircleQuestion,
-	faClose,
-	faFont,
 	faGear,
-	faLeftLong,
-	faSignature,
 } from '@fortawesome/free-solid-svg-icons';
 import { parseDate } from 'pdf-lib';
-import { addActualColors, changeValueInTag, getIcon } from '../../../utils';
+import { changeValueInTag, getIcon } from '../../../utils';
 
 type Props = {
 	quillRef: React.MutableRefObject<QuillNamespace | undefined>;

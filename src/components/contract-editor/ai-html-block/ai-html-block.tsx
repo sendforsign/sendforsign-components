@@ -11,6 +11,7 @@ export const AiHtmlBlock = () => {
 		readonly,
 		contractType,
 		contractKey,
+		contractName,
 		clientKey,
 		placeholder,
 		refreshPlaceholders,
@@ -48,6 +49,7 @@ export const AiHtmlBlock = () => {
 			token={token ? token : ''}
 			userKey={userKey ? userKey : ''}
 			aitype={AiTypes.CONTRACT_SIDEBAR}
+			contract={{ contractName, controlLink: contractKey }}
 		/>
 	);
 };

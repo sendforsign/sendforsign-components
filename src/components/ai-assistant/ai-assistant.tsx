@@ -20,10 +20,7 @@ import {
 	faArrowUp,
 	faBook,
 	faBookBookmark,
-	faBookmark,
 	faCommentDots,
-	faContactBook,
-	faFile,
 	faFileArrowUp,
 	faFileCirclePlus,
 	faFileCircleQuestion,
@@ -32,11 +29,7 @@ import {
 	faGlobe,
 	faLanguage,
 	faLegal,
-	faLightbulb,
-	faPager,
-	faPaperclip,
 	faPlus,
-	faQuestion,
 	faQuestionCircle,
 	faRectangleList,
 	faSpellCheck,
@@ -63,6 +56,7 @@ export interface AiAssistantProps {
 	clientKey?: string;
 	token?: string;
 	userKey?: string;
+	contract?: Contract;
 	aitype?: AiTypes;
 }
 type SelectData = {
@@ -82,7 +76,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	clientKey = '',
 	token = '',
 	userKey = '',
-	aitype = AiTypes.REGULAR
+	contract = {},
+	aitype = AiTypes.REGULAR,
 }) => {
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [isThinking, setIsThinking] = useState(false);
@@ -156,7 +151,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		}
 	}, [token]);
 	useEffect(() => {
-		body.current = { ...body.current, aitype: aitype }; 
+		body.current = { ...body.current, aitype: aitype };
 	}, []);
 	useEffect(() => {
 		setCurrApiKey(apiKey || '');
@@ -173,6 +168,33 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			body.current = { ...body.current, userKey: userKey };
 		}
 	}, [userKey]);
+	useEffect(() => {
+		if (
+			contract &&
+			contract.controlLink &&
+			aitype === AiTypes.CONTRACT_SIDEBAR
+		) {
+			setOptionsData([
+				{
+					label: 'Contracts',
+					title: 'Contracts',
+					options: [
+						{
+							label: contract.contractName as string,
+							value: `contract_${contract.controlLink as string}`,
+						},
+					],
+				},
+			]);
+			let selectedValuesTmp = [...selectedValues];
+			selectedValuesTmp.push(`contract_${contract.controlLink}`);
+			setSelectedValues(selectedValuesTmp);
+			let selectedContractsTmp = [...selectedContracts];
+			selectedContractsTmp.push(contract.controlLink);
+			setSelectedContracts(selectedContractsTmp);
+			body.current = { ...body.current, contracts: selectedContractsTmp };
+		}
+	}, [contract]);
 	useEffect(() => {
 		if (!token && apiKey) {
 			headers.current = {
@@ -682,36 +704,40 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			) : (
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 					<Card style={{ maxHeight: '95vh', overflow: 'auto' }}>
-					{(aitype === AiTypes.REGULAR || aitype === AiTypes.CONTRACT_SIDEBAR || aitype === AiTypes.TEMPLATE_SIDEBAR) && (
-						<Row style={{ margin: '0 0 16px 0' }}>
-							<Col flex={'auto'}>
-								<Space
-									style={{ width: '100%', justifyContent: 'space-between' }}
-									wrap
-									size={16}
-								>		
-									<Space direction='vertical' size={2}>
-										<Title
-											level={4}
-											style={{
-												margin: '0',
-												display: 'flex',
-												textAlign: 'center',
-											}}
-										>
-											{AiAssistantLocalization.uiText[contextMessageKey].title}
-										</Title>
-										<Text type='secondary'>
-											{
-												AiAssistantLocalization.uiText[contextMessageKey]
-													.subtitle
-											}
-										</Text>
+						{(aitype === AiTypes.REGULAR ||
+							aitype === AiTypes.CONTRACT_SIDEBAR ||
+							aitype === AiTypes.TEMPLATE_SIDEBAR) && (
+							<Row style={{ margin: '0 0 16px 0' }}>
+								<Col flex={'auto'}>
+									<Space
+										style={{ width: '100%', justifyContent: 'space-between' }}
+										wrap
+										size={16}
+									>
+										<Space direction='vertical' size={2}>
+											<Title
+												level={4}
+												style={{
+													margin: '0',
+													display: 'flex',
+													textAlign: 'center',
+												}}
+											>
+												{
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.title
+												}
+											</Title>
+											<Text type='secondary'>
+												{
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.subtitle
+												}
+											</Text>
+										</Space>
 									</Space>
-									
-								</Space>
-							</Col>
-						</Row>
+								</Col>
+							</Row>
 						)}
 						<Row gutter={16}>
 							<Col flex={'auto'}></Col>
@@ -1006,7 +1032,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 												</Upload>
 											</Tooltip>
 										</Col>
-										{(aitype === AiTypes.REGULAR) && (
+										{aitype === AiTypes.REGULAR && (
 											<Col style={{ marginBottom: 8 }}>
 												<Tooltip
 													title={
@@ -1027,9 +1053,9 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 														onClick={handleOpenContractsList}
 													></Button>
 												</Tooltip>
-											</Col> 
+											</Col>
 										)}
-										{(aitype === AiTypes.REGULAR) && (
+										{aitype === AiTypes.REGULAR && (
 											<Col style={{ marginBottom: 8 }}>
 												<Tooltip
 													title={
@@ -1050,14 +1076,15 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 														onClick={handleOpenTemplatesList}
 													></Button>
 												</Tooltip>
-											</Col> 
+											</Col>
 										)}
-										
+
 										<Col flex={'auto'}></Col>
 										<Col>
 											<Tooltip
 												title={
-													AiAssistantLocalization.uiText[contextMessageKey].language
+													AiAssistantLocalization.uiText[contextMessageKey]
+														.language
 												}
 												placement='bottom'
 											>
@@ -1096,23 +1123,33 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 													options={[
 														{ value: 'gpt-4o-mini', label: 'gpt-4o-mini' },
 														{ value: 'sonar', label: 'sonar' },
-														{ 
-															value: 'gpt-4o', 
+														{
+															value: 'gpt-4o',
 															label: (
-																<Space style={{width: '100%', justifyContent: 'space-between'}}>
-																gpt-4o
-																<Tag style={{margin: 0}}>Premium</Tag>
+																<Space
+																	style={{
+																		width: '100%',
+																		justifyContent: 'space-between',
+																	}}
+																>
+																	gpt-4o
+																	<Tag style={{ margin: 0 }}>Premium</Tag>
 																</Space>
-															) 
+															),
 														},
-														{ 
-															value: 'sonar-pro', 
+														{
+															value: 'sonar-pro',
 															label: (
-																<Space style={{width: '100%', justifyContent: 'space-between'}}>
-																sonar-pro
-																<Tag style={{margin: 0}}>Premium</Tag>
+																<Space
+																	style={{
+																		width: '100%',
+																		justifyContent: 'space-between',
+																	}}
+																>
+																	sonar-pro
+																	<Tag style={{ margin: 0 }}>Premium</Tag>
 																</Space>
-															) 
+															),
 														},
 													]}
 												/>
@@ -1161,7 +1198,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 							</Col>
 							<Col flex={'auto'}></Col>
 						</Row>
-						{(aitype === AiTypes.REGULAR) && (
+						{aitype === AiTypes.REGULAR && (
 							<div className={isSubmitted ? 'hideOnSubmit' : ''}>
 								<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
 									<Col flex={'auto'} />
@@ -1389,7 +1426,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 								<ContextList />
 							</div>
 						)}
-						{(aitype === AiTypes.CONTRACT_CHOOSE) && (
+						{aitype === AiTypes.CONTRACT_CHOOSE && (
 							<div className={isSubmitted ? 'hideOnSubmit' : ''}>
 								<Row gutter={16} style={{ marginBottom: 16 }} wrap={false}>
 									<Col flex={'auto'} />

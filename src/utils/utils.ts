@@ -2083,3 +2083,49 @@ export const getIcon = (placeholder: Placeholder) => {
 
 	return faFont;
 };
+export const removeAilineTags = (html: string) => {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, 'text/html');
+	const ailineElements = doc.querySelectorAll('ailine');
+	ailineElements.forEach((element) => {
+		const parent = element.parentNode;
+		if (parent) {
+			const textNode = document.createTextNode(element.textContent || '');
+			parent.replaceChild(textNode, element);
+		}
+	});
+	return doc.body.innerHTML;
+};
+// Обновленная функция wrapTextNodes
+export const wrapTextNodes = (html: string) => {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, 'text/html');
+	let valueCounter = 1;
+	debugger;
+	const traverseNodes = (node: Node) => {
+		if (node.nodeType === Node.TEXT_NODE) {
+			const textContent = node.textContent?.trim();
+			if (
+				textContent &&
+				!textContent.startsWith('{{{') &&
+				!textContent.endsWith('}}}') &&
+				!node.parentNode?.nodeName.toLowerCase().startsWith('placeholder') &&
+				!node.parentNode?.nodeName.toLowerCase().startsWith('sign') &&
+				!node.parentNode?.nodeName.toLowerCase().startsWith('fullname') &&
+				!node.parentNode?.nodeName.toLowerCase().startsWith('date') &&
+				!node.parentNode?.nodeName.toLowerCase().startsWith('email')
+			) {
+				const wrappedNode = doc.createElement('ailine');
+				wrappedNode.setAttribute('value', valueCounter.toString());
+				wrappedNode.textContent = node.textContent || '';
+				node.parentNode?.replaceChild(wrappedNode, node);
+				valueCounter++;
+			}
+		} else {
+			node.childNodes.forEach(traverseNodes);
+		}
+	};
+
+	traverseNodes(doc.body);
+	return doc.body.innerHTML;
+};
