@@ -111,6 +111,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	const headers = useRef<any>({});
 	const chatKey = useRef<string>(uuid());
 	const body = useRef<any>({ chatKey: chatKey.current });
+	const first = useRef(false);
 	const [selectedLanguage, setSelectedLanguage] = useState('eng');
 
 	const { messages, input, handleInputChange, handleSubmit, setMessages } =
@@ -172,8 +173,10 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		if (
 			contract &&
 			contract.controlLink &&
-			aitype === AiTypes.CONTRACT_SIDEBAR
+			aitype === AiTypes.CONTRACT_SIDEBAR &&
+			!first.current
 		) {
+			first.current = true;
 			setOptionsData([
 				{
 					label: 'Contracts',
