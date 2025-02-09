@@ -15,7 +15,7 @@ export const AiHtmlBlock = () => {
 		clientKey,
 		placeholder,
 		refreshPlaceholders,
-		AiVisible,
+		aiVisible,
 	} = useContractEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
 
@@ -27,7 +27,7 @@ export const AiHtmlBlock = () => {
 			contractType.toString() !== ContractTypeText.PDF.toString() &&
 			contractKey &&
 			(clientKey || token) &&
-			AiVisible &&
+			aiVisible &&
 			(refreshPlaceholders || !placeholder || placeholder.length === 0)
 		) {
 			setCurrPlaceholder(refreshPlaceholders);
@@ -35,7 +35,7 @@ export const AiHtmlBlock = () => {
 		return () => {
 			isMounted = false;
 		};
-	}, [refreshPlaceholders, AiVisible]);
+	}, [refreshPlaceholders, aiVisible]);
 	useEffect(() => {
 		if (readonly) {
 			readonlyCurrent.current = true;

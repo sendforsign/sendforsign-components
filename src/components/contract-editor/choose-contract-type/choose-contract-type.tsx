@@ -31,9 +31,10 @@ import { faHatWizard } from '@fortawesome/free-solid-svg-icons';
 
 type Props = {
 	allowPdf: boolean;
+	allowAi: boolean;
 };
 
-export const ChooseContractType = ({ allowPdf }: Props) => {
+export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 	const {
 		apiKey,
 		continueDisable,
@@ -109,24 +110,28 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					//console.log('editor read', payload);
 					let array: SegmentedLabeledOption[] = [];
 					setCurrentData({ currentStep: ContractSteps.TYPE_CHOOSE_STEP });
-					array.push({
-						label: (
-							<div
-								style={{
-									paddingTop: '8px',
-									width: 100,
-									whiteSpace: 'normal',
-									lineHeight: '20px',
-								}}
-							>
-								<Tag style={{ margin: '4px 0' }} color={'orange'} >
-									AI
-								</Tag>
-								<div style={{ padding: '4px 0' }}>Generate<br></br>with AI</div>
-							</div>
-						),
-						value: ContractTypeText.AI,
-					});
+					if (allowAi) {
+						array.push({
+							label: (
+								<div
+									style={{
+										paddingTop: '8px',
+										width: 100,
+										whiteSpace: 'normal',
+										lineHeight: '20px',
+									}}
+								>
+									<Tag style={{ margin: '4px 0' }} color={'orange'}>
+										AI
+									</Tag>
+									<div style={{ padding: '4px 0' }}>
+										Generate<br></br>with AI
+									</div>
+								</div>
+							),
+							value: ContractTypeText.AI,
+						});
+					}
 					array.push({
 						label: (
 							<div
@@ -325,10 +330,10 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 					}
 					// debugger;
 					break;
-					case ContractTypeText.AI.toString():
-						setAiBlockVisible(true);
-						setCurrentData({ currentStep: ContractSteps.AI_STEP });
-						// debugger;
+				case ContractTypeText.AI.toString():
+					setAiBlockVisible(true);
+					setCurrentData({ currentStep: ContractSteps.AI_STEP });
+					// debugger;
 					break;
 				default:
 					break;
@@ -445,8 +450,8 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 	const handleChoose = async (e: any) => {
 		// debugger;
 		let contractTypeTmp = e.toString().split('_');
-		console.log ('e',e);
-		console.log ('contractTypeTmp',contractTypeTmp[1]);
+		console.log('e', e);
+		console.log('contractTypeTmp', contractTypeTmp[1]);
 		if (
 			contractTypeTmp[1] === ContractTypeText.DOCX.toString() ||
 			contractTypeTmp[1] === ContractTypeText.PDF.toString()
@@ -458,12 +463,9 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 		if (contractTypeTmp[1]) {
 			setContractType(contractTypeTmp[1]);
 			setTemplateKey('');
-		} else 
-		if (e === ContractTypeText.AI.toString()) {
+		} else if (e === ContractTypeText.AI.toString()) {
 			setContractType(e);
-		}
-		else
-		{
+		} else {
 			setTemplateKey(e);
 			setContractType('');
 		}
@@ -570,49 +572,50 @@ export const ChooseContractType = ({ allowPdf }: Props) => {
 	return (
 		<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 			{!fieldBlockVisible && !aiBlockVisible && (
-			<Card loading={loadSegmented}>
-				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-					<Space direction='vertical' size={2}>
-						<Title level={4} style={{ margin: '0' }}>
-							Select a document to be signed
-						</Title>
-						<Text type='secondary'>
-							Draft from scratch, use a template, or upload a file.
-						</Text>
+				<Card loading={loadSegmented}>
+					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
+						<Space direction='vertical' size={2}>
+							<Title level={4} style={{ margin: '0' }}>
+								Select a document to be signed
+							</Title>
+							<Text type='secondary'>
+								Draft from scratch, use a template, or upload a file.
+							</Text>
+						</Space>
+						<Segmented
+							options={options}
+							onChange={handleChoose}
+							value={segmentedValue}
+						/>
+						<Button
+							type='primary'
+							disabled={createDisable}
+							loading={load}
+							onClick={handleCreate}
+						>
+							{btnName}
+						</Button>
 					</Space>
-					<Segmented
-						options={options}
-						onChange={handleChoose}
-						value={segmentedValue}
-					/>
-					<Button
-						type='primary'
-						disabled={createDisable}
-						loading={load}
-						onClick={handleCreate}
-					>
-						{btnName}
-					</Button>
-				</Space>
-			</Card>
+				</Card>
 			)}
 			{aiBlockVisible && (
 				<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-										<Space direction='vertical' size={2}>
+					<Space direction='vertical' size={2}>
 						<Title level={4} style={{ margin: '0' }}>
 							Generate agreement with AI
 						</Title>
 						<Text type='secondary'>
-							Generate from a simple prompt, attach a Word or PDF for reference, or add context.						
+							Generate from a simple prompt, attach a Word or PDF for reference,
+							or add context.
 						</Text>
 					</Space>
 					<AiAssistant
-							apiKey={apiKey ? apiKey : ''}
-							clientKey={clientKey ? clientKey : ''}
-							token={currToken ? currToken : ''}
-							userKey={userKey ? userKey : ''}
-							aitype={AiTypes.CONTRACT_CHOOSE}
-						/>
+						apiKey={apiKey ? apiKey : ''}
+						clientKey={clientKey ? clientKey : ''}
+						token={currToken ? currToken : ''}
+						userKey={userKey ? userKey : ''}
+						aitype={AiTypes.CONTRACT_CHOOSE}
+					/>
 				</Space>
 			)}
 			{fieldBlockVisible && (

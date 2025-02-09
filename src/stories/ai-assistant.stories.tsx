@@ -21,4 +21,5 @@ Primary.args = {
 	clientKey: '',
 	token: '',
 	userKey: '',
+	contract: {},
 };

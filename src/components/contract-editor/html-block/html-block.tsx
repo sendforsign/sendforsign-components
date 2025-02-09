@@ -338,6 +338,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		) => {
 			let contentTmp = removeAilineTags(content); // Удаляем теги перед сохранением
 			contentTmp = wrapTextNodes(contentTmp);
+			quillRef?.current?.clipboard.dangerouslyPasteHTML(contentTmp, 'user');
+			quillRef?.current?.blur();
 
 			let body = {};
 			let changed = false;

@@ -43,6 +43,7 @@ export interface ContractEditorProps {
 	userKey?: string;
 	contractKey?: string;
 	pdf?: boolean;
+	ai?: boolean;
 	canReDraft?: boolean;
 	showTimeline?: boolean;
 	showActionsBar?: boolean;
@@ -57,6 +58,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	contractKey = '',
 	userKey = '',
 	pdf = true,
+	ai = false,
 	canReDraft = false,
 	showTimeline = true,
 	showActionsBar = true,
@@ -99,7 +101,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [ready, setReady] = useState(false);
 	const [fillType, setFillType] = useState(false);
 	const [placeholderVisible, setPlaceholderVisible] = useState(false);
-	const [AiVisible, setAiVisible] = useState(false);
+	const [aiVisible, setAiVisible] = useState(false);
+	const [aiHidden, setAiHidden] = useState(!ai);
 	const [sign, setSign] = useState('');
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
 	const [refreshSign, setRefreshSign] = useState(0);
@@ -530,8 +533,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					setPlaceholderPdf,
 					placeholderVisible,
 					setPlaceholderVisible,
-					AiVisible,
+					aiVisible,
 					setAiVisible,
+					aiHidden,
+					setAiHidden,
 					contractValue,
 					setContractValue,
 					createContract,
@@ -591,7 +596,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				) : (
 					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 						{isNew || beforeCreated ? (
-							<ChooseContractType allowPdf={pdf} />
+							<ChooseContractType allowPdf={pdf} allowAi={ai} />
 						) : (
 							<>{showTimeline && <DocumentTimilineBlock />}</>
 						)}
@@ -654,7 +659,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 													</Space>
 												</Col>
 											)}
-											{AiVisible && (
+											{aiVisible && (
 												<Col flex='350px' style={{ display: 'block' }}>
 													<Space
 														direction='vertical'

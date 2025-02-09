@@ -2101,7 +2101,7 @@ export const wrapTextNodes = (html: string) => {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, 'text/html');
 	let valueCounter = 1;
-	debugger;
+	// debugger;
 	const traverseNodes = (node: Node) => {
 		if (node.nodeType === Node.TEXT_NODE) {
 			const textContent = node.textContent?.trim();

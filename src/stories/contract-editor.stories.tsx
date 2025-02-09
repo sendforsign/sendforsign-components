@@ -23,6 +23,7 @@ Primary.args = {
 	userKey: '',
 	contractKey: '',
 	pdf: true,
+	ai: false,
 	canReDraft: false,
 	showTimeline: true,
 	showActionsBar: true,

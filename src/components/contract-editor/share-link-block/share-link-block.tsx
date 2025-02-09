@@ -45,8 +45,9 @@ export const ShareLinkBlock = () => {
 		setRefreshSign,
 		placeholderVisible,
 		setPlaceholderVisible,
-		AiVisible,
+		aiVisible,
 		setAiVisible,
+		aiHidden,
 		setIpInfo,
 		contractName,
 	} = useContractEditorContext();
@@ -278,28 +279,20 @@ export const ShareLinkBlock = () => {
 
 	const items: MenuProps['items'] = [
 		{
-		  key: '1',
-		  icon: <FontAwesomeIcon icon={faFilePdf} />,
-		  label: (
-			<a
-				onClick={handleDownloadClick}
-			>
-				PDF
-			</a>
-		  ),
+			key: '1',
+			icon: <FontAwesomeIcon icon={faFilePdf} />,
+			label: <a onClick={handleDownloadClick}>PDF</a>,
 		},
-		...(isPdf ? [] : [{
-			key: '2',
-			icon: <FontAwesomeIcon icon={faFileWord} />,
-			label: (
-				<a
-					onClick={handleDownloadDocxClick}
-				>
-					DOCX
-				</a>
-			),
-		}]),
-	  ];
+		...(isPdf
+			? []
+			: [
+					{
+						key: '2',
+						icon: <FontAwesomeIcon icon={faFileWord} />,
+						label: <a onClick={handleDownloadDocxClick}>DOCX</a>,
+					},
+			  ]),
+	];
 
 	return (
 		<Space direction='vertical' size={16} style={{ display: 'flex' }}>
@@ -376,57 +369,33 @@ export const ShareLinkBlock = () => {
 								</Button>
 							</div>
 						</Tooltip>
-						<Tooltip title='Ask AI assistant.'>
-							<div>
-								<Button
-									id='AskAI'
-									type='default'
-									icon={<FontAwesomeIcon icon={faHatWizard} />}
-									onClick={() => {
-										setAiVisible(!AiVisible);
-										setPlaceholderVisible(false);
-									}}
-									style={{
-										backgroundColor: AiVisible ? '#e6f7ff' : 'inherit', // Highlight when visible
-									}}
-								>
-									AI Assistant
-								</Button>
-							</div>
-						</Tooltip>
-						{/* <Tooltip title='Download PDF.'>
-							<div>
-								<Button
-									id='DownloadPdf'
-									type='default'
-									loading={downloadPdfSpin}
-									icon={<FontAwesomeIcon icon={faDownload} />}
-									onClick={handleDownloadClick}
-								>
-									Download PDF
-								</Button>
-							</div>
-						</Tooltip>
-						{!isPdf && (
-							<Tooltip title='Download DOCX.'>
+						{!aiHidden && (
+							<Tooltip title='Ask AI assistant.'>
 								<div>
 									<Button
-										id='DownloadDOCX'
+										id='AskAI'
 										type='default'
-										loading={downloadDocxSpin}
-										icon={<FontAwesomeIcon icon={faDownload} />}
-										onClick={handleDownloadDocxClick}
+										icon={<FontAwesomeIcon icon={faHatWizard} />}
+										onClick={() => {
+											setAiVisible(!aiVisible);
+											setPlaceholderVisible(false);
+										}}
+										style={{
+											backgroundColor: aiVisible ? '#e6f7ff' : 'inherit', // Highlight when visible
+										}}
 									>
-										Download DOCX
+										AI Assistant
 									</Button>
 								</div>
 							</Tooltip>
-						)} */}
-						<Dropdown
-							menu={{ items }}
-							trigger={['click']}
-						>
-							<Button loading={downloadPdfSpin || downloadDocxSpin} icon={<FontAwesomeIcon icon={faDownload} />}>Download</Button>
+						)}
+						<Dropdown menu={{ items }} trigger={['click']}>
+							<Button
+								loading={downloadPdfSpin || downloadDocxSpin}
+								icon={<FontAwesomeIcon icon={faDownload} />}
+							>
+								Download
+							</Button>
 						</Dropdown>
 					</Space>
 				</Space>
