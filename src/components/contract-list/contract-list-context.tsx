@@ -17,6 +17,8 @@ export type TContractListContextType = {
 	setRefreshContracts: (refreshContracts: number) => void;
 	needUpdate: boolean;
 	setNeedUpdate: (needUpdate: boolean) => void;
+	aiShow: boolean;
+	setAiShow: (aiHidden: boolean) => void;
 	apiKey: string | undefined;
 	setApiKey: (apiKey: string) => void;
 };

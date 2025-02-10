@@ -53,6 +53,7 @@ export interface ContractListProps {
 	token?: string;
 	userKey?: string;
 	isModal?: boolean;
+	ai?: boolean;
 }
 
 export const ContractList: FC<ContractListProps> = ({
@@ -61,6 +62,7 @@ export const ContractList: FC<ContractListProps> = ({
 	token,
 	isModal = true,
 	userKey,
+	ai = false,
 }) => {
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [currContractKey, setCurrContractKey] = useState('');
@@ -75,6 +77,7 @@ export const ContractList: FC<ContractListProps> = ({
 	const [eventStatus, setEventStatus] = useState<EventStatus[]>([]);
 	const [spinLoad, setSpinLoad] = useState(false);
 	const [contractsLoad, setContractsLoad] = useState(false);
+	const [aiShow, setAiShow] = useState(!ai);
 	const currentRecord = useRef<DataType>({});
 	const { Title, Text } = Typography;
 	const items: MenuProps['items'] = [
@@ -379,6 +382,8 @@ export const ContractList: FC<ContractListProps> = ({
 				setApiKey: setCurrApiKey,
 				notification,
 				setNotification,
+				aiShow,
+				setAiShow,
 			}}
 		>
 			{spinLoad ? (

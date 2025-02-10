@@ -16,6 +16,7 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 		clientKey,
 		userKey,
 		token,
+		aiShow,
 		setContractKey,
 		setContractModal,
 		refreshContracts,
@@ -84,8 +85,7 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 						token={token}
 						userKey={userKey}
 						contractKey={contractKey}
-						// onStepChange={handleStep}
-						// onDocumentSave={handleSave}
+						ai={aiShow}
 					/>
 				</Space>
 			)}
