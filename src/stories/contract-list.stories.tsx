@@ -13,13 +13,14 @@ export default meta;
 
 type Story = StoryObj<typeof ContractList>;
 
-export const Primary: Story = (args: React.JSX.IntrinsicAttributes & ContractListProps) => (
-	<ContractList data-testId='InputField-id' {...args} />
-);
+export const Primary: Story = (
+	args: React.JSX.IntrinsicAttributes & ContractListProps
+) => <ContractList data-testId='InputField-id' {...args} />;
 Primary.args = {
 	apiKey: '',
 	clientKey: '',
 	token: '',
 	userKey: '',
 	isModal: true,
+	ai: false,
 };
