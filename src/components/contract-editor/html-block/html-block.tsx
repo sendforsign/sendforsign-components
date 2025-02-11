@@ -12,6 +12,7 @@ import { BASE_URL } from '../../../config/config';
 import {
 	Action,
 	ApiEntity,
+	ContractType,
 	PlaceholderColor,
 	PlaceholderView,
 } from '../../../config/enum';
@@ -65,7 +66,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		token,
 		sign,
 		setSign,
-		contractSign,
+		contractSign, 
 		setContractSign,
 		setContinueLoad,
 		setNotification,
@@ -80,7 +81,6 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		setDocumentCurrentSaved,
 	} = useContractEditorContext();
 	const container = document.querySelector('#contract-editor-container');
-	const placeholderRecipients = useRef<Recipient[]>([]);
 	const placeholderClassFill = useRef(false);
 
 	useEffect(() => {
@@ -168,7 +168,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	useEffect(() => {
 		const setValue = async () => {
 			const processedValue = wrapTextNodes(value); // Обрабатываем HTML
-			quillRef?.current?.clipboard.dangerouslyPasteHTML(processedValue);
+			quillRef?.current?.clipboard.dangerouslyPasteHTML(processedValue, 'user');
 			// debugger;
 			setLoad(false);
 			setRefreshPlaceholders(refreshPlaceholders + 1);
