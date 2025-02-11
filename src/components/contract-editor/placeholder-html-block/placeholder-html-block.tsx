@@ -56,7 +56,6 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		continueLoad,
 		setPlaceholder,
 		refreshPlaceholders,
-		setPlaceholderVisible,
 		placeholderVisible,
 		setNotification,
 		contractPlaceholderCount,
@@ -582,18 +581,23 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			const empty = holderInsert.value
 				? holderInsert.value?.replace(/\s/g, '')
 				: '';
+				
+			const maxPlaceholderId =
+				Math.max(...placeholder.map((ph) => ph.id || 0)) + 1;
 
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(
 				position ? position?.index : 0,
-				`<placeholder${holderInsert.id} className={placeholderClass${
-					holderInsert.id
+				`<placeholder${
+					holderInsert.id ? holderInsert.id : maxPlaceholderId
+				} className={placeholderClass${
+					holderInsert.id ? holderInsert.id : maxPlaceholderId
 				}} contenteditable="false">${
 					empty ? holderInsert.value : `{{{${holderInsert.name}}}}`
-				}</placeholder${holderInsert.id}>`,
+				}</placeholder${holderInsert.id ? holderInsert.id : maxPlaceholderId}>`,
 				'user'
 			);
 			updatePlaceholderClass({
-				id: holderInsert.id as number,
+				id: holderInsert.id ? (holderInsert.id as number) : maxPlaceholderId,
 				owner:
 					holderInsert.fillingType === PlaceholderFill.CREATOR ? true : false,
 				recipientKey: holderInsert.externalRecipientKey,
