@@ -382,7 +382,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						action: Action.UPDATE,
 						clientKey: !token ? clientKey : undefined,
 						userKey: userKey,
-						contract: { contractKey: contractKey, value: content },
+						contract: { contractKey: contractKey, value: contentTmp },
 					},
 				};
 				await axios
