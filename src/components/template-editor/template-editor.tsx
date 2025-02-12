@@ -302,9 +302,16 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 												style={{ display: 'flex' }}
 											>
 												<Space direction='vertical' size={2}>
-													<Title level={4} style={{ margin: '0 0 0 0' }}>
-														Review your template
-													</Title>
+													<Space
+														direction='horizontal'
+														size={10}
+														style={{ display: 'flex', alignItems: 'end' }}
+													>
+														<Title level={4} style={{ margin: '0 0 0 0' }}>
+															Review your template
+														</Title>
+														<Text type='secondary'>{`${templateKey}`}</Text>
+													</Space>
 													<Text type='secondary'>
 														Highlight text to see options.
 													</Text>

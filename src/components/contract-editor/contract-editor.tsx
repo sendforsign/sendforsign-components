@@ -618,9 +618,21 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 																size={2}
 																className='SharingDocHeader'
 															>
-																<Title level={4} style={{ margin: '0 0 0 0' }}>
-																	Review your document
-																</Title>
+																<Space
+																	direction='horizontal'
+																	size={10}
+																	style={{ display: 'flex', alignItems: 'end' }}
+																>
+																	<Title
+																		level={4}
+																		style={{ margin: '0 0 0 0' }}
+																	>
+																		Review your document
+																	</Title>
+																	<Text type='secondary'>
+																		{`${contractKey}`}
+																	</Text>
+																</Space>
 																{!isPdf && (
 																	<Text type='secondary'>
 																		Highlight text to see options.

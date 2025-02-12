@@ -350,100 +350,123 @@ export const PlaceholderDrag = ({
 					<Col flex={'auto'}></Col>
 					{currPlaceholder.current.view?.toString() !==
 						PlaceholderView.SIGNATURE.toString() &&
-						!currPlaceholder.current.isSpecial && (
-							<Col flex='24px'>
-								<Popover
-									content={
-										<Space direction='vertical' style={{ display: 'flex' }}>
-											<Space>
-												<Text type='secondary'>Who fills in this field:</Text>
-												<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
-													<div>
-														<Button
-															disabled={readonly}
-															size='small'
-															icon={
-																<FontAwesomeIcon
-																	icon={faCircleQuestion}
-																	size='xs'
-																/>
-															}
-															type='text'
-														></Button>
-													</div>
-												</Tooltip>
-											</Space>
-											<Radio.Group
-												size='small'
-												value={
-													currPlaceholder.current.fillingType &&
-													currPlaceholder.current.fillingType.toString() !==
-														PlaceholderFill.SPECIFIC.toString()
-														? currPlaceholder.current.fillingType?.toString()
-														: currPlaceholder.current.fillingType &&
-														  currPlaceholder.current.fillingType.toString() ===
-																PlaceholderFill.SPECIFIC.toString() &&
-														  currPlaceholder.current.externalRecipientKey &&
-														  recipients &&
-														  recipients.length > 0
-														? recipients.find((placeholderRecipient) =>
-																placeholderRecipient.recipientKey?.includes(
-																	currPlaceholder.current
-																		.externalRecipientKey as string
-																)
-														  )?.recipientKey
-														: '1'
-												}
-												onChange={(e: any) => handleChangeFilling(e)}
-											>
-												<Space direction='vertical'>
-													<Radio value={PlaceholderFill.NONE.toString()}>
-														None
-													</Radio>
-													<Radio value={PlaceholderFill.CREATOR.toString()}>
-														Contract owner
-													</Radio>
-													{recipients &&
-														recipients.length > 0 &&
-														recipients.map((placeholderRecipient) => {
-															return (
-																<Radio
-																	value={placeholderRecipient.recipientKey}
-																>
-																	{placeholderRecipient.fullname}
-																</Radio>
-															);
-														})}
-												</Space>
-											</Radio.Group>
-											<Divider style={{ margin: 0 }} />
-											<Button
-												disabled={readonly}
-												// loading={delLoad}
-												block
-												danger
-												type='text'
-												onClick={() => {
-													handleDeletePlaceholder();
-												}}
-											>
-												Delete
-											</Button>
+					!currPlaceholder.current.isSpecial ? (
+						<Col flex='24px'>
+							<Popover
+								content={
+									<Space direction='vertical' style={{ display: 'flex' }}>
+										<Text type='secondary'>
+											{currPlaceholder.current.placeholderKey}
+										</Text>
+										<Space>
+											<Text type='secondary'>Who fills in this field:</Text>
+											<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
+												<div>
+													<Button
+														disabled={readonly}
+														size='small'
+														icon={
+															<FontAwesomeIcon
+																icon={faCircleQuestion}
+																size='xs'
+															/>
+														}
+														type='text'
+													></Button>
+												</div>
+											</Tooltip>
 										</Space>
-									}
-									trigger='click'
-								>
-									<div>
+										<Radio.Group
+											size='small'
+											value={
+												currPlaceholder.current.fillingType &&
+												currPlaceholder.current.fillingType.toString() !==
+													PlaceholderFill.SPECIFIC.toString()
+													? currPlaceholder.current.fillingType?.toString()
+													: currPlaceholder.current.fillingType &&
+													  currPlaceholder.current.fillingType.toString() ===
+															PlaceholderFill.SPECIFIC.toString() &&
+													  currPlaceholder.current.externalRecipientKey &&
+													  recipients &&
+													  recipients.length > 0
+													? recipients.find((placeholderRecipient) =>
+															placeholderRecipient.recipientKey?.includes(
+																currPlaceholder.current
+																	.externalRecipientKey as string
+															)
+													  )?.recipientKey
+													: '1'
+											}
+											onChange={(e: any) => handleChangeFilling(e)}
+										>
+											<Space direction='vertical'>
+												<Radio value={PlaceholderFill.NONE.toString()}>
+													None
+												</Radio>
+												<Radio value={PlaceholderFill.CREATOR.toString()}>
+													Contract owner
+												</Radio>
+												{recipients &&
+													recipients.length > 0 &&
+													recipients.map((placeholderRecipient) => {
+														return (
+															<Radio value={placeholderRecipient.recipientKey}>
+																{placeholderRecipient.fullname}
+															</Radio>
+														);
+													})}
+											</Space>
+										</Radio.Group>
+										<Divider style={{ margin: 0 }} />
 										<Button
 											disabled={readonly}
-											size='small'
+											// loading={delLoad}
+											block
+											danger
 											type='text'
-											icon={<FontAwesomeIcon icon={faGear} size='xs' />}
-										/>
-									</div>
-								</Popover>
-							</Col>
-						)}
+											onClick={() => {
+												handleDeletePlaceholder();
+											}}
+										>
+											Delete
+										</Button>
+									</Space>
+								}
+								trigger='click'
+							>
+								<div>
+									<Button
+										disabled={readonly}
+										size='small'
+										type='text'
+										icon={<FontAwesomeIcon icon={faGear} size='xs' />}
+									/>
+								</div>
+							</Popover>
+						</Col>
+					) : (
+						<Col flex='24px'>
+							<Popover
+								content={
+									<Space direction='vertical' style={{ display: 'flex' }}>
+										<Text type='secondary'>
+											{currPlaceholder.current.placeholderKey}
+										</Text>
+									</Space>
+								}
+								trigger='click'
+							>
+								<div>
+									<Button
+										disabled={readonly}
+										size='small'
+										type='text'
+										icon={<FontAwesomeIcon icon={faGear} size='xs' />}
+									/>
+								</div>
+							</Popover>
+						</Col>
+					)}
 				</Row>
 				{currPlaceholder.current.view?.toString() !==
 					PlaceholderView.SIGNATURE.toString() &&

@@ -581,7 +581,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			const empty = holderInsert.value
 				? holderInsert.value?.replace(/\s/g, '')
 				: '';
-				
+
 			const maxPlaceholderId =
 				Math.max(...placeholder.map((ph) => ph.id || 0)) + 1;
 
@@ -967,115 +967,141 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 									<Col flex={'auto'}></Col>
 									{holder.view?.toString() !==
 										PlaceholderView.SIGNATURE.toString() &&
-										!holder.isSpecial && (
-											<Col flex='24px'>
-												<Popover
-													content={
-														<Space
-															direction='vertical'
-															style={{ display: 'flex' }}
-														>
-															<Space>
-																<Text type='secondary'>
-																	Who fills in this field:
-																</Text>
-																<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
-																	<div>
-																		<Button
-																			disabled={readonlyCurrent.current}
-																			size='small'
-																			icon={
-																				<FontAwesomeIcon
-																					icon={faCircleQuestion}
-																					size='xs'
-																				/>
-																			}
-																			type='text'
-																		></Button>
-																	</div>
-																</Tooltip>
-															</Space>
-															<Radio.Group
-																size='small'
-																value={
-																	holder.fillingType &&
-																	holder.fillingType.toString() !==
-																		PlaceholderFill.SPECIFIC.toString()
-																		? holder.fillingType?.toString()
-																		: holder.fillingType &&
-																		  holder.fillingType.toString() ===
-																				PlaceholderFill.SPECIFIC.toString() &&
-																		  holder.externalRecipientKey &&
-																		  placeholderRecipients.current &&
-																		  placeholderRecipients.current.length > 0
-																		? placeholderRecipients.current.find(
-																				(placeholderRecipient) =>
-																					placeholderRecipient.recipientKey?.includes(
-																						holder.externalRecipientKey as string
-																					)
-																		  )?.recipientKey
-																		: '1'
-																}
-																onChange={(e: any) =>
-																	handleChangeFilling(e, holder.id as number)
-																}
-															>
-																<Space direction='vertical'>
-																	<Radio
-																		value={PlaceholderFill.NONE.toString()}
-																	>
-																		None
-																	</Radio>
-																	<Radio
-																		value={PlaceholderFill.CREATOR.toString()}
-																	>
-																		Contract owner
-																	</Radio>
-																	{placeholderRecipients.current &&
-																		placeholderRecipients.current.length > 0 &&
-																		placeholderRecipients.current.map(
-																			(placeholderRecipient) => {
-																				return (
-																					<Radio
-																						value={
-																							placeholderRecipient.recipientKey
-																						}
-																					>
-																						{placeholderRecipient.fullname}
-																					</Radio>
-																				);
-																			}
-																		)}
-																</Space>
-															</Radio.Group>
-															<Divider style={{ margin: 0 }} />
-															<Button
-																disabled={readonlyCurrent.current}
-																loading={delLoad}
-																block
-																danger
-																type='text'
-																onClick={() => {
-																	handleDeletePlaceholder(holder);
-																}}
-															>
-																Delete
-															</Button>
+									!holder.isSpecial ? (
+										<Col flex='24px'>
+											<Popover
+												content={
+													<Space
+														direction='vertical'
+														style={{ display: 'flex' }}
+													>
+														<Text type='secondary'>
+															{holder.placeholderKey}
+														</Text>
+														<Space>
+															<Text type='secondary'>
+																Who fills in this field:
+															</Text>
+															<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
+																<div>
+																	<Button
+																		disabled={readonlyCurrent.current}
+																		size='small'
+																		icon={
+																			<FontAwesomeIcon
+																				icon={faCircleQuestion}
+																				size='xs'
+																			/>
+																		}
+																		type='text'
+																	></Button>
+																</div>
+															</Tooltip>
 														</Space>
-													}
-													trigger='click'
-												>
-													<div>
+														<Radio.Group
+															size='small'
+															value={
+																holder.fillingType &&
+																holder.fillingType.toString() !==
+																	PlaceholderFill.SPECIFIC.toString()
+																	? holder.fillingType?.toString()
+																	: holder.fillingType &&
+																	  holder.fillingType.toString() ===
+																			PlaceholderFill.SPECIFIC.toString() &&
+																	  holder.externalRecipientKey &&
+																	  placeholderRecipients.current &&
+																	  placeholderRecipients.current.length > 0
+																	? placeholderRecipients.current.find(
+																			(placeholderRecipient) =>
+																				placeholderRecipient.recipientKey?.includes(
+																					holder.externalRecipientKey as string
+																				)
+																	  )?.recipientKey
+																	: '1'
+															}
+															onChange={(e: any) =>
+																handleChangeFilling(e, holder.id as number)
+															}
+														>
+															<Space direction='vertical'>
+																<Radio value={PlaceholderFill.NONE.toString()}>
+																	None
+																</Radio>
+																<Radio
+																	value={PlaceholderFill.CREATOR.toString()}
+																>
+																	Contract owner
+																</Radio>
+																{placeholderRecipients.current &&
+																	placeholderRecipients.current.length > 0 &&
+																	placeholderRecipients.current.map(
+																		(placeholderRecipient) => {
+																			return (
+																				<Radio
+																					value={
+																						placeholderRecipient.recipientKey
+																					}
+																				>
+																					{placeholderRecipient.fullname}
+																				</Radio>
+																			);
+																		}
+																	)}
+															</Space>
+														</Radio.Group>
+														<Divider style={{ margin: 0 }} />
 														<Button
 															disabled={readonlyCurrent.current}
-															size='small'
+															loading={delLoad}
+															block
+															danger
 															type='text'
-															icon={<FontAwesomeIcon icon={faGear} size='xs' />}
-														/>
-													</div>
-												</Popover>
-											</Col>
-										)}
+															onClick={() => {
+																handleDeletePlaceholder(holder);
+															}}
+														>
+															Delete
+														</Button>
+													</Space>
+												}
+												trigger='click'
+											>
+												<div>
+													<Button
+														disabled={readonlyCurrent.current}
+														size='small'
+														type='text'
+														icon={<FontAwesomeIcon icon={faGear} size='xs' />}
+													/>
+												</div>
+											</Popover>
+										</Col>
+									) : (
+										<Col flex='24px'>
+											<Popover
+												content={
+													<Space
+														direction='vertical'
+														style={{ display: 'flex' }}
+													>
+														<Text type='secondary'>
+															{holder.placeholderKey}
+														</Text>
+													</Space>
+												}
+												trigger='click'
+											>
+												<div>
+													<Button
+														disabled={readonlyCurrent.current}
+														size='small'
+														type='text'
+														icon={<FontAwesomeIcon icon={faGear} size='xs' />}
+													/>
+												</div>
+											</Popover>
+										</Col>
+									)}
 								</Row>
 								{holder.view?.toString() !==
 									PlaceholderView.SIGNATURE.toString() &&
