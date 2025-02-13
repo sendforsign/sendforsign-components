@@ -328,6 +328,9 @@ export const PlaceholderDrag = ({
 							<Popover
 								content={
 									<Space direction='vertical' style={{ display: 'flex' }}>
+										<Text type='secondary'>
+											{currPlaceholder.current.placeholderKey}
+										</Text>
 										<Space>
 											<Text type='secondary'>Who fills in this field:</Text>
 											<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>

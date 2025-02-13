@@ -510,6 +510,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 										<Popover
 											content={
 												<Space direction='vertical' style={{ display: 'flex' }}>
+													<Text type='secondary'>{holder.placeholderKey}</Text>
 													<Space>
 														<Text type='secondary'>
 															Who fills in this field:
