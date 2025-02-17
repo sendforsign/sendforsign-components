@@ -20,6 +20,7 @@ import {
 	faArrowUp,
 	faBook,
 	faBookBookmark,
+	faCheckDouble,
 	faCommentDots,
 	faFileArrowUp,
 	faFileCirclePlus,
@@ -27,6 +28,7 @@ import {
 	faFileContract,
 	faFileInvoice,
 	faGlobe,
+	faHandPointer,
 	faLanguage,
 	faLegal,
 	faPlus,
@@ -596,42 +598,124 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 		setSelectedLanguage(value);
 	};
 
+	const handleFind = (value: string) => {
+		const ailines = document.querySelectorAll('ailine');
+		for (let i = 0; i < ailines.length; i++) {
+			if (ailines[i].getAttribute('value') === value) {
+				const nextAiline = ailines[i];
+				if (nextAiline) {
+					nextAiline.classList.remove('highlight-green');
+					nextAiline.classList.remove('highlight-transparent');
+					nextAiline.scrollIntoView({ behavior: 'smooth', block: 'center' });
+					nextAiline.classList.add('highlight-green');
+	
+					setTimeout(() => {
+						nextAiline.classList.add('highlight-transparent');
+					}, 3000);
+				}
+				break;
+			}
+		}
+	};
+	
+	const handleReplace = (value: string, newValue: string) => {
+		const ailines = document.querySelectorAll('ailine');
+		for (let i = 0; i < ailines.length; i++) {
+			if (ailines[i].getAttribute('value') === value) {
+				const nextAiline = ailines[i];
+				if (nextAiline) {
+					// Сохраняем текущее содержимое тега
+					const originalContent = nextAiline.textContent;
+	
+					// Заменяем текст внутри тега <ailine> на текст из соответствующего элемента
+	
+					// Прокручиваем к тегу и добавляем стили
+					nextAiline.classList.remove('highlight-green');
+					nextAiline.classList.remove('highlight-red');
+					nextAiline.classList.remove('highlight-transparent');
+					nextAiline.scrollIntoView({ behavior: 'smooth', block: 'center' });
+					nextAiline.classList.add('highlight-red');
+	
+					setTimeout(() => {
+						nextAiline.classList.add('fade-out');
+						setTimeout(() => {
+							nextAiline.classList.remove('highlight-red');
+							nextAiline.classList.remove('fade-out');
+							setTimeout(() => {
+								nextAiline.classList.add('highlight-green');
+								nextAiline.textContent = newValue; // Заменяем на значение из тега
+								nextAiline.classList.add('fade-in');
+								setTimeout(() => {
+									nextAiline.classList.remove('fade-in');
+									nextAiline.classList.add('highlight-transparent');
+								}, 1500);
+							}, 0);
+						}, 500);
+					}, 1500);
+				}
+				break;
+			}
+		}
+	};
+
 	const replaceTextWithElement = (text: string) => {
-		const parts = text.split(
-			/{ContractKey: ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})}/g
-		);
+		const parts = text.split(/(<ailine.*?<\/ailine>|{ContractKey: [0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}})/g);
 		return parts.map((part, index) => {
-			const match = part.match(
-				/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/
-			);
-			return (
-				<>
-					{match ? (
+			const matchAiline = part.match(/<ailine.*?>(.*?)<\/ailine>/);
+			const matchContractKey = part.match(/{ContractKey: ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})}/);
+
+			if (matchAiline) {
+				const content = matchAiline[1] || ''; // Safely get content
+				const value = matchAiline[0]?.match(/value="(\d+)"/)?.[1] || ''; // Safely extract value
+				return (
+					<div key={index} style={{ display: 'flex', alignItems: 'center', position: 'relative', padding: '28px 4px 4px 4px', margin: '8px 0', background: '#f0f0f0', borderRadius: '4px' }}>
 						<Button
-							target='_blank'
-							rel='noopener noreferrer'
 							type='default'
-							key={index}
-							onClick={() => handleOpenDocument(match[1])}
+							size='small'
+							onClick={() => handleFind(value)} // Pass value to Find handler
+							style={{ position: 'absolute', top: 4, right: 80 }} // Расположение кнопки "Find"
+							icon={<FontAwesomeIcon icon={faHandPointer} size='sm' />}
 						>
-							{AiAssistantLocalization.uiText[contextMessageKey].openDoc}
+							Find
 						</Button>
-					) : (
-						<ReactMarkdown
-							key={index}
-							components={{
-								a: ({ node, ...props }) => (
-									<a {...props} target='_blank' rel='noopener noreferrer'>
-										{props.children}
-									</a>
-								),
-							}}
+						<Button
+							type='default'
+							size='small'
+							onClick={() => handleReplace(value, content)} // Pass value and content to Replace handler
+							style={{ position: 'absolute', top: 4, right: 4 }} // Расположение кнопки "Replace"
+							icon={<FontAwesomeIcon icon={faCheckDouble} size='sm' />}
 						>
-							{part}
-						</ReactMarkdown>
-					)}
-				</>
-			);
+							Apply
+						</Button>
+						<span>{content}</span> {/* Display content */}
+					</div>
+				);
+			} else if (matchContractKey) {
+				const contractKey = matchContractKey[1]; // Extract contract key
+				return (
+					<Button
+						key={index}
+						target='_blank'
+						rel='noopener noreferrer'
+						type='default'
+						onClick={() => handleOpenDocument(contractKey)} // Handler to open document
+					>
+						{AiAssistantLocalization.uiText[contextMessageKey].openDoc}
+					</Button>
+				);
+			} else {
+				return (
+					<ReactMarkdown key={index} components={{
+						a: ({ node, ...props }) => (
+							<a {...props} target='_blank' rel='noopener noreferrer'>
+								{props.children}
+							</a>
+						),
+					}}>
+						{part}
+					</ReactMarkdown>
+				);
+			}
 		});
 	};
 
@@ -994,18 +1078,23 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 													value={selectedValues}
 													variant='borderless'
 													popupMatchSelectWidth={false}
+													showSearch={false}
 													suffixIcon={
-														<FontAwesomeIcon
-															icon={faBookBookmark}
-															color='black'
-															size='lg'
-															style={{ paddingTop: '2px' }}
-														/>
+														selectedValues.length === 0 ? (
+															<FontAwesomeIcon
+																icon={faBookBookmark}
+																color='black'
+																size='lg'
+																style={{ paddingTop: '2px' }}
+															/>
+														) : null
 													}
 													notFoundContent={
 														AiAssistantLocalization.uiText[contextMessageKey]
 															.contextHelp
 													}
+													style={{ maxWidth: '100px', whiteSpace: 'normal' }} // Установите maxWidth по вашему усмотрению
+
 												/>
 											</Tooltip>
 										</Col>
@@ -1107,6 +1196,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 												/>
 											</Tooltip>
 										</Col>
+										{aitype === AiTypes.REGULAR && (
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
 												title={
@@ -1158,13 +1248,14 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 												/>
 											</Tooltip>
 										</Col>
+										)}
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
 												title={
 													AiAssistantLocalization.uiText[contextMessageKey]
 														.newChat
 												}
-												placement='left'
+												placement='bottom'
 											>
 												<Button
 													id='newChat'

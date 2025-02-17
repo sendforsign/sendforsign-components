@@ -43,13 +43,15 @@ export const AiHtmlBlock = () => {
 	}, [readonly]);
 
 	return (
-		<AiAssistant
-			apiKey={apiKey ? apiKey : ''}
-			clientKey={clientKey ? clientKey : ''}
-			token={token ? token : ''}
-			userKey={userKey ? userKey : ''}
-			aitype={AiTypes.CONTRACT_SIDEBAR}
-			contract={{ contractName, controlLink: contractKey }}
-		/>
+		<div>
+			<AiAssistant
+				apiKey={apiKey ? apiKey : ''}
+				clientKey={clientKey ? clientKey : ''}
+				token={token ? token : ''}
+				userKey={userKey ? userKey : ''}
+				aitype={AiTypes.CONTRACT_SIDEBAR}
+				contract={{ contractName, controlLink: contractKey }}
+			/>
+		</div>
 	);
 };

@@ -155,7 +155,7 @@ export const ContextModal = () => {
 			});
 	};
 	const handleOk = async () => {
-		debugger;
+		// debugger;
 
 		setSpinLoad(true);
 		setDisableLoad(true);

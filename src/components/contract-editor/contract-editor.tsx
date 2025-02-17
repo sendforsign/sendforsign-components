@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
-import { Card, Col, Row, Space, Spin, Typography } from 'antd';
+import { Button, Card, Col, Popover, Row, Space, Spin, Typography } from 'antd';
 import './contract-editor.css';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
@@ -29,6 +29,8 @@ import { PdfBlockDnd } from './pdf-block-dnd';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { delColorFromHtml, removeAilineTags } from '../../utils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCopy, faInfo, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 export interface StepChangeProps {
 	currentStep?: ContractSteps;
@@ -620,8 +622,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 															>
 																<Space
 																	direction='horizontal'
-																	size={10}
-																	style={{ display: 'flex', alignItems: 'end' }}
+																	align='center'
+																	style={{ display: 'flex' }}
 																>
 																	<Title
 																		level={4}
@@ -629,9 +631,14 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 																	>
 																		Review your document
 																	</Title>
-																	<Text type='secondary'>
-																		{`${contractKey}`}
-																	</Text>
+																	<Popover content={
+																		<Space direction='vertical'>
+																			<Text type='secondary'>Contract Key: {contractKey}</Text>
+																			<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d'/>} onClick={() => navigator.clipboard.writeText(contractKey)}>Copy</Button>
+																		</Space>
+																	} title={contractName} trigger="click">
+																		<Button size='small' type='text' icon={<FontAwesomeIcon icon={faInfoCircle} size='sm' color='#5d5d5d'/>}></Button>
+																	</Popover>
 																</Space>
 																{!isPdf && (
 																	<Text type='secondary'>

@@ -640,7 +640,7 @@ export const SendModal = () => {
 									</Title>
 								</Space>
 							</Col>
-							<Col flex='46px' hidden>
+							<Col flex='46px'>
 								<Tooltip title='Internal recipient.'>
 									<div>
 										<Switch
@@ -694,7 +694,7 @@ export const SendModal = () => {
 												</Title>
 											</Space>
 										</Col>
-										<Col flex='46px' hidden>
+										<Col flex='46px'>
 											<Tooltip title='Internal recipient.'>
 												<div>
 													<Switch

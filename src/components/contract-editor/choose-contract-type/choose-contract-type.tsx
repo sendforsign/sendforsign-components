@@ -230,7 +230,6 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 	}, []);
 
 	const handleCreate = async () => {
-		debugger;
 		if (contractType && !templateKey) {
 			let input = null;
 			console.log('contractType', contractType);

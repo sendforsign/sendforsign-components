@@ -27,6 +27,7 @@ import { Placeholder, Recipient } from '../../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faCircleQuestion,
+	faCopy,
 	faFont,
 	faGear,
 	faSignature,
@@ -355,9 +356,6 @@ export const PlaceholderDrag = ({
 							<Popover
 								content={
 									<Space direction='vertical' style={{ display: 'flex' }}>
-										<Text type='secondary'>
-											{currPlaceholder.current.placeholderKey}
-										</Text>
 										<Space>
 											<Text type='secondary'>Who fills in this field:</Text>
 											<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
@@ -430,6 +428,15 @@ export const PlaceholderDrag = ({
 										>
 											Delete
 										</Button>
+										<Divider style={{ margin: 0 }} />
+										<Popover content={
+											<Space direction='vertical'>
+												<Text type='secondary'>Placeholder Key: {currPlaceholder.current.placeholderKey}</Text>
+												<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d'/>} onClick={() => navigator.clipboard.writeText(currPlaceholder.current.placeholderKey || 'N/A')}>Copy</Button>
+											</Space>
+										} trigger="click">
+											<Button size='small'>{currPlaceholder.current.placeholderKey}</Button>
+										</Popover>
 									</Space>
 								}
 								trigger='click'
@@ -449,9 +456,14 @@ export const PlaceholderDrag = ({
 							<Popover
 								content={
 									<Space direction='vertical' style={{ display: 'flex' }}>
-										<Text type='secondary'>
-											{currPlaceholder.current.placeholderKey}
-										</Text>
+										<Popover content={
+											<Space direction='vertical'>
+												<Text type='secondary'>Placeholder Key: {currPlaceholder.current.placeholderKey}</Text>
+												<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d'/>} onClick={() => navigator.clipboard.writeText(currPlaceholder.current.placeholderKey || 'N/A')}>Copy</Button>
+											</Space>
+										} trigger="click">
+											<Button size='small'>{currPlaceholder.current.placeholderKey}</Button>
+										</Popover>
 									</Space>
 								}
 								trigger='click'

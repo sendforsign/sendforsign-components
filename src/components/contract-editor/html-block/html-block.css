@@ -1063,3 +1063,50 @@
 .qlbt-operation-menu {
 	z-index: 2001 !important;
 }
+
+/* src/components/contract-editor/html-block/html-block.css */
+.highlight-green {
+	background-color: #e3fbc8;
+	border-radius: 4px;
+	transition: background-color 0.5s ease;
+}
+
+.highlight-transparent {
+	background-color: transparent; 
+	border-radius: 4px;
+	transition: background-color 0.5s ease;
+}
+
+.highlight-red {
+	background-color: #f9cac9; 
+	border-radius: 4px;
+	transition: background-color 0.5s ease;
+}
+
+.fade-out {
+	animation: fadeOut 0.5s forwards; /* Анимация исчезновения */
+	opacity: 0;
+}
+
+.fade-in {
+	animation: fadeIn 0.5s forwards; /* Анимация появления */
+	opacity: 1;
+}
+
+@keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}

@@ -28,6 +28,7 @@ import { Placeholder, Recipient } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faCircleQuestion,
+	faCopy,
 	faGear,
 	faLeftLong,
 } from '@fortawesome/free-solid-svg-icons';
@@ -510,7 +511,6 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 										<Popover
 											content={
 												<Space direction='vertical' style={{ display: 'flex' }}>
-													<Text type='secondary'>{holder.placeholderKey}</Text>
 													<Space>
 														<Text type='secondary'>
 															Who fills in this field:
@@ -591,6 +591,15 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 													>
 														Delete
 													</Button>
+													<Divider style={{ margin: 0 }} />
+													<Popover content={
+														<Space direction='vertical'>
+															<Text type='secondary'>Placeholder Key: {holder.placeholderKey}</Text>
+															<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d'/>} onClick={() => navigator.clipboard.writeText(holder.placeholderKey || 'N/A')}>Copy</Button>
+														</Space>
+													} trigger="click">
+														<Button size='small'>{holder.placeholderKey}</Button>
+													</Popover>
 												</Space>
 											}
 											trigger='click'

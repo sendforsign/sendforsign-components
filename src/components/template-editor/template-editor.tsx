@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import './template-editor.css';
-import { Card, Col, Row, Space, Spin, Typography } from 'antd';
+import { Button, Card, Col, Popover, Row, Space, Spin, Typography } from 'antd';
 import axios from 'axios';
 import { BASE_URL } from '../../config/config';
 import { Action, ApiEntity } from '../../config/enum';
@@ -14,6 +14,8 @@ import { PlaceholderPdfBlock } from './placeholder-pdf-block';
 import { PdfBlockDnd } from './pdf-block-dnd';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCopy, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 export interface TemplateEditorProps {
 	apiKey?: string;
 	clientKey?: string;
@@ -304,13 +306,20 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 												<Space direction='vertical' size={2}>
 													<Space
 														direction='horizontal'
-														size={10}
-														style={{ display: 'flex', alignItems: 'end' }}
+														align='center'
+														style={{ display: 'flex' }}
 													>
 														<Title level={4} style={{ margin: '0 0 0 0' }}>
 															Review your template
 														</Title>
-														<Text type='secondary'>{`${templateKey}`}</Text>
+														<Popover content={
+															<Space direction='vertical'>
+																<Text type='secondary'>Template Key: {templateKey}</Text>
+																<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d'/>} onClick={() => navigator.clipboard.writeText(templateKey || 'N/A')}>Copy</Button>
+															</Space>
+														} title={templateName} trigger="click">
+															<Button size='small' type='text' icon={<FontAwesomeIcon icon={faInfoCircle} size='sm' color='#5d5d5d'/>}></Button>
+														</Popover>
 													</Space>
 													<Text type='secondary'>
 														Highlight text to see options.
