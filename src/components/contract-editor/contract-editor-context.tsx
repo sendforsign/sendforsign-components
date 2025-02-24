@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 import {
 	ContractSign,
+	EventStatus,
 	PagePlaceholder,
 	Placeholder,
 	Recipient,
@@ -96,6 +97,10 @@ export type TContractEditorContextType = {
 	setContractEvents: (contractEvents: Array<any>) => void;
 	fillPlaceholder: boolean;
 	setFillPlaceholder: (fillPlaceholder: boolean) => void;
+	fillRecipient: boolean;
+	setFillRecipient: (fillRecipient: boolean) => void;
+	recipientFilling: Recipient[];
+	setRecipientFilling: (recipientFilling: Recipient[]) => void;
 	currentData: StepChangeProps;
 	setCurrentData: (currentData: StepChangeProps) => void;
 	documentCurrentSaved: boolean;
@@ -112,6 +117,10 @@ export type TContractEditorContextType = {
 	setContractPlaceholderCount: (contractPlaceholderCount: number) => void;
 	ready: boolean;
 	setReady: (ready: boolean) => void;
+	fullySigned: boolean;
+	setFullySigned: (fullySigned: boolean) => void;
+	eventStatus: EventStatus[];
+	setEventStatus: (eventStatus: EventStatus[]) => void;
 };
 export const ContractEditorContext = createContext<
 	TContractEditorContextType | undefined

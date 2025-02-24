@@ -17,7 +17,6 @@ import {
 	PlaceholderView,
 } from '../../../config/enum';
 import { addBlotClass, removeAilineTags, wrapTextNodes } from '../../../utils';
-import { Recipient } from '../../../config/types';
 
 class AiLineBlot extends Inline {
 	static create(value: string) {
@@ -66,7 +65,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		token,
 		sign,
 		setSign,
-		contractSign, 
+		contractSign,
 		setContractSign,
 		setContinueLoad,
 		setNotification,

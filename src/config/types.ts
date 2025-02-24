@@ -1,6 +1,7 @@
 import {
 	Action,
 	PlaceholderView,
+	RecipientType,
 	ShareLinkView,
 	ShareLinkViewText,
 	SignType,
@@ -172,6 +173,7 @@ export type Recipient = {
 	isDone?: boolean;
 	shareLink?: string;
 	color?: string;
+	type?: RecipientType;
 };
 export type Placeholder = {
 	templateKey?: string;

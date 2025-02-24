@@ -68,6 +68,10 @@ export const enum PlaceholderTypeText {
 	INTERNAL = 'internal',
 	EXTERNAL = 'external',
 }
+export const enum RecipientType {
+	INTERNAL = '1',
+	EXTERNAL = '2',
+}
 export const enum PlaceholderFill {
 	NONE = 1,
 	CREATOR = 2,

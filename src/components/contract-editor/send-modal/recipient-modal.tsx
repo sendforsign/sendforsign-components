@@ -1,42 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-	Space,
-	Card,
-	Typography,
-	Button,
-	Input,
-	Modal,
-	Tooltip,
-	Spin,
-	Segmented,
-	InputNumber,
-	Row,
-	Col,
-	Switch,
-} from 'antd';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-	faCheck,
-	faHouseUser,
-	faLink,
-	faLock,
-	faPaperPlane,
-	faTrash,
-} from '@fortawesome/free-solid-svg-icons';
+import { Button, Modal } from 'antd';
 import { useContractEditorContext } from '../contract-editor-context';
 import {
 	Action,
 	ApiEntity,
 	ContractAction,
 	PlaceholderColor,
+	RecipientType,
 	ShareLinkViewText,
 } from '../../../config/enum';
 import axios from 'axios';
-import { BASE_URL, SHARE_URL } from '../../../config/config';
+import { BASE_URL } from '../../../config/config';
 import { Recipient } from '../../../config/types';
+import { RecipientContent } from './recipient-content';
 
-export const SendModal = () => {
+export const RecipientModal = () => {
 	const {
 		apiKey,
 		token,
@@ -57,7 +35,6 @@ export const SendModal = () => {
 		setRefreshPagePlaceholders,
 	} = useContractEditorContext();
 	const [sendLoad, setSendLoad] = useState(false);
-	const [dataLoad, setDataLoad] = useState(false);
 	const [saveLoad, setSaveLoad] = useState(false);
 	const [insertRecipient, setInsertRecipient] = useState<Recipient[]>([]);
 	const [updateRecipient, setUpdateRecipient] = useState<Recipient[]>([]);
@@ -67,35 +44,25 @@ export const SendModal = () => {
 	const [recipientInit, setRecipientInit] = useState(false);
 	const [load, setLoad] = useState(false);
 	const isSave = useRef(false);
-	const options = [
-		{ label: 'Sign', value: ShareLinkViewText.SIGN },
-		{ label: 'Approve', value: ShareLinkViewText.APPROVE },
-		{ label: 'View', value: ShareLinkViewText.VIEW },
-		{
-			value: ShareLinkViewText.LOCK,
-			icon: <FontAwesomeIcon icon={faLock} />,
-		},
-	];
-	const { Title, Text } = Typography;
 
-	// console.log('contractKey 8');
 	useEffect(() => {
 		let isMounted = true;
-		if (contractKey) {
-			const body = {
-				data: {
-					action: Action.LIST,
-					clientKey: !token ? clientKey : undefined,
-					userKey: userKey,
-					contractKey: contractKey,
-					getShareLinks: true,
-				},
-			};
-			setDataLoad(true);
+		if (contractKey && sendModal) {
+			// setDataLoad(true);
 			const getRecipients = async () => {
 				setUpdateRecipient([]);
 				setDeleteRecipient([]);
 				setInsertRecipient([]);
+
+				let body = {
+					data: {
+						action: Action.LIST,
+						clientKey: !token ? clientKey : undefined,
+						userKey: userKey,
+						contractKey: contractKey,
+						getShareLinks: true,
+					},
+				};
 				await axios
 					.post(BASE_URL + ApiEntity.RECIPIENT, body, {
 						headers: {
@@ -121,6 +88,8 @@ export const SendModal = () => {
 										action: recipient.action,
 										recipientKey: recipient.recipientKey,
 										shareLink: recipient.shareLink,
+										isDone: recipient.isDone,
+										type: recipient.type,
 									};
 								})
 							);
@@ -134,7 +103,7 @@ export const SendModal = () => {
 							);
 							let idTmp = Math.max(...idArr);
 							setId(idTmp);
-							setDataLoad(false);
+							// setDataLoad(false);
 						} else {
 							setRecipientInit(true);
 							setId(0);
@@ -149,7 +118,7 @@ export const SendModal = () => {
 									recipientKey: '',
 								},
 							]);
-							setDataLoad(false);
+							// setDataLoad(false);
 						}
 						setLoad(false);
 					})
@@ -225,45 +194,7 @@ export const SendModal = () => {
 				});
 		}
 	};
-	const handleSendOne = async (index: number) => {
-		let recipientsTmp: Recipient[] = [];
-		recipientsTmp.push(recipients[index]);
-		const body = {
-			data: {
-				action: Action.SEND,
-				clientKey: !token ? clientKey : undefined,
-				userKey: userKey,
-				contractKey: contractKey,
-				recipients: recipientsTmp,
-			},
-		};
-		await axios
-			.post(BASE_URL + ApiEntity.RECIPIENT, body, {
-				headers: {
-					Accept: 'application/vnd.api+json',
-					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-					Authorization: token ? `Bearer ${token}` : undefined,
-				},
-				responseType: 'json',
-			})
-			.then((payload: any) => {
-				setSendLoad(false);
-				handleCancel();
-				if (payload.data.result) {
-					setResultModal({ open: true, action: ContractAction.SEND });
-					setRefreshEvent(refreshEvent + 1);
-				}
-			})
-			.catch((error) => {
-				setNotification({
-					text:
-						error.response && error.response.data && error.response.data.message
-							? error.response.data.message
-							: error.message,
-				});
-			});
-	};
+
 	const handleChange = (e: any, index: number) => {
 		let recipientsTmp = [...recipients];
 		switch (e.target.id) {
@@ -275,6 +206,11 @@ export const SendModal = () => {
 				break;
 			case 'CustomMessage':
 				recipientsTmp[index].customMessage = e.target.value;
+				break;
+			case 'TypeSwitch':
+				recipientsTmp[index].type = e.target.value
+					? RecipientType.INTERNAL
+					: RecipientType.EXTERNAL;
 				break;
 		}
 		setRecipients(recipientsTmp);
@@ -302,23 +238,9 @@ export const SendModal = () => {
 				updateRecipient.push(recipientsTmp[index]);
 				setUpdateRecipient(updateRecipient);
 			}
-		} else {
 		}
 	};
-	const handleChangePosition = (e: any, index: number) => {
-		let recipientsTmp = [...recipients];
-		recipientsTmp[index].position = e;
-		setRecipients(recipientsTmp);
-		if (
-			!updateRecipient.find(
-				(recipient) => recipient.id === recipientsTmp[index].id
-			) &&
-			recipientsTmp[index].recipientKey
-		) {
-			updateRecipient.push(recipientsTmp[index]);
-			setUpdateRecipient(updateRecipient);
-		}
-	};
+
 	const handleSaveAndClose = async () => {
 		if (updateRecipient.length > 0) {
 			for (let index = 0; index < updateRecipient.length; index++) {
@@ -340,6 +262,7 @@ export const SendModal = () => {
 								customMessage: recipientFind.customMessage,
 								action: recipientFind.action,
 								position: recipientFind.position,
+								type: recipientFind.type,
 							},
 						},
 					};
@@ -493,6 +416,7 @@ export const SendModal = () => {
 							email: recipients[0].email,
 							customMessage: recipients[0].customMessage,
 							position: recipients[0].position,
+							type: recipients[0].type,
 							action: recipients[0].action,
 							recipientKey: '',
 						},
@@ -561,11 +485,7 @@ export const SendModal = () => {
 		});
 		setInsertRecipient(insertRecipient);
 	};
-	const handleCopyShareLink = () => {
-		setNotification({
-			text: 'Sharing link copied.',
-		});
-	};
+
 	const removeClasses = (recipientKey: string) => {
 		const placeholderFilter = placeholder.filter(
 			(holder) => holder.externalRecipientKey === recipientKey
@@ -610,217 +530,45 @@ export const SendModal = () => {
 					>
 						Save & Close
 					</Button>
-					{recipientInit && (
-						<Button
-							key='submit'
-							type='primary'
-							loading={sendLoad}
-							onClick={handleSend}
-						>
-							{`Send to ${recipients.length} recipient${
-								recipients.length === 1 ? '' : 's'
-							}`}
-						</Button>
-					)}
+					<Button
+						key='submit'
+						type='primary'
+						loading={sendLoad}
+						onClick={handleSend}
+						disabled={
+							recipients &&
+							recipients.length > 0 &&
+							recipients[0].fullname &&
+							recipients[0].email
+								? false
+								: true
+						}
+					>
+						{`Send to ${recipients.length} recipient${
+							recipients.length === 1 ? '' : 's'
+						}`}
+					</Button>
 				</>
 			}
 		>
-			{load ? (
-				<Space
-					direction='vertical'
-					size='large'
-					style={{ display: 'flex', margin: '32px 0 32px 0' }}
-				>
-					<Card loading={load}>
-						<Row wrap={false} align='middle' style={{ margin: '0 0 16px 0' }}>
-							<Col flex='auto'>
-								<Space direction='vertical' size={2}>
-									<Title level={5} style={{ margin: '0 0 0 0' }}>
-										Recipient
-									</Title>
-								</Space>
-							</Col>
-							<Col flex='46px'>
-								<Tooltip title='Internal recipient.'>
-									<div>
-										<Switch
-											checkedChildren={<FontAwesomeIcon icon={faCheck} />}
-											unCheckedChildren={<FontAwesomeIcon icon={faHouseUser} />}
-										/>
-									</div>
-								</Tooltip>
-							</Col>
-						</Row>
-						<Row wrap={false} style={{ margin: '16px 0' }}>
-							<Col flex='auto'>
-								<Input id={`FullName`} placeholder="Recipient's full name" />
-							</Col>
-							<Col flex='8px' />
-							<Col flex='auto'>
-								<Input id={`Email`} placeholder="Recipient's email" />
-							</Col>
-						</Row>
-						<Row wrap={false} style={{ margin: '16px 0' }}>
-							<Col flex='auto'>
-								<Input
-									id={`CustomMessage`}
-									placeholder='Private note; leave empty for the default message'
-									value={''}
-								/>
-							</Col>
-						</Row>
-					</Card>
-				</Space>
-			) : (
-				<Space
-					direction='vertical'
-					size='large'
-					style={{ display: 'flex', margin: '32px 0 32px 0' }}
-				>
-					{recipients &&
-						recipients.length > 0 &&
-						recipients.map((recipient, index) => {
-							return (
-								<Card loading={dataLoad}>
-									<Row
-										wrap={false}
-										align='middle'
-										style={{ margin: '0 0 16px 0' }}
-									>
-										<Col flex='auto'>
-											<Space direction='vertical' size={2}>
-												<Title level={5} style={{ margin: '0 0 0 0' }}>
-													Recipient
-												</Title>
-											</Space>
-										</Col>
-										<Col flex='46px'>
-											<Tooltip title='Internal recipient.'>
-												<div>
-													<Switch
-														checkedChildren={<FontAwesomeIcon icon={faCheck} />}
-														unCheckedChildren={
-															<FontAwesomeIcon icon={faHouseUser} />
-														}
-													/>
-												</div>
-											</Tooltip>
-										</Col>
-									</Row>
-									<Row wrap={false} style={{ margin: '16px 0' }}>
-										<Col flex='auto'>
-											<Input
-												id={`FullName`}
-												placeholder="Recipient's full name"
-												value={recipient.fullname}
-												onChange={(e: any) => handleChange(e, index)}
-											/>
-										</Col>
-										<Col flex='8px' />
-										<Col flex='auto'>
-											<Input
-												id={`Email`}
-												placeholder="Recipient's email"
-												value={recipient.email}
-												onChange={(e: any) => handleChange(e, index)}
-											/>
-										</Col>
-									</Row>
-									<Row wrap={false} style={{ margin: '16px 0' }}>
-										<Col flex='auto'>
-											<Input
-												id={`CustomMessage`}
-												placeholder='Private note; leave empty for the default message'
-												value={recipient.customMessage}
-												onChange={(e: any) => handleChange(e, index)}
-											/>
-										</Col>
-										{/* <Col flex='8px' />
-										<Col>
-											<Tooltip title='Set signing order.'>
-												<div>
-													<InputNumber
-														min={1}
-														max={10}
-														style={{ width: '56px' }}
-														value={recipient.position}
-														onChange={(e: any) =>
-															handleChangePosition(e, index)
-														}
-													/>
-												</div>
-											</Tooltip>
-										</Col> */}
-									</Row>
-									<Row wrap={false} style={{ margin: '16px 0 0 0' }}>
-										<Col>
-											<Spin spinning={false}>
-												<Tooltip title="Set what recipient needs to do with the document or lock so they can't open it.">
-													<div>
-														<Segmented
-															id={`Segmented${index}`}
-															value={recipient.action}
-															options={options}
-															onChange={(e: any) => handleClick(e, index)}
-														/>
-													</div>
-												</Tooltip>
-											</Spin>
-										</Col>
-										<Col flex='auto'></Col>
-										{recipient.shareLink && ( 
-											<>
-												<Col flex='32px'>
-													<Tooltip title='Send personal request.'>
-														<div>
-															<Button
-																type='text'
-																icon={<FontAwesomeIcon icon={faPaperPlane} />}
-																onClick={(e: any) => handleSendOne(index)}
-															/>
-														</div>
-													</Tooltip>
-												</Col>
-												<Col flex='32px'>
-													<CopyToClipboard
-														text={`${SHARE_URL}/sharing/${recipient.shareLink}`}
-														children={
-															<Tooltip title='Copy sharing link.'>
-																<div>
-																	<Button
-																		type='text'
-																		icon={<FontAwesomeIcon icon={faLink} />}
-																		onClick={handleCopyShareLink}
-																	/>
-																</div>
-															</Tooltip>
-														}
-													/>
-												</Col>
-												{!recipient.isDone && (
-													<Col flex='32px'>
-														<Tooltip title='Delete recipient.'>
-															<div>
-																<Button
-																	type='text'
-																	icon={<FontAwesomeIcon icon={faTrash} />}
-																	onClick={() => handleDelete(index)}
-																/>
-															</div>
-														</Tooltip>
-													</Col>
-												)}
-											</>
-										)}
-									</Row>
-								</Card>
-							);
-						})}
-					<Button loading={dataLoad} type='dashed' block onClick={handleInsert}>
-						Add recipient
-					</Button>
-				</Space>
-			)}
+			<RecipientContent
+				load={load}
+				handleChangeLoad={(type: string) => {
+					switch (type) {
+						case 'send':
+							setSendLoad(false);
+							break;
+						default:
+							break;
+					}
+				}}
+				handleCancel={handleCancel}
+				handleClick={handleClick}
+				handleChange={handleChange}
+				handleDelete={handleDelete}
+				handleInsert={handleInsert}
+				recipients={recipients}
+			/>
 		</Modal>
 	);
 };

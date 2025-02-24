@@ -1,3 +1,3 @@
-import { SendModal } from './send-modal';
+import { RecipientModal } from './recipient-modal';
 
-export { SendModal };
+export { RecipientModal };

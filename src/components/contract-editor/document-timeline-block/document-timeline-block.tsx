@@ -26,6 +26,7 @@ export const DocumentTimilineBlock = () => {
 		continueLoad,
 		setContractEvents,
 		setNotification,
+		setEventStatus,
 	} = useContractEditorContext();
 	const [timelines, setTimelines] = useState<TimelineItemProps[]>([]);
 	const { Title, Text } = Typography;
@@ -47,6 +48,7 @@ export const DocumentTimilineBlock = () => {
 				.then((payload: any) => {
 					//console.log('getEventStatus read', payload);
 					eventStatusTmp = payload.data;
+					setEventStatus(payload.data);
 				})
 				.catch((error) => {
 					setNotification({

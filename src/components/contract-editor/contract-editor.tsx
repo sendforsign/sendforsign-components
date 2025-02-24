@@ -11,11 +11,17 @@ import {
 	ContractSteps,
 } from '../../config/enum';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
-import { ContractSign, PagePlaceholder, Placeholder } from '../../config/types';
+import {
+	ContractSign,
+	EventStatus,
+	PagePlaceholder,
+	Placeholder,
+	Recipient,
+} from '../../config/types';
 import { ContractEditorContext } from './contract-editor-context';
 import { ApproveModal } from './approve-modal/approve-modal';
 import { SignModal } from './sign-modal/sign-modal';
-import { SendModal } from './send-modal/send-modal';
+import { RecipientModal } from './send-modal/recipient-modal';
 import { ResultModal } from './result-modal/result-modal';
 import { HtmlBlock } from './html-block/html-block';
 import { Notification } from './notification/notification';
@@ -30,7 +36,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { delColorFromHtml, removeAilineTags } from '../../utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy, faInfo, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 export interface StepChangeProps {
 	currentStep?: ContractSteps;
@@ -86,6 +92,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [continueDisable, setContinueDisable] = useState(true);
 	const [editorVisible, setEditorVisible] = useState(false);
 	const [fillPlaceholder, setFillPlaceholder] = useState(false);
+	const [fillRecipient, setFillRecipient] = useState(false);
 	const [contractType, setContractType] = useState('');
 	const [templateKey, setTemplateKey] = useState('');
 	const [spinLoad, setSpinLoad] = useState(false);
@@ -98,6 +105,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [fillPlaceholderLoad, setFillPlaceholderLoad] = useState(false);
 	const [createContract, setCreateContract] = useState(false);
 	const [readonly, setReadonly] = useState(false);
+	const [fullySigned, setFullySigned] = useState(false);
 	const [pdfDownload, setPdfDownload] = useState(false);
 	const [load, setLoad] = useState(false);
 	const [ready, setReady] = useState(false);
@@ -116,9 +124,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [refreshPagePlaceholders, setRefreshPagePlaceholders] = useState<
 		string[]
 	>([]);
-
+	const [eventStatus, setEventStatus] = useState<EventStatus[]>([]);
 	const [signCount, setSignCount] = useState(0);
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
+	const [recipientFilling, setRecipientFilling] = useState<Recipient[]>([]);
 	const [placeholderPdf, setPlaceholderPdf] = useState<Placeholder>({});
 	const [placeholderChange, setPlaceholderChange] = useState<Placeholder>({});
 	const [placeholderDelete, setPlaceholderDelete] = useState<string>('');
@@ -175,6 +184,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 		let isMounted = true;
 		async function getContract() {
 			let contractTmp: {
+				status?: string;
 				contractType?: number;
 				value?: string;
 				name?: string;
@@ -219,6 +229,11 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					});
 				});
 			setContractName(contractTmp.name ? contractTmp.name : '');
+			setFullySigned(
+				contractTmp.status && contractTmp.status.toLowerCase().includes('fully')
+					? true
+					: false
+			);
 			if (beforeCreated) {
 				setContractType(
 					contractTmp.contractType ? contractTmp.contractType.toString() : ''
@@ -345,6 +360,17 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 										};
 									})
 							: undefined,
+						recipients: fillRecipient
+							? recipientFilling.map((recipient) => {
+									return {
+										action: recipient.action,
+										customMessage: recipient.customMessage,
+										fullname: recipient.fullname,
+										email: recipient.email,
+										position: recipient.id,
+									};
+							  })
+							: undefined,
 					},
 				};
 			} else {
@@ -369,6 +395,18 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 										};
 									})
 							: undefined,
+
+						recipients: fillRecipient
+							? recipientFilling.map((recipient) => {
+									return {
+										action: recipient.action,
+										customMessage: recipient.customMessage,
+										fullname: recipient.fullname,
+										email: recipient.email,
+										position: recipient.id,
+									};
+							  })
+							: undefined,
 						returnValue: fillPlaceholder ? true : undefined,
 					},
 				};
@@ -384,6 +422,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 						'x-sendforsign-key':
 							!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
 						Authorization: currToken ? `Bearer ${currToken}` : undefined,
+						'x-sendforsign-component': true,
 					},
 					responseType: 'json',
 				})
@@ -531,6 +570,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					setRefreshPlaceholders,
 					placeholder,
 					setPlaceholder,
+					recipientFilling,
+					setRecipientFilling,
 					placeholderPdf,
 					setPlaceholderPdf,
 					placeholderVisible,
@@ -567,6 +608,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					setContractEvents,
 					fillPlaceholder,
 					setFillPlaceholder,
+					fillRecipient,
+					setFillRecipient,
 					currentData,
 					setCurrentData,
 					documentCurrentSaved,
@@ -591,6 +634,10 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					setRefreshOnlyPlaceholders,
 					refreshPagePlaceholders,
 					setRefreshPagePlaceholders,
+					fullySigned,
+					setFullySigned,
+					eventStatus,
+					setEventStatus,
 				}}
 			>
 				{spinLoad ? (
@@ -631,13 +678,45 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 																	>
 																		Review your document
 																	</Title>
-																	<Popover content={
-																		<Space direction='vertical'>
-																			<Text type='secondary'>Contract Key: {contractKey}</Text>
-																			<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d'/>} onClick={() => navigator.clipboard.writeText(contractKey)}>Copy</Button>
-																		</Space>
-																	} title={contractName} trigger="click">
-																		<Button size='small' type='text' icon={<FontAwesomeIcon icon={faInfoCircle} size='sm' color='#5d5d5d'/>}></Button>
+																	<Popover
+																		content={
+																			<Space direction='vertical'>
+																				<Text type='secondary'>
+																					Contract Key: {contractKey}
+																				</Text>
+																				<Button
+																					size='small'
+																					icon={
+																						<FontAwesomeIcon
+																							icon={faCopy}
+																							size='sm'
+																							color='#5d5d5d'
+																						/>
+																					}
+																					onClick={() =>
+																						navigator.clipboard.writeText(
+																							contractKey
+																						)
+																					}
+																				>
+																					Copy
+																				</Button>
+																			</Space>
+																		}
+																		title={contractName}
+																		trigger='click'
+																	>
+																		<Button
+																			size='small'
+																			type='text'
+																			icon={
+																				<FontAwesomeIcon
+																					icon={faInfoCircle}
+																					size='sm'
+																					color='#5d5d5d'
+																				/>
+																			}
+																		></Button>
 																	</Popover>
 																</Space>
 																{!isPdf && (
@@ -721,7 +800,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					</Space>
 				)}
 				<SignModal />
-				<SendModal />
+				<RecipientModal />
 				<ApproveModal />
 				<ResultModal />
 				<Notification />

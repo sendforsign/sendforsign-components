@@ -1,15 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-	Space,
-	Card,
-	Typography,
-	Button,
-	Tag,
-	Input,
-	Steps,
-	theme,
-	Tooltip,
-} from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Space, Card, Typography, Button, Tag } from 'antd';
 import axios from 'axios';
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented';
 import { useContractEditorContext } from '../contract-editor-context';
@@ -21,13 +11,11 @@ import {
 	ApiEntity,
 	ContractSteps,
 	ContractTypeText,
-	PlaceholderFill,
 } from '../../../config/enum';
 import { BASE_URL } from '../../../config/config';
 import { docx2html } from '../../../utils';
-import { Placeholder, Template } from '../../../config/types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHatWizard } from '@fortawesome/free-solid-svg-icons';
+import { Template } from '../../../config/types';
+import { FieldsBlock } from './fields-block';
 
 type Props = {
 	allowPdf: boolean;
@@ -37,26 +25,19 @@ type Props = {
 export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 	const {
 		apiKey,
-		continueDisable,
-		setContinueDisable,
 		clientKey,
 		userKey,
-		placeholder,
 		token: currToken,
 		setIsPdf,
 		setCreateContract,
 		contractName,
 		setContractValue,
-		setContractName,
 		setContractType,
-		setPlaceholder,
 		contractType,
 		setTemplateKey,
 		templateKey,
-		continueLoad,
 		setPdfDownload,
 		beforeCreated,
-		setFillPlaceholder,
 		setCurrentData,
 		setNotification,
 		load,
@@ -64,7 +45,7 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 	} = useContractEditorContext();
 	const { Title, Text } = Typography;
 	const [options, setOptions] = useState<SegmentedLabeledOption[]>([]);
-	const currPlaceholder = useRef(placeholder);
+
 	const [createDisable, setCreateDisable] = useState(true);
 	const [fieldBlockVisible, setFieldBlockVisible] = useState(false);
 	const [aiBlockVisible, setAiBlockVisible] = useState(false);
@@ -73,17 +54,7 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 	const [segmentedValue, setSegmentedValue] = useState('');
 	const [btnName, setBtnName] = useState('Create document');
 	const [pdfFileLoad, setPdfFileLoad] = useState(0);
-	const [steps, setSteps] = useState<
-		{ key: string; name: string; value: string }[]
-	>([]);
-	const { token } = theme.useToken();
-	const [current, setCurrent] = useState(0);
-	const [items, setItems] = useState<
-		{
-			key: string;
-			title: string;
-		}[]
-	>([]);
+
 	const { setArrayBuffer } = useSaveArrayBuffer();
 	useEffect(() => {
 		let isMounted = true;
@@ -414,38 +385,10 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 		}
 	};
 
-	const handleContinue = async () => {
+	const handleContinue = () => {
 		setCreateContract(true);
 	};
-	const handleChange = (e: any, placeholderKey: string) => {
-		let stepsTmp: { key: string; name: string; value: string }[] = [...steps];
-		switch (e.target.id) {
-			case 'ContractName':
-				setContractName(e.target.value);
-				if (stepsTmp.length > 0 && stepsTmp[0]) {
-					stepsTmp[0].value = e.target.value;
-				}
-				if (e.target.value) {
-					setContinueDisable(false);
-				} else {
-					setContinueDisable(true);
-				}
-				break;
-			default:
-				const index = currPlaceholder.current.findIndex(
-					(holder) => holder.placeholderKey === placeholderKey
-				);
-				currPlaceholder.current[index].value = e.target.value;
-				const stepIndex = stepsTmp.findIndex(
-					(step) => step.key === placeholderKey
-				);
-				stepsTmp[stepIndex].value = currPlaceholder.current[index]
-					.value as string;
-				setPlaceholder(currPlaceholder.current);
-				break;
-		}
-		setSteps(stepsTmp);
-	};
+
 	const handleChoose = async (e: any) => {
 		// debugger;
 		let contractTypeTmp = e.toString().split('_');
@@ -471,101 +414,6 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 		setLoad(false);
 		setSegmentedValue(e);
 		setCreateDisable(false);
-	};
-
-	useEffect(() => {
-		const getPlaceholder = async () => {
-			// debugger;
-			const body = {
-				data: {
-					action: Action.LIST,
-					clientKey: !currToken ? clientKey : undefined,
-					templateKey: templateKey,
-				},
-			};
-			await axios
-				.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-					headers: {
-						Accept: 'application/vnd.api+json',
-						'Content-Type': 'application/vnd.api+json',
-						'x-sendforsign-key': !currToken && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-						Authorization: currToken ? `Bearer ${currToken}` : undefined,
-					},
-					responseType: 'json',
-				})
-				.then((payload: any) => {
-					//console.log('getPlaceholders read', payload);
-					let stepsTmp: { key: string; name: string; value: string }[] = [];
-					stepsTmp.push({
-						key: 'ContractName',
-						name: 'What is the name of your document?',
-						value: contractName,
-					});
-					if (
-						payload.data.placeholders &&
-						payload.data.placeholders.length > 0
-					) {
-						let placeholderTmp: Placeholder[] = [];
-						for (
-							let index = 0;
-							index < payload.data.placeholders.length;
-							index++
-						) {
-							placeholderTmp.push(payload.data.placeholders[index]);
-						}
-
-						setPlaceholder(placeholderTmp);
-						currPlaceholder.current = placeholderTmp;
-						// debugger;
-
-						placeholderTmp
-							?.filter(
-								(holder) =>
-									holder.fillingType?.toString() ===
-									PlaceholderFill.CREATOR.toString()
-							)
-							.forEach((holder) => {
-								setFillPlaceholder(true);
-								stepsTmp.push({
-									key: holder.placeholderKey as string,
-									name: holder.name as string,
-									value: holder.value as string,
-								});
-							});
-					}
-					setItems(
-						stepsTmp.map((step) => {
-							return { key: step.key, title: '' };
-						})
-					);
-					setSteps(stepsTmp);
-					setLoad(false);
-					setFieldBlockVisible(true);
-					setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
-					setCreateDisable(true);
-				})
-				.catch((error) => {
-					setNotification({
-						text:
-							error.response &&
-							error.response.data &&
-							error.response.data.message
-								? error.response.data.message
-								: error.message,
-					});
-				});
-		};
-		if (chooseTemplate) {
-			getPlaceholder();
-		}
-	}, [chooseTemplate]);
-
-	const next = () => {
-		setCurrent(current + 1);
-	};
-
-	const prev = () => {
-		setCurrent(current - 1);
 	};
 
 	return (
@@ -618,103 +466,10 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 				</Space>
 			)}
 			{fieldBlockVisible && (
-				<Card bordered={true}>
-					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
-						<Space direction='vertical' size={2}>
-							<Title level={4} style={{ margin: '0' }}>
-								Answer the questions below to create your document
-							</Title>
-						</Space>
-						{steps.length > 1 ? (
-							<>
-								<Steps current={current} items={items} size='small' />
-								<Card
-									style={{
-										marginTop: 16,
-										textAlign: 'center',
-										color: token.colorTextTertiary,
-										backgroundColor: token.colorFillAlter,
-										borderRadius: token.borderRadiusLG,
-									}}
-								>
-									<Space direction='vertical' style={{ display: 'flex' }}>
-										<Title level={5} style={{ margin: '0' }}>
-											{steps[current].name}
-										</Title>
-										<Text type='secondary'>
-											Enter the value in the field below.
-										</Text>
-										<Input
-											id={steps[current].key}
-											placeholder={`Type here`}
-											value={steps[current].value}
-											onChange={(e) => handleChange(e, steps[current].key)}
-										/>
-									</Space>
-								</Card>
-								<div style={{ marginTop: 24 }}>
-									{current > 0 && (
-										<Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-											Previous
-										</Button>
-									)}
-									{current < steps.length - 1 && (
-										<Button
-											type='primary'
-											disabled={continueDisable}
-											onClick={() => next()}
-										>
-											Next
-										</Button>
-									)}
-									{current === steps.length - 1 && (
-										<Button
-											type='primary'
-											onClick={handleContinue}
-											loading={continueLoad}
-										>
-											Done
-										</Button>
-									)}
-								</div>
-							</>
-						) : (
-							<>
-								<Card
-									style={{
-										marginTop: 16,
-										textAlign: 'center',
-										color: token.colorTextTertiary,
-										backgroundColor: token.colorFillAlter,
-										borderRadius: token.borderRadiusLG,
-									}}
-								>
-									<Space direction='vertical' style={{ display: 'flex' }}>
-										<Title level={5} style={{ margin: '0' }}>
-											What is the name of your document?
-										</Title>
-										<Text type='secondary'>
-											Enter the value in the field below.
-										</Text>
-										<Input
-											id={'ContractName'}
-											placeholder='Type here'
-											value={contractName}
-											onChange={(e) => handleChange(e, 'ContractName')}
-										/>
-									</Space>
-								</Card>
-								<Button
-									type='primary'
-									onClick={handleContinue}
-									loading={continueLoad}
-								>
-									Done
-								</Button>
-							</>
-						)}
-					</Space>
-				</Card>
+				<FieldsBlock
+					handleContinue={handleContinue}
+					templateKey={templateKey}
+				/>
 			)}
 		</Space>
 	);

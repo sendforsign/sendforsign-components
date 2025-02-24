@@ -39,7 +39,12 @@ import {
 	faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { parseDate } from 'pdf-lib';
-import { changeValueInTag, getIcon } from '../../../utils';
+import {
+	changeValueInTag,
+	getIcon,
+	removeAilineTags,
+	wrapTextNodes,
+} from '../../../utils';
 
 type Props = {
 	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
@@ -250,6 +255,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 								action: recipient.action,
 								recipientKey: recipient.recipientKey,
 								color: recipient.color,
+								type: recipient.type,
 							};
 						}
 					);
@@ -586,9 +592,13 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 
 			const maxPlaceholderId =
 				Math.max(...placeholder.map((ph) => ph.id || 0)) + 1;
+			// let content = removeAilineTags(
+			// 	quillRef?.current?.root.innerHTML as string
+			// );
+			// quillRef?.current?.clipboard.dangerouslyPasteHTML(content, 'silent');
 
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(
-				position ? position?.index : 0,
+				position ? position.index : 0,
 				`<placeholder${
 					holderInsert.id ? holderInsert.id : maxPlaceholderId
 				} className={placeholderClass${
@@ -604,6 +614,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 					holderInsert.fillingType === PlaceholderFill.CREATOR ? true : false,
 				recipientKey: holderInsert.externalRecipientKey,
 			});
+			// wrapTextNodes(quillRef?.current?.root.innerHTML as string);
 		} else {
 			let tag = '';
 			switch (holderInsert.specialType) {
@@ -1062,13 +1073,36 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 															Delete
 														</Button>
 														<Divider style={{ margin: 0 }} />
-														<Popover content={
-															<Space direction='vertical'>
-																<Text type='secondary'>Placeholder Key: {holder.placeholderKey}</Text>
-																<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d'/>} onClick={() => navigator.clipboard.writeText(holder.placeholderKey || 'N/A')}>Copy</Button>
-															</Space>
-														} trigger="click">
-															<Button size='small'>{holder.placeholderKey}</Button>
+														<Popover
+															content={
+																<Space direction='vertical'>
+																	<Text type='secondary'>
+																		Placeholder Key: {holder.placeholderKey}
+																	</Text>
+																	<Button
+																		size='small'
+																		icon={
+																			<FontAwesomeIcon
+																				icon={faCopy}
+																				size='sm'
+																				color='#5d5d5d'
+																			/>
+																		}
+																		onClick={() =>
+																			navigator.clipboard.writeText(
+																				holder.placeholderKey || 'N/A'
+																			)
+																		}
+																	>
+																		Copy
+																	</Button>
+																</Space>
+															}
+															trigger='click'
+														>
+															<Button size='small'>
+																{holder.placeholderKey}
+															</Button>
 														</Popover>
 													</Space>
 												}
@@ -1092,13 +1126,36 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 														direction='vertical'
 														style={{ display: 'flex' }}
 													>
-														<Popover content={
-															<Space direction='vertical'>
-																<Text type='secondary'>Placeholder Key: {holder.placeholderKey}</Text>
-																<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d'/>} onClick={() => navigator.clipboard.writeText(holder.placeholderKey || 'N/A')}>Copy</Button>
-															</Space>
-														} trigger="click">
-															<Button size='small'>{holder.placeholderKey}</Button>
+														<Popover
+															content={
+																<Space direction='vertical'>
+																	<Text type='secondary'>
+																		Placeholder Key: {holder.placeholderKey}
+																	</Text>
+																	<Button
+																		size='small'
+																		icon={
+																			<FontAwesomeIcon
+																				icon={faCopy}
+																				size='sm'
+																				color='#5d5d5d'
+																			/>
+																		}
+																		onClick={() =>
+																			navigator.clipboard.writeText(
+																				holder.placeholderKey || 'N/A'
+																			)
+																		}
+																	>
+																		Copy
+																	</Button>
+																</Space>
+															}
+															trigger='click'
+														>
+															<Button size='small'>
+																{holder.placeholderKey}
+															</Button>
 														</Popover>
 													</Space>
 												}

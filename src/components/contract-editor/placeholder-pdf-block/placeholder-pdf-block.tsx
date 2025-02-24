@@ -95,7 +95,7 @@ export const PlaceholderPdfBlock = () => {
 		};
 		await axios
 			.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-			// .post('http://localhost:5000/api/' + ApiEntity.PLACEHOLDER, body, {
+				// .post('http://localhost:5000/api/' + ApiEntity.PLACEHOLDER, body, {
 				headers: {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
@@ -216,6 +216,7 @@ export const PlaceholderPdfBlock = () => {
 								action: recipient.action,
 								recipientKey: recipient.recipientKey,
 								color: recipient.color,
+								type: recipient.type,
 							};
 						}
 					);
