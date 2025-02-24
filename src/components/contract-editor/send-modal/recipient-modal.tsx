@@ -552,6 +552,7 @@ export const RecipientModal = () => {
 			}
 		>
 			<RecipientContent
+				isModal={true}
 				load={load}
 				handleChangeLoad={(type: string) => {
 					switch (type) {

@@ -381,6 +381,7 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 				} else {
 					setChooseTemplate(chooseTemplate + 1);
 				}
+				setLoad(false);
 			}
 		}
 	};

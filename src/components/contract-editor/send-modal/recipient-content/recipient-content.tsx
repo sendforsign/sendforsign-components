@@ -36,6 +36,7 @@ import { Recipient } from '../../../../config/types';
 import axios from 'axios';
 
 type Props = {
+	isModal: boolean;
 	load: boolean;
 	recipients: Recipient[];
 	handleInsert: () => void;
@@ -47,6 +48,7 @@ type Props = {
 };
 
 export const RecipientContent = ({
+	isModal = true,
 	load,
 	recipients,
 	handleCancel,
@@ -156,7 +158,7 @@ export const RecipientContent = ({
 			if (eventStatus && eventStatus.length === 0) {
 				getEventStatus();
 			}
-			if (!defaultData.email) {
+			if (!defaultData.email && !defaultData.fullname) {
 				getClientInfo();
 			}
 		}
@@ -399,32 +401,18 @@ export const RecipientContent = ({
 											/>
 										</Col>
 									</Row>
-									<Row wrap={false} style={{ margin: '16px 0' }}>
-										<Col flex='auto'>
-											<Input
-												id={`CustomMessage`}
-												placeholder='Private note; leave empty for the default message'
-												value={recipient.customMessage}
-												onChange={(e: any) => handleChange(e, index)}
-											/>
-										</Col>
-										{/* <Col flex='8px' />
-										<Col>
-											<Tooltip title='Set signing order.'>
-												<div>
-													<InputNumber
-														min={1}
-														max={10}
-														style={{ width: '56px' }}
-														value={recipient.position}
-														onChange={(e: any) =>
-															handleChangePosition(e, index)
-														}
-													/>
-												</div>
-											</Tooltip>
-										</Col> */}
-									</Row>
+									{isModal && (
+										<Row wrap={false} style={{ margin: '16px 0' }}>
+											<Col flex='auto'>
+												<Input
+													id={`CustomMessage`}
+													placeholder='Private note; leave empty for the default message'
+													value={recipient.customMessage}
+													onChange={(e: any) => handleChange(e, index)}
+												/>
+											</Col>
+										</Row>
+									)}
 									<Row wrap={false} style={{ margin: '16px 0 0 0' }}>
 										<Col>
 											<Spin spinning={false}>
@@ -491,21 +479,22 @@ export const RecipientContent = ({
 														}
 													/>
 												</Col>
-												{!recipient.isDone && handleDelete && (
-													<Col flex='32px'>
-														<Tooltip title='Delete recipient.'>
-															<div>
-																<Button
-																	type='text'
-																	icon={<FontAwesomeIcon icon={faTrash} />}
-																	onClick={() => handleDelete(index)}
-																/>
-															</div>
-														</Tooltip>
-													</Col>
-												)}
 											</>
 										)}
+										{(!isModal || (isModal && !recipient.isDone)) &&
+											handleDelete && (
+												<Col flex='32px'>
+													<Tooltip title='Delete recipient.'>
+														<div>
+															<Button
+																type='text'
+																icon={<FontAwesomeIcon icon={faTrash} />}
+																onClick={() => handleDelete(index)}
+															/>
+														</div>
+													</Tooltip>
+												</Col>
+											)}
 									</Row>
 								</Card>
 							);

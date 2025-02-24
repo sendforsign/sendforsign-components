@@ -282,6 +282,13 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 		setInsertRecipient(insertRecipient);
 	};
 
+	const handleDeleteRecipient = (index: number) => {
+		let recipientsTmp = [...recipients];
+
+		recipientsTmp.splice(index, 1);
+		setRecipients(recipientsTmp);
+	};
+
 	const handleSaveRecipients = async () => {
 		if (insertRecipient.length > 0) {
 			let insertTmp: Recipient[] = [];
@@ -342,10 +349,12 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 						<Steps current={current} items={items} size='small' />
 						{steps[current].key === 'Recipients' ? (
 							<RecipientContent
-								load={false}
+								isModal={false}
+								load={true}
 								handleClick={handleClickRecipient}
 								handleChange={handleChangeRecipient}
 								handleInsert={handleInsertRecipient}
+								handleDelete={handleDeleteRecipient}
 								recipients={recipients}
 							/>
 						) : (
