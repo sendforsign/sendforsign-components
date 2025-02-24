@@ -481,20 +481,19 @@ export const RecipientContent = ({
 												</Col>
 											</>
 										)}
-										{(!isModal || (isModal && !recipient.isDone)) &&
-											handleDelete && (
-												<Col flex='32px'>
-													<Tooltip title='Delete recipient.'>
-														<div>
-															<Button
-																type='text'
-																icon={<FontAwesomeIcon icon={faTrash} />}
-																onClick={() => handleDelete(index)}
-															/>
-														</div>
-													</Tooltip>
-												</Col>
-											)}
+										{!recipient.isDone && handleDelete && (
+											<Col flex='32px'>
+												<Tooltip title='Delete recipient.'>
+													<div>
+														<Button
+															type='text'
+															icon={<FontAwesomeIcon icon={faTrash} />}
+															onClick={() => handleDelete(index)}
+														/>
+													</div>
+												</Tooltip>
+											</Col>
+										)}
 									</Row>
 								</Card>
 							);
