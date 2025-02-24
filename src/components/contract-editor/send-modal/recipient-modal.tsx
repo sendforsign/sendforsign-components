@@ -348,6 +348,7 @@ export const RecipientModal = () => {
 					customMessage: recipients[0].customMessage,
 					position: recipients[0].position,
 					action: recipients[0].action,
+					type: recipients[0].type,
 					recipientKey: '',
 				});
 			}
@@ -417,7 +418,7 @@ export const RecipientModal = () => {
 							customMessage: recipients[0].customMessage,
 							position: recipients[0].position,
 							type: recipients[0].type,
-							action: recipients[0].action,
+							action: recipients[0].action,							
 							recipientKey: '',
 						},
 					],

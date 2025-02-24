@@ -368,6 +368,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 										fullname: recipient.fullname,
 										email: recipient.email,
 										position: recipient.id,
+										type: recipient.type,
 									};
 							  })
 							: undefined,
@@ -404,6 +405,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 										fullname: recipient.fullname,
 										email: recipient.email,
 										position: recipient.id,
+										type: recipient.type,
 									};
 							  })
 							: undefined,

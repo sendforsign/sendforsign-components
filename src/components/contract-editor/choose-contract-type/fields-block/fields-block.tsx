@@ -8,6 +8,7 @@ import {
 	Input,
 	Steps,
 	theme,
+	Spin,
 } from 'antd';
 import axios from 'axios';
 import { useContractEditorContext } from '../../contract-editor-context';
@@ -45,6 +46,7 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 		setFillRecipient,
 		setCurrentData,
 		setNotification,
+		load,
 		setLoad,
 	} = useContractEditorContext();
 	const { Title, Text } = Typography;
@@ -53,6 +55,8 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 		{ key: string; name: string; value: string }[]
 	>([]);
 	const [insertRecipient, setInsertRecipient] = useState<Recipient[]>([]);
+	const [loadData, setLoadData] = useState(true);
+	const [loadCard, setLoadCard] = useState(true);
 	const [recipients, setRecipients] = useState<Recipient[]>([
 		{
 			id: 0,
@@ -103,31 +107,6 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 		}
 		setSteps(stepsTmp);
 	};
-
-	useEffect(() => {
-		setSteps([
-			{
-				key: 'ContractName',
-				name: 'What is the name of your document?',
-				value: contractName,
-			},
-			{
-				key: 'Recipients',
-				name: 'who are your recipients?',
-				value: '',
-			},
-		]);
-		setItems([
-			{
-				key: 'ContractName',
-				title: '',
-			},
-			{
-				key: 'Recipients',
-				title: '',
-			},
-		]);
-	}, []);
 
 	useEffect(() => {
 		const getPlaceholder = async () => {
@@ -201,6 +180,7 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 					);
 					setSteps(stepsTmp);
 					setLoad(false);
+					setLoadCard(false);
 					// setFieldBlockVisible(true);
 					setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
 					// setCreateDisable(true);
@@ -218,8 +198,32 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 		};
 		if (templateKey) {
 			getPlaceholder();
+		} else {
+			setSteps([
+				{
+					key: 'ContractName',
+					name: 'What is the name of your document?',
+					value: contractName,
+				},
+				{
+					key: 'Recipients',
+					name: 'who are your recipients?',
+					value: '',
+				},
+			]);
+			setItems([
+				{
+					key: 'ContractName',
+					title: '',
+				},
+				{
+					key: 'Recipients',
+					title: '',
+				},
+			]);
+			setLoadCard(false);
 		}
-	}, [templateKey]);
+	}, []);
 
 	const next = () => {
 		setCurrent(current + 1);
@@ -268,6 +272,7 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 			fullname: '',
 			email: '',
 			customMessage: '',
+			type: RecipientType.EXTERNAL,
 		});
 		setRecipients(recipientsTmp);
 		insertRecipient.push({
@@ -278,6 +283,7 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 			fullname: '',
 			email: '',
 			customMessage: '',
+			type: RecipientType.EXTERNAL,
 		});
 		setInsertRecipient(insertRecipient);
 	};
@@ -300,6 +306,7 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 					customMessage: recipients[0].customMessage,
 					position: recipients[0].position,
 					action: recipients[0].action,
+					type: recipients[0].type,
 					recipientKey: '',
 				});
 			}
@@ -344,20 +351,89 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 						Answer the questions below to create your document
 					</Title>
 				</Space>
-				{steps.length > 1 ? (
-					<>
-						<Steps current={current} items={items} size='small' />
-						{steps[current].key === 'Recipients' ? (
-							<RecipientContent
-								isModal={false}
-								load={true}
-								handleClick={handleClickRecipient}
-								handleChange={handleChangeRecipient}
-								handleInsert={handleInsertRecipient}
-								handleDelete={handleDeleteRecipient}
-								recipients={recipients}
-							/>
-						) : (
+				<Spin spinning={loadCard}>
+					{steps.length > 1 ? (
+						<>
+							<Steps current={current} items={items} size='small' />
+							{steps[current].key === 'Recipients' ? (
+								<RecipientContent
+									isModal={false}
+									load={loadData}
+									handleClick={handleClickRecipient}
+									handleChange={handleChangeRecipient}
+									handleInsert={handleInsertRecipient}
+									handleDelete={handleDeleteRecipient}
+									handleChangeLoad={(type: string) => {
+										switch (type) {
+											case 'data':
+												setLoadData(false);
+												break;
+
+											default:
+												break;
+										}
+									}}
+									recipients={recipients}
+								/>
+							) : (
+								<Card
+									style={{
+										marginTop: 16,
+										textAlign: 'center',
+										color: token.colorTextTertiary,
+										backgroundColor: token.colorFillAlter,
+										borderRadius: token.borderRadiusLG,
+									}}
+								>
+									<Space direction='vertical' style={{ display: 'flex' }}>
+										<Title level={5} style={{ margin: '0' }}>
+											{steps[current].name}
+										</Title>
+										<Text type='secondary'>
+											Enter the value in the field below.
+										</Text>
+										<Input
+											id={steps[current].key}
+											placeholder={`Type here`}
+											value={steps[current].value}
+											onChange={(e) => handleChange(e, steps[current].key)}
+										/>
+									</Space>
+								</Card>
+							)}
+							<div style={{ marginTop: 24 }}>
+								{current > 0 && (
+									<Button style={{ margin: '0 8px' }} onClick={() => prev()}>
+										Previous
+									</Button>
+								)}
+								{current < steps.length - 1 && (
+									<Button
+										type='primary'
+										disabled={continueDisable}
+										onClick={() => next()}
+									>
+										Next
+									</Button>
+								)}
+								{current === steps.length - 1 && (
+									<Button
+										type='primary'
+										onClick={async () => {
+											if (recipients[0].fullname && recipients[0].email) {
+												await handleSaveRecipients();
+											}
+											handleContinue();
+										}}
+										loading={continueLoad}
+									>
+										Done
+									</Button>
+								)}
+							</div>
+						</>
+					) : (
+						<>
 							<Card
 								style={{
 									marginTop: 16,
@@ -369,86 +445,29 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 							>
 								<Space direction='vertical' style={{ display: 'flex' }}>
 									<Title level={5} style={{ margin: '0' }}>
-										{steps[current].name}
+										What is the name of your document?
 									</Title>
 									<Text type='secondary'>
 										Enter the value in the field below.
 									</Text>
 									<Input
-										id={steps[current].key}
-										placeholder={`Type here`}
-										value={steps[current].value}
-										onChange={(e) => handleChange(e, steps[current].key)}
+										id={'ContractName'}
+										placeholder='Type here'
+										value={contractName}
+										onChange={(e) => handleChange(e, 'ContractName')}
 									/>
 								</Space>
 							</Card>
-						)}
-						<div style={{ marginTop: 24 }}>
-							{current > 0 && (
-								<Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-									Previous
-								</Button>
-							)}
-							{current < steps.length - 1 && (
-								<Button
-									type='primary'
-									disabled={continueDisable}
-									onClick={() => next()}
-								>
-									Next
-								</Button>
-							)}
-							{current === steps.length - 1 && (
-								<Button
-									type='primary'
-									onClick={async () => {
-										if (recipients[0].fullname && recipients[0].email) {
-											await handleSaveRecipients();
-										}
-										handleContinue();
-									}}
-									loading={continueLoad}
-								>
-									Done
-								</Button>
-							)}
-						</div>
-					</>
-				) : (
-					<>
-						<Card
-							style={{
-								marginTop: 16,
-								textAlign: 'center',
-								color: token.colorTextTertiary,
-								backgroundColor: token.colorFillAlter,
-								borderRadius: token.borderRadiusLG,
-							}}
-						>
-							<Space direction='vertical' style={{ display: 'flex' }}>
-								<Title level={5} style={{ margin: '0' }}>
-									What is the name of your document?
-								</Title>
-								<Text type='secondary'>
-									Enter the value in the field below.
-								</Text>
-								<Input
-									id={'ContractName'}
-									placeholder='Type here'
-									value={contractName}
-									onChange={(e) => handleChange(e, 'ContractName')}
-								/>
-							</Space>
-						</Card>
-						<Button
-							type='primary'
-							onClick={handleContinue}
-							loading={continueLoad}
-						>
-							Done
-						</Button>
-					</>
-				)}
+							<Button
+								type='primary'
+								onClick={handleContinue}
+								loading={continueLoad}
+							>
+								Done
+							</Button>
+						</>
+					)}
+				</Spin>
 			</Space>
 		</Card>
 	);

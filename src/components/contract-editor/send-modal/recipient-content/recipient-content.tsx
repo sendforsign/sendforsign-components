@@ -142,6 +142,10 @@ export const RecipientContent = ({
 						fullname: payload.data.client.fullname,
 						email: payload.data.client.email,
 					});
+
+					if (handleChangeLoad) {
+						handleChangeLoad('data');
+					}
 				})
 				.catch((error) => {
 					setNotification({
@@ -160,6 +164,10 @@ export const RecipientContent = ({
 			}
 			if (!defaultData.email && !defaultData.fullname) {
 				getClientInfo();
+			} else {
+				if (handleChangeLoad) {
+					handleChangeLoad('data');
+				}
 			}
 		}
 		return () => {
@@ -341,7 +349,10 @@ export const RecipientContent = ({
 												<div>
 													<Switch
 														id={`TypeSwitch`}
-														checked={recipient.type === RecipientType.INTERNAL}
+														checked={
+															recipient.type?.toString() ===
+															RecipientType.INTERNAL.toString()
+														}
 														disabled={recipient.isDone}
 														checkedChildren={<FontAwesomeIcon icon={faCheck} />}
 														unCheckedChildren={
