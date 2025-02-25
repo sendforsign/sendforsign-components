@@ -375,16 +375,17 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 			} else {
 				// debugger;
 				setContractValue(template.value as string);
-				if (beforeCreated && contractName) {
+				if (beforeCreated && contractName) { 
 					setCreateContract(true);
 				} else {
 					setChooseTemplate(chooseTemplate + 1);
+
+					setFieldBlockVisible(true);
+					setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
+					setCreateDisable(true);
+					setLoad(false);
 				}
 			}
-			setFieldBlockVisible(true);
-			setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
-			setCreateDisable(true);
-			setLoad(false);
 		}
 	};
 

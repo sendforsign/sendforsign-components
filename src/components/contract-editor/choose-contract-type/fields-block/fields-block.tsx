@@ -261,9 +261,12 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 	const handleInsertRecipient = () => {
 		// debugger;
 		let recipientsTmp = [...recipients];
-		let idTmp = recipientsTmp[recipientsTmp.length - 1].id
-			? (recipientsTmp[recipientsTmp.length - 1]?.id as number) + 1
-			: 1;
+		let idTmp =
+			recipientsTmp.length !== 0
+				? recipientsTmp[recipientsTmp.length - 1].id
+					? (recipientsTmp[recipientsTmp.length - 1]?.id as number) + 1
+					: 1
+				: 1;
 		recipientsTmp.push({
 			id: idTmp,
 			position: 1,
