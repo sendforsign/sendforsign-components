@@ -469,7 +469,6 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			}
 			contentTmp = tempDiv.innerHTML;
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(contentTmp, '');
-			quillRef?.current?.blur();
 
 			let body = {};
 			let changed = false;
