@@ -22,7 +22,7 @@ import {
 } from '../../../../config/enum';
 import { BASE_URL } from '../../../../config/config';
 import { Placeholder, Recipient } from '../../../../config/types';
-import { RecipientContent } from '../../send-modal/recipient-content';
+import { RecipientContent } from '../../recipient-modal/recipient-content';
 
 type Props = {
 	handleContinue: () => void;

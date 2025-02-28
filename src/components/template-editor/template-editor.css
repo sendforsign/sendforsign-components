@@ -81,6 +81,5 @@ table.quill-better-table td {
 [class^="placeholderClass"] {
   border-radius: 4px;
   border: 1px solid #d0e0c7;
-  color: black;
-  /* background: #8ae2f4; */
+  color: black; 
 }

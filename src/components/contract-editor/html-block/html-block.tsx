@@ -15,6 +15,7 @@ import {
 	ContractType,
 	PlaceholderColor,
 	PlaceholderView,
+	SpecialType,
 } from '../../../config/enum';
 import { addBlotClass, removeAilineTags, wrapTextNodes } from '../../../utils';
 
@@ -75,6 +76,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		setSignCount,
 		refreshPlaceholders,
 		placeholder,
+		setPlaceholder,
 		setLoad,
 		setRefreshPlaceholders,
 		setDocumentCurrentSaved,
@@ -251,15 +253,54 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					placeholder[index].view?.toString() !==
 					PlaceholderView.SIGNATURE.toString()
 				) {
-					const elements = document.getElementsByTagName(
-						`placeholder${placeholder[index].id}`
-					);
-					for (let i = 0; i < elements.length; i++) {
-						let element: any = elements[i];
-						element.style.background = placeholder[index].color
-							? placeholder[index].color
-							: PlaceholderColor.OTHER;
+					// const elements = document.getElementsByTagName(
+					// 	`placeholder${placeholder[index].id}`
+					// );
+					let tagClass = `placeholderClass${placeholder[index].id}`;
+					if (placeholder[index].specialType) {
+						switch (placeholder[index].specialType) {
+							case SpecialType.DATE:
+								// elements = document.getElementsByTagName(`date${id}`);
+								tagClass = `dateClass${placeholder[index].id}`;
+								break;
+
+							case SpecialType.FULLNAME:
+								// elements = document.getElementsByTagName(`fullname${id}`);
+								tagClass = `fullnameClass${placeholder[index].id}`;
+								break;
+
+							case SpecialType.EMAIL:
+								// elements = document.getElementsByTagName(`email${id}`);
+								tagClass = `emailClass${placeholder[index].id}`;
+								break;
+
+							case SpecialType.SIGN:
+								// elements = document.getElementsByTagName(`sign${id}`);
+								tagClass = `signClass${placeholder[index].id}`;
+								break;
+
+							case SpecialType.INITIALS:
+								// elements = document.getElementsByTagName(`initials${id}`);
+								tagClass = `initialsClass${placeholder[index].id}`;
+								break;
+						}
 					}
+
+					const styleSheet = document.styleSheets[0]; // Получаем первый стиль
+					styleSheet.insertRule(
+						`.${tagClass} { background-color: ${
+							placeholder[index].color
+								? placeholder[index].color
+								: PlaceholderColor.OTHER
+						} }`,
+						styleSheet.cssRules.length
+					);
+					// for (let i = 0; i < elements.length; i++) {
+					// 	let element: any = elements[i];
+					// 	element.style.background = placeholder[index].color
+					// 		? placeholder[index].color
+					// 		: PlaceholderColor.OTHER;
+					// }
 				}
 			}
 			placeholderClassFill.current = true;
@@ -289,6 +330,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						payload.data.placeholders &&
 						payload.data.placeholders.length > 0
 					) {
+						setPlaceholder(payload.data.placeholders);
 						for (
 							let index = 0;
 							index < payload.data.placeholders.length;
@@ -298,16 +340,54 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 								payload.data.placeholders[index].view.toString() !==
 								PlaceholderView.SIGNATURE.toString()
 							) {
-								const elements = document.getElementsByTagName(
-									`placeholder${payload.data.placeholders[index].id}`
-								);
-								for (let i = 0; i < elements.length; i++) {
-									let element: any = elements[i];
-									element.style.background = payload.data.placeholders[index]
-										.color
-										? payload.data.placeholders[index].color
-										: PlaceholderColor.OTHER;
+								// const elements = document.getElementsByTagName(
+								// 	`placeholder${payload.data.placeholders[index].id}`
+								// );
+								// for (let i = 0; i < elements.length; i++) {
+								// 	let element: any = elements[i];
+								// 	element.style.background = payload.data.placeholders[index]
+								// 		.color
+								// 		? payload.data.placeholders[index].color
+								// 		: PlaceholderColor.OTHER;
+								// }
+								let tagClass = `placeholderClass${payload.data.placeholders[index].id}`;
+								if (payload.data.placeholders[index].specialType) {
+									switch (payload.data.placeholders[index].specialType) {
+										case SpecialType.DATE:
+											// elements = document.getElementsByTagName(`date${id}`);
+											tagClass = `dateClass${payload.data.placeholders[index].id}`;
+											break;
+
+										case SpecialType.FULLNAME:
+											// elements = document.getElementsByTagName(`fullname${id}`);
+											tagClass = `fullnameClass${payload.data.placeholders[index].id}`;
+											break;
+
+										case SpecialType.EMAIL:
+											// elements = document.getElementsByTagName(`email${id}`);
+											tagClass = `emailClass${payload.data.placeholders[index].id}`;
+											break;
+
+										case SpecialType.SIGN:
+											// elements = document.getElementsByTagName(`sign${id}`);
+											tagClass = `signClass${payload.data.placeholders[index].id}`;
+											break;
+
+										case SpecialType.INITIALS:
+											// elements = document.getElementsByTagName(`initials${id}`);
+											tagClass = `initialsClass${payload.data.placeholders[index].id}`;
+											break;
+									}
 								}
+								const styleSheet = document.styleSheets[0]; // Получаем первый стиль
+								styleSheet.insertRule(
+									`.${tagClass} { background-color: ${
+										payload.data.placeholders[index].color
+											? payload.data.placeholders[index].color
+											: PlaceholderColor.OTHER
+									} }`,
+									styleSheet.cssRules.length
+								);
 							}
 						}
 						placeholderClassFill.current = true;
@@ -328,7 +408,18 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	const addTable = () => {
 		quillRef?.current?.getModule('better-table').insertTable(3, 3);
 	};
-
+	const removeParentSpan = (element: HTMLElement | null) => {
+		// Проверяем, что элемент существует
+		if (element) {
+			// Получаем родительский элемент
+			const parent = element.parentElement;
+			// Проверяем, является ли родительский элемент тегом <span>
+			if (parent && parent.tagName.toLowerCase() === 'span') {
+				// Удаляем родительский элемент
+				parent.remove();
+			}
+		}
+	};
 	const handleChangeText = useDebouncedCallback(
 		async (
 			content: string,
@@ -337,6 +428,46 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		) => {
 			let contentTmp = removeAilineTags(content); // Удаляем теги перед сохранением
 			contentTmp = wrapTextNodes(contentTmp);
+
+			const tempDiv = document.createElement('div');
+			tempDiv.innerHTML = contentTmp;
+			for (let index = 0; index < placeholder.length; index++) {
+				if (
+					placeholder[index].view?.toString() !==
+					PlaceholderView.SIGNATURE.toString()
+				) {
+					let tag = `placeholder${placeholder[index].id}`;
+					if (placeholder[index].specialType) {
+						switch (placeholder[index].specialType) {
+							case SpecialType.DATE:
+								tag = `date${placeholder[index].id}`;
+								break;
+
+							case SpecialType.FULLNAME:
+								tag = `fullname${placeholder[index].id}`;
+								break;
+
+							case SpecialType.EMAIL:
+								tag = `email${placeholder[index].id}`;
+								break;
+
+							case SpecialType.SIGN:
+								tag = `sign${placeholder[index].id}`;
+								break;
+
+							case SpecialType.INITIALS:
+								tag = `initials${placeholder[index].id}`;
+								break;
+						}
+					}
+					const elements = tempDiv.getElementsByTagName(tag);
+					for (let i = 0; i < elements.length; i++) {
+						let element: any = elements[i];
+						removeParentSpan(element);
+					}
+				}
+			}
+			contentTmp = tempDiv.innerHTML;
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(contentTmp, '');
 			quillRef?.current?.blur();
 

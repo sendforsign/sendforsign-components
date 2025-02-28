@@ -78,17 +78,19 @@ table.quill-better-table td {
 	top: 50%;
 }
 
-[class^="placeholderClass"], [class^="dateClass"], [class^="fullnameClass"],
-[class^="emailClass"], [class^="signClass"], [class^="initialsClass"] {
-  border-radius: 4px;
-  border: 1px solid #d0e0c7;
-  color: black;
-  /* background: #8ae2f4; */
+[class^='placeholderClass'],
+[class^='dateClass'],
+[class^='fullnameClass'],
+[class^='emailClass'],
+[class^='signClass'],
+[class^='initialsClass'] {
+	border-radius: 4px;
+	border: 1px solid #d0e0c7;
+	color: black;
 }
 
 .ant-space-item:has(> #contractActionsFooter) {
 	bottom: 8px;
 	position: sticky;
 	z-index: 1000;
-  }
-  
+}

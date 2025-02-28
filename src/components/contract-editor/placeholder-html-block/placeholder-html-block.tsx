@@ -321,15 +321,18 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		owner?: boolean;
 		deleteClass?: boolean;
 	}) => {
+		// let content = removeAilineTags(quillRef?.current?.root.innerHTML as string);
+		// quillRef?.current?.clipboard.dangerouslyPasteHTML(content, 'silent');
+
 		if (!specialType) {
 			let placeholderFind = placeholder.find(
 				(pl) => pl.id?.toString() === id.toString() && !pl.isSpecial
 			) as Placeholder;
 
 			if (placeholderFind && placeholderFind.id) {
-				const elements = document.getElementsByTagName(
-					`placeholder${placeholderFind.id}`
-				);
+				// const elements = document.getElementsByTagName(
+				// 	`placeholder${placeholderFind.id}`
+				// );
 				if (!deleteClass) {
 					let color = '';
 					if (owner) {
@@ -344,48 +347,76 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 							}
 						}
 					}
-					for (let i = 0; i < elements.length; i++) {
-						let element: any = elements[i];
-						element.style.background = color ? color : PlaceholderColor.OTHER;
-					}
+					// for (let i = 0; i < elements.length; i++) {
+					// 	let element: any = elements[i];
+					// 	element.style.background = color ? color : PlaceholderColor.OTHER;
+					// }
+					const styleSheet = document.styleSheets[0]; // Получаем первый стиль
+					styleSheet.insertRule(
+						`.placeholderClass${placeholderFind.id} { background-color: ${
+							color ? color : PlaceholderColor.OTHER
+						} }`,
+						styleSheet.cssRules.length
+					);
 				} else {
-					for (let i = 0; i < elements.length; i++) {
-						let element: any = elements[i];
-						element.style.removeProperty('background');
+					// for (let i = 0; i < elements.length; i++) {
+					// 	let element: any = elements[i];
+					// 	element.style.removeProperty('background');
+					// }
+					const styleSheets = document.styleSheets;
+
+					for (let i = 0; i < styleSheets.length; i++) {
+						const rules = styleSheets[i].cssRules || styleSheets[i].rules; // Для кроссбраузерной совместимости
+						for (let j = 0; j < rules.length; j++) {
+							if (
+								(rules[j] as CSSStyleRule).selectorText ===
+								`.placeholderClass${placeholderFind.id}`
+							) {
+								// Удаляем стиль из правила
+								(rules[j] as CSSStyleRule).style.removeProperty(
+									'background-color'
+								);
+								break; // Выходим из цикла, если нашли и удалили
+							}
+						}
 					}
 				}
-				quillRef?.current?.clipboard.dangerouslyPasteHTML(0, '', 'user');
 			}
 		} else {
-			let elements: HTMLCollectionOf<Element> = {
-				item: function (index: number): Element | null {
-					throw new Error('Function not implemented.');
-				},
-				namedItem: function (name: string): Element | null {
-					throw new Error('Function not implemented.');
-				},
-				length: 0,
-			};
+			// let elements: HTMLCollectionOf<Element> = {
+			// 	item: function (index: number): Element | null {
+			// 		throw new Error('Function not implemented.');
+			// 	},
+			// 	namedItem: function (name: string): Element | null {
+			// 		throw new Error('Function not implemented.');
+			// 	},
+			// 	length: 0,
+			// };
+			let tagClass = '';
 			switch (specialType) {
 				case SpecialType.DATE:
-					elements = document.getElementsByTagName(`date${id}`);
-
+					// elements = document.getElementsByTagName(`date${id}`);
+					tagClass = `dateClass${id}`;
 					break;
 
 				case SpecialType.FULLNAME:
-					elements = document.getElementsByTagName(`fullname${id}`);
+					// elements = document.getElementsByTagName(`fullname${id}`);
+					tagClass = `fullnameClass${id}`;
 					break;
 
 				case SpecialType.EMAIL:
-					elements = document.getElementsByTagName(`email${id}`);
+					// elements = document.getElementsByTagName(`email${id}`);
+					tagClass = `emailClass${id}`;
 					break;
 
 				case SpecialType.SIGN:
-					elements = document.getElementsByTagName(`sign${id}`);
+					// elements = document.getElementsByTagName(`sign${id}`);
+					tagClass = `signClass${id}`;
 					break;
 
 				case SpecialType.INITIALS:
-					elements = document.getElementsByTagName(`initials${id}`);
+					// elements = document.getElementsByTagName(`initials${id}`);
+					tagClass = `initialsClass${id}`;
 					break;
 			}
 			let color = '';
@@ -397,12 +428,21 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 					color = recipientFind.color as string;
 				}
 			}
-			for (let i = 0; i < elements.length; i++) {
-				let element: any = elements[i];
-				element.style.background = color ? color : PlaceholderColor.OTHER;
-			}
-			quillRef?.current?.clipboard.dangerouslyPasteHTML(0, '', 'user');
+			// for (let i = 0; i < elements.length; i++) {
+			// 	let element: any = elements[i];
+			// 	element.style.background = color ? color : PlaceholderColor.OTHER;
+			// }
+			const styleSheet = document.styleSheets[0]; // Получаем первый стиль
+			styleSheet.insertRule(
+				`.${tagClass} { background-color: ${
+					color ? color : PlaceholderColor.OTHER
+				} }`,
+				styleSheet.cssRules.length
+			);
 		}
+		quillRef?.current?.clipboard.dangerouslyPasteHTML(0, '', 'user');
+		// content = wrapTextNodes(content);
+		// quillRef?.current?.clipboard.dangerouslyPasteHTML(content, 'user');
 	};
 	const deleteTag = (placeholderDelete: Placeholder) => {
 		let tagName = '';
@@ -592,10 +632,6 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 
 			const maxPlaceholderId =
 				Math.max(...placeholder.map((ph) => ph.id || 0)) + 1;
-			// let content = removeAilineTags(
-			// 	quillRef?.current?.root.innerHTML as string
-			// );
-			// quillRef?.current?.clipboard.dangerouslyPasteHTML(content, 'silent');
 
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(
 				position ? position.index : 0,
@@ -614,7 +650,6 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 					holderInsert.fillingType === PlaceholderFill.CREATOR ? true : false,
 				recipientKey: holderInsert.externalRecipientKey,
 			});
-			// wrapTextNodes(quillRef?.current?.root.innerHTML as string);
 		} else {
 			let tag = '';
 			switch (holderInsert.specialType) {

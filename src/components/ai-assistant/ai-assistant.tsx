@@ -608,7 +608,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 					nextAiline.classList.remove('highlight-transparent');
 					nextAiline.scrollIntoView({ behavior: 'smooth', block: 'center' });
 					nextAiline.classList.add('highlight-green');
-	
+
 					setTimeout(() => {
 						nextAiline.classList.add('highlight-transparent');
 					}, 3000);
@@ -617,7 +617,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			}
 		}
 	};
-	
+
 	const handleReplace = (value: string, newValue: string) => {
 		const ailines = document.querySelectorAll('ailine');
 		for (let i = 0; i < ailines.length; i++) {
@@ -626,16 +626,16 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				if (nextAiline) {
 					// Сохраняем текущее содержимое тега
 					const originalContent = nextAiline.textContent;
-	
+
 					// Заменяем текст внутри тега <ailine> на текст из соответствующего элемента
-	
+
 					// Прокручиваем к тегу и добавляем стили
 					nextAiline.classList.remove('highlight-green');
 					nextAiline.classList.remove('highlight-red');
 					nextAiline.classList.remove('highlight-transparent');
 					nextAiline.scrollIntoView({ behavior: 'smooth', block: 'center' });
 					nextAiline.classList.add('highlight-red');
-	
+
 					setTimeout(() => {
 						nextAiline.classList.add('fade-out');
 						setTimeout(() => {
@@ -659,16 +659,31 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	};
 
 	const replaceTextWithElement = (text: string) => {
-		const parts = text.split(/(<ailine.*?<\/ailine>|{ContractKey: [0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}})/g);
+		const parts = text.split(
+			/(<ailine.*?<\/ailine>|{ContractKey: [0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}})/g
+		);
 		return parts.map((part, index) => {
 			const matchAiline = part.match(/<ailine.*?>(.*?)<\/ailine>/);
-			const matchContractKey = part.match(/{ContractKey: ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})}/);
+			const matchContractKey = part.match(
+				/{ContractKey: ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})}/
+			);
 
 			if (matchAiline) {
 				const content = matchAiline[1] || ''; // Safely get content
 				const value = matchAiline[0]?.match(/value="(\d+)"/)?.[1] || ''; // Safely extract value
 				return (
-					<div key={index} style={{ display: 'flex', alignItems: 'center', position: 'relative', padding: '28px 4px 4px 4px', margin: '8px 0', background: '#f0f0f0', borderRadius: '4px' }}>
+					<div
+						key={index}
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							position: 'relative',
+							padding: '28px 4px 4px 4px',
+							margin: '8px 0',
+							background: '#f0f0f0',
+							borderRadius: '4px',
+						}}
+					>
 						<Button
 							type='default'
 							size='small'
@@ -705,13 +720,16 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 				);
 			} else {
 				return (
-					<ReactMarkdown key={index} components={{
-						a: ({ node, ...props }) => (
-							<a {...props} target='_blank' rel='noopener noreferrer'>
-								{props.children}
-							</a>
-						),
-					}}>
+					<ReactMarkdown
+						key={index}
+						components={{
+							a: ({ node, ...props }) => (
+								<a {...props} target='_blank' rel='noopener noreferrer'>
+									{props.children}
+								</a>
+							),
+						}}
+					>
 						{part}
 					</ReactMarkdown>
 				);
@@ -721,18 +739,28 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 
 	const handleNewChat = () => {
 		chatKey.current = uuid();
-		setSelectedValues([]);
-		setSelectedContexts([]);
-		setSelectedContracts([]);
-		contextFromFileRef.current = [];
+		if (
+			aitype !== AiTypes.CONTRACT_SIDEBAR &&
+			aitype !== AiTypes.TEMPLATE_SIDEBAR
+		) {
+			setSelectedValues([]);
+			setSelectedContexts([]);
+			setSelectedContracts([]);
+			contextFromFileRef.current = [];
+			body.current = {
+				...body.current,
+				chatKey: chatKey.current,
+				contracts: [],
+				contexts: [],
+				texts: [],
+			};
+		} else {
+			body.current = {
+				...body.current,
+				chatKey: chatKey.current,
+			};
+		}
 		setMessages([]);
-		body.current = {
-			...body.current,
-			chatKey: chatKey.current,
-			contracts: [],
-			contexts: [],
-			texts: [],
-		};
 		setIsSubmitted(false);
 	};
 
@@ -1094,7 +1122,6 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 															.contextHelp
 													}
 													style={{ maxWidth: '100px', whiteSpace: 'normal' }} // Установите maxWidth по вашему усмотрению
-
 												/>
 											</Tooltip>
 										</Col>
@@ -1197,57 +1224,57 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 											</Tooltip>
 										</Col>
 										{aitype === AiTypes.REGULAR && (
-										<Col style={{ marginBottom: 8 }}>
-											<Tooltip
-												title={
-													AiAssistantLocalization.uiText[contextMessageKey]
-														.model
-												}
-												placement='bottom'
-											>
-												<Select
-													defaultValue='gpt-4o-mini'
-													id='Model'
-													onChange={(value) => {
-														body.current = { ...body.current, model: value }; // Update body.current with the selected model
-													}}
-													variant='borderless'
-													popupMatchSelectWidth={false}
-													options={[
-														{ value: 'gpt-4o-mini', label: 'gpt-4o-mini' },
-														{ value: 'sonar', label: 'sonar' },
-														{
-															value: 'gpt-4o',
-															label: (
-																<Space
-																	style={{
-																		width: '100%',
-																		justifyContent: 'space-between',
-																	}}
-																>
-																	gpt-4o
-																	<Tag style={{ margin: 0 }}>Premium</Tag>
-																</Space>
-															),
-														},
-														{
-															value: 'sonar-pro',
-															label: (
-																<Space
-																	style={{
-																		width: '100%',
-																		justifyContent: 'space-between',
-																	}}
-																>
-																	sonar-pro
-																	<Tag style={{ margin: 0 }}>Premium</Tag>
-																</Space>
-															),
-														},
-													]}
-												/>
-											</Tooltip>
-										</Col>
+											<Col style={{ marginBottom: 8 }}>
+												<Tooltip
+													title={
+														AiAssistantLocalization.uiText[contextMessageKey]
+															.model
+													}
+													placement='bottom'
+												>
+													<Select
+														defaultValue='gpt-4o-mini'
+														id='Model'
+														onChange={(value) => {
+															body.current = { ...body.current, model: value }; // Update body.current with the selected model
+														}}
+														variant='borderless'
+														popupMatchSelectWidth={false}
+														options={[
+															{ value: 'gpt-4o-mini', label: 'gpt-4o-mini' },
+															{ value: 'sonar', label: 'sonar' },
+															{
+																value: 'gpt-4o',
+																label: (
+																	<Space
+																		style={{
+																			width: '100%',
+																			justifyContent: 'space-between',
+																		}}
+																	>
+																		gpt-4o
+																		<Tag style={{ margin: 0 }}>Premium</Tag>
+																	</Space>
+																),
+															},
+															{
+																value: 'sonar-pro',
+																label: (
+																	<Space
+																		style={{
+																			width: '100%',
+																			justifyContent: 'space-between',
+																		}}
+																	>
+																		sonar-pro
+																		<Tag style={{ margin: 0 }}>Premium</Tag>
+																	</Space>
+																),
+															},
+														]}
+													/>
+												</Tooltip>
+											</Col>
 										)}
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
