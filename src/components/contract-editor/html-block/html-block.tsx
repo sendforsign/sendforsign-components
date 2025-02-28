@@ -44,7 +44,7 @@ QuillNamespace.register(AiLineBlot);
 //env.config();
 type Props = {
 	value: string;
-	quillRef: React.MutableRefObject<any>;
+	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
 };
 QuillNamespace.register(
 	{
@@ -138,7 +138,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				theme: 'bubble',
 			});
 			if (quillRef.current) {
-				quillRef.current
+				(quillRef.current as any)
 					.getModule('toolbar')
 					.container.addEventListener(
 						'mousedown',
@@ -406,7 +406,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		}
 	};
 	const addTable = () => {
-		quillRef?.current?.getModule('better-table').insertTable(3, 3);
+		(quillRef?.current?.getModule('better-table') as any).insertTable(3, 3);
 	};
 	const removeParentSpan = (element: HTMLElement | null) => {
 		// Проверяем, что элемент существует
@@ -468,7 +468,12 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				}
 			}
 			contentTmp = tempDiv.innerHTML;
-			quillRef?.current?.clipboard.dangerouslyPasteHTML(contentTmp, '');
+
+			const position = quillRef?.current?.getSelection();
+			if (position) {
+				quillRef?.current?.clipboard.dangerouslyPasteHTML(contentTmp);
+				quillRef?.current?.setSelection(position.index, position.length, 'api');
+			}
 
 			let body = {};
 			let changed = false;
