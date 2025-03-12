@@ -23,6 +23,7 @@ class AiLineBlot extends Inline {
 	static create(value: string) {
 		const node = super.create();
 		node.setAttribute('value', value);
+		node.style.whiteSpace = 'pre-wrap';
 		return node;
 	}
 	static blotName = 'ailine';
@@ -35,6 +36,7 @@ class AiLineBlot extends Inline {
 	format(name: string, value: string) {
 		if (name === 'ailine' && value) {
 			this.domNode.setAttribute('value', value);
+			this.domNode.style.whiteSpace = 'pre-wrap';
 		}
 	}
 }

@@ -2104,7 +2104,7 @@ export const wrapTextNodes = (html: string) => {
 	// debugger;
 	const traverseNodes = (node: Node) => {
 		if (node.nodeType === Node.TEXT_NODE) {
-			const textContent = node.textContent?.trim();
+			const textContent = node.textContent;
 			if (
 				textContent &&
 				!textContent.startsWith('{{{') &&
@@ -2117,7 +2117,11 @@ export const wrapTextNodes = (html: string) => {
 			) {
 				const wrappedNode = doc.createElement('ailine');
 				wrappedNode.setAttribute('value', valueCounter.toString());
-				wrappedNode.textContent = node.textContent || '';
+				wrappedNode.style.whiteSpace = 'pre-wrap';
+				wrappedNode.innerHTML =
+					textContent
+						?.replace(/ /g, '&nbsp;')
+						.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') || '';
 				node.parentNode?.replaceChild(wrappedNode, node);
 				valueCounter++;
 			}
