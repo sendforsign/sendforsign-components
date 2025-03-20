@@ -197,18 +197,30 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						}
 					);
 
+					quillRef.current.on(
+						'editor-change',
+						function (delta: any, oldDelta: any, source: any) {
+							console.log('editor-change');
+						}
+					);
+
 					// Handle clicks outside the editor
 					document.addEventListener('click', (e) => {
 						const target = e.target as HTMLElement;
 						const editor = editorContainer.querySelector('.ql-editor');
 						if (!editor?.contains(target) && hasChanges) {
+							console.log('addEventListener');
 							hasChanges = false;
 							let contentTmp = removeAilineTags(
 								quillRef?.current?.root?.innerHTML as string
 							);
 							contentTmp = wrapTextNodes(contentTmp);
-							quillRef?.current?.clipboard.dangerouslyPasteHTML(contentTmp);
+							quillRef?.current?.clipboard.dangerouslyPasteHTML(
+								contentTmp,
+								'silent'
+							);
 							handleChangeText(contentTmp);
+							quillRef?.current?.blur();
 						}
 					});
 				}
@@ -219,7 +231,10 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	useEffect(() => {
 		const setValue = async () => {
 			const processedValue = wrapTextNodes(value); // Обрабатываем HTML
-			quillRef?.current?.clipboard.dangerouslyPasteHTML(processedValue, 'user');
+			quillRef?.current?.clipboard.dangerouslyPasteHTML(
+				processedValue,
+				'silent'
+			);
 			// debugger;
 			setLoad(false);
 			setRefreshPlaceholders(refreshPlaceholders + 1);
@@ -462,7 +477,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			needCheck: boolean = true,
 			email: boolean = false
 		) => {
-			let contentTmp = content; 
+			let contentTmp = content;
 			// let contentTmp = removeAilineTags(content); // Удаляем теги перед сохранением
 			// contentTmp = wrapTextNodes(contentTmp);
 
@@ -504,7 +519,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					}
 				}
 			}
-			contentTmp = tempDiv.innerHTML; 
+			contentTmp = tempDiv.innerHTML;
 
 			let body = {};
 			let changed = false;

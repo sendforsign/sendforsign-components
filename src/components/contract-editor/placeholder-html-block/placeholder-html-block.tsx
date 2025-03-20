@@ -79,7 +79,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 	>([]);
 	const [selectedOtion, setSelectedOtion] = useState('0');
 	const readonlyCurrent = useRef(false);
-	// const selectedOtion = useRef('0');
+	const hasChange = useRef(false);
 	const placeholderRecipients = useRef<Recipient[]>([]);
 
 	const { Title, Text } = Typography;
@@ -321,18 +321,12 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		owner?: boolean;
 		deleteClass?: boolean;
 	}) => {
-		// let content = removeAilineTags(quillRef?.current?.root.innerHTML as string);
-		// quillRef?.current?.clipboard.dangerouslyPasteHTML(content, 'silent');
-
 		if (!specialType) {
 			let placeholderFind = placeholder.find(
 				(pl) => pl.id?.toString() === id.toString() && !pl.isSpecial
 			) as Placeholder;
 
 			if (placeholderFind && placeholderFind.id) {
-				// const elements = document.getElementsByTagName(
-				// 	`placeholder${placeholderFind.id}`
-				// );
 				if (!deleteClass) {
 					let color = '';
 					if (owner) {
@@ -347,10 +341,6 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 							}
 						}
 					}
-					// for (let i = 0; i < elements.length; i++) {
-					// 	let element: any = elements[i];
-					// 	element.style.background = color ? color : PlaceholderColor.OTHER;
-					// }
 					const styleSheet = document.styleSheets[0]; // Получаем первый стиль
 					styleSheet.insertRule(
 						`.placeholderClass${placeholderFind.id} { background-color: ${
@@ -359,10 +349,6 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 						styleSheet.cssRules.length
 					);
 				} else {
-					// for (let i = 0; i < elements.length; i++) {
-					// 	let element: any = elements[i];
-					// 	element.style.removeProperty('background');
-					// }
 					const styleSheets = document.styleSheets;
 
 					for (let i = 0; i < styleSheets.length; i++) {
@@ -383,39 +369,25 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				}
 			}
 		} else {
-			// let elements: HTMLCollectionOf<Element> = {
-			// 	item: function (index: number): Element | null {
-			// 		throw new Error('Function not implemented.');
-			// 	},
-			// 	namedItem: function (name: string): Element | null {
-			// 		throw new Error('Function not implemented.');
-			// 	},
-			// 	length: 0,
-			// };
 			let tagClass = '';
 			switch (specialType) {
 				case SpecialType.DATE:
-					// elements = document.getElementsByTagName(`date${id}`);
 					tagClass = `dateClass${id}`;
 					break;
 
 				case SpecialType.FULLNAME:
-					// elements = document.getElementsByTagName(`fullname${id}`);
 					tagClass = `fullnameClass${id}`;
 					break;
 
 				case SpecialType.EMAIL:
-					// elements = document.getElementsByTagName(`email${id}`);
 					tagClass = `emailClass${id}`;
 					break;
 
 				case SpecialType.SIGN:
-					// elements = document.getElementsByTagName(`sign${id}`);
 					tagClass = `signClass${id}`;
 					break;
 
 				case SpecialType.INITIALS:
-					// elements = document.getElementsByTagName(`initials${id}`);
 					tagClass = `initialsClass${id}`;
 					break;
 			}
@@ -428,10 +400,6 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 					color = recipientFind.color as string;
 				}
 			}
-			// for (let i = 0; i < elements.length; i++) {
-			// 	let element: any = elements[i];
-			// 	element.style.background = color ? color : PlaceholderColor.OTHER;
-			// }
 			const styleSheet = document.styleSheets[0]; // Получаем первый стиль
 			styleSheet.insertRule(
 				`.${tagClass} { background-color: ${
@@ -441,8 +409,6 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			);
 		}
 		quillRef?.current?.clipboard.dangerouslyPasteHTML(0, '', 'user');
-		// content = wrapTextNodes(content);
-		// quillRef?.current?.clipboard.dangerouslyPasteHTML(content, 'user');
 	};
 	const deleteTag = (placeholderDelete: Placeholder) => {
 		let tagName = '';
@@ -776,29 +742,38 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		);
 		switch (e.target.id) {
 			case 'PlaceholderName':
-				placeholderTmp[holderIndex].name = e.target.value;
-
+				if (placeholderTmp[holderIndex].name !== e.target.value) {
+					hasChange.current = true;
+					placeholderTmp[holderIndex].name = e.target.value;
+				}
 				break;
 
 			case 'PlaceholderValue':
-				placeholderTmp[holderIndex].value = e.target.value;
-
+				if (placeholderTmp[holderIndex].value !== e.target.value) {
+					hasChange.current = true;
+					placeholderTmp[holderIndex].value = e.target.value;
+				}
 				break;
 		}
 		setPlaceholder(placeholderTmp);
 	};
 	const handleBlur = async (e: any, placeholderChange: Placeholder) => {
-		if (placeholderChange.isSpecial || readonlyCurrent.current) {
+		if (
+			placeholderChange.isSpecial ||
+			readonlyCurrent.current ||
+			!hasChange.current
+		) {
 			return;
 		}
+		hasChange.current = false;
+		let placeholdersTmp = [...placeholder];
+		let holderIndex = placeholdersTmp.findIndex(
+			(holder) =>
+				holder.id?.toString() === placeholderChange.id?.toString() &&
+				!holder.isSpecial
+		);
 		switch (e.target.id) {
 			case 'PlaceholderName':
-				let placeholdersTmp = [...placeholder];
-				const holderIndex = placeholdersTmp.findIndex(
-					(holder) =>
-						holder.id?.toString() === placeholderChange.id?.toString() &&
-						!holder.isSpecial
-				);
 				let body = {
 					data: {
 						action: Action.UPDATE,
@@ -838,6 +813,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 
 			case 'PlaceholderValue':
 				changeValue(placeholderChange);
+
 				break;
 		}
 	};
