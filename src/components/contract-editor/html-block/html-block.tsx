@@ -116,6 +116,30 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					},
 					clipboard: {
 						matchVisual: false,
+						// allowed: {
+						// 	tags: [
+						// 		'p',
+						// 		'br',
+						// 		'strong',
+						// 		'em',
+						// 		'u',
+						// 		's',
+						// 		'blockquote',
+						// 		'ol',
+						// 		'ul',
+						// 		'li',
+						// 		'sub',
+						// 		'sup',
+						// 		'h1',
+						// 		'h2',
+						// 		'h3',
+						// 		'h4',
+						// 		'h5',
+						// 		'h6',
+						// 		'span',
+						// 	],
+						// 	attributes: ['style', 'class', 'href', 'rel', 'target', 'id'],
+						// },
 					},
 					table: false, // disable table module
 					'better-table': {
@@ -297,12 +321,6 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						} }`,
 						styleSheet.cssRules.length
 					);
-					// for (let i = 0; i < elements.length; i++) {
-					// 	let element: any = elements[i];
-					// 	element.style.background = placeholder[index].color
-					// 		? placeholder[index].color
-					// 		: PlaceholderColor.OTHER;
-					// }
 				}
 			}
 			placeholderClassFill.current = true;
@@ -342,16 +360,6 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 								payload.data.placeholders[index].view.toString() !==
 								PlaceholderView.SIGNATURE.toString()
 							) {
-								// const elements = document.getElementsByTagName(
-								// 	`placeholder${payload.data.placeholders[index].id}`
-								// );
-								// for (let i = 0; i < elements.length; i++) {
-								// 	let element: any = elements[i];
-								// 	element.style.background = payload.data.placeholders[index]
-								// 		.color
-								// 		? payload.data.placeholders[index].color
-								// 		: PlaceholderColor.OTHER;
-								// }
 								let tagClass = `placeholderClass${payload.data.placeholders[index].id}`;
 								if (payload.data.placeholders[index].specialType) {
 									switch (payload.data.placeholders[index].specialType) {
@@ -594,6 +602,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					); // Удаляем теги перед сохранением
 					contentTmp = wrapTextNodes(contentTmp);
 
+					quillRef?.current?.clipboard.dangerouslyPasteHTML(contentTmp);
 					handleChangeText(contentTmp);
 				}}
 			/>
