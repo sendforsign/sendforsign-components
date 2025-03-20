@@ -449,6 +449,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			const parent = element.parentElement;
 			// Проверяем, является ли родительский элемент тегом <span>
 			if (parent && parent.tagName.toLowerCase() === 'span') {
+				// Перемещаем текущий элемент перед родительским
+				parent.parentNode?.insertBefore(element, parent);
 				// Удаляем родительский элемент
 				parent.remove();
 			}
@@ -461,50 +463,50 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			email: boolean = false
 		) => {
 			let contentTmp = content;
-			// console.log('value31', content);
+			console.log('value31', content);
 			// let contentTmp = removeAilineTags(content); // Удаляем теги перед сохранением
 			// contentTmp = wrapTextNodes(contentTmp);
 
-			// const tempDiv = document.createElement('div');
-			// tempDiv.innerHTML = contentTmp;
-			// for (let index = 0; index < placeholder.length; index++) {
-			// 	if (
-			// 		placeholder[index].view?.toString() !==
-			// 		PlaceholderView.SIGNATURE.toString()
-			// 	) {
-			// 		let tag = `placeholder${placeholder[index].id}`;
-			// 		if (placeholder[index].specialType) {
-			// 			switch (placeholder[index].specialType) {
-			// 				case SpecialType.DATE:
-			// 					tag = `date${placeholder[index].id}`;
-			// 					break;
+			const tempDiv = document.createElement('div');
+			tempDiv.innerHTML = contentTmp;
+			for (let index = 0; index < placeholder.length; index++) {
+				if (
+					placeholder[index].view?.toString() !==
+					PlaceholderView.SIGNATURE.toString()
+				) {
+					let tag = `placeholder${placeholder[index].id}`;
+					if (placeholder[index].specialType) {
+						switch (placeholder[index].specialType) {
+							case SpecialType.DATE:
+								tag = `date${placeholder[index].id}`;
+								break;
 
-			// 				case SpecialType.FULLNAME:
-			// 					tag = `fullname${placeholder[index].id}`;
-			// 					break;
+							case SpecialType.FULLNAME:
+								tag = `fullname${placeholder[index].id}`;
+								break;
 
-			// 				case SpecialType.EMAIL:
-			// 					tag = `email${placeholder[index].id}`;
-			// 					break;
+							case SpecialType.EMAIL:
+								tag = `email${placeholder[index].id}`;
+								break;
 
-			// 				case SpecialType.SIGN:
-			// 					tag = `sign${placeholder[index].id}`;
-			// 					break;
+							case SpecialType.SIGN:
+								tag = `sign${placeholder[index].id}`;
+								break;
 
-			// 				case SpecialType.INITIALS:
-			// 					tag = `initials${placeholder[index].id}`;
-			// 					break;
-			// 			}
-			// 		}
-			// 		const elements = tempDiv.getElementsByTagName(tag);
-			// 		for (let i = 0; i < elements.length; i++) {
-			// 			let element: any = elements[i];
-			// 			removeParentSpan(element);
-			// 		}
-			// 	}
-			// }
-			// contentTmp = tempDiv.innerHTML;
-			// console.log('value32', contentTmp);
+							case SpecialType.INITIALS:
+								tag = `initials${placeholder[index].id}`;
+								break;
+						}
+					}
+					const elements = tempDiv.getElementsByTagName(tag);
+					for (let i = 0; i < elements.length; i++) {
+						let element: any = elements[i];
+						removeParentSpan(element);
+					}
+				}
+			}
+			contentTmp = tempDiv.innerHTML;
+			console.log('value32', contentTmp);
 
 			let body = {};
 			let changed = false;
