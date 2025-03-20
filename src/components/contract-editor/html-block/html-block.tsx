@@ -218,23 +218,23 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 								quillRef?.current?.root?.innerHTML as string
 							);
 							contentTmp = wrapTextNodes(contentTmp);
-							quillRef?.current?.clipboard.dangerouslyPasteHTML(
-								contentTmp,
-								'silent'
-							);
+							// quillRef?.current?.clipboard.dangerouslyPasteHTML(
+							// 	contentTmp,
+							// 	'silent'
+							// );
 							handleChangeText(contentTmp);
-							if (focusElementRef.current) {
-								const element = document.getElementById(
-									focusElementRef.current
-								);
-								element?.focus();
-								setFocusElement('');
-							} else if (!aiHidden) {
-								const element = document.getElementById(
-									'AiAssistantTextArea'
-								) as HTMLTextAreaElement;
-								element?.focus();
-							}
+							// if (focusElementRef.current) {
+							// 	const element = document.getElementById(
+							// 		focusElementRef.current
+							// 	);
+							// 	element?.focus();
+							// 	setFocusElement('');
+							// } else if (!aiHidden) {
+							// 	const element = document.getElementById(
+							// 		'AiAssistantTextArea'
+							// 	) as HTMLTextAreaElement;
+							// 	element?.focus();
+							// }
 						}
 					});
 				}
