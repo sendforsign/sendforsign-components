@@ -462,8 +462,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			needCheck: boolean = true,
 			email: boolean = false
 		) => {
-			let contentTmp = content;
-			console.log('value31', content);
+			let contentTmp = content; 
 			// let contentTmp = removeAilineTags(content); // Удаляем теги перед сохранением
 			// contentTmp = wrapTextNodes(contentTmp);
 
@@ -505,8 +504,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					}
 				}
 			}
-			contentTmp = tempDiv.innerHTML;
-			console.log('value32', contentTmp);
+			contentTmp = tempDiv.innerHTML; 
 
 			let body = {};
 			let changed = false;
