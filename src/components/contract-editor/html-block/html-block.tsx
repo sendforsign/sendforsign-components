@@ -12,7 +12,6 @@ import { BASE_URL } from '../../../config/config';
 import {
 	Action,
 	ApiEntity,
-	ContractType,
 	PlaceholderColor,
 	PlaceholderView,
 	SpecialType,
@@ -116,30 +115,30 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					},
 					clipboard: {
 						matchVisual: false,
-						// allowed: {
-						// 	tags: [
-						// 		'p',
-						// 		'br',
-						// 		'strong',
-						// 		'em',
-						// 		'u',
-						// 		's',
-						// 		'blockquote',
-						// 		'ol',
-						// 		'ul',
-						// 		'li',
-						// 		'sub',
-						// 		'sup',
-						// 		'h1',
-						// 		'h2',
-						// 		'h3',
-						// 		'h4',
-						// 		'h5',
-						// 		'h6',
-						// 		'span',
-						// 	],
-						// 	attributes: ['style', 'class', 'href', 'rel', 'target', 'id'],
-						// },
+						allowed: {
+							tags: [
+								'p',
+								'br',
+								'strong',
+								'em',
+								'u',
+								's',
+								'blockquote',
+								'ol',
+								'ul',
+								'li',
+								'sub',
+								'sup',
+								'h1',
+								'h2',
+								'h3',
+								'h4',
+								'h5',
+								'h6',
+								'span',
+							],
+							attributes: ['style', 'class', 'href', 'rel', 'target', 'id'],
+						},
 					},
 					table: false, // disable table module
 					'better-table': {
@@ -177,17 +176,42 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						}
 					);
 
-				quillRef.current.on(
-					'text-change',
-					function (delta: any, oldDelta: any, source: any) {
-						if (source === 'user') {
-							setDocumentCurrentSaved(false);
-							handleChangeText(
-								quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
-							);
-						}
-					}
+				// Add focus tracking
+				const editorContainer = document.querySelector(
+					'#contract-editor-container'
 				);
+				if (editorContainer) {
+					let hasChanges = false;
+
+					// Track text changes
+					quillRef.current.on(
+						'text-change',
+						function (delta: any, oldDelta: any, source: any) {
+							if (source === 'user') {
+								hasChanges = true;
+								setDocumentCurrentSaved(false);
+								handleChangeText(
+									quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
+								);
+							}
+						}
+					);
+
+					// Handle clicks outside the editor
+					document.addEventListener('click', (e) => {
+						const target = e.target as HTMLElement;
+						const editor = editorContainer.querySelector('.ql-editor');
+						if (!editor?.contains(target) && hasChanges) {
+							hasChanges = false;
+							let contentTmp = removeAilineTags(
+								quillRef?.current?.root?.innerHTML as string
+							);
+							contentTmp = wrapTextNodes(contentTmp);
+							quillRef?.current?.clipboard.dangerouslyPasteHTML(contentTmp);
+							handleChangeText(contentTmp);
+						}
+					});
+				}
 			}
 		}
 	}, [container]);
@@ -594,18 +618,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	};
 	return (
 		<div id='scroll-container'>
-			<div
-				id='contract-editor-container'
-				onBlur={() => {
-					let contentTmp = removeAilineTags(
-						quillRef?.current?.root?.innerHTML as string
-					); // Удаляем теги перед сохранением
-					contentTmp = wrapTextNodes(contentTmp);
-
-					quillRef?.current?.clipboard.dangerouslyPasteHTML(contentTmp);
-					handleChangeText(contentTmp);
-				}}
-			/>
+			<div id='contract-editor-container' />
 		</div>
 	);
 };
