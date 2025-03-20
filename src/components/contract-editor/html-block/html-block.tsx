@@ -428,8 +428,9 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			needCheck: boolean = true,
 			email: boolean = false
 		) => {
-			let contentTmp = removeAilineTags(content); // Удаляем теги перед сохранением
-			contentTmp = wrapTextNodes(contentTmp);
+			let contentTmp = content;
+			// let contentTmp = removeAilineTags(content); // Удаляем теги перед сохранением
+			// contentTmp = wrapTextNodes(contentTmp);
 
 			const tempDiv = document.createElement('div');
 			tempDiv.innerHTML = contentTmp;
@@ -470,12 +471,6 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 				}
 			}
 			contentTmp = tempDiv.innerHTML;
-
-			const position = quillRef?.current?.getSelection();
-			if (position) {
-				quillRef?.current?.clipboard.dangerouslyPasteHTML(contentTmp);
-				quillRef?.current?.setSelection(position.index, position.length, 'api');
-			}
 
 			let body = {};
 			let changed = false;
@@ -591,7 +586,17 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	};
 	return (
 		<div id='scroll-container'>
-			<div id='contract-editor-container' />
+			<div
+				id='contract-editor-container'
+				onBlur={() => {
+					let contentTmp = removeAilineTags(
+						quillRef?.current?.root?.innerHTML as string
+					); // Удаляем теги перед сохранением
+					contentTmp = wrapTextNodes(contentTmp);
+
+					handleChangeText(contentTmp);
+				}}
+			/>
 		</div>
 	);
 };
