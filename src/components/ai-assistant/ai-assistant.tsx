@@ -1072,6 +1072,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 												))} */}
 											</Space>
 											<TextArea
+												id='AiAssistantTextArea'
 												autoSize={{ minRows: 1 }}
 												style={{ width: '100%' }}
 												placeholder={

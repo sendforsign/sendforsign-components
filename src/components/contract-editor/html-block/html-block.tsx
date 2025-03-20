@@ -81,9 +81,19 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		setLoad,
 		setRefreshPlaceholders,
 		setDocumentCurrentSaved,
+		focusElement,
+		setFocusElement,
+		aiHidden,
 	} = useContractEditorContext();
 	const container = document.querySelector('#contract-editor-container');
 	const placeholderClassFill = useRef(false);
+	const focusElementRef = useRef('');
+
+	useEffect(() => {
+		if (focusElement) {
+			focusElementRef.current = focusElement;
+		}
+	}, [focusElement]);
 
 	useEffect(() => {
 		if (document.querySelector('#contract-editor-container')) {
@@ -197,13 +207,6 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						}
 					);
 
-					quillRef.current.on(
-						'editor-change',
-						function (delta: any, oldDelta: any, source: any) {
-							console.log('editor-change');
-						}
-					);
-
 					// Handle clicks outside the editor
 					document.addEventListener('click', (e) => {
 						const target = e.target as HTMLElement;
@@ -220,7 +223,18 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 								'silent'
 							);
 							handleChangeText(contentTmp);
-							quillRef?.current?.blur();
+							if (focusElementRef.current) {
+								const element = document.getElementById(
+									focusElementRef.current
+								);
+								element?.focus();
+								setFocusElement('');
+							} else if (!aiHidden) {
+								const element = document.getElementById(
+									'AiAssistantTextArea'
+								) as HTMLTextAreaElement;
+								element?.focus();
+							}
 						}
 					});
 				}

@@ -69,6 +69,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		setContractPlaceholderCount,
 		refreshPagePlaceholders,
 		setRefreshPagePlaceholders,
+		setFocusElement,
 	} = useContractEditorContext();
 	const [currPlaceholder, setCurrPlaceholder] = useState(refreshPlaceholders);
 	const [placeholderLoad, setPlaceholderLoad] = useState(false);
@@ -83,6 +84,10 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 	const placeholderRecipients = useRef<Recipient[]>([]);
 
 	const { Title, Text } = Typography;
+
+	const handleFocus = (e: any) => { 
+		setFocusElement(e.target.id);
+	};
 
 	const getPlaceholders = async (load = true) => {
 		//console.log('PlaceholderBlock');
@@ -156,10 +161,6 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 								: PlaceholderColor.OTHER;
 						}
 					}
-					// let text = quillRef?.current?.root.innerHTML;
-					// text = addActualColors(text as string, placeholderTmp);
-					// quillRef?.current?.clipboard.dangerouslyPasteHTML(text, 'user');
-					// quillRef?.current?.blur();
 					setPlaceholder(placeholderTmp);
 					setContractPlaceholderCount(placeholderTmp.length);
 					handleChangeSelect(selectedOtion, placeholderTmp);
@@ -740,7 +741,13 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				holder.id?.toString() === placeholderChange.id?.toString() &&
 				!holder.isSpecial
 		);
-		switch (e.target.id) {
+		let targetId = '';
+		if (e.target.id.includes('PlaceholderName')) {
+			targetId = 'PlaceholderName';
+		} else if (e.target.id.includes('PlaceholderValue')) {
+			targetId = 'PlaceholderValue';
+		}
+		switch (targetId) {
 			case 'PlaceholderName':
 				if (placeholderTmp[holderIndex].name !== e.target.value) {
 					hasChange.current = true;
@@ -772,7 +779,13 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				holder.id?.toString() === placeholderChange.id?.toString() &&
 				!holder.isSpecial
 		);
-		switch (e.target.id) {
+		let targetId = '';
+		if (e.target.id.includes('PlaceholderName')) {
+			targetId = 'PlaceholderName';
+		} else if (e.target.id.includes('PlaceholderValue')) {
+			targetId = 'PlaceholderValue';
+		}
+		switch (targetId) {
 			case 'PlaceholderName':
 				let body = {
 					data: {
@@ -980,12 +993,20 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 													? false
 													: true
 											}
-											id='PlaceholderName'
+											id={`PlaceholderName${holder.id}`}
 											placeholder='Enter placeholder name'
 											variant='borderless'
 											value={holder.name}
 											onChange={(e: any) => handleChange(e, holder)}
 											onBlur={(e: any) => handleBlur(e, holder)}
+											onFocus={
+												holder.view?.toString() !==
+													PlaceholderView.SIGNATURE.toString() &&
+												!holder.isSpecial &&
+												!readonlyCurrent.current
+													? handleFocus
+													: undefined
+											}
 										/>
 									</Col>
 									<Col flex={'auto'}></Col>
@@ -1189,12 +1210,20 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 									!holder.isSpecial && (
 										<Input
 											readOnly={readonlyCurrent.current}
-											id='PlaceholderValue'
+											id={`PlaceholderValue${holder.id}`}
 											placeholder='Enter value'
 											value={holder.value}
 											onChange={(e: any) => handleChange(e, holder)}
 											onBlur={(e: any) => handleBlur(e, holder)}
 											onPressEnter={() => handleEnter(holder)}
+											onFocus={
+												holder.view?.toString() !==
+													PlaceholderView.SIGNATURE.toString() &&
+												!holder.isSpecial &&
+												!readonlyCurrent.current
+													? handleFocus
+													: undefined
+											}
 										/>
 									)}
 							</Space>

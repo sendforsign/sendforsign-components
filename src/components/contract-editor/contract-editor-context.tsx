@@ -117,6 +117,8 @@ export type TContractEditorContextType = {
 	setContractPlaceholderCount: (contractPlaceholderCount: number) => void;
 	ready: boolean;
 	setReady: (ready: boolean) => void;
+	focusElement: string;
+	setFocusElement: (focusElement: string) => void;
 	fullySigned: boolean;
 	setFullySigned: (fullySigned: boolean) => void;
 	eventStatus: EventStatus[];

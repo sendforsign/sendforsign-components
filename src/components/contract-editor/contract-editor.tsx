@@ -131,6 +131,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [placeholderPdf, setPlaceholderPdf] = useState<Placeholder>({});
 	const [placeholderChange, setPlaceholderChange] = useState<Placeholder>({});
 	const [placeholderDelete, setPlaceholderDelete] = useState<string>('');
+	const [focusElement, setFocusElement] = useState<string>('');
 	const [pagePlaceholder, setPagePlaceholder] = useState<PagePlaceholder[]>([]);
 	const [notification, setNotification] = useState({});
 	const [ipInfo, setIpInfo] = useState('');
@@ -640,6 +641,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					setFullySigned,
 					eventStatus,
 					setEventStatus,
+					focusElement,
+					setFocusElement,
 				}}
 			>
 				{spinLoad ? (
