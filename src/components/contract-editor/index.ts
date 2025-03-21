@@ -9,7 +9,7 @@ export { PlaceholderHtmlBlock } from './placeholder-html-block/placeholder-html-
 export { PlaceholderPdfBlock } from './placeholder-pdf-block/placeholder-pdf-block';
 export {AiHtmlBlock} from './ai-html-block/ai-html-block';
 export { ResultModal } from './result-modal/result-modal';
-export { SendModal } from './recipient-modal/recipient-modal';
+export { RecipientModal } from './recipient-modal/recipient-modal';
 export {
 	ContractEditorContext,
 	useContractEditorContext,

@@ -42,7 +42,7 @@ import { ContextModal } from './context-modal';
 import { ContextList } from './context-list';
 import { useChat } from 'ai/react';
 import { BASE_URL } from '../../config/config';
-import { Action, AiTypes, ApiEntity } from '../../config/enum';
+import { Action, AiType, AiTypes, ApiEntity } from '../../config/enum';
 import { Context, Contract } from '../../config/types';
 import axios from 'axios';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
@@ -59,7 +59,7 @@ export interface AiAssistantProps {
 	token?: string;
 	userKey?: string;
 	contract?: Contract;
-	aitype?: AiTypes;
+	aitype?: AiType;
 }
 type SelectData = {
 	value: string;
@@ -1087,47 +1087,48 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										</Col>
 									</Row>
 									<Row gutter={4} style={{ padding: '0px 8px' }}>
-									{(aitype === AiTypes.REGULAR || aitype === AiTypes.CONTRACT_SIDEBAR) && (
-										<Col style={{ marginBottom: 8 }}>
-											<Tooltip
-												title={
-													AiAssistantLocalization.uiText[contextMessageKey]
-														.context
-												}
-												open={tooltipContextVisible}
-												placement='bottom'
-												onOpenChange={(visible) =>
-													setTooltipContextVisible(visible)
-												}
-											>
-												<Select
-													mode='multiple'
-													onSelect={handleSelectContext}
-													onDeselect={handleDeselectContext}
-													options={optionsData}
-													value={selectedValues}
-													variant='borderless'
-													popupMatchSelectWidth={false}
-													showSearch={false}
-													suffixIcon={
-														selectedValues.length === 0 ? (
-															<FontAwesomeIcon
-																icon={faBookBookmark}
-																color='black'
-																size='lg'
-																style={{ paddingTop: '2px' }}
-															/>
-														) : null
-													}
-													notFoundContent={
+										{(aitype === AiTypes.REGULAR ||
+											aitype === AiTypes.CONTRACT_SIDEBAR) && (
+											<Col style={{ marginBottom: 8 }}>
+												<Tooltip
+													title={
 														AiAssistantLocalization.uiText[contextMessageKey]
-															.contextHelp
+															.context
 													}
-													style={{ maxWidth: '100px', whiteSpace: 'normal' }} // Установите maxWidth по вашему усмотрению
-												/>
-											</Tooltip>
-										</Col>
-									)}
+													open={tooltipContextVisible}
+													placement='bottom'
+													onOpenChange={(visible) =>
+														setTooltipContextVisible(visible)
+													}
+												>
+													<Select
+														mode='multiple'
+														onSelect={handleSelectContext}
+														onDeselect={handleDeselectContext}
+														options={optionsData}
+														value={selectedValues}
+														variant='borderless'
+														popupMatchSelectWidth={false}
+														showSearch={false}
+														suffixIcon={
+															selectedValues.length === 0 ? (
+																<FontAwesomeIcon
+																	icon={faBookBookmark}
+																	color='black'
+																	size='lg'
+																	style={{ paddingTop: '2px' }}
+																/>
+															) : null
+														}
+														notFoundContent={
+															AiAssistantLocalization.uiText[contextMessageKey]
+																.contextHelp
+														}
+														style={{ maxWidth: '100px', whiteSpace: 'normal' }} // Установите maxWidth по вашему усмотрению
+													/>
+												</Tooltip>
+											</Col>
+										)}
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
 												title={
