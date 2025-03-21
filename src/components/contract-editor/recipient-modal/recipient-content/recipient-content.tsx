@@ -282,7 +282,8 @@ export const RecipientContent = ({
 						recipients.length > 0 &&
 						recipients.map((recipient, index) => {
 							return (
-								<Card loading={load}>
+								<Card loading={load}
+								style={{backgroundColor: '#00000005'}}>
 									<Row
 										wrap={false}
 										align='middle'
@@ -444,9 +445,10 @@ export const RecipientContent = ({
 										{recipient.shareLink && (
 											<>
 												{recipient.type === RecipientType.INTERNAL && (
-													<Col flex='100px'>
+													<Col>
 														<Button
 															key='actionIntoModal'
+															type='primary'
 															onClick={() => {
 																const url = `${SHARE_URL}/sharing/${recipient.shareLink}`; // Replace with your desired URL
 																window.open(url, '_blank');
@@ -463,6 +465,7 @@ export const RecipientContent = ({
 														</Button>
 													</Col>
 												)}
+												<Col flex='auto'></Col>
 												<Col flex='32px'>
 													<Tooltip title='Send personal request.'>
 														<div>

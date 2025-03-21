@@ -142,4 +142,5 @@ export const enum AiTypes {
 	TEMPLATE_CHOOSE = 'template_choose',
 	CONTRACT_SIDEBAR = 'contract_sidebar',
 	TEMPLATE_SIDEBAR = 'template_sidebar',
+	API_ASSISTANT = 'api_assistant',
 }

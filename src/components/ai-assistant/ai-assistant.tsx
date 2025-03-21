@@ -79,7 +79,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 	token = '',
 	userKey = '',
 	contract = {},
-	aitype = AiTypes.REGULAR,
+	aitype = AiTypes.API_ASSISTANT,
 }) => {
 	const [currClientKey, setCurrClientKey] = useState(clientKey);
 	const [isThinking, setIsThinking] = useState(false);
@@ -942,7 +942,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 																<Text className='text-primary'>
 																	{replaceTextWithElement(m.content)}
 																</Text>
-																{!m.content.includes('{ContractKey') && (
+																{/* {!m.content.includes('{ContractKey') && (
 																	<Tooltip
 																		title={
 																			AiAssistantLocalization.uiText[
@@ -963,7 +963,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 																			}
 																		></Button>
 																	</Tooltip>
-																)}
+																)} */}
 															</div>
 														</Space>
 													</li>
@@ -1087,6 +1087,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 										</Col>
 									</Row>
 									<Row gutter={4} style={{ padding: '0px 8px' }}>
+									{(aitype === AiTypes.REGULAR || aitype === AiTypes.CONTRACT_SIDEBAR) && (
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
 												title={
@@ -1126,6 +1127,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 												/>
 											</Tooltip>
 										</Col>
+									)}
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
 												title={
