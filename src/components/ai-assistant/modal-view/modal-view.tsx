@@ -3,7 +3,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { Card, Space, Modal, Typography, Tag, Segmented } from 'antd';
 import { useAiAssistantContext } from '../ai-assistant-context';
 import { ContractEditor } from '../../contract-editor';
-import { ContractList } from '../../contract-list'; 
+import { ContractList } from '../../contract-list';
 import { TemplateList } from '../../template-list';
 // import useSaveParams from '../../../hooks/use-save-params';
 export interface ModalViewProps {
@@ -67,31 +67,30 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 				</Space>
 			) : (
 				<Space direction='vertical' size='large' style={{ display: 'flex' }}>
-					{
-						contractKey === 'contracts' ? ( // Check if contractKey is 'contracts'
-							<ContractList 
-								apiKey={apiKey}
-								clientKey={clientKey}
-								token={token}
-								userKey={userKey}
-							/> // Show the ContractList
-						) : contractKey === 'templates' ? ( // Check if contractKey is 'templates'
-							<TemplateList 
-								apiKey={apiKey}
-								clientKey={clientKey}
-								token={token}
-								userKey={userKey}
-							/> // Show the TemplateList
-						) : (
-							<ContractEditor
-								apiKey={apiKey}
-								clientKey={clientKey}
-								token={token}
-								userKey={userKey}
-								contractKey={contractKey}
-							/> // Show the ContractEditor in other cases
-						)
-					}
+					{contractKey === 'contracts' ? ( // Check if contractKey is 'contracts'
+						<ContractList
+							apiKey={apiKey}
+							clientKey={clientKey}
+							token={token}
+							userKey={userKey}
+						/> // Show the ContractList
+					) : contractKey === 'templates' ? ( // Check if contractKey is 'templates'
+						<TemplateList
+							apiKey={apiKey}
+							clientKey={clientKey}
+							token={token}
+							userKey={userKey}
+						/> // Show the TemplateList
+					) : (
+						<ContractEditor
+							apiKey={apiKey}
+							clientKey={clientKey}
+							token={token}
+							userKey={userKey}
+							contractKey={contractKey}
+							ai={true}
+						/> // Show the ContractEditor in other cases
+					)}
 				</Space>
 			)}
 		</Modal>
