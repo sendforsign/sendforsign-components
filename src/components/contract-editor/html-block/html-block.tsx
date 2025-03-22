@@ -245,10 +245,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	useEffect(() => {
 		const setValue = async () => {
 			const processedValue = wrapTextNodes(value); // Обрабатываем HTML
-			quillRef?.current?.clipboard.dangerouslyPasteHTML(
-				processedValue,
-				'silent'
-			);
+			quillRef?.current?.clipboard.dangerouslyPasteHTML(processedValue, 'user');
 			// debugger;
 			setLoad(false);
 			setRefreshPlaceholders(refreshPlaceholders + 1);
