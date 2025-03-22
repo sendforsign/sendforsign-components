@@ -48,7 +48,7 @@ export const RecipientModal = () => {
 	useEffect(() => {
 		let isMounted = true;
 		if (contractKey && sendModal) {
-			// setDataLoad(true);
+			setLoad(true);
 			const getRecipients = async () => {
 				setUpdateRecipient([]);
 				setDeleteRecipient([]);
@@ -74,7 +74,7 @@ export const RecipientModal = () => {
 						responseType: 'json',
 					})
 					.then((payload: any) => {
-						//console.log('getShareLinks read', payload);
+						//console.log('getRecipients read', payload);
 						if (payload.data.recipients && payload.data.recipients.length > 0) {
 							setRecipientInit(false);
 							setRecipients(
@@ -138,12 +138,6 @@ export const RecipientModal = () => {
 		return () => {
 			isMounted = false;
 		};
-	}, [refreshRecipients]);
-
-	useEffect(() => {
-		if (sendModal) {
-			setLoad(true);
-		}
 	}, [sendModal]);
 
 	const handleSend = async () => {
@@ -418,7 +412,7 @@ export const RecipientModal = () => {
 							customMessage: recipients[0].customMessage,
 							position: recipients[0].position,
 							type: recipients[0].type,
-							action: recipients[0].action,							
+							action: recipients[0].action,
 							recipientKey: '',
 						},
 					],
