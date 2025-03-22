@@ -151,7 +151,7 @@ export const AiAssistantLocalization = {
 	uiText: {
 		rus: {
 			title: 'ИИ ассистент',
-			subtitle: 'Создавай, модифицируй, проверяй с ИИ.',
+			subtitle: 'Спрашивай, модифицируй, проверяй с ИИ.',
 			context: 'Выбрать контекст',
 			attach: 'Прикрепить файлы',
 			newChat: 'Новый чат',
@@ -171,7 +171,7 @@ export const AiAssistantLocalization = {
 		},
 		eng: {
 			title: 'AI assistant',
-			subtitle: 'Create, modify, assess and more.',
+			subtitle: 'Chat, modify, assess and more.',
 			context: 'Select context',
 			attach: 'Attach files',
 			newChat: 'New chat',
