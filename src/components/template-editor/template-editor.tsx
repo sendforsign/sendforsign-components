@@ -16,6 +16,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { FluentEditorBlock } from './fluent-editor-block';
 export interface TemplateEditorProps {
 	apiKey?: string;
 	clientKey?: string;
@@ -65,6 +66,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 	const templateKeyRef = useRef(templateKey);
 	const { Title, Text } = Typography;
 	const quillRef = useRef<any>();
+	const fluentRef = useRef<any>();
 
 	useEffect(() => {
 		setCurrToken(token);
@@ -315,10 +317,10 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 														<Popover content={
 															<Space direction='vertical'>
 																<Text type='secondary'>Template Key: {templateKey}</Text>
-																<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d'/>} onClick={() => navigator.clipboard.writeText(templateKey || 'N/A')}>Copy</Button>
+																<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d' />} onClick={() => navigator.clipboard.writeText(templateKey || 'N/A')}>Copy</Button>
 															</Space>
 														} title={templateName} trigger="click">
-															<Button size='small' type='text' icon={<FontAwesomeIcon icon={faInfoCircle} size='sm' color='#5d5d5d'/>}></Button>
+															<Button size='small' type='text' icon={<FontAwesomeIcon icon={faInfoCircle} size='sm' color='#5d5d5d' />}></Button>
 														</Popover>
 													</Space>
 													<Text type='secondary'>
@@ -328,10 +330,13 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 												{!isPdf ? (
 													<>
 														{templateValue && (
-															<HtmlBlock
-																value={templateValue}
-																quillRef={quillRef}
-															/>
+															// <HtmlBlock
+															// 	value={templateValue}
+															// 	quillRef={quillRef}
+															// />
+															<FluentEditorBlock
+																fluentRef={fluentRef}
+																value={templateValue} />
 														)}
 													</>
 												) : (

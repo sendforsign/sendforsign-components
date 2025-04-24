@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import './html-block.css';
-import QuillNamespace from 'quill';
-import Inline from 'quill/blots/inline';
-// import QuillBetterTable from 'quill-better-table';
 import { useDebouncedCallback } from 'use-debounce';
+import FluentEditor from '@opentiny/fluent-editor';
+import ImageToolbarButtons from '@opentiny/fluent-editor';
+import MarkdownShortcuts from 'quill-markdown-shortcuts';
+import TableUp, { defaultCustomSelect, TableAlign, TableMenuSelect, TableMenuContextmenu, TableResizeBox, TableResizeScale, TableSelection, TableVirtualScrollbar } from 'quill-table-up';
+
 import axios from 'axios';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -16,8 +17,22 @@ import {
 	PlaceholderView,
 	SpecialType,
 } from '../../../config/enum';
-import { addBlotClass, removeAilineTags, wrapTextNodes } from '../../../utils';
+import { addBlotClass, wrapTextNodes } from '../../../utils';
+import hljs from 'highlight.js'
+import Html2Canvas from 'html2canvas'
+import katex from 'katex'
 
+import '@opentiny/fluent-editor/style.css';
+import 'highlight.js/styles/atom-one-dark.css'
+import 'katex/dist/katex.min.css'
+import 'quill-table-up/index.css'
+import 'quill-table-up/table-creator.css'
+import Inline from 'quill/blots/inline';
+
+type Props = {
+	fluentRef: React.MutableRefObject<FluentEditor | undefined>;
+	value: string;
+}
 class AiLineBlot extends Inline {
 	static create(value: string) {
 		const node = super.create();
@@ -40,25 +55,41 @@ class AiLineBlot extends Inline {
 	}
 }
 
-QuillNamespace.register(AiLineBlot);
+FluentEditor.register(AiLineBlot);
 
-//env.config();
-type Props = {
-	value: string;
-	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
-};
-// QuillNamespace.register(
-// 	{
-// 		'modules/better-table': QuillBetterTable,
-// 	},
-// 	true
-// );
 for (let index = 1; index <= 40; index++) {
 	addBlotClass(index);
 }
 
-export const HtmlBlock = ({ value, quillRef }: Props) => {
+FluentEditor.register({ 'modules/table-up': TableUp }, true);
+FluentEditor.register({ 'modules/markdownShortcuts': MarkdownShortcuts }, true);
+
+export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
+	const TOOLBAR_CONFIG = [
+		['undo', 'redo', 'clean', 'format-painter'],
+		[
+			{ header: [1, 2, 3, 4, 5, 6, false] },
+			// { font: [false, '仿宋_GB2312, 仿宋', '楷体', '隶书', '黑体', '无效字体, 隶书'] },
+			{ size: [false, '12px', '14px', '16px', '18px', '20px', '24px', '32px', '36px', '48px', '72px'] },
+			{ 'line-height': [false, '1.2', '1.5', '1.75', '2', '3', '4', '5'] },
+		],
+		['bold', 'italic', 'strike', 'underline', 'divider'],
+		[{ color: [] }, { background: [] }],
+		[{ align: '' }, { align: 'center' }, { align: 'right' }, { align: 'justify' }],
+		[{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
+		[{ script: 'sub' }, { script: 'super' }],
+		[{ indent: '-1' }, { indent: '+1' }],
+		[{ direction: 'rtl' }],
+		['link', 'blockquote', 'code', 'code-block'],
+		['image', 'file'],
+		['emoji', 'video', 'formula'],//'screenshot', 'fullscreen'
+		[{ 'table-up': [] }],
+	];
+	(window as any).hljs = hljs;
+	(window as any).katex = katex;
+	(window as any).Html2Canvas = Html2Canvas;
 	dayjs.extend(utc);
+
 	const {
 		apiKey,
 		contractKey,
@@ -96,176 +127,82 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 	}, [focusElement]);
 
 	useEffect(() => {
-		if (document.querySelector('#contract-editor-container')) {
-			quillRef.current = new QuillNamespace('#contract-editor-container', {
+		if (container) {
+			fluentRef.current = new FluentEditor('#contract-editor-container', {
+				theme: 'snow',
 				modules: {
-					toolbar: {
-						container: [
-							['bold', 'italic', 'underline', 'strike'], // toggled buttons
-							['blockquote'],
-
-							[{ list: 'ordered' }, { list: 'bullet' }],
-							[{ script: 'sub' }, { script: 'super' }], // superscript/subscript
-							[{ indent: '-1' }, { indent: '+1' }], // outdent/indent
-							[{ direction: 'rtl' }], // text direction
-
-							[{ size: ['small', false, 'large', 'huge'] }], // custom dropdown
-
-							[{ color: [] }, { background: [] }], // dropdown with defaults from theme
-							[{ font: [] }],
-							[{ align: [] }],
-
-							['link', 'image', 'table'],
-
-							['clean'],
-						],
-						handlers: {
-							// table: addTable,
-						},
-					},
-					clipboard: {
-						matchVisual: false,
-						allowed: {
-							tags: [
-								'p',
-								'br',
-								'strong',
-								'em',
-								'u',
-								's',
-								'blockquote',
-								'ol',
-								'ul',
-								'li',
-								'sub',
-								'sup',
-								'h1',
-								'h2',
-								'h3',
-								'h4',
-								'h5',
-								'h6',
-								'span',
-							],
-							attributes: ['style', 'class', 'href', 'rel', 'target', 'id'],
-						},
-					},
-					table: false, // disable table module
-					'better-table': {
-						operationMenu: {
-							items: {
-								unmergeCells: {
-									text: 'Unmerge',
+					'toolbar': TOOLBAR_CONFIG as any,
+					image: {
+						toolbar: {
+							buttons: {
+								copy: false,
+								download: false,
+								clean: {
+									name: 'clean',
+									icon: (FluentEditor.import('ui/icons') as Record<string, string>).clean,
+									apply(el: HTMLImageElement, toolbarButtons: ImageToolbarButtons) {
+										(toolbarButtons as any).clear(el);
+										el.removeAttribute('width');
+										el.removeAttribute('height');
+									},
 								},
 							},
 						},
 					},
-					// keyboard: {
-					// 	bindings: QuillBetterTable.keyboardBindings,
-					// },
-					history: {
-						delay: 5000,
-						maxStack: 5000,
-						userOnly: true,
+					table: false,
+					'table-up': {
+						scrollbar: TableVirtualScrollbar,
+						align: TableAlign,
+						resize: TableResizeBox,
+						resizeScale: TableResizeScale,
+						customSelect: defaultCustomSelect,
+						selection: TableSelection,
+						selectionOptions: {
+							tableMenu: TableMenuSelect,
+						}
 					},
+					'syntax': { hljs },
+					// 'emoji-toolbar': true,
+					'file': true,
+					// 'mention': {
+					// 	itemKey: 'cn',
+					// 	searchKey,
+					// 	search(term) {
+					// 		return mentionList.filter((item) => {
+					// 			return item[searchKey] && String(item[searchKey]).includes(term)
+					// 		})
+					// 	},
+					// },
 				},
-				// scrollingContainer: 'body',
-				theme: 'bubble',
+				trackChanges: 'user'
 			});
-			if (quillRef.current) {
-				(quillRef.current as any)
-					.getModule('toolbar')
-					.container.addEventListener(
-						'mousedown',
-						(e: {
-							preventDefault: () => void;
-							stopPropagation: () => void;
-						}) => {
-							e.preventDefault();
-							e.stopPropagation();
-						}
-					);
-
-				// Add focus tracking
-				const editorContainer = document.querySelector(
-					'#contract-editor-container'
-				);
-				if (editorContainer) {
-					let hasChanges = false;
-
-					// Track text changes
-					quillRef.current.on(
-						'text-change',
-						function (delta: any, oldDelta: any, source: any) {
-							if (source === 'user') {
-								hasChanges = true;
-								setDocumentCurrentSaved(false);
-								handleChangeText(
-									quillRef?.current ? quillRef?.current?.root?.innerHTML : ''
-								);
-							}
-						}
-					);
-
-					// Handle clicks outside the editor
-					document.addEventListener('click', (e) => {
-						const target = e.target as HTMLElement;
-						const editor = editorContainer.querySelector('.ql-editor');
-						if (!editor?.contains(target) && hasChanges) {
-							console.log('addEventListener');
-							hasChanges = false;
-							let contentTmp = removeAilineTags(
-								quillRef?.current?.root?.innerHTML as string
-							);
-							contentTmp = wrapTextNodes(contentTmp);
-							// quillRef?.current?.clipboard.dangerouslyPasteHTML(
-							// 	contentTmp,
-							// 	'silent'
-							// );
-							handleChangeText(contentTmp);
-							// if (focusElementRef.current) {
-							// 	const element = document.getElementById(
-							// 		focusElementRef.current
-							// 	);
-							// 	element?.focus();
-							// 	setFocusElement('');
-							// } else if (!aiHidden) {
-							// 	const element = document.getElementById(
-							// 		'AiAssistantTextArea'
-							// 	) as HTMLTextAreaElement;
-							// 	element?.focus();
-							// }
-						}
-					});
+			if (fluentRef.current) {
+				fluentRef.current.on('text-change', () => {
+					handleChangeText(fluentRef?.current?.root?.innerHTML as string);
+				});
+				const setValue = async () => {
+					const processedValue = wrapTextNodes(value); // Обрабатываем HTML 
+					fluentRef.current && (fluentRef.current.root.innerHTML = processedValue);
+					setLoad(false);
+					setRefreshPlaceholders(refreshPlaceholders + 1);
+					if (!placeholderClassFill.current) {
+						await getPlaceholders();
+					}
+				};
+				if (value) {
+					setValue();
+				}
+				if (readonly) {
+					fluentRef?.current?.enable(!readonly);
 				}
 			}
 		}
 	}, [container]);
 
 	useEffect(() => {
-		const setValue = async () => {
-			const processedValue = wrapTextNodes(value); // Обрабатываем HTML
-			quillRef?.current?.clipboard.dangerouslyPasteHTML(processedValue, 'user');
-			// debugger;
-			setLoad(false);
-			setRefreshPlaceholders(refreshPlaceholders + 1);
-			if (!placeholderClassFill.current) {
-				await getPlaceholders();
-			}
-		};
-		if (value && quillRef?.current) {
-			setValue();
-		}
-	}, [value]);
-	useEffect(() => {
-		if (readonly) {
-			quillRef?.current?.enable(!readonly);
-		}
-	}, [readonly]);
-	useEffect(() => {
 		if (sign && contractSign) {
 			let textTmp =
-				quillRef?.current?.root.innerHTML +
+				fluentRef?.current?.root.innerHTML +
 				`<br></br><p><img src='${sign}' alt="signature" /></p>`;
 			textTmp = textTmp + `<p>Name: ${contractSign.fullName}</p>`;
 			textTmp = textTmp + `<p>Email: ${contractSign.email}</p>`;
@@ -276,12 +213,12 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					.format('YYYY-MM-DD HH:mm:ss')} GMT</p>`;
 
 			handleChangeText(textTmp, false, true);
-			quillRef?.current?.clipboard.dangerouslyPasteHTML(textTmp);
+			fluentRef?.current?.clipboard.dangerouslyPasteHTML(textTmp);
 			// debugger;
 			setContinueLoad(false);
 			setSign('');
 			setContractSign({});
-			quillRef?.current?.enable(false);
+			fluentRef?.current?.enable(false);
 		}
 	}, [sign, contractSign]);
 	useEffect(() => {
@@ -309,8 +246,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -329,34 +266,26 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					placeholder[index].view?.toString() !==
 					PlaceholderView.SIGNATURE.toString()
 				) {
-					// const elements = document.getElementsByTagName(
-					// 	`placeholder${placeholder[index].id}`
-					// );
 					let tagClass = `placeholderClass${placeholder[index].id}`;
 					if (placeholder[index].specialType) {
 						switch (placeholder[index].specialType) {
 							case SpecialType.DATE:
-								// elements = document.getElementsByTagName(`date${id}`);
 								tagClass = `dateClass${placeholder[index].id}`;
 								break;
 
 							case SpecialType.FULLNAME:
-								// elements = document.getElementsByTagName(`fullname${id}`);
 								tagClass = `fullnameClass${placeholder[index].id}`;
 								break;
 
 							case SpecialType.EMAIL:
-								// elements = document.getElementsByTagName(`email${id}`);
 								tagClass = `emailClass${placeholder[index].id}`;
 								break;
 
 							case SpecialType.SIGN:
-								// elements = document.getElementsByTagName(`sign${id}`);
 								tagClass = `signClass${placeholder[index].id}`;
 								break;
 
 							case SpecialType.INITIALS:
-								// elements = document.getElementsByTagName(`initials${id}`);
 								tagClass = `initialsClass${placeholder[index].id}`;
 								break;
 						}
@@ -364,10 +293,9 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 
 					const styleSheet = document.styleSheets[0]; // Получаем первый стиль
 					styleSheet.insertRule(
-						`.${tagClass} { background-color: ${
-							placeholder[index].color
-								? placeholder[index].color
-								: PlaceholderColor.OTHER
+						`.${tagClass} { background-color: ${placeholder[index].color
+							? placeholder[index].color
+							: PlaceholderColor.OTHER
 						} }`,
 						styleSheet.cssRules.length
 					);
@@ -394,7 +322,6 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					responseType: 'json',
 				})
 				.then((payload: any) => {
-					//console.log('getPlaceholders read', payload);
 
 					if (
 						payload.data.placeholders &&
@@ -414,37 +341,31 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 								if (payload.data.placeholders[index].specialType) {
 									switch (payload.data.placeholders[index].specialType) {
 										case SpecialType.DATE:
-											// elements = document.getElementsByTagName(`date${id}`);
 											tagClass = `dateClass${payload.data.placeholders[index].id}`;
 											break;
 
 										case SpecialType.FULLNAME:
-											// elements = document.getElementsByTagName(`fullname${id}`);
 											tagClass = `fullnameClass${payload.data.placeholders[index].id}`;
 											break;
 
 										case SpecialType.EMAIL:
-											// elements = document.getElementsByTagName(`email${id}`);
 											tagClass = `emailClass${payload.data.placeholders[index].id}`;
 											break;
 
 										case SpecialType.SIGN:
-											// elements = document.getElementsByTagName(`sign${id}`);
 											tagClass = `signClass${payload.data.placeholders[index].id}`;
 											break;
 
 										case SpecialType.INITIALS:
-											// elements = document.getElementsByTagName(`initials${id}`);
 											tagClass = `initialsClass${payload.data.placeholders[index].id}`;
 											break;
 									}
 								}
 								const styleSheet = document.styleSheets[0]; // Получаем первый стиль
 								styleSheet.insertRule(
-									`.${tagClass} { background-color: ${
-										payload.data.placeholders[index].color
-											? payload.data.placeholders[index].color
-											: PlaceholderColor.OTHER
+									`.${tagClass} { background-color: ${payload.data.placeholders[index].color
+										? payload.data.placeholders[index].color
+										: PlaceholderColor.OTHER
 									} }`,
 									styleSheet.cssRules.length
 								);
@@ -457,17 +378,14 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
 				});
 		}
 	};
-	// const addTable = () => {
-	// 	(quillRef?.current?.getModule('better-table') as any).insertTable(3, 3);
-	// };
 	const removeParentSpan = (element: HTMLElement | null) => {
 		// Проверяем, что элемент существует
 		if (element) {
@@ -489,8 +407,6 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			email: boolean = false
 		) => {
 			let contentTmp = content;
-			// let contentTmp = removeAilineTags(content); // Удаляем теги перед сохранением
-			// contentTmp = wrapTextNodes(contentTmp);
 
 			const tempDiv = document.createElement('div');
 			tempDiv.innerHTML = contentTmp;
@@ -560,8 +476,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						setNotification({
 							text:
 								error.response &&
-								error.response.data &&
-								error.response.data.message
+									error.response.data &&
+									error.response.data.message
 									? error.response.data.message
 									: error.message,
 						});
@@ -597,8 +513,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						setNotification({
 							text:
 								error.response &&
-								error.response.data &&
-								error.response.data.message
+									error.response.data &&
+									error.response.data.message
 									? error.response.data.message
 									: error.message,
 						});
@@ -606,7 +522,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 			} else {
 				setReadonly(true);
 				if (contractValueTmp) {
-					quillRef?.current?.clipboard.dangerouslyPasteHTML(contractValueTmp);
+					fluentRef?.current?.clipboard.dangerouslyPasteHTML(contractValueTmp);
 				}
 				setNotification({
 					text: 'Contract updated. Please, reload the page.',

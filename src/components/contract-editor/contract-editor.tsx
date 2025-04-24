@@ -23,7 +23,7 @@ import { ApproveModal } from './approve-modal/approve-modal';
 import { SignModal } from './sign-modal/sign-modal';
 import { RecipientModal } from './recipient-modal/recipient-modal';
 import { ResultModal } from './result-modal/result-modal';
-import { HtmlBlock } from './html-block/html-block';
+// import { HtmlBlock } from './html-block/html-block';
 import { Notification } from './notification/notification';
 import { DocumentTimilineBlock } from './document-timeline-block/document-timeline-block';
 import { ChooseContractType } from './choose-contract-type/choose-contract-type';
@@ -37,6 +37,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { delColorFromHtml, removeAilineTags } from '../../utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { FluentEditorBlock } from './fluent-editor-block';
 
 export interface StepChangeProps {
 	currentStep?: ContractSteps;
@@ -147,6 +148,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const contractEditorRef = useRef<HTMLDivElement>(null);
 
 	const quillRef = useRef<any>();
+	const fluentRef = useRef<any>();
 	const contractKeyRef = useRef(contractKey);
 	const first = useRef(false);
 	const { Title, Text } = Typography;
@@ -223,8 +225,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -353,25 +355,25 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 						},
 						placeholders: fillPlaceholder
 							? placeholder
-									.filter((holder) => holder.value)
-									.map((holder) => {
-										return {
-											placeholderKey: holder.placeholderKey,
-											value: holder.value,
-										};
-									})
+								.filter((holder) => holder.value)
+								.map((holder) => {
+									return {
+										placeholderKey: holder.placeholderKey,
+										value: holder.value,
+									};
+								})
 							: undefined,
 						recipients: fillRecipient
 							? recipientFilling.map((recipient) => {
-									return {
-										action: recipient.action,
-										customMessage: recipient.customMessage,
-										fullname: recipient.fullname,
-										email: recipient.email,
-										position: recipient.id,
-										type: recipient.type,
-									};
-							  })
+								return {
+									action: recipient.action,
+									customMessage: recipient.customMessage,
+									fullname: recipient.fullname,
+									email: recipient.email,
+									position: recipient.id,
+									type: recipient.type,
+								};
+							})
 							: undefined,
 					},
 				};
@@ -389,26 +391,26 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 						},
 						placeholders: fillPlaceholder
 							? placeholder
-									.filter((holder) => holder.value)
-									.map((holder) => {
-										return {
-											placeholderKey: holder.placeholderKey,
-											value: holder.value,
-										};
-									})
+								.filter((holder) => holder.value)
+								.map((holder) => {
+									return {
+										placeholderKey: holder.placeholderKey,
+										value: holder.value,
+									};
+								})
 							: undefined,
 
 						recipients: fillRecipient
 							? recipientFilling.map((recipient) => {
-									return {
-										action: recipient.action,
-										customMessage: recipient.customMessage,
-										fullname: recipient.fullname,
-										email: recipient.email,
-										position: recipient.id,
-										type: recipient.type,
-									};
-							  })
+								return {
+									action: recipient.action,
+									customMessage: recipient.customMessage,
+									fullname: recipient.fullname,
+									email: recipient.email,
+									position: recipient.id,
+									type: recipient.type,
+								};
+							})
 							: undefined,
 						returnValue: fillPlaceholder ? true : undefined,
 					},
@@ -433,8 +435,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -466,9 +468,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 				});
 				formData.append('pdf', pdfFileBlob);
 
-				let url = `${BASE_URL}${ApiEntity.UPLOAD_PDF}?contractKey=${
-					contractKeyTmp ? contractKeyTmp : ''
-				}`;
+				let url = `${BASE_URL}${ApiEntity.UPLOAD_PDF}?contractKey=${contractKeyTmp ? contractKeyTmp : ''
+					}`;
 				url =
 					!currToken && currApiKey ? `${url}&clientKey=${currClientKey}` : url;
 
@@ -485,8 +486,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 						setNotification({
 							text:
 								error.response &&
-								error.response.data &&
-								error.response.data.message
+									error.response.data &&
+									error.response.data.message
 									? error.response.data.message
 									: error.message,
 						});
@@ -732,11 +733,16 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 															</Space>
 															{!isPdf ? (
 																<>
-																	{contractValue && (
+																	{/* {contractValue && (
 																		<HtmlBlock
 																			value={contractValue}
 																			quillRef={quillRef}
 																		/>
+																	)} */}
+																	{contractValue && (
+																		<FluentEditorBlock
+																			fluentRef={fluentRef}
+																			value={contractValue} />
 																	)}
 																</>
 															) : (
@@ -758,7 +764,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 															overflow: 'auto',
 														}}
 													>
-														<PlaceholderHtmlBlock quillRef={quillRef} />
+														<PlaceholderHtmlBlock quillRef={fluentRef} />
 													</Space>
 												</Col>
 											)}

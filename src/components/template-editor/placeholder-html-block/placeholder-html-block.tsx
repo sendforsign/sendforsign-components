@@ -12,7 +12,8 @@ import {
 	Popover,
 	Divider,
 } from 'antd';
-import QuillNamespace from 'quill';
+// import QuillNamespace from 'quill';
+import FluentEditor from '@opentiny/fluent-editor';
 import { useTemplateEditorContext } from '../template-editor-context';
 import { BASE_URL } from '../../../config/config';
 import {
@@ -34,7 +35,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 type Props = {
-	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
+	quillRef: React.MutableRefObject<FluentEditor | undefined>;
 };
 
 export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {

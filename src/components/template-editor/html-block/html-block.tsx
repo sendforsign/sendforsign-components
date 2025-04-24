@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import './html-block.css';
 import QuillNamespace from 'quill';
-import QuillBetterTable from 'quill-better-table';
+// import QuillBetterTable from 'quill-better-table';
 import { useDebouncedCallback } from 'use-debounce';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -9,19 +9,18 @@ import utc from 'dayjs/plugin/utc';
 import { useTemplateEditorContext } from '../template-editor-context';
 import { BASE_URL } from '../../../config/config';
 import { Action, ApiEntity } from '../../../config/enum';
-import { addBlotClass } from '../../../utils';
-//env.config();
+import { addBlotClass } from '../../../utils'; 
 type Props = {
 	value: string;
 	quillRef: React.MutableRefObject<any>;
 };
 
-QuillNamespace.register(
-	{
-		'modules/better-table': QuillBetterTable,
-	},
-	true
-);
+// QuillNamespace.register(
+// 	{
+// 		'modules/better-table': QuillBetterTable,
+// 	},
+// 	true
+// );
 for (let index = 1; index <= 40; index++) {
 	addBlotClass(index);
 }
@@ -37,7 +36,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		refreshPlaceholders,
 	} = useTemplateEditorContext();
 	const container = document.querySelector('#template-editor-container');
-	// const quillRef = useRef<Quill>();
+
 	useEffect(() => {
 		if (document.querySelector('#template-editor-container')) {
 			quillRef.current = new QuillNamespace('#template-editor-container', {
@@ -63,7 +62,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 							['clean'],
 						],
 						handlers: {
-							table: addTable,
+							// table: addTable,
 						},
 					},
 					table: false, // disable table module
@@ -76,9 +75,9 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 							},
 						},
 					},
-					keyboard: {
-						bindings: QuillBetterTable.keyboardBindings,
-					},
+					// keyboard: {
+					// 	bindings: QuillBetterTable.keyboardBindings,
+					// },
 					history: {
 						delay: 5000,
 						maxStack: 5000,
@@ -123,9 +122,9 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 		}
 	}, [value]);
 
-	const addTable = () => {
-		quillRef?.current?.getModule('better-table').insertTable(3, 3);
-	};
+	// const addTable = () => {
+	// 	quillRef?.current?.getModule('better-table').insertTable(3, 3);
+	// };
 	const handleChangeText = useDebouncedCallback(
 		async (content: string) => {
 			let body = {

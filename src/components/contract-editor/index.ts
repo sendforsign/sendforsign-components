@@ -1,7 +1,7 @@
 export { ApproveModal } from './approve-modal/approve-modal';
 export { ChooseContractType } from './choose-contract-type/choose-contract-type';
 export { DocumentTimilineBlock } from './document-timeline-block/document-timeline-block';
-export { HtmlBlock } from './html-block/html-block';
+// export { HtmlBlock } from './html-block/html-block';
 export { Notification } from './notification/notification';
 export { PdfBlockDnd } from './pdf-block-dnd/pdf-block-dnd';
 export { PdfSign } from './pdf-sign/pdf-sign';

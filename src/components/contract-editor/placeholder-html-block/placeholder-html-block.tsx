@@ -12,8 +12,8 @@ import {
 	Popover,
 	Divider,
 	Select,
-} from 'antd';
-import QuillNamespace from 'quill';
+} from 'antd'; 
+import FluentEditor from '@opentiny/fluent-editor';
 import { useContractEditorContext } from '../contract-editor-context';
 import { BASE_URL } from '../../../config/config';
 import {
@@ -47,7 +47,7 @@ import {
 } from '../../../utils';
 
 type Props = {
-	quillRef: React.MutableRefObject<QuillNamespace | undefined>;
+	quillRef: React.MutableRefObject<FluentEditor | undefined>;
 };
 type Option = { value: string; label: React.JSX.Element };
 export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
