@@ -722,7 +722,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 																					color='#5d5d5d'
 																				/>
 																			}
-																		></Button>
+																		/>
 																	</Popover>
 																</Space>
 																{!isPdf && (

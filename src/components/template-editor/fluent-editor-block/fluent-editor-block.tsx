@@ -3,18 +3,24 @@ import React, { useEffect } from 'react';
 // import QuillNamespace from 'quill';
 // import QuillBetterTable from 'quill-better-table';
 import FluentEditor from '@opentiny/fluent-editor';
-// import ImageToolbarButtons from '@opentiny/fluent-editor';
-// import MarkdownShortcuts from 'quill-markdown-shortcuts';
-// import TableUp, { defaultCustomSelect, TableAlign, TableMenuSelect, TableMenuContextmenu, TableResizeBox, TableResizeScale, TableSelection, TableVirtualScrollbar } from 'quill-table-up';
+import ImageToolbarButtons from '@opentiny/fluent-editor';
+import MarkdownShortcuts from 'quill-markdown-shortcuts';
+import TableUp, { defaultCustomSelect, TableAlign, TableMenuSelect, TableMenuContextmenu, TableResizeBox, TableResizeScale, TableSelection, TableVirtualScrollbar } from 'quill-table-up';
 
 import { useDebouncedCallback } from 'use-debounce';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import hljs from 'highlight.js'
 import { useTemplateEditorContext } from '../template-editor-context';
 import { BASE_URL } from '../../../config/config';
 import { Action, ApiEntity } from '../../../config/enum';
 import { addBlotClass } from '../../../utils';
+import '@opentiny/fluent-editor/style.css';
+import 'highlight.js/styles/atom-one-dark.css'
+import 'katex/dist/katex.min.css'
+import 'quill-table-up/index.css'
+import 'quill-table-up/table-creator.css'
 type Props = {
 	value: string;
 	fluentRef: React.MutableRefObject<FluentEditor | undefined>;
@@ -26,13 +32,13 @@ type Props = {
 // 	},
 // 	true
 // );
-// for (let index = 1; index <= 40; index++) {
-// 	addBlotClass(index);
-// }
-// FluentEditor.register({ 'modules/table-up': TableUp }, true);
-// FluentEditor.register({ 'modules/markdownShortcuts': MarkdownShortcuts }, true);
+for (let index = 1; index <= 40; index++) {
+	addBlotClass(index);
+}
+FluentEditor.register({ 'modules/table-up': TableUp }, true);
+FluentEditor.register({ 'modules/markdownShortcuts': MarkdownShortcuts }, true);
 
-export const HtmlBlock = ({ value, fluentRef }: Props) => {
+export const FluentEditorBlock = ({ value, fluentRef }: Props) => {
 	const TOOLBAR_CONFIG = [
 		['undo', 'redo', 'clean', 'format-painter'],
 		[
@@ -53,6 +59,7 @@ export const HtmlBlock = ({ value, fluentRef }: Props) => {
 		['emoji', 'video', 'formula'],//'screenshot', 'fullscreen'
 		// [{ 'table-up': [] }],
 	];
+	(window as any).hljs = hljs;
 	dayjs.extend(utc);
 	const {
 		apiKey,
@@ -66,8 +73,8 @@ export const HtmlBlock = ({ value, fluentRef }: Props) => {
 	const container = document.querySelector('#template-editor-container');
 
 	useEffect(() => {
-		if (document.querySelector('#template-editor-container')) {
-			fluentRef.current = new FluentEditor('#contract-editor-container', {
+		if (document.querySelector('#template-editor-container') && !fluentRef.current) {
+			fluentRef.current = new FluentEditor('#template-editor-container', {
 				theme: 'snow',
 				modules: {
 					'toolbar': TOOLBAR_CONFIG as any,
@@ -79,28 +86,28 @@ export const HtmlBlock = ({ value, fluentRef }: Props) => {
 								clean: {
 									name: 'clean',
 									icon: (FluentEditor.import('ui/icons') as Record<string, string>).clean,
-									// apply(el: HTMLImageElement, toolbarButtons: ImageToolbarButtons) {
-									// 	(toolbarButtons as any).clear(el);
-									// 	el.removeAttribute('width');
-									// 	el.removeAttribute('height');
-									// },
+									apply(el: HTMLImageElement, toolbarButtons: ImageToolbarButtons) {
+										(toolbarButtons as any).clear(el);
+										el.removeAttribute('width');
+										el.removeAttribute('height');
+									},
 								},
 							},
 						},
 					},
 					table: false,
-					// 'table-up': {
-					// 	scrollbar: TableVirtualScrollbar,
-					// 	align: TableAlign,
-					// 	resize: TableResizeBox,
-					// 	resizeScale: TableResizeScale,
-					// 	customSelect: defaultCustomSelect,
-					// 	selection: TableSelection,
-					// 	selectionOptions: {
-					// 		tableMenu: TableMenuSelect,
-					// 	}
-					// },
-					// 'syntax': { hljs },
+					'table-up': {
+						scrollbar: TableVirtualScrollbar,
+						align: TableAlign,
+						resize: TableResizeBox,
+						resizeScale: TableResizeScale,
+						customSelect: defaultCustomSelect,
+						selection: TableSelection,
+						selectionOptions: {
+							tableMenu: TableMenuSelect,
+						}
+					},
+					'syntax': { hljs },
 					// 'emoji-toolbar': true,
 					'file': true,
 					// 'mention': {
@@ -133,20 +140,21 @@ export const HtmlBlock = ({ value, fluentRef }: Props) => {
 				fluentRef.current.on(
 					'text-change',
 					function (delta: any, oldDelta: any, source: any) {
-						handleChangeText(
-							fluentRef?.current ? fluentRef?.current?.root?.innerHTML : ''
-						);
+						handleChangeText(fluentRef?.current?.root?.innerHTML as string);
 					}
 				);
+				fluentRef.current && (fluentRef.current.root.innerHTML = value);
+				setRefreshPlaceholders(refreshPlaceholders + 1);
+
 			}
 		}
 	}, [container]);
-	useEffect(() => {
-		if (value && fluentRef?.current) {
-			fluentRef?.current?.clipboard.dangerouslyPasteHTML(value);
-			setRefreshPlaceholders(refreshPlaceholders + 1);
-		}
-	}, [value]);
+	// useEffect(() => {
+	// 	if (value && fluentRef?.current) {
+	// 		fluentRef?.current?.clipboard.dangerouslyPasteHTML(value);
+	// 		setRefreshPlaceholders(refreshPlaceholders + 1);
+	// 	}
+	// }, [value]);
 
 	// const addTable = () => {
 	// 	quillRef?.current?.getModule('better-table').insertTable(3, 3);
@@ -181,8 +189,6 @@ export const HtmlBlock = ({ value, fluentRef }: Props) => {
 	);
 
 	return (
-		<div id='scroll-container'>
-			<div id='template-editor-container' />
-		</div>
+		<div id='template-editor-container' />
 	);
 };

@@ -317,10 +317,33 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 														<Popover content={
 															<Space direction='vertical'>
 																<Text type='secondary'>Template Key: {templateKey}</Text>
-																<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d' />} onClick={() => navigator.clipboard.writeText(templateKey || 'N/A')}>Copy</Button>
+																<Button
+																	size='small'
+																	icon={
+																		<FontAwesomeIcon
+																			icon={faCopy}
+																			size='sm'
+																			color='#5d5d5d'
+																		/>}
+																	onClick={() => navigator.clipboard.writeText(templateKey || 'N/A')}>
+																	Copy
+																</Button>
 															</Space>
-														} title={templateName} trigger="click">
-															<Button size='small' type='text' icon={<FontAwesomeIcon icon={faInfoCircle} size='sm' color='#5d5d5d' />}></Button>
+														}
+															title={templateName}
+															trigger="click"
+														>
+															<Button
+																size='small'
+																type='text'
+																icon={
+																	<FontAwesomeIcon
+																		icon={faInfoCircle}
+																		size='sm'
+																		color='#5d5d5d'
+																	/>
+																}
+															/>
 														</Popover>
 													</Space>
 													<Text type='secondary'>
@@ -358,7 +381,7 @@ export const TemplateEditor: FC<TemplateEditorProps> = ({
 												overflow: 'auto',
 											}}
 										>
-											<PlaceholderHtmlBlock quillRef={quillRef} />
+											<PlaceholderHtmlBlock quillRef={fluentRef} />
 										</Space>
 									</Col>
 								)}

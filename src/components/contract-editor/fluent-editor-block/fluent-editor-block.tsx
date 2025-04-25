@@ -127,7 +127,7 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 	}, [focusElement]);
 
 	useEffect(() => {
-		if (container) {
+		if (document.querySelector('#contract-editor-container') && !fluentRef.current) {
 			fluentRef.current = new FluentEditor('#contract-editor-container', {
 				theme: 'snow',
 				modules: {
@@ -561,8 +561,6 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 			});
 	};
 	return (
-		<div id='scroll-container'>
-			<div id='contract-editor-container' />
-		</div>
+		<div id='contract-editor-container' />
 	);
 };
