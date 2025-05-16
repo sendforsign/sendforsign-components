@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 // import QuillBetterTable from 'quill-better-table';
 import FluentEditor from '@opentiny/fluent-editor';
 import ImageToolbarButtons from '@opentiny/fluent-editor';
+import QuillBetterTable from 'quill-better-table';
 import MarkdownShortcuts from 'quill-markdown-shortcuts';
 import TableUp, { defaultCustomSelect, TableAlign, TableMenuSelect, TableMenuContextmenu, TableResizeBox, TableResizeScale, TableSelection, TableVirtualScrollbar } from 'quill-table-up';
 
@@ -37,7 +38,12 @@ for (let index = 1; index <= 40; index++) {
 }
 FluentEditor.register({ 'modules/table-up': TableUp }, true);
 FluentEditor.register({ 'modules/markdownShortcuts': MarkdownShortcuts }, true);
-
+FluentEditor.register(
+	{
+		'modules/better-table': QuillBetterTable,
+	},
+	true
+);
 export const FluentEditorBlock = ({ value, fluentRef }: Props) => {
 	const TOOLBAR_CONFIG = [
 		['undo', 'redo', 'clean', 'format-painter'],
@@ -108,34 +114,12 @@ export const FluentEditorBlock = ({ value, fluentRef }: Props) => {
 						}
 					},
 					'syntax': { hljs },
-					// 'emoji-toolbar': true,
 					'file': true,
-					// 'mention': {
-					// 	itemKey: 'cn',
-					// 	searchKey,
-					// 	search(term) {
-					// 		return mentionList.filter((item) => {
-					// 			return item[searchKey] && String(item[searchKey]).includes(term)
-					// 		})
-					// 	},
-					// },
 				},
 				trackChanges: 'user'
 			});
 
 			if (fluentRef.current) {
-				// fluentRef?.current
-				// 	?.getModule('toolbar')
-				// 	.container.addEventListener(
-				// 		'mousedown',
-				// 		(e: {
-				// 			preventDefault: () => void;
-				// 			stopPropagation: () => void;
-				// 		}) => {
-				// 			e.preventDefault();
-				// 			e.stopPropagation();
-				// 		}
-				// 	);
 
 				fluentRef.current.on(
 					'text-change',
@@ -149,16 +133,6 @@ export const FluentEditorBlock = ({ value, fluentRef }: Props) => {
 			}
 		}
 	}, [container]);
-	// useEffect(() => {
-	// 	if (value && fluentRef?.current) {
-	// 		fluentRef?.current?.clipboard.dangerouslyPasteHTML(value);
-	// 		setRefreshPlaceholders(refreshPlaceholders + 1);
-	// 	}
-	// }, [value]);
-
-	// const addTable = () => {
-	// 	quillRef?.current?.getModule('better-table').insertTable(3, 3);
-	// };
 	const handleChangeText = useDebouncedCallback(
 		async (content: string) => {
 			let body = {

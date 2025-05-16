@@ -44,6 +44,7 @@
 		"mammoth": "^1.6.0",
 		"pdf-lib": "^1.17.1",
 		"pdf-merger-js": "^4.3.0",
+		"quill-better-table": "^1.2.10",
 		"quill-markdown-shortcuts": "^0.0.10",
 		"quill-table-up": "^2.1.9",
 		"re-resizable": "^6.9.17",

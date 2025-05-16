@@ -1,9 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import FluentEditor from '@opentiny/fluent-editor';
+import QuillBetterTable from 'quill-better-table';
 import ImageToolbarButtons from '@opentiny/fluent-editor';
 import MarkdownShortcuts from 'quill-markdown-shortcuts';
 import TableUp, { defaultCustomSelect, TableAlign, TableMenuSelect, TableMenuContextmenu, TableResizeBox, TableResizeScale, TableSelection, TableVirtualScrollbar } from 'quill-table-up';
+import hljs from 'highlight.js'
+import Html2Canvas from 'html2canvas'
+import katex from 'katex'
 
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -18,9 +22,6 @@ import {
 	SpecialType,
 } from '../../../config/enum';
 import { addBlotClass, wrapTextNodes } from '../../../utils';
-import hljs from 'highlight.js'
-import Html2Canvas from 'html2canvas'
-import katex from 'katex'
 
 import '@opentiny/fluent-editor/style.css';
 import 'highlight.js/styles/atom-one-dark.css'
@@ -63,7 +64,12 @@ for (let index = 1; index <= 40; index++) {
 
 FluentEditor.register({ 'modules/table-up': TableUp }, true);
 FluentEditor.register({ 'modules/markdownShortcuts': MarkdownShortcuts }, true);
-
+FluentEditor.register(
+	{
+		'modules/better-table': QuillBetterTable,
+	},
+	true
+);
 export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 	const TOOLBAR_CONFIG = [
 		['undo', 'redo', 'clean', 'format-painter'],
