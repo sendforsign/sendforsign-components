@@ -418,7 +418,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 			}
 			let contractKeyTmp: string = '';
 			const url: string = BASE_URL + ApiEntity.CONTRACT || '';
-
+			let hasError = false;
 			const response = await axios
 				.post(url, body, {
 					headers: {
@@ -432,6 +432,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					responseType: 'json',
 				})
 				.catch((error) => {
+					hasError = true;
 					setNotification({
 						text:
 							error.response &&
@@ -495,11 +496,13 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 
 				setDocumentCurrentSaved(true);
 			}
-			setCurrentData({ currentStep: ContractSteps.CONTRACT_EDITOR_STEP });
-			setEditorVisible(true);
-			setContinueDisable(true);
-			setIsNew(false);
-			setBeforeCreated(false);
+			if (!hasError) {
+				setCurrentData({ currentStep: ContractSteps.CONTRACT_EDITOR_STEP });
+				setEditorVisible(true);
+				setContinueDisable(true);
+				setIsNew(false);
+				setBeforeCreated(false);
+			}
 			setContinueLoad(false);
 			return response;
 		};
