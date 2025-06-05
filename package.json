@@ -1,6 +1,6 @@
 {
 	"name": "sendforsign",
-	"version": "1.1.29",
+	"version": "1.1.30",
 	"description": "Sendforsign components",
 	"main": "/dist/index",
 	"typings": "dist/index",
@@ -17,7 +17,7 @@
 		"sendforsign"
 	],
 	"engines": {
-		"node": "18.13.0",
+		"node": ">=18.13.0",
 		"npm": "8.19.4"
 	},
 	"author": {
