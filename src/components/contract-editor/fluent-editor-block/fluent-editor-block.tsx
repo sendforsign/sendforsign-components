@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import FluentEditor from '@opentiny/fluent-editor';
-import QuillBetterTable from 'quill-better-table';
+// import QuillBetterTable from 'quill-better-table';
 import ImageToolbarButtons from '@opentiny/fluent-editor';
 import MarkdownShortcuts from 'quill-markdown-shortcuts';
 import TableUp, { defaultCustomSelect, TableAlign, TableMenuSelect, TableMenuContextmenu, TableResizeBox, TableResizeScale, TableSelection, TableVirtualScrollbar } from 'quill-table-up';
@@ -64,12 +64,12 @@ for (let index = 1; index <= 40; index++) {
 
 FluentEditor.register({ 'modules/table-up': TableUp }, true);
 FluentEditor.register({ 'modules/markdownShortcuts': MarkdownShortcuts }, true);
-FluentEditor.register(
-	{
-		'modules/better-table': QuillBetterTable,
-	},
-	true
-);
+// FluentEditor.register(
+// 	{
+// 		'modules/better-table': QuillBetterTable,
+// 	},
+// 	true
+// );
 export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 	const TOOLBAR_CONFIG = [
 		['undo', 'redo', 'clean', 'format-painter'],
