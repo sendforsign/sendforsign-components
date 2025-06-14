@@ -187,7 +187,11 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 					handleChangeText(fluentRef?.current?.root?.innerHTML as string);
 				});
 				const setValue = async () => {
-					const processedValue = wrapTextNodes(value); // Обрабатываем HTML 
+					// debugger;
+					let processedValue = wrapTextNodes(value); // Обрабатываем HTML 
+					if (processedValue.includes('quill-better-table-wrapper')) {
+						processedValue = convertQuillTablesInHTML(processedValue);
+					}
 					fluentRef.current && (fluentRef.current.root.innerHTML = processedValue);
 					setLoad(false);
 					setRefreshPlaceholders(refreshPlaceholders + 1);
@@ -264,6 +268,137 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 			isMounted = false;
 		};
 	}, [refreshSign]);
+
+	const generateId = () => {
+		return Math.random().toString(36).substr(2, 10);
+	};
+
+	const convertQuillTablesInHTML = (htmlString: string) => {
+		// Создаем временный DOM-документ
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(htmlString, 'text/html');
+
+		// Находим все исходные таблицы
+		const sourceTables = doc.querySelectorAll('.quill-better-table-wrapper');
+
+		sourceTables.forEach(sourceWrapper => {
+			const sourceTable = sourceWrapper.querySelector('.quill-better-table');
+			if (!sourceTable) return;
+
+			// Создаем новый контейнер таблицы
+			const newWrapper = document.createElement('div');
+			newWrapper.className = 'ql-table-wrapper';
+			newWrapper.setAttribute('contenteditable', 'false');
+			const tableId = generateId();
+			newWrapper.setAttribute('data-table-id', tableId);
+
+			// Создаем новую таблицу
+			const newTable = document.createElement('table');
+			newTable.className = 'ql-table';
+			newTable.setAttribute('data-table-id', tableId);
+			newTable.setAttribute('cellpadding', '0');
+			newTable.setAttribute('cellspacing', '0');
+			newTable.style.marginRight = 'auto';
+			newTable.style.width = '100%';
+
+			let colIds: string[] = [];
+			// Копируем colgroup из исходной таблицы
+			const sourceColgroup = sourceTable.querySelector('colgroup');
+			if (sourceColgroup) {
+				const colgroup = sourceColgroup.cloneNode(true) as HTMLTableColElement;
+				colgroup.setAttribute('data-table-id', tableId);
+				colgroup.setAttribute('contenteditable', 'false');
+				const cols = colgroup.querySelectorAll('col');
+
+				// Генерируем colIds для каждого столбца
+				cols.forEach(col => {
+					const colId = generateId();
+					col.setAttribute('data-col-id', colId);
+					colIds.push(colId);
+				});
+				newTable.appendChild(colgroup);
+			}
+
+			// Создаем тело таблицы
+			const tbody = document.createElement('tbody');
+			tbody.setAttribute('data-table-id', tableId);
+
+			// Обрабатываем строки
+			const sourceRows = sourceTable.querySelectorAll('tr');
+			sourceRows.forEach(sourceRow => {
+				const rowId = generateId();
+				const newRow = document.createElement('tr');
+				newRow.className = 'ql-table-row';
+				newRow.setAttribute('data-table-id', tableId);
+				newRow.setAttribute('data-row-id', rowId);
+
+				// Обрабатываем ячейки
+				const sourceCells = Array.from(sourceRow.querySelectorAll('td'));
+				let index = 0;
+				sourceCells.forEach(sourceCell => {
+					const newCell = document.createElement('td');
+					newCell.className = 'ql-table-cell';
+					newCell.setAttribute('data-table-id', tableId);
+					newCell.setAttribute('data-row-id', rowId);
+					newCell.setAttribute('data-col-id', colIds[index]);
+
+					// Копируем атрибуты объединения ячеек
+					const rowspan = sourceCell.getAttribute('rowspan');
+					const colspan = sourceCell.getAttribute('colspan');
+					if (rowspan) newCell.setAttribute('rowspan', rowspan);
+					if (colspan) newCell.setAttribute('colspan', colspan);
+
+					// Копируем стили
+					if (sourceCell.hasAttribute('style')) {
+						newCell.setAttribute('style', sourceCell.getAttribute('style') || '');
+					}
+					if (sourceCell.hasAttribute('data-cell-bg')) {
+						newCell.setAttribute('data-cell-bg', sourceCell.getAttribute('data-cell-bg') || '');
+					}
+
+					// Создаем внутренний контейнер
+					const cellInner = document.createElement('div');
+					cellInner.className = 'ql-table-cell-inner';
+					cellInner.setAttribute('data-table-id', tableId);
+					cellInner.setAttribute('data-row-id', rowId);
+					cellInner.setAttribute('data-col-id', colIds[index]);
+					cellInner.setAttribute('data-rowspan', rowspan || '1');
+					cellInner.setAttribute('data-colspan', colspan || '1');
+					cellInner.setAttribute('contenteditable', 'true');
+ 
+					// Копируем содержимое как чистые элементы
+					Array.from(sourceCell.children).forEach(child => {
+						const cleanElement = document.createElement(child.tagName.toLowerCase());
+						cleanElement.innerHTML = child.innerHTML;
+						cellInner.appendChild(cleanElement);
+					});
+					// 2. Если ячейка была пустая, добавляем минимальную структуру
+					if (cellInner.childNodes.length === 0) {
+						const p = document.createElement('p');
+						p.innerHTML = '<br>';
+						cellInner.appendChild(p);
+					}
+
+					newCell.appendChild(cellInner);
+					newRow.appendChild(newCell);
+					index += parseInt(colspan || '1', 10);
+				});
+
+				tbody.appendChild(newRow);
+			});
+
+			newTable.appendChild(tbody);
+			newWrapper.appendChild(newTable);
+
+			// Заменяем старую таблицу новой
+			if (sourceWrapper.parentNode) {
+				sourceWrapper.parentNode.replaceChild(newWrapper, sourceWrapper);
+			}
+		});
+
+		// Возвращаем преобразованный HTML
+		return doc.documentElement.innerHTML;
+	}
 
 	const getPlaceholders = async () => {
 		if (placeholder && placeholder.length > 0) {
