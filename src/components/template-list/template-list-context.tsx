@@ -4,6 +4,8 @@ import { ContractSign } from '../../config/types';
 export type TTemplateListContextType = {
 	templateModal: boolean;
 	setTemplateModal: (templateModal: boolean) => void;
+	renameModal: { open: boolean, templateKey: string, name: string };
+	setRenameModal: ({ open, templateKey, name }: { open: boolean, templateKey: string, name: string }) => void;
 	templateKey: string;
 	setTemplateKey: (contractKey: string) => void;
 	clientKey: string | undefined;

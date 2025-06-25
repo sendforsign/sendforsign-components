@@ -43,6 +43,8 @@ export const enum Action {
 	SEND = 'send',
 	ARCHIVE = 'archive',
 	CONVERT = 'convert',
+	RENAME = 'rename',
+	DUPLICATE = 'duplicate',
 }
 export const enum ContractType {
 	DOCX = 6,

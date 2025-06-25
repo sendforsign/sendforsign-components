@@ -36,9 +36,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { EventStatus } from '../../config/types';
 import { Notification } from './notification/notification';
+import { RenameModal } from './rename-modal';
 
-const { Option } = Select;
-const { TextArea } = Input;
 
 interface DataType {
 	key?: string;
@@ -72,6 +71,7 @@ export const ContractList: FC<ContractListProps> = ({
 	const [notification, setNotification] = useState({});
 	const [contractModal, setContractModal] = useState(false);
 	const [needUpdate, setNeedUpdate] = useState(false);
+	const [renameModal, setRenameModal] = useState({ open: false, contractKey: '', name: '' });
 	const [refreshContracts, setRefreshContracts] = useState(0);
 	const [data, setData] = useState<DataType[]>([]);
 	const [eventStatus, setEventStatus] = useState<EventStatus[]>([]);
@@ -88,6 +88,14 @@ export const ContractList: FC<ContractListProps> = ({
 		{
 			label: 'Convert into template',
 			key: Action.CONVERT,
+		},
+		{
+			label: 'Rename',
+			key: Action.RENAME,
+		},
+		{
+			label: 'Duplicate',
+			key: Action.DUPLICATE,
 		},
 	];
 
@@ -139,8 +147,8 @@ export const ContractList: FC<ContractListProps> = ({
 							setNotification({
 								text:
 									error.response &&
-									error.response.data &&
-									error.response.data.message
+										error.response.data &&
+										error.response.data.message
 										? error.response.data.message
 										: error.message,
 							});
@@ -184,8 +192,53 @@ export const ContractList: FC<ContractListProps> = ({
 							setNotification({
 								text:
 									error.response &&
-									error.response.data &&
-									error.response.data.message
+										error.response.data &&
+										error.response.data.message
+										? error.response.data.message
+										: error.message,
+							});
+						});
+					break;
+				case Action.RENAME:
+					setRenameModal({ open: true, contractKey: currentRecord.current.key, name: currentRecord.current.name as string });
+					break;
+				case Action.DUPLICATE:
+					const url: string = BASE_URL + ApiEntity.CONTRACT;
+					const body = {
+						data: {
+							action: Action.DUPLICATE,
+							clientKey: !token ? currClientKey : undefined,
+							userKey: currUserKey ? currUserKey : '',
+							contract: {
+								contractKey: currentRecord.current.key,
+							},
+						},
+					};
+					await axios
+						.post(url, body, {
+							headers: {
+								Accept: 'application/vnd.api+json',
+								'Content-Type': 'application/vnd.api+json',
+								'x-sendforsign-key':
+									!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+								Authorization: currToken ? `Bearer ${currToken}` : undefined,
+							},
+							responseType: 'json',
+						})
+						.then((result) => {
+							if (result.data.code === 201) {
+								setNotification({
+									text: result.data.message,
+								});
+								setRefreshContracts(refreshContracts + 1);
+							}
+						})
+						.catch((error) => {
+							setNotification({
+								text:
+									error.response &&
+										error.response.data &&
+										error.response.data.message
 										? error.response.data.message
 										: error.message,
 							});
@@ -292,8 +345,8 @@ export const ContractList: FC<ContractListProps> = ({
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -331,8 +384,8 @@ export const ContractList: FC<ContractListProps> = ({
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -384,6 +437,8 @@ export const ContractList: FC<ContractListProps> = ({
 				setNotification,
 				aiShow,
 				setAiShow,
+				renameModal,
+				setRenameModal
 			}}
 		>
 			{spinLoad ? (
@@ -439,6 +494,11 @@ export const ContractList: FC<ContractListProps> = ({
 				</Space>
 			)}
 			<ModalView id={currContractKey ? currContractKey : 'New contract'} />
+			<RenameModal onSave={(e: any) => {
+				if (e.success) {
+					setRefreshContracts(refreshContracts + 1);
+				}
+			}} />
 			<Notification />
 		</ContractListContext.Provider>
 	);

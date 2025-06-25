@@ -21,6 +21,7 @@ import { ModalView } from './modal-view/modal-view';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisVertical, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Notification } from './notification/notification';
+import { RenameModal } from './rename-modal';
 
 interface DataType {
 	key?: string;
@@ -53,6 +54,7 @@ export const TemplateList: FC<TemplateListProps> = ({
 	const [refreshTemplate, setRefreshTemplate] = useState(0);
 	const [spinLoad, setSpinLoad] = useState(false);
 	const [templatesLoad, setTemplatesLoad] = useState(false);
+	const [renameModal, setRenameModal] = useState({ open: false, templateKey: '', name: '' });
 	const [data, setData] = useState<DataType[]>([]);
 	const currentRecord = useRef<DataType>({});
 	const { Title } = Typography;
@@ -60,6 +62,14 @@ export const TemplateList: FC<TemplateListProps> = ({
 		{
 			label: 'Delete',
 			key: Action.DELETE,
+		},
+		{
+			label: 'Rename',
+			key: Action.RENAME,
+		},
+		{
+			label: 'Duplicate',
+			key: Action.DUPLICATE,
 		},
 	];
 
@@ -71,9 +81,10 @@ export const TemplateList: FC<TemplateListProps> = ({
 	};
 	const dropdownClick: MenuProps['onClick'] = async (e: any) => {
 		if (currentRecord.current && currentRecord.current.key) {
+			let url = '';
 			switch (e.key) {
 				case Action.DELETE:
-					let url = BASE_URL + ApiEntity.TEMPLATE;
+					url = BASE_URL + ApiEntity.TEMPLATE;
 					let bodyTemplate = {
 						data: {
 							action: Action.DELETE,
@@ -111,8 +122,53 @@ export const TemplateList: FC<TemplateListProps> = ({
 							setNotification({
 								text:
 									error.response &&
-									error.response.data &&
-									error.response.data.message
+										error.response.data &&
+										error.response.data.message
+										? error.response.data.message
+										: error.message,
+							});
+						});
+					break;
+				case Action.RENAME:
+					setRenameModal({ open: true, templateKey: currentRecord.current.key, name: currentRecord.current.name as string });
+					break;
+				case Action.DUPLICATE:
+					url = BASE_URL + ApiEntity.TEMPLATE;
+					const body = {
+						data: {
+							action: Action.DUPLICATE,
+							clientKey: !token ? currClientKey : undefined,
+							userKey: currUserKey ? currUserKey : '',
+							template: {
+								templateKey: currentRecord.current.key,
+							},
+						},
+					};
+					await axios
+						.post(url, body, {
+							headers: {
+								Accept: 'application/vnd.api+json',
+								'Content-Type': 'application/vnd.api+json',
+								'x-sendforsign-key':
+									!currToken && currApiKey ? currApiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
+								Authorization: currToken ? `Bearer ${currToken}` : undefined,
+							},
+							responseType: 'json',
+						})
+						.then((result) => {
+							if (result.data.code === 201) {
+								setNotification({
+									text: result.data.message,
+								});
+								setRefreshTemplate(refreshTemplate + 1);
+							}
+						})
+						.catch((error) => {
+							setNotification({
+								text:
+									error.response &&
+										error.response.data &&
+										error.response.data.message
 										? error.response.data.message
 										: error.message,
 							});
@@ -263,6 +319,8 @@ export const TemplateList: FC<TemplateListProps> = ({
 				setToken: setCurrToken,
 				notification,
 				setNotification,
+				renameModal,
+				setRenameModal
 			}}
 		>
 			{spinLoad ? (
@@ -318,6 +376,11 @@ export const TemplateList: FC<TemplateListProps> = ({
 				</Space>
 			)}
 			<ModalView />
+			<RenameModal onSave={(e: any) => {
+				if (e.success) {
+					setRefreshTemplate(refreshTemplate + 1);
+				}
+			}} />
 			<Notification />
 		</TemplateListContext.Provider>
 	);

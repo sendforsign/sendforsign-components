@@ -3,6 +3,8 @@ import { createContext, useContext } from 'react';
 export type TContractListContextType = {
 	contractModal: boolean;
 	setContractModal: (contractModal: boolean) => void;
+	renameModal: { open: boolean, contractKey: string, name: string };
+	setRenameModal: ({ open, contractKey, name }: { open: boolean, contractKey: string, name: string }) => void;
 	notification: { text?: any };
 	setNotification: (text: any) => void;
 	contractKey: string;
