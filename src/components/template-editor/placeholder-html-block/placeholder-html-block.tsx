@@ -33,6 +33,7 @@ import {
 	faGear,
 	faLeftLong,
 } from '@fortawesome/free-solid-svg-icons';
+import { generateTableHTML } from '../../../utils/utils';
 
 type Props = {
 	quillRef: React.MutableRefObject<FluentEditor | undefined>;
@@ -188,20 +189,26 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 	const handleInsertPlaceholder = (index: number) => {
 		const position = quillRef?.current?.getSelection();
 		//console.log('position', position, quillRef);
+		if (placeholder[index].isTable) {
+			let value = generateTableHTML(JSON.parse(placeholder[index].value as string));
+			quillRef?.current?.clipboard.dangerouslyPasteHTML(
+				position ? position.index : 0,
+				value,
+				'user'
+			);
+		} else {
+			const empty = placeholder[index].value
+				? placeholder[index].value?.replace(/\s/g, '')
+				: '';
 
-		const empty = placeholder[index].value
-			? placeholder[index].value?.replace(/\s/g, '')
-			: '';
-
-		quillRef?.current?.clipboard.dangerouslyPasteHTML(
-			position ? position?.index : 0,
-			`<placeholder${placeholder[index].id} className={placeholderClass${
-				placeholder[index].id
-			}} contenteditable="false">${
-				empty ? placeholder[index].value : `{{{${placeholder[index].name}}}}`
-			}</placeholder${placeholder[index].id}>`,
-			'user'
-		);
+			quillRef?.current?.clipboard.dangerouslyPasteHTML(
+				position ? position?.index : 0,
+				`<placeholder${placeholder[index].id} className={placeholderClass${placeholder[index].id
+				}} contenteditable="false">${empty ? placeholder[index].value : `{{{${placeholder[index].name}}}}`
+				}</placeholder${placeholder[index].id}>`,
+				'user'
+			);
+		}
 		// handleChangeText(quillRef?.root.innerHTML);
 		//console.log('handleInsertPlaceholder', quillRef?.current?.root.innerHTML);
 	};
@@ -345,8 +352,8 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 						setNotification({
 							text:
 								error.response &&
-								error.response.data &&
-								error.response.data.message
+									error.response.data &&
+									error.response.data.message
 									? error.response.data.message
 									: error.message,
 						});
@@ -536,22 +543,22 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 														size='small'
 														value={
 															holder.fillingType &&
-															holder.fillingType.toString() !==
+																holder.fillingType.toString() !==
 																PlaceholderFill.SPECIFIC.toString()
 																? holder.fillingType?.toString()
 																: holder.fillingType &&
-																  holder.fillingType.toString() ===
-																		PlaceholderFill.SPECIFIC.toString() &&
-																  holder.externalRecipientKey &&
-																  placeholderRecipients &&
-																  placeholderRecipients.length > 0
-																? placeholderRecipients.find(
+																	holder.fillingType.toString() ===
+																	PlaceholderFill.SPECIFIC.toString() &&
+																	holder.externalRecipientKey &&
+																	placeholderRecipients &&
+																	placeholderRecipients.length > 0
+																	? placeholderRecipients.find(
 																		(placeholderRecipient) =>
 																			placeholderRecipient.recipientKey?.includes(
 																				holder.externalRecipientKey as string
 																			)
-																  )?.recipientKey
-																: '1'
+																	)?.recipientKey
+																	: '1'
 														}
 														onChange={(e: any) => handleChangeFilling(e, index)}
 													>
@@ -596,7 +603,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 													<Popover content={
 														<Space direction='vertical'>
 															<Text type='secondary'>Placeholder Key: {holder.placeholderKey}</Text>
-															<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d'/>} onClick={() => navigator.clipboard.writeText(holder.placeholderKey || 'N/A')}>Copy</Button>
+															<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d' />} onClick={() => navigator.clipboard.writeText(holder.placeholderKey || 'N/A')}>Copy</Button>
 														</Space>
 													} trigger="click">
 														<Button size='small'>{holder.placeholderKey}</Button>
@@ -616,15 +623,17 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 										</Popover>
 									</Col>
 								</Row>
-								<Input
-									readOnly={readonlyCurrent.current}
-									id='PlaceholderValue'
-									placeholder='Enter value'
-									value={holder.value}
-									onChange={(e: any) => handleChange(e, index)}
-									onBlur={(e: any) => handleBlur(e, index)}
-									onPressEnter={() => handleEnter(index)}
-								/>
+								{!holder.isTable &&
+									<Input
+										readOnly={readonlyCurrent.current}
+										id='PlaceholderValue'
+										placeholder='Enter value'
+										value={holder.value}
+										onChange={(e: any) => handleChange(e, index)}
+										onBlur={(e: any) => handleBlur(e, index)}
+										onPressEnter={() => handleEnter(index)}
+									/>
+								}
 							</Space>
 						);
 					})}

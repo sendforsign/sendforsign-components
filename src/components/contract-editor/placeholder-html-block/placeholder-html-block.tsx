@@ -12,7 +12,7 @@ import {
 	Popover,
 	Divider,
 	Select,
-} from 'antd'; 
+} from 'antd';
 import FluentEditor from '@opentiny/fluent-editor';
 import { useContractEditorContext } from '../contract-editor-context';
 import { BASE_URL } from '../../../config/config';
@@ -41,9 +41,8 @@ import {
 import { parseDate } from 'pdf-lib';
 import {
 	changeValueInTag,
+	generateTableHTML,
 	getIcon,
-	removeAilineTags,
-	wrapTextNodes,
 } from '../../../utils';
 
 type Props = {
@@ -85,7 +84,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 
 	const { Title, Text } = Typography;
 
-	const handleFocus = (e: any) => { 
+	const handleFocus = (e: any) => {
 		setFocusElement(e.target.id);
 	};
 
@@ -344,8 +343,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 					}
 					const styleSheet = document.styleSheets[0]; // Получаем первый стиль
 					styleSheet.insertRule(
-						`.placeholderClass${placeholderFind.id} { background-color: ${
-							color ? color : PlaceholderColor.OTHER
+						`.placeholderClass${placeholderFind.id} { background-color: ${color ? color : PlaceholderColor.OTHER
 						} }`,
 						styleSheet.cssRules.length
 					);
@@ -403,8 +401,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			}
 			const styleSheet = document.styleSheets[0]; // Получаем первый стиль
 			styleSheet.insertRule(
-				`.${tagClass} { background-color: ${
-					color ? color : PlaceholderColor.OTHER
+				`.${tagClass} { background-color: ${color ? color : PlaceholderColor.OTHER
 				} }`,
 				styleSheet.cssRules.length
 			);
@@ -476,10 +473,10 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				? placeholderChange.specialType === SpecialType.DATE
 					? Tags.DATE
 					: placeholderChange.specialType === SpecialType.FULLNAME
-					? Tags.FULLNAME
-					: placeholderChange.specialType === SpecialType.EMAIL
-					? Tags.EMAIL
-					: Tags.SIGN
+						? Tags.FULLNAME
+						: placeholderChange.specialType === SpecialType.EMAIL
+							? Tags.EMAIL
+							: Tags.SIGN
 				: Tags.PLACEHOLDER,
 			placeholderChange.id ? (placeholderChange.id as number) : 0,
 			placeholderChange.value
@@ -537,8 +534,8 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				selectedOtion === '1'
 					? PlaceholderFill.CREATOR
 					: selectedOtion !== '0'
-					? PlaceholderFill.SPECIFIC
-					: PlaceholderFill.NONE,
+						? PlaceholderFill.SPECIFIC
+						: PlaceholderFill.NONE,
 			externalRecipientKey:
 				selectedOtion !== '0' && selectedOtion !== '1' ? selectedOtion : '',
 		});
@@ -558,8 +555,8 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 						selectedOtion === '1'
 							? PlaceholderFill.CREATOR
 							: selectedOtion !== '0'
-							? PlaceholderFill.SPECIFIC
-							: PlaceholderFill.NONE,
+								? PlaceholderFill.SPECIFIC
+								: PlaceholderFill.NONE,
 					externalRecipientKey:
 						selectedOtion !== '0' && selectedOtion !== '1' ? selectedOtion : '',
 				},
@@ -590,85 +587,87 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			});
 	};
 	const handleInsertPlaceholder = (holderInsert: Placeholder) => {
+		debugger;
 		const position = quillRef?.current?.getSelection();
 		//console.log('position', position, quillRef);
 		if (!holderInsert.isSpecial) {
-			const empty = holderInsert.value
-				? holderInsert.value?.replace(/\s/g, '')
-				: '';
+			let value = '';
+			if (holderInsert.isTable) {
+				value = generateTableHTML(JSON.parse(holderInsert.value as string));
+				quillRef?.current?.clipboard.dangerouslyPasteHTML(
+					position ? position.index : 0,
+					value,
+					'user'
+				);
+			} else {
+				value = holderInsert.value as string;
 
-			const maxPlaceholderId =
-				Math.max(...placeholder.map((ph) => ph.id || 0)) + 1;
+				const empty = holderInsert.value
+					? holderInsert.value?.replace(/\s/g, '')
+					: '';
 
-			quillRef?.current?.clipboard.dangerouslyPasteHTML(
-				position ? position.index : 0,
-				`<placeholder${
-					holderInsert.id ? holderInsert.id : maxPlaceholderId
-				} className={placeholderClass${
-					holderInsert.id ? holderInsert.id : maxPlaceholderId
-				}} contenteditable="false">${
-					empty ? holderInsert.value : `{{{${holderInsert.name}}}}`
-				}</placeholder${holderInsert.id ? holderInsert.id : maxPlaceholderId}>`,
-				'user'
-			);
-			updatePlaceholderClass({
-				id: holderInsert.id ? (holderInsert.id as number) : maxPlaceholderId,
-				owner:
-					holderInsert.fillingType === PlaceholderFill.CREATOR ? true : false,
-				recipientKey: holderInsert.externalRecipientKey,
-			});
+				const maxPlaceholderId =
+					Math.max(...placeholder.map((ph) => ph.id || 0)) + 1;
+
+				quillRef?.current?.clipboard.dangerouslyPasteHTML(
+					position ? position.index : 0,
+					`<placeholder${holderInsert.id ? holderInsert.id : maxPlaceholderId
+					} className={placeholderClass${holderInsert.id ? holderInsert.id : maxPlaceholderId
+					}} contenteditable="false">${empty ? value : `{{{${holderInsert.name}}}}`
+					}</placeholder${holderInsert.id ? holderInsert.id : maxPlaceholderId}>`,
+					'user'
+				);
+				updatePlaceholderClass({
+					id: holderInsert.id ? (holderInsert.id as number) : maxPlaceholderId,
+					owner:
+						holderInsert.fillingType === PlaceholderFill.CREATOR ? true : false,
+					recipientKey: holderInsert.externalRecipientKey,
+				});
+			}
 		} else {
 			let tag = '';
 			switch (holderInsert.specialType) {
 				case SpecialType.DATE:
 					const date = holderInsert.value ? parseDate(holderInsert.value) : '';
-					tag = `<date${holderInsert.id} className={dateClass${
-						holderInsert.id
-					}} contenteditable="false">${
-						date ? date : `{{{${holderInsert.name}}}}`
-					}</date${holderInsert.id}>`;
+					tag = `<date${holderInsert.id} className={dateClass${holderInsert.id
+						}} contenteditable="false">${date ? date : `{{{${holderInsert.name}}}}`
+						}</date${holderInsert.id}>`;
 					break;
 
 				case SpecialType.FULLNAME:
-					tag = `<fullname${holderInsert.id} className={fullnameClass${
-						holderInsert.id
-					}} contenteditable="false">${
-						holderInsert.value
+					tag = `<fullname${holderInsert.id} className={fullnameClass${holderInsert.id
+						}} contenteditable="false">${holderInsert.value
 							? holderInsert.value
 							: `{{{${holderInsert.name}}}}`
-					}</fullname${holderInsert.id}>`;
+						}</fullname${holderInsert.id}>`;
 					break;
 
 				case SpecialType.EMAIL:
-					tag = `<email${holderInsert.id} className={emailClass${
-						holderInsert.id
-					}} contenteditable="false">${
-						holderInsert.value
+					tag = `<email${holderInsert.id} className={emailClass${holderInsert.id
+						}} contenteditable="false">${holderInsert.value
 							? holderInsert.value
 							: `{{{${holderInsert.name}}}}`
-					}</email${holderInsert.id}>`;
+						}</email${holderInsert.id}> `;
 					break;
 
 				case SpecialType.SIGN:
-					tag = `<sign${holderInsert.id} className={signClass${
-						holderInsert.id
-					}} contenteditable="false">${`{{{${holderInsert.name}}}}`}</sign${
-						holderInsert.id
-					}>`;
+					tag = `< sign${holderInsert.id} className = { signClass${holderInsert.id
+						}
+			} contenteditable = "false" > ${`{{{${holderInsert.name}}}}`}</sign${holderInsert.id
+						}> `;
 					break;
 
 				case SpecialType.INITIALS:
-					tag = `<initials${holderInsert.id} className={initialsClass${
-						holderInsert.id
-					}} contenteditable="false">${
-						holderInsert.value
+					tag = `< initials${holderInsert.id} className = { initialsClass${holderInsert.id
+						}
+		} contenteditable = "false" > ${holderInsert.value
 							? `<img
 									alt='initials'
 									src={${holderInsert.value}} 
 									style={{ objectFit: 'contain' }}
 								/>`
 							: `{{{${holderInsert.name}}}}`
-					}</initials${holderInsert.id}>`;
+						}</initials${holderInsert.id}> `;
 					break;
 			}
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(
@@ -712,7 +711,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
 					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-					Authorization: token ? `Bearer ${token}` : undefined,
+					Authorization: token ? `Bearer ${token} ` : undefined,
 				},
 				responseType: 'json',
 			})
@@ -804,7 +803,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 							Accept: 'application/vnd.api+json',
 							'Content-Type': 'application/vnd.api+json',
 							'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-							Authorization: token ? `Bearer ${token}` : undefined,
+							Authorization: token ? `Bearer ${token} ` : undefined,
 						},
 						responseType: 'json',
 					})
@@ -816,8 +815,8 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 						setNotification({
 							text:
 								error.response &&
-								error.response.data &&
-								error.response.data.message
+									error.response.data &&
+									error.response.data.message
 									? error.response.data.message
 									: error.message,
 						});
@@ -891,7 +890,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 					Accept: 'application/vnd.api+json',
 					'Content-Type': 'application/vnd.api+json',
 					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-					Authorization: token ? `Bearer ${token}` : undefined,
+					Authorization: token ? `Bearer ${token} ` : undefined,
 				},
 				responseType: 'json',
 			})
@@ -933,7 +932,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 	return (
 		<Card
 			loading={placeholderLoad || continueLoad}
-			key={`PlaceholderBlock${contractKey}`}
+			key={`PlaceholderBlock${contractKey} `}
 		>
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 				<Space direction='vertical' size={2}>
@@ -967,7 +966,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 											<div>
 												<Button
 													disabled={readonlyCurrent.current}
-													style={{ background: `${holder.color}` }}
+													style={{ background: `${holder.color} ` }}
 													size='small'
 													type='text'
 													icon={
@@ -988,12 +987,12 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 											readOnly={
 												holder.view?.toString() !==
 													PlaceholderView.SIGNATURE.toString() &&
-												!holder.isSpecial &&
-												!readonlyCurrent.current
+													!holder.isSpecial &&
+													!readonlyCurrent.current
 													? false
 													: true
 											}
-											id={`PlaceholderName${holder.id}`}
+											id={`PlaceholderName${holder.id} `}
 											placeholder='Enter placeholder name'
 											variant='borderless'
 											value={holder.name}
@@ -1002,8 +1001,8 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 											onFocus={
 												holder.view?.toString() !==
 													PlaceholderView.SIGNATURE.toString() &&
-												!holder.isSpecial &&
-												!readonlyCurrent.current
+													!holder.isSpecial &&
+													!readonlyCurrent.current
 													? handleFocus
 													: undefined
 											}
@@ -1012,7 +1011,8 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 									<Col flex={'auto'}></Col>
 									{holder.view?.toString() !==
 										PlaceholderView.SIGNATURE.toString() &&
-									!holder.isSpecial ? (
+										!holder.isSpecial &&
+										!holder.isTable ? (
 										<Col flex='24px'>
 											<Popover
 												content={
@@ -1044,22 +1044,22 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 															size='small'
 															value={
 																holder.fillingType &&
-																holder.fillingType.toString() !==
+																	holder.fillingType.toString() !==
 																	PlaceholderFill.SPECIFIC.toString()
 																	? holder.fillingType?.toString()
 																	: holder.fillingType &&
-																	  holder.fillingType.toString() ===
-																			PlaceholderFill.SPECIFIC.toString() &&
-																	  holder.externalRecipientKey &&
-																	  placeholderRecipients.current &&
-																	  placeholderRecipients.current.length > 0
-																	? placeholderRecipients.current.find(
+																		holder.fillingType.toString() ===
+																		PlaceholderFill.SPECIFIC.toString() &&
+																		holder.externalRecipientKey &&
+																		placeholderRecipients.current &&
+																		placeholderRecipients.current.length > 0
+																		? placeholderRecipients.current.find(
 																			(placeholderRecipient) =>
 																				placeholderRecipient.recipientKey?.includes(
 																					holder.externalRecipientKey as string
 																				)
-																	  )?.recipientKey
-																	: '1'
+																		)?.recipientKey
+																		: '1'
 															}
 															onChange={(e: any) =>
 																handleChangeFilling(e, holder.id as number)
@@ -1207,10 +1207,11 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 								</Row>
 								{holder.view?.toString() !==
 									PlaceholderView.SIGNATURE.toString() &&
-									!holder.isSpecial && (
+									!holder.isSpecial &&
+									!holder.isTable && (
 										<Input
 											readOnly={readonlyCurrent.current}
-											id={`PlaceholderValue${holder.id}`}
+											id={`PlaceholderValue${holder.id} `}
 											placeholder='Enter value'
 											value={holder.value}
 											onChange={(e: any) => handleChange(e, holder)}
@@ -1219,8 +1220,8 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 											onFocus={
 												holder.view?.toString() !==
 													PlaceholderView.SIGNATURE.toString() &&
-												!holder.isSpecial &&
-												!readonlyCurrent.current
+													!holder.isSpecial &&
+													!readonlyCurrent.current
 													? handleFocus
 													: undefined
 											}

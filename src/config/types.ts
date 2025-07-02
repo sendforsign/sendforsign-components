@@ -182,6 +182,7 @@ export type Placeholder = {
 	createtime?: Date;
 	name?: string;
 	value?: string;
+	isTable?: boolean;
 	type?: string;
 	placeholderKey?: string;
 	fillingType?: number;

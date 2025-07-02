@@ -10,12 +10,13 @@ import {
 	faFont,
 	faSignature,
 	faUser,
-} from '@fortawesome/free-solid-svg-icons'; 
+	faTableList,
+} from '@fortawesome/free-solid-svg-icons';
 
 export const docx2html = (content: ArrayBuffer, callback?: any) => {
 	Mammoth.convertToHtml({ arrayBuffer: content })
 		.then(function (result: any) {
-			callback(result.value); // The generated HTML 
+			callback(result.value); // The generated HTML
 		})
 		.catch(function (error: any) {
 			console.error(error);
@@ -29,7 +30,7 @@ export const addBlotClass = (index: number) => {
 					const node = super.create();
 					node.setAttribute('contenteditable', 'false');
 					return node;
-				} 
+				}
 			}
 			PlaceholderBlot1.className = `placeholderClass${index}`;
 			PlaceholderBlot1.blotName = `placeholder${index}`;
@@ -1939,6 +1940,9 @@ export const getIcon = (placeholder: Placeholder) => {
 	) {
 		return faAt;
 	}
+	if (placeholder.isTable) {
+		return faTableList;
+	}
 
 	return faFont;
 };
@@ -1991,4 +1995,79 @@ export const wrapTextNodes = (html: string) => {
 
 	traverseNodes(doc.body);
 	return doc.body.innerHTML;
+};
+
+export const generateTableHTML = (tableData: any) => {
+	const tableId = crypto.randomUUID();
+	const colIds = tableData.columns.map(() => crypto.randomUUID());
+	const colWidth = `${(100 / tableData.columns.length).toFixed(2)}%`;
+
+	// colgroup с одинаковой шириной
+	const colgroup = `
+    <colgroup data-table-id="${tableId}" contenteditable="false">
+      ${colIds
+				.map(
+					(colId: any) =>
+						`<col data-full="true" data-table-id="${tableId}" data-col-id="${colId}"  style="width: ${colWidth};">`
+				)
+				.join('')}
+    </colgroup>
+  `;
+
+	// Заголовок
+	const headerRowId = crypto.randomUUID();
+	const headerRow = `
+    <tr class="ql-table-row" data-table-id="${tableId}" data-row-id="${headerRowId}">
+      ${tableData.columns
+				.map(
+					(col: any, i: string | number) => `
+        <td class="ql-table-cell" data-table-id="${tableId}" data-row-id="${headerRowId}" data-col-id="${colIds[i]}" rowspan="1" colspan="1">
+          <div class="ql-table-cell-inner" data-table-id="${tableId}" data-row-id="${headerRowId}" data-col-id="${colIds[i]}" data-rowspan="1" data-colspan="1" contenteditable="true">
+            <p>${col}</p>
+          </div>
+        </td>
+      `
+				)
+				.join('')}
+    </tr>
+  `;
+
+	// Данные
+	const rows = tableData.rows
+		.map((row: any[]) => {
+			const rowId = crypto.randomUUID();
+			// Заполняем недостающие значения пустыми строками
+			const filledRow = [...row];
+			while (filledRow.length < colIds.length) {
+				filledRow.push('');
+			}
+			return `
+      <tr class="ql-table-row" data-table-id="${tableId}" data-row-id="${rowId}">
+        ${filledRow
+					.map(
+						(cell: any, i: string | number) => `
+          <td class="ql-table-cell" data-table-id="${tableId}" data-row-id="${rowId}" data-col-id="${colIds[i]}" rowspan="1" colspan="1">
+            <div class="ql-table-cell-inner" data-table-id="${tableId}" data-row-id="${rowId}" data-col-id="${colIds[i]}" data-rowspan="1" data-colspan="1" contenteditable="true">
+              <p>${cell}</p>
+            </div>
+          </td>
+        `
+					)
+					.join('')}
+      </tr>
+    `;
+		})
+		.join('');
+
+	// Итоговая таблица
+	return `
+    <div class="ql-table-wrapper" data-table-id="${tableId}" contenteditable="false">
+      <table class="ql-table" data-full="true" data-table-id="${tableId}" cellpadding="0" cellspacing="0" style="margin-right: auto; width: 100%;">
+     ${colgroup}
+        <tbody data-table-id="${tableId}">
+          ${headerRow}
+          ${rows}
+        </tbody>
+      </table>
+    </div>`;
 };
