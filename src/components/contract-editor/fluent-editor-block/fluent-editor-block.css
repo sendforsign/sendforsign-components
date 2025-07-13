@@ -1,0 +1,9 @@
+
+.ql-toolbar {
+    top: 8px;
+    position: sticky;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    background: rgba(255, 255, 255, 0.8)!important;
+    border: 1px solid #f0f0f0!important;
+}

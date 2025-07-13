@@ -320,7 +320,7 @@ export const ShareLinkBlock = () => {
 									// disabled={signDisable}
 									loading={sendSpin}
 								>
-									Recipients
+									Ready to share
 								</Button>
 							</div>
 						</Tooltip>

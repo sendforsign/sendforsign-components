@@ -46,10 +46,10 @@ FluentEditor.register(
 );
 export const FluentEditorBlock = ({ value, fluentRef }: Props) => {
 	const TOOLBAR_CONFIG = [
-		['undo', 'redo', 'clean', 'format-painter'],
+		['undo', 'redo', 'clean'], //'format-painter'
 		[
 			{ header: [1, 2, 3, 4, 5, 6, false] },
-			// { font: [false, '仿宋_GB2312, 仿宋', '楷体', '隶书', '黑体', '无效字体, 隶书'] },
+			{ font: [] },
 			{ size: [false, '12px', '14px', '16px', '18px', '20px', '24px', '32px', '36px', '48px', '72px'] },
 			{ 'line-height': [false, '1.2', '1.5', '1.75', '2', '3', '4', '5'] },
 		],
@@ -60,10 +60,10 @@ export const FluentEditorBlock = ({ value, fluentRef }: Props) => {
 		[{ script: 'sub' }, { script: 'super' }],
 		[{ indent: '-1' }, { indent: '+1' }],
 		[{ direction: 'rtl' }],
-		['link', 'blockquote', 'code', 'code-block'],
-		['image', 'file'],
-		['emoji', 'video', 'formula'],//'screenshot', 'fullscreen'
-		// [{ 'table-up': [] }],
+		['link', 'blockquote', 'code'], //'code-block'
+		['image', 'formula'], //'file'
+		//'screenshot', 'fullscreen''emoji', 'video'
+		[{ 'table-up': [] }],
 	];
 	(window as any).hljs = hljs;
 	dayjs.extend(utc);
