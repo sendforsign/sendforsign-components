@@ -25,7 +25,7 @@ export const PdfAuditTrailInfo = ({ contract }: Props) => {
 		},
 		invoiceText: {
 			fontSize: '14px',
-			fontStyle: 'bold',
+			fontWeight: 'bold',
 		},
 		label: {
 			fontSize: '14px',

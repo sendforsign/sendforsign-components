@@ -121,11 +121,11 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			api: `${BASE_URL}${ApiEntity.CHAT}`,
 			body: body.current,
 			headers: headers.current,
-			onError: (e) => {
+			onError: (e: any) => {
 				console.log(e);
 				setIsThinking(false);
 			},
-			onResponse: (response) => {
+			onResponse: (response: any) => {
 				console.log('response', response);
 				setIsThinking(false); // Stop thinking when request completes
 			},
@@ -252,8 +252,8 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -822,38 +822,38 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 						{(aitype === AiTypes.REGULAR ||
 							aitype === AiTypes.CONTRACT_SIDEBAR ||
 							aitype === AiTypes.TEMPLATE_SIDEBAR) && (
-							<Row style={{ margin: '0 0 16px 0' }}>
-								<Col flex={'auto'}>
-									<Space
-										style={{ width: '100%', justifyContent: 'space-between' }}
-										wrap
-										size={16}
-									>
-										<Space direction='vertical' size={2}>
-											<Title
-												level={4}
-												style={{
-													margin: '0',
-													display: 'flex',
-													textAlign: 'center',
-												}}
-											>
-												{
-													AiAssistantLocalization.uiText[contextMessageKey]
-														.title
-												}
-											</Title>
-											<Text type='secondary'>
-												{
-													AiAssistantLocalization.uiText[contextMessageKey]
-														.subtitle
-												}
-											</Text>
+								<Row style={{ margin: '0 0 16px 0' }}>
+									<Col flex={'auto'}>
+										<Space
+											style={{ width: '100%', justifyContent: 'space-between' }}
+											wrap
+											size={16}
+										>
+											<Space direction='vertical' size={2}>
+												<Title
+													level={4}
+													style={{
+														margin: '0',
+														display: 'flex',
+														textAlign: 'center',
+													}}
+												>
+													{
+														AiAssistantLocalization.uiText[contextMessageKey]
+															.title
+													}
+												</Title>
+												<Text type='secondary'>
+													{
+														AiAssistantLocalization.uiText[contextMessageKey]
+															.subtitle
+													}
+												</Text>
+											</Space>
 										</Space>
-									</Space>
-								</Col>
-							</Row>
-						)}
+									</Col>
+								</Row>
+							)}
 						<Row gutter={16}>
 							<Col flex={'auto'}></Col>
 							<Col
@@ -862,7 +862,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 								id='chat'
 							>
 								<ul style={{ width: '100%', paddingLeft: 0, paddingRight: 0 }}>
-									{messages.map((m, index) => {
+									{messages.map((m: any, index: any) => {
 										return (
 											<div style={{ width: '100%' }}>
 												{m.role === 'user' ? (
@@ -1089,46 +1089,46 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 									<Row gutter={4} style={{ padding: '0px 8px' }}>
 										{(aitype === AiTypes.REGULAR ||
 											aitype === AiTypes.CONTRACT_SIDEBAR) && (
-											<Col style={{ marginBottom: 8 }}>
-												<Tooltip
-													title={
-														AiAssistantLocalization.uiText[contextMessageKey]
-															.context
-													}
-													open={tooltipContextVisible}
-													placement='bottom'
-													onOpenChange={(visible) =>
-														setTooltipContextVisible(visible)
-													}
-												>
-													<Select
-														mode='multiple'
-														onSelect={handleSelectContext}
-														onDeselect={handleDeselectContext}
-														options={optionsData}
-														value={selectedValues}
-														variant='borderless'
-														popupMatchSelectWidth={false}
-														showSearch={false}
-														suffixIcon={
-															selectedValues.length === 0 ? (
-																<FontAwesomeIcon
-																	icon={faBookBookmark}
-																	color='black'
-																	size='lg'
-																	style={{ paddingTop: '2px' }}
-																/>
-															) : null
-														}
-														notFoundContent={
+												<Col style={{ marginBottom: 8 }}>
+													<Tooltip
+														title={
 															AiAssistantLocalization.uiText[contextMessageKey]
-																.contextHelp
+																.context
 														}
-														style={{ maxWidth: '100px', whiteSpace: 'normal' }} // Установите maxWidth по вашему усмотрению
-													/>
-												</Tooltip>
-											</Col>
-										)}
+														open={tooltipContextVisible}
+														placement='bottom'
+														onOpenChange={(visible) =>
+															setTooltipContextVisible(visible)
+														}
+													>
+														<Select
+															mode='multiple'
+															onSelect={handleSelectContext}
+															onDeselect={handleDeselectContext}
+															options={optionsData}
+															value={selectedValues}
+															variant='borderless'
+															popupMatchSelectWidth={false}
+															showSearch={false}
+															suffixIcon={
+																selectedValues.length === 0 ? (
+																	<FontAwesomeIcon
+																		icon={faBookBookmark}
+																		color='black'
+																		size='lg'
+																		style={{ paddingTop: '2px' }}
+																	/>
+																) : null
+															}
+															notFoundContent={
+																AiAssistantLocalization.uiText[contextMessageKey]
+																	.contextHelp
+															}
+															style={{ maxWidth: '100px', whiteSpace: 'normal' }} // Установите maxWidth по вашему усмотрению
+														/>
+													</Tooltip>
+												</Col>
+											)}
 										<Col style={{ marginBottom: 8 }}>
 											<Tooltip
 												title={
@@ -1313,7 +1313,7 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 												disabled={
 													input
 														? // && (selectedContexts.length > 0 || contextFromFile !== '')
-														  false
+														false
 														: true
 												}
 											></Button>

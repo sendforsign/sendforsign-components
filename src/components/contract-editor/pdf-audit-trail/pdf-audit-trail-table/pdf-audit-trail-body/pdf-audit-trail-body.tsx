@@ -14,7 +14,7 @@ export const PdfAuditTrailBody = ({ rows }: Props) => {
 			borderBottomWidth: 1,
 			alignItems: 'center',
 			height: 100,
-			fontStyle: 'bold',
+			fontWeight: 'bold',
 			marginLeft: 20,
 			marginRight: 20,
 			fontSize: 12,

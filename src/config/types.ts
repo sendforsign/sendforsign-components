@@ -16,13 +16,20 @@ export type Contract = {
 	contractValue?: string;
 	statusId?: number;
 	statusName?: string;
-	contractName?: string;
 	changeTime?: Date;
 	changed?: boolean;
 	view?: ShareLinkView;
 	owner?: boolean;
+	audit?: boolean;
 	userId?: string;
 	result?: boolean;
+	contractName?: string;
+	isDone?: boolean;
+	fullname?: string;
+	email?: string;
+	placeholders?: Placeholder[];
+	visiblePageBranding?: boolean;
+	isTest?: boolean;
 };
 export type ContractLinkCheck = {
 	controlLink?: string;
@@ -93,11 +100,29 @@ export type ContractSign = {
 	fullName?: string;
 	email?: string;
 	id?: number;
+	recipientId?: number;
 	createTime?: Date;
 	owner?: boolean;
 	base64?: string;
 	userId?: string;
 	signTypeId?: SignType;
+	ipInfo?: string;
+	fromShareLink?: boolean;
+	contractType?: number;
+	contractValue?: string;
+	statusId?: number;
+	statusName?: string;
+	changeTime?: Date;
+	changed?: boolean;
+	view?: ShareLinkView;
+	audit?: boolean;
+	result?: boolean;
+	contractName?: string;
+	isDone?: boolean;
+	fullname?: string;
+	placeholders?: Placeholder[];
+	visiblePageBranding?: boolean;
+	isTest?: boolean;
 };
 export type ContractSignAi = {
 	fullName?: string;
@@ -219,6 +244,7 @@ export type PagePlaceholder = {
 	isSpecial?: boolean;
 	specialType?: SpecialType | undefined;
 	externalRecipientKey?: string;
+	owner?: boolean;
 };
 export type Row = {
 	json?: any;

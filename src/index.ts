@@ -5,6 +5,7 @@ import {
 	TemplateEditor,
 	TemplateList,
 	AiAssistant,
+	RecipientView,
 } from './components';
 
 export {
@@ -13,4 +14,5 @@ export {
 	TemplateEditor,
 	TemplateList,
 	AiAssistant,
+	RecipientView,
 };

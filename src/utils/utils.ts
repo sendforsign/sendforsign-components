@@ -1981,10 +1981,9 @@ export const wrapTextNodes = (html: string) => {
 				const wrappedNode = doc.createElement('ailine');
 				wrappedNode.setAttribute('value', valueCounter.toString());
 				wrappedNode.style.whiteSpace = 'pre-wrap';
-				wrappedNode.innerHTML =
-					textContent
-						?.replace(/ /g, '&nbsp;')
-						.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') || '';
+				wrappedNode.innerHTML = textContent;
+				// ?.replace(/ /g, '&nbsp;')
+				// .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') || '';
 				node.parentNode?.replaceChild(wrappedNode, node);
 				valueCounter++;
 			}
@@ -2008,7 +2007,7 @@ export const generateTableHTML = (tableData: any) => {
       ${colIds
 				.map(
 					(colId: any) =>
-						`<col data-full="true" data-table-id="${tableId}" data-col-id="${colId}"  style="width: ${colWidth};">`
+						`<col data-full="true" data-table-id="${tableId}" data-col-id="${colId}" width="${colWidth}">`
 				)
 				.join('')}
     </colgroup>
