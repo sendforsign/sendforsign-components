@@ -17,6 +17,7 @@ import {
     Select,
     Tooltip,
     Steps,
+    Alert,
 } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -37,7 +38,7 @@ import {
     faSignature,
     faStamp,
 } from '@fortawesome/free-solid-svg-icons';
-import { Contract, ContractEvent, ContractSign, ContractSignAi, ContractValue, EventStatus, Placeholder } from '../../config/types';
+import { Contract, ContractEvent, ContractSign, ContractSignAi, ContractValue, EventStatus, PagePlaceholder, Placeholder } from '../../config/types';
 import { RecipientViewContext } from './recipient-view-context';
 import { addActualColors, delColorFromHtml, changeValueInTag } from '../../utils/util-for-share';
 import { ResultModal } from './result-modal/result-modal';
@@ -48,7 +49,8 @@ import { FluentEditorBlock } from './fluent-editor-block';
 import { SignModal } from './sign-modal';
 import { ApproveModal } from './approve-modal';
 import { Notification } from './notification';
-
+import { PdfViewer } from './pdf-viewer/pdf-viewer';
+import { PdfViewerPrint } from './pdf-viewer-print/pdf-viewer-print';
 
 interface DataType {
     key?: string;
@@ -58,10 +60,10 @@ interface DataType {
     createdBy?: string;
 }
 export interface RecipientViewProps {
-    shareLink: string;
+    recipientKey: string;
 }
 
-export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
+export const RecipientView: FC<RecipientViewProps> = ({ recipientKey }) => {
     const [notification, setNotification] = useState({});
     const [isDone, setIsDone] = useState(false);
     const [fillPlaceholderBefore, setFillPlaceholderBefore] = useState(false);
@@ -83,14 +85,14 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
     const [data, setData] = useState<DataType[]>([]);
     const [eventStatus, setEventStatus] = useState<EventStatus[]>([]);
     const [spinLoad, setSpinLoad] = useState(false);
-    const [contractsLoad, setContractsLoad] = useState(false);
+    const [refreshSigns, setRefreshSigns] = useState(0);
     const [contract, setContract] = useState<Contract>({});
     const [contractValue, setContractValue] = useState<ContractValue>({});
     const [ipInfo, setIpInfo] = useState('');
     const [contractEvent, setContractEvent] = useState<ContractEvent[]>([]);
     const currentRecord = useRef<DataType>({});
     const { Title, Text } = Typography;
-    const { setArrayBuffer, getArrayBuffer, clearArrayBuffer } =
+    const { setArrayBuffer, clearArrayBuffer } =
         useSaveArrayBuffer();
     const first = useRef(false);
     const [currentStep, setCurrentStep] = useState(0);
@@ -106,7 +108,7 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
     >([]);
     useEffect(() => {
         const fetchContract = async () => {
-            let url = `${BASE_URL}${ApiEntity.RECIPIENT_CONTRACT}?shareLink=${shareLink}`;
+            let url = `${BASE_URL}${ApiEntity.RECIPIENT_CONTRACT}?shareLink=${recipientKey}`;
             await axios
                 .get(url, {
                     headers: {
@@ -115,7 +117,7 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
                     },
                     responseType: 'json',
                 })
-                .then((payload: any) => {
+                .then(async (payload: any) => {
                     console.log('payload', payload);
                     first.current = true;
                     let value =
@@ -171,17 +173,22 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
                         // console.log('contractData', contractData);
                         setIsDone(true);
                     }
+                    if (
+                        payload.data.placeholders &&
+                        payload.data.placeholders.length > 0
+                    ) {
+                        setPlaceholder(payload.data.placeholders);
+                    }
                     if (!payload.data.isDone && !payload.data.audit) {
                         getSignIPInfo();
                         if (payload.data.placeholders && payload.data.placeholders.length > 0) {
-                            setPlaceholder(payload.data.placeholders);
                             setFillPlaceholderBefore(true);
                         }
                     }
-                    if (payload.data.contractType.toString() === ContractType.PDF.toString()
-                    ) {
+
+                    if (payload.data.contractType.toString() === ContractType.PDF.toString()) {
                         clearArrayBuffer();
-                        axios
+                        await axios
                             .get(payload.data.contractValue, {
                                 responseType: 'arraybuffer',
                             })
@@ -192,7 +199,7 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
                                 await setArrayBuffer('pdfFile', response.data);
                                 await setArrayBuffer('pdfFileOriginal', response.data);
                                 setPdfFileLoad(pdfFileLoad + 1);
-                                //  setShareBlockReady(true) ;
+                                setShareBlockReady(true);
                             });
                         if (payload.data.isDone || payload.data.audit) {
                             if (
@@ -208,7 +215,7 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
                     // dispatch(setContractLink(ContractLink.SHARE));
                     if (!payload.data.audit) {
                         let body = {
-                            shareLink: shareLink,
+                            shareLink: recipientKey,
                             status: EventStatuses.SEEN,
                             name: payload.data.fullname,
                             email: payload.data.email,
@@ -243,7 +250,7 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
                                 : error.message,
                     });
                 });
-            url = `${BASE_URL}${ApiEntity.RECIPIENT_CONTRACT_EVENT}?shareLink=${shareLink}`;
+            url = `${BASE_URL}${ApiEntity.RECIPIENT_CONTRACT_EVENT}?shareLink=${recipientKey}`;
             await axios
                 .get(url, {
                     headers: {
@@ -255,24 +262,13 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
                 .then((payload) => {
                     setContractEvent(payload.data);
                 });
-            url = `${BASE_URL}${ApiEntity.RECIPIENT_SIGN}?shareLink=${shareLink}`;
-            await axios
-                .get(url, {
-                    headers: {
-                        Accept: 'application/vnd.api+json',
-                        'Content-Type': 'application/vnd.api+json',
-                    },
-                    responseType: 'json',
-                })
-                .then((payload) => {
-                    setContractSign(payload.data);
-                });
+            setRefreshSigns(refreshSigns + 1);
         };
-        if (shareLink &&
+        if (recipientKey &&
             !first.current) {
             fetchContract();
         }
-    }, [shareLink]);
+    }, [recipientKey]);
 
     useEffect(() => {
         if (placeholder && placeholder.length > 0) {
@@ -305,6 +301,27 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
             }
         }
     }, [placeholder]);
+    useEffect(() => {
+        const getSigns = async () => {
+            const url = `${BASE_URL}${ApiEntity.RECIPIENT_SIGN}?shareLink=${recipientKey}`;
+            await axios
+                .get(url, {
+                    headers: {
+                        Accept: 'application/vnd.api+json',
+                        'Content-Type': 'application/vnd.api+json',
+                    },
+                    responseType: 'json',
+                })
+                .then((payload) => {
+                    setSigns(payload.data);
+                });
+        };
+        if (refreshSigns > 0) {
+            console.log('refreshSigns', refreshSigns);
+            getSigns();
+        }
+    }, [refreshSigns]);
+
     const getSignIPInfo = async () => {
         // debugger;
         await axios
@@ -328,7 +345,7 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
         let changed = false;
         let viewCurrent: ShareLinkView = contract.view as ShareLinkView;
         let body = {
-            shareLink,
+            shareLink: recipientKey,
             changeTime: contract.changeTime,
             view: contract.view,
         };
@@ -396,36 +413,54 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
         setSteps(stepsTmp);
     };
     const handleContinue = async () => {
-        let value = contractValue.contractValue as string;
-        for (let i = 0; i < placeholder.length; i++) {
-            if (placeholder[i].isSpecial) {
-                if (placeholder[i].specialType) {
-                    let tag = '';
-                    switch (placeholder[i].specialType) {
-                        case SpecialType.DATE:
-                            tag = Tags.DATE;
-                            break;
-                        case SpecialType.FULLNAME:
-                            tag = Tags.FULLNAME;
-                            break;
-                        case SpecialType.EMAIL:
-                            tag = Tags.EMAIL;
-                            break;
-                        case SpecialType.SIGN:
-                            tag = Tags.SIGN;
-                            break;
-                        case SpecialType.INITIALS:
-                            tag = Tags.INITIALS;
-                            break;
+        if (contract.contractType?.toString() !== ContractType.PDF.toString()) {
+            let value = contractValue.contractValue as string;
+            for (let i = 0; i < placeholder.length; i++) {
+                if (placeholder[i].isSpecial) {
+                    if (placeholder[i].specialType) {
+                        let tag = '';
+                        switch (placeholder[i].specialType) {
+                            case SpecialType.DATE:
+                                tag = Tags.DATE;
+                                break;
+                            case SpecialType.FULLNAME:
+                                tag = Tags.FULLNAME;
+                                break;
+                            case SpecialType.EMAIL:
+                                tag = Tags.EMAIL;
+                                break;
+                            case SpecialType.SIGN:
+                                tag = Tags.SIGN;
+                                break;
+                            case SpecialType.INITIALS:
+                                tag = Tags.INITIALS;
+                                break;
+                        }
+                        value = changeValueInTag(
+                            tag,
+                            placeholder[i].id ? (placeholder[i].id as number) : 0,
+                            placeholder[i].value
+                                ? placeholder[i].specialType !== SpecialType.SIGN &&
+                                    placeholder[i].specialType !== SpecialType.INITIALS
+                                    ? (placeholder[i].value as string)
+                                    : `<img src='${placeholder[i].value}' alt="signature" />`
+                                : `{{{${placeholder[i].name as string}}}}`,
+                            value,
+                            contract.audit
+                                ? '#ffffff'
+                                : placeholder[i].externalRecipientKey &&
+                                    placeholder[i].externalRecipientKey === contract.shareLink
+                                    ? '#a3e8f6'
+                                    : '#f0f0f0',
+                            placeholder
+                        );
                     }
+                } else {
                     value = changeValueInTag(
-                        tag,
+                        Tags.PLACEHOLDER,
                         placeholder[i].id ? (placeholder[i].id as number) : 0,
                         placeholder[i].value
-                            ? placeholder[i].specialType !== SpecialType.SIGN &&
-                                placeholder[i].specialType !== SpecialType.INITIALS
-                                ? (placeholder[i].value as string)
-                                : `<img src='${placeholder[i].value}' alt="signature" />`
+                            ? (placeholder[i].value as string)
                             : `{{{${placeholder[i].name as string}}}}`,
                         value,
                         contract.audit
@@ -437,37 +472,40 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
                         placeholder
                     );
                 }
-            } else {
-                value = changeValueInTag(
-                    Tags.PLACEHOLDER,
-                    placeholder[i].id ? (placeholder[i].id as number) : 0,
-                    placeholder[i].value
-                        ? (placeholder[i].value as string)
-                        : `{{{${placeholder[i].name as string}}}}`,
-                    value,
-                    contract.audit
-                        ? '#ffffff'
-                        : placeholder[i].externalRecipientKey &&
-                            placeholder[i].externalRecipientKey === contract.shareLink
-                            ? '#a3e8f6'
-                            : '#f0f0f0',
-                    placeholder
-                );
             }
+            setContractValue({
+                changeTime: contractValue.changeTime,
+                contractValue: value,
+            });
         }
-        setContractValue({
-            changeTime: contractValue.changeTime,
-            contractValue: value,
-        });
         setPlaceholdersFilling(true);
         setFillPlaceholderBefore(false);
-        // await updatePlaceholders(placeholders);
+        let body = {
+            shareLink: contract.shareLink,
+            placeholders: placeholder,
+        };
+        await axios
+            .post(BASE_URL + ApiEntity.RECIPIENT_PLACEHOLDER, body, {
+                headers: {
+                    Accept: 'application/vnd.api+json',
+                    'Content-Type': 'application/vnd.api+json',
+                },
+                responseType: 'json',
+            })
+            .catch((error) => {
+                setNotification({
+                    text:
+                        error.response && error.response.data && error.response.data.message
+                            ? error.response.data.message
+                            : error.message,
+                });
+            });
     };
     const handleDownload = async () => {
         setSpinBtn(true);
         // debugger;
         await axios
-            .get(`/api/download_pdf?shareLink=${contract.shareLink}&owner=true`, {
+            .get(`${BASE_URL}${ApiEntity.RECIPIENT_DOWNLOAD_PDF}?shareLink=${recipientKey}&owner=true`, {
                 responseType: 'arraybuffer',
             })
             .then((payload) => {
@@ -527,7 +565,11 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
                 contractSign,
                 setContractSign,
                 signs,
-                setSigns
+                setSigns,
+                placeholdersFilling,
+                setPlaceholdersFilling,
+                refreshSigns,
+                setRefreshSigns
             }}
         >
             <Row>
@@ -664,13 +706,70 @@ export const RecipientView: FC<RecipientViewProps> = ({ shareLink }) => {
                                                     ShareLinkView.APPROVE.toString() ||
                                                     contract.view.toString() ===
                                                     ShareLinkView.VIEW.toString()) ? (
-                                                <>
-                                                    {contract.contractType?.toString() === ContractType.PDF.toString() ?
-                                                        <></>
-                                                        :
-                                                        <FluentEditorBlock value={contractValue.contractValue as string} />
-                                                    }
-                                                </>
+                                                <Card
+                                                    style={{ opacity: 1, overflow: 'auto' }}
+                                                    variant='outlined'
+                                                    className="SharingCardToHide"
+                                                >
+                                                    <Space direction="vertical" size={16} style={{ display: 'flex' }}>
+                                                        <Space direction="vertical" size={2} className="SharingDocHeader">
+                                                            {contract.view.toString() === ShareLinkView.SIGN.toString() && (
+                                                                <>
+                                                                    <Title level={4} style={{ margin: '0 0 0 0' }}>
+                                                                        Please, review and sign this document
+                                                                    </Title>
+                                                                    <Text type="secondary">Find the Sign button below. </Text>
+                                                                </>
+                                                            )}
+                                                            {contract.view.toString() === ShareLinkView.APPROVE.toString() && (
+                                                                <>
+                                                                    <Title level={4} style={{ margin: '0 0 0 0' }}>
+                                                                        Please, review and approve this document
+                                                                    </Title>
+                                                                    <Text type="secondary">Find the Approve button below. </Text>
+                                                                </>
+                                                            )}
+                                                            {contract.view.toString() === ShareLinkView.VIEW.toString() && (
+                                                                <>
+                                                                    <Title level={4} style={{ margin: '0 0 0 0' }}>
+                                                                        Please, review this document
+                                                                    </Title>
+                                                                </>
+                                                            )}
+                                                        </Space>
+                                                        {contract.isTest && (
+                                                            <Alert
+                                                                showIcon
+                                                                banner
+                                                                message="Sandbox"
+                                                                description="Congratulations! You've created a new document in Sandforsign's test environment."
+                                                                type="success"
+                                                            />
+                                                        )}
+                                                        {contract.contractType?.toString() === ContractType.PDF.toString() ?
+                                                            <>
+                                                                {contract.audit ? (
+                                                                    <PdfViewerPrint
+                                                                        onLoad={(data) => {
+                                                                            console.log(
+                                                                                'PdfViewerPrint',
+                                                                                data,
+                                                                            );
+                                                                        }}
+                                                                    />
+                                                                ) : (
+                                                                    <PdfViewer
+                                                                        onLoad={(data) => {
+                                                                            // console.log('data', data, pagePlaceholders.current);
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                            </>
+                                                            :
+                                                            <FluentEditorBlock value={contractValue.contractValue as string} />
+                                                        }
+                                                    </Space>
+                                                </Card>
                                             ) : (
                                                 <LockBlock />
                                             )}

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import {
 	Space,
@@ -36,7 +36,9 @@ export const SignModal = () => {
 	const padRef = useRef<any>(null);
 
 	useEffect(() => {
-		if (contract && contract.fullname && contract.email) {
+		if (contract &&
+			contract.fullname &&
+			contract.email) {
 			setFullName(contract.fullname);
 			setEmail(contract.email);
 		}
@@ -83,17 +85,17 @@ export const SignModal = () => {
 			}
 		}
 	};
-	const handleChange = (e: any) => {
-		switch (e.target.id) {
+	const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+		const { id, value } = e.target;
+		switch (id) {
 			case 'FullName':
-				setFullName(e.target.value);
+				setFullName(value);
 				break;
-
 			case 'Email':
-				setEmail(e.target.value);
+				setEmail(value);
 				break;
 		}
-	};
+	}, []);
 	const handleClear = () => {
 		padRef?.current?.clear();
 		setSignDisable(true);
@@ -184,7 +186,7 @@ export const SignModal = () => {
 				direction='vertical'
 				style={{ display: 'flex', margin: '32px 0 0 0' }}
 			>
-				<Card key={`SignModal${contract.shareLink}`}>
+				<Card>
 					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 						<Space direction='vertical' size={2}>
 							<Title level={5} style={{ margin: '0 0 0 0' }}>
@@ -210,7 +212,7 @@ export const SignModal = () => {
 				</Card>
 				<Spin spinning={!fullName || !email} style={{ display: 'none' }}>
 					<Space direction='vertical' style={{ display: 'flex' }}>
-						<Card bordered={true}>
+						<Card >
 							<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 								<Space direction='vertical' size={2}>
 									{/* <Title level={5} style={{ margin: '0 0 0 0' }}>

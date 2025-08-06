@@ -6,6 +6,7 @@ export default function useSaveArrayBuffer() {
 		await localforage.getItem<ArrayBuffer>(key).then((getItemValue) => {
 			value = getItemValue as ArrayBuffer;
 		});
+		console.log('getArrayBuffer', key, value);
 		return value;
 	};
 
@@ -16,10 +17,12 @@ export default function useSaveArrayBuffer() {
 		if (valueTmp) {
 			await localforage.removeItem(key);
 		}
+		console.log('saveArrayBuffer', key, value);
 		// //console.log('pdfFile saveArrayBuffer', value);
 		await localforage.setItem<ArrayBuffer>(key, value);
 	};
 	const clearArrayBuffer = async () => {
+		console.log('clearArrayBuffer');
 		await localforage.clear();
 	};
 	return {

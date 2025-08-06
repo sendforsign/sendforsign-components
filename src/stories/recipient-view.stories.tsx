@@ -16,5 +16,5 @@ export const Primary: Story = (args) => (
     <RecipientView data-testId='InputField-id' {...args} />
 );
 Primary.args = {
-    shareLink: '',
+    recipientKey: '',
 };

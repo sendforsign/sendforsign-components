@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Space, Card, Typography, Modal, Button, Input } from 'antd';
 import axios from 'axios';
 import { BASE_URL } from '../../../config/config';
@@ -12,7 +12,8 @@ export const ApproveModal = () => {
 		approveModal,
 		setApproveModal,
 		setResultModal,
-		setNotification
+		setNotification,
+		setContractValue
 	} = useRecipientViewContext()
 	const { Title, Text } = Typography;
 	const [fullName, setFullName] = useState('');
@@ -20,60 +21,72 @@ export const ApproveModal = () => {
 	const [spinLoad, setSpinLoad] = useState(false);
 
 	useEffect(() => {
-		if (contract && contract.fullname && contract.email) {
+		if (contract &&
+			contract.fullname &&
+			contract.email) {
 			setFullName(contract.fullname);
 			setEmail(contract.email);
 		}
 	}, [contract]);
 	// console.log('contractKey 9');
 	const handleOk = async () => {
-		setSpinLoad(true);
-		const body = {
-			shareLink: contract.shareLink,
-			fullName: fullName,
-			email: email,
-		};
-		await axios
-			.post(BASE_URL + ApiEntity.RECIPIENT_APPROVE, body, {
-				headers: {
-					Accept: 'application/vnd.api+json',
-					'Content-Type': 'application/vnd.api+json',
-				},
-				responseType: 'json',
-			})
-			.then((payload: any) => {
-				//console.log('getContract read', payload);
-				setSpinLoad(false);
-				handleCancel();
-				sendEmail();
-				setResultModal({ open: true, action: ContractAction.APPROVE });
-				setIsDone(true);
-			})
-			.catch((error) => {
+		if (fullName && email) {
+			setSpinLoad(true);
+			const changed = await checkChangeContract();
+			if (changed) {
 				setNotification({
-					text:
-						error.response && error.response.data && error.response.data.message
-							? error.response.data.message
-							: error.message,
+					text: 'Contract updated. You must check document again.',
 				});
-			});
+				setApproveModal(false);
+			} else {
+				const body = {
+					shareLink: contract.shareLink,
+					fullName: fullName,
+					email: email,
+				};
+				await axios
+					.post(BASE_URL + ApiEntity.RECIPIENT_APPROVE, body, {
+						headers: {
+							Accept: 'application/vnd.api+json',
+							'Content-Type': 'application/vnd.api+json',
+						},
+						responseType: 'json',
+					})
+					.then((payload: any) => {
+						//console.log('getContract read', payload);
+						setSpinLoad(false);
+						handleCancel();
+						sendEmail();
+						setResultModal({ open: true, action: ContractAction.APPROVE });
+						setIsDone(true);
+					})
+					.catch((error) => {
+						setNotification({
+							text:
+								error.response && error.response.data && error.response.data.message
+									? error.response.data.message
+									: error.message,
+						});
+					});
+			}
+		}
 	};
 	const handleCancel = () => {
 		setEmail('');
 		setFullName('');
 		setApproveModal(false);
 	};
-	const handleChange = (e: any) => {
-		switch (e.target.id) {
+	const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+		const { id, value } = e.target;
+		switch (id) {
 			case 'FullName':
-				setFullName(e.target.value);
+				setFullName(value);
 				break;
-
 			case 'Email':
-				setEmail(e.target.value);
+				setEmail(value);
 				break;
 		}
-	};
+	}, []);
 	const sendEmail = async () => {
 		let body = {
 			shareLink: contract.shareLink,
@@ -97,6 +110,38 @@ export const ApproveModal = () => {
 							: error.message,
 				});
 			});
+	};
+	const checkChangeContract = async () => {
+		let changed = false;
+		let body = {
+			shareLink: contract.shareLink,
+			changeTime: contract.changeTime,
+			view: contract.view,
+		};
+		await axios
+			.post(BASE_URL + ApiEntity.CHECK_CONTRACT_CHANGED, body, {
+				headers: {
+					Accept: 'application/vnd.api+json',
+					'Content-Type': 'application/vnd.api+json',
+				},
+				responseType: 'json',
+			})
+			.then((payload: any) => {
+				//console.log('CHECK_CONTRACT_VALUE read', payload);
+				if (payload.data.changed && payload.data.contractValue) {
+					changed = payload.data.changed;
+					setContractValue(payload.data.contractValue);
+				}
+			})
+			.catch((error) => {
+				setNotification({
+					text:
+						error.response && error.response.data && error.response.data.message
+							? error.response.data.message
+							: error.message,
+				});
+			});
+		return changed;
 	};
 	return (
 		<Modal
@@ -124,10 +169,9 @@ export const ApproveModal = () => {
 		>
 			<Space
 				direction='vertical'
-				size='large'
 				style={{ display: 'flex', margin: '32px 0 0 0' }}
 			>
-				<Card bordered={true} key={`ApproveModal${new Date().toString()}`}>
+				<Card>
 					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 						<Space direction='vertical' size={2}>
 							<Title level={5} style={{ margin: '0 0 0 0' }}>
@@ -141,7 +185,7 @@ export const ApproveModal = () => {
 							id='FullName'
 							placeholder='Enter your full name'
 							value={fullName}
-							onChange={handleChange}
+							onChange={handleChange} 
 						/>
 						<Input
 							id='Email'

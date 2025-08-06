@@ -231,6 +231,7 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 			fluentRef?.current?.enable(false);
 		}
 	}, [sign, contractSign]);
+
 	useEffect(() => {
 		let isMounted = true;
 		const getSigns = async () => {
@@ -268,6 +269,12 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 			isMounted = false;
 		};
 	}, [refreshSign]);
+
+	useEffect(() => {
+		if (readonly) {
+			fluentRef?.current?.enable(!readonly);
+		}
+	}, [readonly]);
 
 	const generateId = () => {
 		return Math.random().toString(36).substr(2, 10);
@@ -365,7 +372,7 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 					cellInner.setAttribute('data-rowspan', rowspan || '1');
 					cellInner.setAttribute('data-colspan', colspan || '1');
 					cellInner.setAttribute('contenteditable', 'true');
- 
+
 					// Копируем содержимое как чистые элементы
 					Array.from(sourceCell.children).forEach(child => {
 						const cleanElement = document.createElement(child.tagName.toLowerCase());
@@ -547,6 +554,7 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 			needCheck: boolean = true,
 			email: boolean = false
 		) => {
+			if (readonly) { return; }
 			let contentTmp = content;
 
 			const tempDiv = document.createElement('div');

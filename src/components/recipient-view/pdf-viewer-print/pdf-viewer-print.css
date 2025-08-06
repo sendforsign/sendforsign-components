@@ -1,0 +1,51 @@
+.placeholderOwner {
+  position: absolute !important;
+  z-index: 999;
+  border: solid 1px #333;
+  background-color: #a3e8f6;
+  padding-left: 2px;
+  border-radius: 4px;
+  display: flex;
+}
+.placeholderOther {
+  position: absolute !important;
+  z-index: 999;
+  border: solid 1px #333;
+  background-color: #f0f0f0;
+  padding-left: 2px;
+  border-radius: 4px;
+  display: flex;
+}
+.placeholderPrint {
+  position: absolute !important;
+  z-index: 999;
+  border: solid 1px transparent;
+  background-color: #ffffff;
+  padding-left: 2px;
+  border-radius: 4px;
+  display: flex;
+}
+
+.classWithHover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+.classWithHover:hover {
+  box-shadow: none;
+  transition: 0.5s;
+}
+
+.react-pdf__Page__canvas {
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.contentClass {
+  padding: auto;
+}
+
+.wrapperClass {
+  padding: auto;
+}

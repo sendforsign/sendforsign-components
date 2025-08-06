@@ -79,28 +79,14 @@ export const FluentEditorBlock = ({ value }: Props) => {
 		setContractValue,
 		contractValue,
 		setIsDone,
-		// 	refreshSign,
-		// 	setReadonly,
-		// 	setSignCount,
-		// 	refreshPlaceholders,
 		placeholder,
 		setPlaceholder,
-		// 	setLoad,
-		// 	setRefreshPlaceholders,
-		// 	setDocumentCurrentSaved,
-		// 	focusElement,
-		// 	setFocusElement,
-		// 	aiHidden,
+		placeholdersFilling,
+		setPlaceholdersFilling
 	} = useRecipientViewContext();
 	const container = document.querySelector('#contract-editor-container');
 	const placeholderClassFill = useRef(false);
 	const focusElementRef = useRef('');
-
-	// useEffect(() => {
-	// 	if (focusElement) {
-	// 		focusElementRef.current = focusElement;
-	// 	}
-	// }, [focusElement]);
 
 	useEffect(() => {
 		if (document.querySelector('#contract-editor-container') && !fluentRef.current) {
@@ -196,43 +182,20 @@ export const FluentEditorBlock = ({ value }: Props) => {
 			fluentRef?.current?.enable(false);
 		}
 	}, [sign, contractSign]);
-	// useEffect(() => {
-	// 	let isMounted = true;
-	// 	const getSigns = async () => {
-	// 		let url = `${BASE_URL}${ApiEntity.CONTRACT_SIGN}?contractKey=${contractKey}&clientKey=${clientKey}`;
-	// 		await axios
-	// 			.get(url, {
-	// 				headers: {
-	// 					Accept: 'application/vnd.api+json',
-	// 					'Content-Type': 'application/vnd.api+json',
-	// 					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-	// 					Authorization: token ? `Bearer ${token}` : undefined,
-	// 				},
-	// 				responseType: 'json',
-	// 			})
-	// 			.then((payload: any) => {
-	// 				//console.log('getSigns read', payload);
-	// 				setSignCount(payload.data.length);
-	// 				if (payload.data.length > 0) {
-	// 					setReadonly(true);
-	// 				}
-	// 			})
-	// 			.catch((error) => {
-	// 				setNotification({
-	// 					text:
-	// 						error.response &&
-	// 							error.response.data &&
-	// 							error.response.data.message
-	// 							? error.response.data.message
-	// 							: error.message,
-	// 				});
-	// 			});
-	// 	};
-	// 	getSigns();
-	// 	return () => {
-	// 		isMounted = false;
-	// 	};
-	// }, [refreshSign]);
+
+	useEffect(() => {
+		if (
+			placeholdersFilling &&
+			contract &&
+			contract.contractType &&
+			contract.contractType.toString() !== ContractType.PDF.toString()
+		) {
+			fluentRef?.current?.clipboard.dangerouslyPasteHTML(contractValue.contractValue);
+
+			handleChangeText(contractValue.contractValue as string, false, false);
+			setPlaceholdersFilling(false);
+		}
+	}, [placeholdersFilling]); 
 
 	const generateId = () => {
 		return Math.random().toString(36).substr(2, 10);
@@ -363,135 +326,8 @@ export const FluentEditorBlock = ({ value }: Props) => {
 
 		// Возвращаем преобразованный HTML
 		return doc.documentElement.innerHTML;
-	}
-
-	// const getPlaceholders = async () => {
-	// 	if (placeholder && placeholder.length > 0) {
-	// 		for (let index = 0; index < placeholder.length; index++) {
-	// 			if (
-	// 				placeholder[index].view?.toString() !==
-	// 				PlaceholderView.SIGNATURE.toString()
-	// 			) {
-	// 				let tagClass = `placeholderClass${placeholder[index].id}`;
-	// 				if (placeholder[index].specialType) {
-	// 					switch (placeholder[index].specialType) {
-	// 						case SpecialType.DATE:
-	// 							tagClass = `dateClass${placeholder[index].id}`;
-	// 							break;
-
-	// 						case SpecialType.FULLNAME:
-	// 							tagClass = `fullnameClass${placeholder[index].id}`;
-	// 							break;
-
-	// 						case SpecialType.EMAIL:
-	// 							tagClass = `emailClass${placeholder[index].id}`;
-	// 							break;
-
-	// 						case SpecialType.SIGN:
-	// 							tagClass = `signClass${placeholder[index].id}`;
-	// 							break;
-
-	// 						case SpecialType.INITIALS:
-	// 							tagClass = `initialsClass${placeholder[index].id}`;
-	// 							break;
-	// 					}
-	// 				}
-
-	// 				const styleSheet = document.styleSheets[0]; // Получаем первый стиль
-	// 				styleSheet.insertRule(
-	// 					`.${tagClass} { background-color: ${placeholder[index].color
-	// 						? placeholder[index].color
-	// 						: PlaceholderColor.OTHER
-	// 					} }`,
-	// 					styleSheet.cssRules.length
-	// 				);
-	// 			}
-	// 		}
-	// 		placeholderClassFill.current = true;
-	// 	} else {
-	// 		const body = {
-	// 			data: {
-	// 				action: Action.LIST,
-	// 				clientKey: !token ? clientKey : undefined,
-	// 				contractKey: contractKey,
-	// 			},
-	// 		};
-	// 		await axios
-	// 			.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-	// 				headers: {
-	// 					Accept: 'application/vnd.api+json',
-	// 					'Content-Type': 'application/vnd.api+json',
-	// 					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-	// 					Authorization: token ? `Bearer ${token}` : undefined,
-	// 					'x-sendforsign-component': true,
-	// 				},
-	// 				responseType: 'json',
-	// 			})
-	// 			.then((payload: any) => {
-
-	// 				if (
-	// 					payload.data.placeholders &&
-	// 					payload.data.placeholders.length > 0
-	// 				) {
-	// 					setPlaceholder(payload.data.placeholders);
-	// 					for (
-	// 						let index = 0;
-	// 						index < payload.data.placeholders.length;
-	// 						index++
-	// 					) {
-	// 						if (
-	// 							payload.data.placeholders[index].view.toString() !==
-	// 							PlaceholderView.SIGNATURE.toString()
-	// 						) {
-	// 							let tagClass = `placeholderClass${payload.data.placeholders[index].id}`;
-	// 							if (payload.data.placeholders[index].specialType) {
-	// 								switch (payload.data.placeholders[index].specialType) {
-	// 									case SpecialType.DATE:
-	// 										tagClass = `dateClass${payload.data.placeholders[index].id}`;
-	// 										break;
-
-	// 									case SpecialType.FULLNAME:
-	// 										tagClass = `fullnameClass${payload.data.placeholders[index].id}`;
-	// 										break;
-
-	// 									case SpecialType.EMAIL:
-	// 										tagClass = `emailClass${payload.data.placeholders[index].id}`;
-	// 										break;
-
-	// 									case SpecialType.SIGN:
-	// 										tagClass = `signClass${payload.data.placeholders[index].id}`;
-	// 										break;
-
-	// 									case SpecialType.INITIALS:
-	// 										tagClass = `initialsClass${payload.data.placeholders[index].id}`;
-	// 										break;
-	// 								}
-	// 							}
-	// 							const styleSheet = document.styleSheets[0]; // Получаем первый стиль
-	// 							styleSheet.insertRule(
-	// 								`.${tagClass} { background-color: ${payload.data.placeholders[index].color
-	// 									? payload.data.placeholders[index].color
-	// 									: PlaceholderColor.OTHER
-	// 								} }`,
-	// 								styleSheet.cssRules.length
-	// 							);
-	// 						}
-	// 					}
-	// 					placeholderClassFill.current = true;
-	// 				}
-	// 			})
-	// 			.catch((error) => {
-	// 				setNotification({
-	// 					text:
-	// 						error.response &&
-	// 							error.response.data &&
-	// 							error.response.data.message
-	// 							? error.response.data.message
-	// 							: error.message,
-	// 				});
-	// 			});
-	// 	}
-	// };
+	} 
+	
 	const removeParentSpan = (element: HTMLElement | null) => {
 		// Проверяем, что элемент существует
 		if (element) {

@@ -7,6 +7,8 @@ export type TRecipientViewContextType = {
 	setContract: (contract: Contract) => void;
 	shareLinkView: ShareLinkView;
 	setShareLinkView: (shareLinkView: ShareLinkView) => void;
+	placeholdersFilling: boolean;
+	setPlaceholdersFilling: (placeholdersFilling: boolean) => void;
 	signModal: boolean;
 	setSignModal: (signModal: boolean) => void;
 	approveModal: boolean;
@@ -37,6 +39,8 @@ export type TRecipientViewContextType = {
 	setSigns: (signs: ContractSign[]) => void;
 	contractSign: ContractSign;
 	setContractSign: (contractSign: ContractSign) => void;
+	refreshSigns: number;
+	setRefreshSigns: (refreshSigns: number) => void;
 };
 export const RecipientViewContext = createContext<
 	TRecipientViewContextType | undefined

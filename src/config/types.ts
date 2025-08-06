@@ -169,6 +169,7 @@ export type ContractEvent = {
 	name?: string;
 	userId?: string;
 	priority?: number;
+	ipInfo?: string;
 };
 export type PdfDownload = {
 	fileName?: string;
