@@ -587,7 +587,6 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			});
 	};
 	const handleInsertPlaceholder = (holderInsert: Placeholder) => {
-		debugger;
 		const position = quillRef?.current?.getSelection();
 		//console.log('position', position, quillRef);
 		if (!holderInsert.isSpecial) {
@@ -651,22 +650,17 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 					break;
 
 				case SpecialType.SIGN:
-					tag = `< sign${holderInsert.id} className = { signClass${holderInsert.id
-						}
-			} contenteditable = "false" > ${`{{{${holderInsert.name}}}}`}</sign${holderInsert.id
-						}> `;
+					tag = `<sign${holderInsert.id} className={signClass${holderInsert.id}} contenteditable="false">${`{{{${holderInsert.name}}}}`}</sign${holderInsert.id}> `;
 					break;
 
 				case SpecialType.INITIALS:
-					tag = `< initials${holderInsert.id} className = { initialsClass${holderInsert.id
-						}
-		} contenteditable = "false" > ${holderInsert.value
-							? `<img
+					tag = `<initials${holderInsert.id} className={initialsClass${holderInsert.id}} contenteditable="false">${holderInsert.value ?
+						`<img
 									alt='initials'
 									src={${holderInsert.value}} 
 									style={{ objectFit: 'contain' }}
-								/>`
-							: `{{{${holderInsert.name}}}}`
+							/>`
+						: `{{{${holderInsert.name}}}}`
 						}</initials${holderInsert.id}> `;
 					break;
 			}
