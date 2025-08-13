@@ -759,9 +759,9 @@ export const RecipientView: FC<RecipientViewProps> = ({ recipientKey }) => {
                                                                     />
                                                                 ) : (
                                                                     <PdfViewer
-                                                                        onLoad={(data) => {
-                                                                            // console.log('data', data, pagePlaceholders.current);
-                                                                        }}
+                                                                    // onLoad={(data) => {
+                                                                    //     // console.log('data', data, pagePlaceholders.current);
+                                                                    // }}
                                                                     />
                                                                 )}
                                                             </>

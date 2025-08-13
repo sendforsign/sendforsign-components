@@ -63,7 +63,7 @@ export const PdfBlockDnd = () => {
 	const contractEvent = useRef(contractEvents);
 	const currentPagePl = useRef<PagePlaceholder[]>([]);
 
-	const { width, ref, height } = useResizeDetector();
+	const { ref } = useResizeDetector();
 
 	useEffect(() => {
 		let isMounted = true;
@@ -88,8 +88,8 @@ export const PdfBlockDnd = () => {
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -126,8 +126,8 @@ export const PdfBlockDnd = () => {
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -275,8 +275,8 @@ export const PdfBlockDnd = () => {
 						setNotification({
 							text:
 								error.response &&
-								error.response.data &&
-								error.response.data.message
+									error.response.data &&
+									error.response.data.message
 									? error.response.data.message
 									: error.message,
 						});
@@ -320,11 +320,11 @@ export const PdfBlockDnd = () => {
 							const pagePlIndex = pagePlaceholder.findIndex(
 								(pagePl) =>
 									pagePl.id?.toString() ===
-										placeholderFilter[j].id?.toString() &&
+									placeholderFilter[j].id?.toString() &&
 									pagePl.placeholderKey ===
-										placeholderFilter[j].placeholderKey &&
+									placeholderFilter[j].placeholderKey &&
 									pagePl.pageId?.toString() ===
-										placeholderFilter[j].pageId?.toString()
+									placeholderFilter[j].pageId?.toString()
 							);
 							if (pagePlIndex) {
 								pagePlaceholder[pagePlIndex].value = placeholder[i]
@@ -346,7 +346,7 @@ export const PdfBlockDnd = () => {
 							contractSigns &&
 							contractSigns.length > 0 &&
 							placeholder[findIndex].view?.toString() ===
-								PlaceholderView.SIGNATURE.toString()
+							PlaceholderView.SIGNATURE.toString()
 						) {
 							const findSign = contractSigns.find(
 								(contractSign) =>
@@ -376,7 +376,7 @@ export const PdfBlockDnd = () => {
 							contractSigns &&
 							contractSigns.length > 0 &&
 							placeholder[i].view?.toString() ===
-								PlaceholderView.SIGNATURE.toString()
+							PlaceholderView.SIGNATURE.toString()
 						) {
 							const findSign = contractSigns.find(
 								(contractSign) =>
@@ -389,7 +389,7 @@ export const PdfBlockDnd = () => {
 						if (
 							placeholder[i].isSpecial &&
 							placeholder[i].specialType?.toString() ===
-								SpecialType.DATE.toString() &&
+							SpecialType.DATE.toString() &&
 							value
 						) {
 							value = `${dayjs(value).format('YYYY-MM-DD @ HH:mm:ss')} GMT`;
@@ -409,10 +409,10 @@ export const PdfBlockDnd = () => {
 									view: placeholder[i].view as PlaceholderView,
 									base64:
 										placeholder[i].isSpecial &&
-										placeholder[i].value &&
-										(placeholder[i].specialType?.toString() ===
-											SpecialType.INITIALS.toString() ||
-											placeholder[i].specialType?.toString() ===
+											placeholder[i].value &&
+											(placeholder[i].specialType?.toString() ===
+												SpecialType.INITIALS.toString() ||
+												placeholder[i].specialType?.toString() ===
 												SpecialType.SIGN.toString())
 											? placeholder[i].value
 											: base64,
@@ -440,9 +440,9 @@ export const PdfBlockDnd = () => {
 				onLoadSuccess={({ numPages }) => {
 					setNumPages(numPages);
 				}}
-				onSourceError={() => {}}
-				onLoadError={() => {}}
-				onError={() => {}}
+				onSourceError={() => { }}
+				onLoadError={() => { }}
+				onError={() => { }}
 			>
 				{new Array(numPages).fill(0).map((_, i) => {
 					// let random = Math.random();

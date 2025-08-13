@@ -62,7 +62,19 @@ export const PdfViewer = ({
   const pagePlaceholders = useRef<PagePlaceholder[]>([]);
   const { getArrayBuffer, setArrayBuffer } = useSaveArrayBuffer();
   // const [checkContractValue] = useCheckContractValueMutation();
-  const { width, ref } = useResizeDetector();
+  const { width, ref } = useResizeDetector({
+    // handleWidth: true,
+    // refreshMode: 'throttle',
+    skipOnMount: true,
+    observerOptions: {
+      box: 'content-box'
+    },
+    onResize: (e: any) => {
+      const newScale = e / (CANVAS_WIDTH * PAGE_SCALE);
+      console.log('onResize', e, newScale);
+      setScale(newScale);
+    }
+  });
   const div = document.getElementById(`page_0`);
   const divFill = useRef(false);
 
@@ -87,12 +99,13 @@ export const PdfViewer = ({
     }
   }, [div]);
   // Calculate scale based on container width
-  useEffect(() => {
-    if (width) {
-      const newScale = width / (CANVAS_WIDTH * PAGE_SCALE);
-      setScale(newScale);
-    }
-  }, [width]);
+  // useEffect(() => {
+  //   if (width) {
+  //     const newScale = width / (CANVAS_WIDTH * PAGE_SCALE);
+  //     console.log('newScale', newScale, width);
+  //     setScale(newScale);
+  //   }
+  // }, [width]);
 
   useEffect(() => {
     if (placeholder && placeholder.length > 0 && signs) {
@@ -513,8 +526,8 @@ export const PdfViewer = ({
       observer.disconnect();
     };
   }, []);
-  console.log('pdfData', pdfData);
   return (
+    // <Spin spinning={!pdfData || pdfData?.byteLength === 0} style={{ marginTop: '30px' }}>
     <div ref={ref} style={{ width: '100%' }}>
       <Document
         loading={<Spin spinning={!shareBlockReady} />}
@@ -533,7 +546,7 @@ export const PdfViewer = ({
               // scale={scale}
               scale={scale * PAGE_SCALE}
               onLoadSuccess={(data) => {
-                console.log('onLoadSuccess', new Date().getMilliseconds());
+                console.log('onLoadSuccess', data, scale);
 
                 adjustTextSize();
                 if (onLoad) {
@@ -683,6 +696,7 @@ export const PdfViewer = ({
         })}
       </Document>
     </div>
+    // </Spin>
   );
 };
 
