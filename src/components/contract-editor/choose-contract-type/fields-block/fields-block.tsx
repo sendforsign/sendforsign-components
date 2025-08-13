@@ -189,8 +189,8 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -347,7 +347,7 @@ export const FieldsBlock = ({ handleContinue, templateKey }: Props) => {
 	};
 
 	return (
-		<Card bordered={true}>
+		<Card  >
 			<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 				<Space direction='vertical' size={2}>
 					<Title level={4} style={{ margin: '0' }}>

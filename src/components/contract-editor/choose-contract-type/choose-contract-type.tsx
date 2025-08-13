@@ -42,6 +42,8 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 		setNotification,
 		load,
 		setLoad,
+		pdfFileLoad,
+		setPdfFileLoad
 	} = useContractEditorContext();
 	const { Title, Text } = Typography;
 	const [options, setOptions] = useState<SegmentedLabeledOption[]>([]);
@@ -53,7 +55,6 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 	const [chooseTemplate, setChooseTemplate] = useState(0);
 	const [segmentedValue, setSegmentedValue] = useState('');
 	const [btnName, setBtnName] = useState('Create document');
-	const [pdfFileLoad, setPdfFileLoad] = useState(0);
 
 	const { setArrayBuffer } = useSaveArrayBuffer();
 	useEffect(() => {
@@ -186,8 +187,8 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -343,8 +344,8 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -364,18 +365,18 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 						setPdfFileLoad(pdfFileLoad + 1);
 						setContractValue(template.value as string);
 						if (beforeCreated && contractName) {
-							// setCreateContract(true);
+							setCreateContract(true);
 						} else {
 							setChooseTemplate(chooseTemplate + 1);
 						}
-						// setFieldBlockVisible(true);
-						// setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
-						// setCreateDisable(true);
+						setFieldBlockVisible(true);
+						setCurrentData({ currentStep: ContractSteps.QN_A_STEP });
+						setCreateDisable(true);
 					});
 			} else {
 				// debugger;
 				setContractValue(template.value as string);
-				if (beforeCreated && contractName) { 
+				if (beforeCreated && contractName) {
 					setCreateContract(true);
 				} else {
 					setChooseTemplate(chooseTemplate + 1);

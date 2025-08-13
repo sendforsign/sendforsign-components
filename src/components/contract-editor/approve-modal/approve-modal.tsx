@@ -24,7 +24,7 @@ export const ApproveModal = () => {
 	const [spinLoad, setSpinLoad] = useState(false);
 
 	// console.log('contractKey 9');
-	const handleOk = async () => { 
+	const handleOk = async () => {
 		setSpinLoad(true);
 		const body = {
 			clientKey: !token ? clientKey : undefined,
@@ -131,7 +131,7 @@ export const ApproveModal = () => {
 				size='large'
 				style={{ display: 'flex', margin: '32px 0 0 0' }}
 			>
-				<Card bordered={true} key={`ApproveModal${new Date().toString()}`}>
+				<Card key={`ApproveModal${new Date().toString()}`}>
 					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 						<Space direction='vertical' size={2}>
 							<Title level={5} style={{ margin: '0 0 0 0' }}>

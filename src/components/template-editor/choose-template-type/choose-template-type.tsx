@@ -19,7 +19,7 @@ export const ChooseTemplateType = () => {
 		setPdfFileLoad,
 		continueLoad,
 		setContinueLoad,
-	} = useTemplateEditorContext(); 
+	} = useTemplateEditorContext();
 	const [options, setOptions] = useState<SegmentedLabeledOption[]>([]);
 	const { setArrayBuffer } = useSaveArrayBuffer();
 	const [createDisable, setCreateDisable] = useState(true);
@@ -209,7 +209,7 @@ export const ChooseTemplateType = () => {
 				</Space>
 			</Card>
 			{fieldBlockVisible && (
-				<Card bordered={true}>
+				<Card  >
 					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 						<Space direction='vertical' size={2}>
 							<Title level={4} style={{ margin: '0' }}>
@@ -221,7 +221,7 @@ export const ChooseTemplateType = () => {
 							placeholder='Enter your template name'
 							value={templateName}
 							onChange={handleChange}
-							// readOnly={!continueDisable}
+						// readOnly={!continueDisable}
 						/>
 						<Button
 							type='primary'

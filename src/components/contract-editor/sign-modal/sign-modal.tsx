@@ -218,7 +218,7 @@ export const SignModal = () => {
 				</Card>
 				<Spin spinning={!fullName || !email} style={{ display: 'none' }}>
 					<Space direction='vertical' style={{ display: 'flex' }}>
-						<Card bordered={true}>
+						<Card  >
 							<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 								<Space direction='vertical' size={2}>
 									{/* <Title level={5} style={{ margin: '0 0 0 0' }}>

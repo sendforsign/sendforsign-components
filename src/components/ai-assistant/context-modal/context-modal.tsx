@@ -212,8 +212,8 @@ export const ContextModal = () => {
 							setNotification({
 								text:
 									error.response &&
-									error.response.data &&
-									error.response.data.message
+										error.response.data &&
+										error.response.data.message
 										? error.response.data.message
 										: error.message,
 							});
@@ -253,8 +253,8 @@ export const ContextModal = () => {
 							setNotification({
 								text:
 									error.response &&
-									error.response.data &&
-									error.response.data.message
+										error.response.data &&
+										error.response.data.message
 										? error.response.data.message
 										: error.message,
 							});
@@ -303,8 +303,8 @@ export const ContextModal = () => {
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -384,7 +384,7 @@ export const ContextModal = () => {
 				size='large'
 				style={{ display: 'flex', margin: '32px 0 0 0' }}
 			>
-				<Card bordered={true} key={`ContextModal${new Date().toString()}`}>
+				<Card key={`ContextModal${new Date().toString()}`}>
 					<Space direction='vertical' size={16} style={{ display: 'flex' }}>
 						<Title level={5} style={{ margin: '0 0 0 0' }}>
 							Enter context name

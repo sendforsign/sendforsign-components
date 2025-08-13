@@ -4,7 +4,7 @@ import { Button, Card, Result, Space } from 'antd';
 export const LockBlock = () => {
 
   return (
-    <Card style={{ opacity: 1 }} bordered={true} className="SharingCardToHide">
+    <Card style={{ opacity: 1 }} className="SharingCardToHide">
       <Space direction="vertical" size={16} style={{ display: 'flex' }}>
         <Result
           title="This document is locked by the contract owner"
