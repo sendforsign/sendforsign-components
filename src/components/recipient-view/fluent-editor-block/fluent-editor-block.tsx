@@ -435,7 +435,7 @@ export const FluentEditorBlock = ({ value }: Props) => {
 					.post(BASE_URL + ApiEntity.RECIPIENT_CONTRACT, body, {
 						headers: {
 							Accept: 'application/vnd.api+json',
-							'Content-Type': 'application/vnd.api+json',
+							// 'Content-Type': 'application/vnd.api+json',
 						},
 						responseType: 'json',
 					})
