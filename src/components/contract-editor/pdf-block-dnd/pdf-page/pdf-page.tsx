@@ -97,7 +97,7 @@ export const PdfPage = ({
 
 				let left = Math.round(
 					parseInt((pagePlaceholderDrag.positionX as number).toString()) +
-						delta.x
+					delta.x
 				);
 				const offsetWidth =
 					(div?.offsetWidth as number) -
@@ -110,7 +110,7 @@ export const PdfPage = ({
 
 				let top = Math.round(
 					parseInt((pagePlaceholderDrag.positionY as number).toString()) +
-						delta.y
+					delta.y
 				);
 				const offsetHeight =
 					(div?.offsetHeight as number) -
@@ -125,7 +125,7 @@ export const PdfPage = ({
 					(currPl) =>
 						currPl.placeholderKey === pagePlaceholderDrag.placeholderKey &&
 						currPl.pageId?.toString() ===
-							pagePlaceholderDrag.pageId?.toString() &&
+						pagePlaceholderDrag.pageId?.toString() &&
 						currPl.id?.toString() === pagePlaceholderDrag.id?.toString()
 				);
 				if (findIndex >= 0) {
@@ -138,7 +138,7 @@ export const PdfPage = ({
 						(insert) =>
 							insert.placeholderKey === pagePlaceholderDrag.placeholderKey &&
 							insert.pageId?.toString() ===
-								pagePlaceholderDrag.pageId?.toString() &&
+							pagePlaceholderDrag.pageId?.toString() &&
 							insert.id?.toString() === pagePlaceholderDrag.id?.toString()
 					);
 					if (insertionIndex >= 0) {
@@ -270,10 +270,11 @@ export const PdfPage = ({
 			});
 		}
 		return () => {
-			div?.removeEventListener('mousemove', () => {});
+			div?.removeEventListener('mousemove', () => { });
 		};
 	}, [div]);
 	useEffect(() => {
+		console.log('onChange3');
 		if (
 			currPagePlaceholder &&
 			currPagePlaceholder.length > 0 &&
@@ -303,8 +304,9 @@ export const PdfPage = ({
 			}
 			setCurrPagePlaceholder(pagePlaceholderTmp);
 			currPagePl.current = pagePlaceholderTmp;
+			console.log('onChange4', placeholderChange);
 		}
-	}, [placeholderChange]);
+	}, [placeholderChange, currPagePlaceholder]);
 	useEffect(() => {
 		if (
 			currPagePlaceholder &&
@@ -423,19 +425,19 @@ export const PdfPage = ({
 					},
 					responseType: 'json',
 				})
-				.then((payload: any) => {})
+				.then((payload: any) => { })
 				.catch((error) => {
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
 				});
 		}
-	}; 
+	};
 	// console.log('currPagePlaceholder', currPagePlaceholder);
 	return (
 		<Page
@@ -446,7 +448,7 @@ export const PdfPage = ({
 			// scale={scale}
 			onLoadSuccess={(e) => {
 				console.log('onLoadSuccess', new Date().getMilliseconds());
-				setReady(true); 
+				setReady(true);
 			}}
 			onDragOver={(e) => {
 				e.preventDefault();
@@ -513,9 +515,9 @@ export const PdfPage = ({
 							top: 0,
 							left: 0,
 						}}
-						// onDrop={() => {
-						// 	console.log('onClick', pageNumber);
-						// }}
+					// onDrop={() => {
+					// 	console.log('onClick', pageNumber);
+					// }}
 					>
 						<div
 							id={idInsert}
@@ -548,9 +550,9 @@ export const PdfPage = ({
 												let placeholderIndex = pagePlaceholderTmp.findIndex(
 													(pagePl) =>
 														pagePl?.id?.toString() ===
-															e.pagePlaceholder.id.toString() &&
+														e.pagePlaceholder.id.toString() &&
 														pagePl.placeholderKey ===
-															e.pagePlaceholder.placeholderKey
+														e.pagePlaceholder.placeholderKey
 												);
 												pagePlaceholderTmp[placeholderIndex] =
 													e.pagePlaceholder;
@@ -560,11 +562,11 @@ export const PdfPage = ({
 												const insertionIndex = insertion.current.findIndex(
 													(insert) =>
 														insert.placeholderKey ===
-															e.pagePlaceholder.placeholderKey &&
+														e.pagePlaceholder.placeholderKey &&
 														insert.pageId?.toString() ===
-															e.pagePlaceholder.pageId?.toString() &&
+														e.pagePlaceholder.pageId?.toString() &&
 														insert.id?.toString() ===
-															e.pagePlaceholder.id?.toString()
+														e.pagePlaceholder.id?.toString()
 												);
 												if (insertionIndex >= 0) {
 													insertion.current[insertionIndex] = {
@@ -605,11 +607,11 @@ export const PdfPage = ({
 												) {
 													if (
 														currPagePlaceholder[index].pageId?.toString() ===
-															e.pagePlaceholder.pageId?.toString() &&
+														e.pagePlaceholder.pageId?.toString() &&
 														currPagePlaceholder[index].placeholderKey ===
-															e.pagePlaceholder.placeholderKey &&
+														e.pagePlaceholder.placeholderKey &&
 														currPagePlaceholder[index].id?.toString() ===
-															e.pagePlaceholder.id?.toString()
+														e.pagePlaceholder.id?.toString()
 													) {
 													} else {
 														currPagePlaceholderTmp.push(

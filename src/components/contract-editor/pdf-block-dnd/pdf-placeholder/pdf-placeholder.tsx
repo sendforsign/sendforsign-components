@@ -91,7 +91,7 @@ export const PdfPlaceholder = ({
 		const divs = document.getElementsByClassName('hola'); // Получаем все элементы с классом 'hola'
 		if (divs.length === 0) return; // Проверяем, существуют ли элементы
 
-		console.log('adjustTextSize', divs);
+		// console.log('adjustTextSize', divs);
 
 		Array.from(divs).forEach((div) => {
 			if (div.id !== `${id}_div`) {

@@ -22,7 +22,7 @@ import {
 	SpecialType,
 	Tags,
 } from '../../../config/enum';
-import { addBlotClass, wrapTextNodes } from '../../../utils';
+import { addBlotClass, removeAilineTags, wrapTextNodes } from '../../../utils';
 
 import '@opentiny/fluent-editor/style.css';
 import 'quill-table-up/index.css'
@@ -115,7 +115,9 @@ export const FluentEditorBlock = ({ value }: Props) => {
 			});
 			if (fluentRef.current) {
 				// debugger;
-				let processedValue = wrapTextNodes(value); // Обрабатываем HTML 
+				let processedValue = removeAilineTags(value);
+				processedValue = wrapTextNodes(value); // Обрабатываем HTML 
+				// let processedValue = value; // Обрабатываем HTML 
 				if (processedValue.includes('quill-better-table-wrapper')) {
 					processedValue = convertQuillTablesInHTML(processedValue);
 				}
@@ -195,7 +197,7 @@ export const FluentEditorBlock = ({ value }: Props) => {
 			handleChangeText(contractValue.contractValue as string, false, false);
 			setPlaceholdersFilling(false);
 		}
-	}, [placeholdersFilling]); 
+	}, [placeholdersFilling]);
 
 	const generateId = () => {
 		return Math.random().toString(36).substr(2, 10);
@@ -326,8 +328,8 @@ export const FluentEditorBlock = ({ value }: Props) => {
 
 		// Возвращаем преобразованный HTML
 		return doc.documentElement.innerHTML;
-	} 
-	
+	}
+
 	const removeParentSpan = (element: HTMLElement | null) => {
 		// Проверяем, что элемент существует
 		if (element) {
@@ -444,6 +446,7 @@ export const FluentEditorBlock = ({ value }: Props) => {
 						}
 						// setDocumentCurrentSaved(true); 
 						// setIsDone(true);
+						setContractValue({ contractValue: payload.data.contractValue, changeTime: payload.data.changeTime });
 					})
 					.catch((error) => {
 						setNotification({

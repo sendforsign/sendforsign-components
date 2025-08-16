@@ -34,6 +34,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useDrag } from 'react-dnd';
 import { getIcon } from '../../../../utils';
+import { useDebouncedCallback } from 'use-debounce';
 
 type Props = {
 	style?: any;
@@ -130,6 +131,7 @@ export const PlaceholderDrag = ({
 
 				break;
 		}
+		console.log('onChange1', currPlaceholder.current);
 		if (onChange) {
 			onChange({ placeholder: currPlaceholder.current });
 		}
@@ -161,13 +163,13 @@ export const PlaceholderDrag = ({
 						},
 						responseType: 'json',
 					})
-					.then((payload: any) => {})
+					.then((payload: any) => { })
 					.catch((error) => {
 						setNotification({
 							text:
 								error.response &&
-								error.response.data &&
-								error.response.data.message
+									error.response.data &&
+									error.response.data.message
 									? error.response.data.message
 									: error.message,
 						});
@@ -203,7 +205,7 @@ export const PlaceholderDrag = ({
 				},
 				responseType: 'json',
 			})
-			.then((payload: any) => {})
+			.then((payload: any) => { })
 			.catch((error) => {
 				setNotification({
 					text:
@@ -336,8 +338,8 @@ export const PlaceholderDrag = ({
 							readOnly={
 								currPlaceholder.current.view?.toString() !==
 									PlaceholderView.SIGNATURE.toString() &&
-								!currPlaceholder.current.isSpecial &&
-								!readonly
+									!currPlaceholder.current.isSpecial &&
+									!readonly
 									? false
 									: true
 							}
@@ -351,7 +353,7 @@ export const PlaceholderDrag = ({
 					<Col flex={'auto'}></Col>
 					{currPlaceholder.current.view?.toString() !==
 						PlaceholderView.SIGNATURE.toString() &&
-					!currPlaceholder.current.isSpecial ? (
+						!currPlaceholder.current.isSpecial ? (
 						<Col flex='24px'>
 							<Popover
 								content={
@@ -378,22 +380,22 @@ export const PlaceholderDrag = ({
 											size='small'
 											value={
 												currPlaceholder.current.fillingType &&
-												currPlaceholder.current.fillingType.toString() !==
+													currPlaceholder.current.fillingType.toString() !==
 													PlaceholderFill.SPECIFIC.toString()
 													? currPlaceholder.current.fillingType?.toString()
 													: currPlaceholder.current.fillingType &&
-													  currPlaceholder.current.fillingType.toString() ===
-															PlaceholderFill.SPECIFIC.toString() &&
-													  currPlaceholder.current.externalRecipientKey &&
-													  recipients &&
-													  recipients.length > 0
-													? recipients.find((placeholderRecipient) =>
+														currPlaceholder.current.fillingType.toString() ===
+														PlaceholderFill.SPECIFIC.toString() &&
+														currPlaceholder.current.externalRecipientKey &&
+														recipients &&
+														recipients.length > 0
+														? recipients.find((placeholderRecipient) =>
 															placeholderRecipient.recipientKey?.includes(
 																currPlaceholder.current
 																	.externalRecipientKey as string
 															)
-													  )?.recipientKey
-													: '1'
+														)?.recipientKey
+														: '1'
 											}
 											onChange={(e: any) => handleChangeFilling(e)}
 										>
@@ -432,7 +434,7 @@ export const PlaceholderDrag = ({
 										<Popover content={
 											<Space direction='vertical'>
 												<Text type='secondary'>Placeholder Key: {currPlaceholder.current.placeholderKey}</Text>
-												<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d'/>} onClick={() => navigator.clipboard.writeText(currPlaceholder.current.placeholderKey || 'N/A')}>Copy</Button>
+												<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d' />} onClick={() => navigator.clipboard.writeText(currPlaceholder.current.placeholderKey || 'N/A')}>Copy</Button>
 											</Space>
 										} trigger="click">
 											<Button size='small'>{currPlaceholder.current.placeholderKey}</Button>
@@ -459,7 +461,7 @@ export const PlaceholderDrag = ({
 										<Popover content={
 											<Space direction='vertical'>
 												<Text type='secondary'>Placeholder Key: {currPlaceholder.current.placeholderKey}</Text>
-												<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d'/>} onClick={() => navigator.clipboard.writeText(currPlaceholder.current.placeholderKey || 'N/A')}>Copy</Button>
+												<Button size='small' icon={<FontAwesomeIcon icon={faCopy} size='sm' color='#5d5d5d' />} onClick={() => navigator.clipboard.writeText(currPlaceholder.current.placeholderKey || 'N/A')}>Copy</Button>
 											</Space>
 										} trigger="click">
 											<Button size='small'>{currPlaceholder.current.placeholderKey}</Button>

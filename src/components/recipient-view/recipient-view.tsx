@@ -7,38 +7,22 @@ import {
     Row,
     Col,
     Button,
-    TableColumnsType,
     Spin,
-    Dropdown,
-    MenuProps,
-    Empty,
-    Statistic,
     Input,
-    Select,
-    Tooltip,
     Steps,
     Alert,
 } from 'antd';
 import axios from 'axios';
-import dayjs from 'dayjs';
 import { BASE_URL } from '../../config/config';
-import { Action, ApiEntity, ContractAction, ContractType, EventStatuses, PlaceholderView, ShareLinkView, SpecialType, Tags } from '../../config/enum';
-import Table from 'antd/es/table';
-// import { ContractListContext } from './contract-list-context';
-// import { ModalView } from './modal-view/modal-view';
+import { ApiEntity, ContractAction, ContractType, EventStatuses, PlaceholderView, ShareLinkView, SpecialType, Tags } from '../../config/enum';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faBookBookmark,
     faDownload,
-    faEllipsisVertical,
-    faLightbulb,
-    faPaperclip,
-    faPlus,
-    faQuestion,
     faSignature,
     faStamp,
 } from '@fortawesome/free-solid-svg-icons';
-import { Contract, ContractEvent, ContractSign, ContractSignAi, ContractValue, EventStatus, PagePlaceholder, Placeholder } from '../../config/types';
+import { Contract, ContractEvent, ContractSign, ContractValue, EventStatus, Placeholder } from '../../config/types';
 import { RecipientViewContext } from './recipient-view-context';
 import { addActualColors, delColorFromHtml, changeValueInTag } from '../../utils/util-for-share';
 import { ResultModal } from './result-modal/result-modal';
@@ -51,6 +35,7 @@ import { ApproveModal } from './approve-modal';
 import { Notification } from './notification';
 import { PdfViewer } from './pdf-viewer/pdf-viewer';
 import { PdfViewerPrint } from './pdf-viewer-print/pdf-viewer-print';
+import { removeAilineTags } from '../../utils';
 
 interface DataType {
     key?: string;
@@ -79,18 +64,11 @@ export const RecipientView: FC<RecipientViewProps> = ({ recipientKey }) => {
     const [sign, setSign] = useState('');
     const [contractSign, setContractSign] = useState<ContractSign>({});
     const [signs, setSigns] = useState<ContractSign[]>([]);
-    const [signCount, setSignCount] = useState(0);
-    const [renameModal, setRenameModal] = useState({ open: false, contractKey: '', name: '' });
-    const [refreshContracts, setRefreshContracts] = useState(0);
-    const [data, setData] = useState<DataType[]>([]);
-    const [eventStatus, setEventStatus] = useState<EventStatus[]>([]);
-    const [spinLoad, setSpinLoad] = useState(false);
     const [refreshSigns, setRefreshSigns] = useState(0);
     const [contract, setContract] = useState<Contract>({});
     const [contractValue, setContractValue] = useState<ContractValue>({});
     const [ipInfo, setIpInfo] = useState('');
     const [contractEvent, setContractEvent] = useState<ContractEvent[]>([]);
-    const currentRecord = useRef<DataType>({});
     const { Title, Text } = Typography;
     const { setArrayBuffer, clearArrayBuffer } =
         useSaveArrayBuffer();
@@ -128,6 +106,7 @@ export const RecipientView: FC<RecipientViewProps> = ({ recipientKey }) => {
                         payload.data.contractType.toString() !== ContractType.PDF.toString() &&
                         !payload.data.isDone
                     ) {
+                        value = removeAilineTags(value);
                         value = addActualColors(
                             payload.data.audit,
                             payload.data.shareLink,
@@ -346,7 +325,7 @@ export const RecipientView: FC<RecipientViewProps> = ({ recipientKey }) => {
         let viewCurrent: ShareLinkView = contract.view as ShareLinkView;
         let body = {
             shareLink: recipientKey,
-            changeTime: contract.changeTime,
+            changeTime: contractValue.changeTime,
             view: contract.view,
         };
         await axios

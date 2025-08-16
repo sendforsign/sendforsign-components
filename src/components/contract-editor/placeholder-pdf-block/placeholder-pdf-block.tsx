@@ -272,8 +272,8 @@ export const PlaceholderPdfBlock = () => {
 				selectedOtion === '1'
 					? PlaceholderFill.CREATOR
 					: selectedOtion !== '0'
-					? PlaceholderFill.SPECIFIC
-					: PlaceholderFill.NONE,
+						? PlaceholderFill.SPECIFIC
+						: PlaceholderFill.NONE,
 			externalRecipientKey:
 				selectedOtion !== '0' && selectedOtion !== '1' ? selectedOtion : '',
 		});
@@ -291,8 +291,8 @@ export const PlaceholderPdfBlock = () => {
 						selectedOtion === '1'
 							? PlaceholderFill.CREATOR
 							: selectedOtion !== '0'
-							? PlaceholderFill.SPECIFIC
-							: PlaceholderFill.NONE,
+								? PlaceholderFill.SPECIFIC
+								: PlaceholderFill.NONE,
 					externalRecipientKey:
 						selectedOtion !== '0' && selectedOtion !== '1' ? selectedOtion : '',
 				},
@@ -337,6 +337,7 @@ export const PlaceholderPdfBlock = () => {
 			(pl) => pl.id?.toString() === id.toString() && !pl.isSpecial
 		);
 		placeholderTmp[holderIndex] = placeholderChange;
+		console.log('onChange2', placeholderChange);
 		setPlaceholderChange(placeholderChange);
 		setPlaceholder(placeholderTmp);
 	};

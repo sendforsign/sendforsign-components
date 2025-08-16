@@ -24,6 +24,7 @@ export const SignModal = () => {
 		setResultModal,
 		setNotification,
 		ipInfo,
+		contractValue,
 		setContractValue,
 		setContractSign,
 		setSign
@@ -113,7 +114,7 @@ export const SignModal = () => {
 		let changed = false;
 		let body = {
 			shareLink: contract.shareLink,
-			changeTime: contract.changeTime,
+			changeTime: contractValue.changeTime,
 			view: contract.view,
 		};
 		await axios

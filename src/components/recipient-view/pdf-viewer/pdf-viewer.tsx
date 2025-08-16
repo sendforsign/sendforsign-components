@@ -492,7 +492,7 @@ export const PdfViewer = ({
   const adjustTextSize = () => {
     const divs = document.getElementsByClassName('hola'); // Получаем все элементы с классом 'hola'
     if (divs.length === 0) return; // Проверяем, существуют ли элементы
-    console.log('adjustTextSize');
+    // console.log('adjustTextSize');
     Array.from(divs).forEach((div) => {
       // Применяем логику к каждому элементу
       const element = div as HTMLElement; // Cast to HTMLElement
