@@ -22,10 +22,16 @@ module.exports = (args) => {
         //   runtimeChunk: true,
         // },
         resolve: {
+            // Allow importing ESM without explicit file extensions from some packages
+            fullySpecified: false,
             extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".css"], // Удалите ".jsx-runtime" из списка
             alias: {
                 "react/jsx-dev-runtime": "react/jsx-dev-runtime",
-                "react/jsx-runtime": "react/jsx-runtime"
+                "react/jsx-runtime": "react/jsx-runtime",
+                // Fix ESM subpath imports inside @opentiny/fluent-editor which use extension-less paths
+                "quill/core/selection": "quill/core/selection.js",
+                "quill/core/emitter": "quill/core/emitter.js",
+                "quill/themes/base": "quill/themes/base.js"
             }
         },
         externals: {
@@ -38,6 +44,7 @@ module.exports = (args) => {
             react: 'react'
         },
         module: {
+            noParse: /mammoth\.browser\.js$/,
             rules: [
                 {
                     test: /\.(ts|tsx)$/,
@@ -46,6 +53,8 @@ module.exports = (args) => {
                         options: {
                             compilerOptions: {
                                 noEmit: false,
+                                module: 'ESNext',
+                                moduleResolution: 'Bundler',
                             },
                         },
                     }],
@@ -71,6 +80,11 @@ module.exports = (args) => {
                     enforce: 'pre',
                     use: ['babel-loader', 'source-map-loader'],
                     exclude: /node_modules/,
+                },
+                {
+                    test: /mammoth\.browser\.js$/,
+                    include: /node_modules\/mammoth/,
+                    parser: { requireContext: false }
                 }
             ],
         },
