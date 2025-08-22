@@ -10,7 +10,7 @@ import {
 import { pdfjs } from 'react-pdf';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { ContractSign } from '../../../../config/types';
+import { ContractSign } from '../../../../../config/types';
 
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;

@@ -17,6 +17,7 @@ import {
 	ApiEntity,
 	ContractAction,
 	ContractType,
+	EventStatuses,
 	PlaceholderColor,
 	PlaceholderView,
 	SpecialType,
@@ -28,7 +29,8 @@ import '@opentiny/fluent-editor/style.css';
 import 'quill-table-up/index.css'
 import 'quill-table-up/table-creator.css'
 import { useRecipientViewContext } from '../recipient-view-context';
-import { changeValueInTag } from '../../../utils/util-for-share';
+import { changeValueInTag, convertQuillTablesInHTML, removeParentSpan } from '../../../utils/util-for-share';
+import { ContractEvent } from '../../../config/types';
 
 type Props = {
 	value: string;
@@ -70,11 +72,12 @@ export const FluentEditorBlock = ({ value }: Props) => {
 
 	const {
 		sign,
+		signs,
+		contractEvent,
 		setSign,
 		contractSign,
 		setContractSign,
 		contract,
-		setResultModal,
 		setNotification,
 		setContractValue,
 		contractValue,
@@ -113,18 +116,35 @@ export const FluentEditorBlock = ({ value }: Props) => {
 				// trackChanges: 'user'
 				readOnly: true
 			});
-			if (fluentRef.current) {
-				// debugger;
-				let processedValue = removeAilineTags(value);
-				processedValue = wrapTextNodes(value); // Обрабатываем HTML 
-				// let processedValue = value; // Обрабатываем HTML 
-				if (processedValue.includes('quill-better-table-wrapper')) {
-					processedValue = convertQuillTablesInHTML(processedValue);
-				}
-				fluentRef?.current?.clipboard.dangerouslyPasteHTML(processedValue);
-			}
 		}
 	}, [container]);
+
+	useEffect(() => {
+		if (contract?.contractType?.toString() !== ContractType.PDF.toString() &&
+			fluentRef.current) {
+			let processedValue = removeAilineTags(value);
+			processedValue = wrapTextNodes(value); // Обрабатываем HTML 
+			// let processedValue = value; // Обрабатываем HTML 
+			if (processedValue.includes('quill-better-table-wrapper')) {
+				processedValue = convertQuillTablesInHTML(processedValue);
+			}
+			if (processedValue && !contract?.audit) {
+				// console.log('contractEventsData', contractEventsData);
+				fluentRef?.current.clipboard.dangerouslyPasteHTML(processedValue);
+			} else if (processedValue && contract.audit) {
+				console.log('contract', contract);
+				if (signs && signs.length > 0 && contract.audit) {
+					fluentRef.current.clipboard.dangerouslyPasteHTML(
+						auditTrailList(processedValue as string)
+					);
+				} else {
+					fluentRef.current.clipboard.dangerouslyPasteHTML(
+						processedValue
+					);
+				}
+			}
+		}
+	}, [contract, signs]);
 
 	useEffect(() => {
 		if (sign &&
@@ -199,151 +219,87 @@ export const FluentEditorBlock = ({ value }: Props) => {
 		}
 	}, [placeholdersFilling]);
 
-	const generateId = () => {
-		return Math.random().toString(36).substr(2, 10);
-	};
-
-	const convertQuillTablesInHTML = (htmlString: string) => {
-		// Создаем временный DOM-документ
-		const parser = new DOMParser();
-		const doc = parser.parseFromString(htmlString, 'text/html');
-
-		// Находим все исходные таблицы
-		const sourceTables = doc.querySelectorAll('.quill-better-table-wrapper');
-
-		sourceTables.forEach(sourceWrapper => {
-			const sourceTable = sourceWrapper.querySelector('.quill-better-table');
-			if (!sourceTable) return;
-
-			// Создаем новый контейнер таблицы
-			const newWrapper = document.createElement('div');
-			newWrapper.className = 'ql-table-wrapper';
-			newWrapper.setAttribute('contenteditable', 'false');
-			const tableId = generateId();
-			newWrapper.setAttribute('data-table-id', tableId);
-
-			// Создаем новую таблицу
-			const newTable = document.createElement('table');
-			newTable.className = 'ql-table';
-			newTable.setAttribute('data-table-id', tableId);
-			newTable.setAttribute('cellpadding', '0');
-			newTable.setAttribute('cellspacing', '0');
-			newTable.style.marginRight = 'auto';
-			newTable.style.width = '100%';
-
-			let colIds: string[] = [];
-			// Копируем colgroup из исходной таблицы
-			const sourceColgroup = sourceTable.querySelector('colgroup');
-			if (sourceColgroup) {
-				const colgroup = sourceColgroup.cloneNode(true) as HTMLTableColElement;
-				colgroup.setAttribute('data-table-id', tableId);
-				colgroup.setAttribute('contenteditable', 'false');
-				const cols = colgroup.querySelectorAll('col');
-
-				// Генерируем colIds для каждого столбца
-				cols.forEach(col => {
-					const colId = generateId();
-					col.setAttribute('data-col-id', colId);
-					colIds.push(colId);
-				});
-				newTable.appendChild(colgroup);
-			}
-
-			// Создаем тело таблицы
-			const tbody = document.createElement('tbody');
-			tbody.setAttribute('data-table-id', tableId);
-
-			// Обрабатываем строки
-			const sourceRows = sourceTable.querySelectorAll('tr');
-			sourceRows.forEach(sourceRow => {
-				const rowId = generateId();
-				const newRow = document.createElement('tr');
-				newRow.className = 'ql-table-row';
-				newRow.setAttribute('data-table-id', tableId);
-				newRow.setAttribute('data-row-id', rowId);
-
-				// Обрабатываем ячейки
-				const sourceCells = Array.from(sourceRow.querySelectorAll('td'));
-				let index = 0;
-				sourceCells.forEach(sourceCell => {
-					const newCell = document.createElement('td');
-					newCell.className = 'ql-table-cell';
-					newCell.setAttribute('data-table-id', tableId);
-					newCell.setAttribute('data-row-id', rowId);
-					newCell.setAttribute('data-col-id', colIds[index]);
-
-					// Копируем атрибуты объединения ячеек
-					const rowspan = sourceCell.getAttribute('rowspan');
-					const colspan = sourceCell.getAttribute('colspan');
-					if (rowspan) newCell.setAttribute('rowspan', rowspan);
-					if (colspan) newCell.setAttribute('colspan', colspan);
-
-					// Копируем стили
-					if (sourceCell.hasAttribute('style')) {
-						newCell.setAttribute('style', sourceCell.getAttribute('style') || '');
+	const auditTrailList = (value: string): string => {
+		console.log('8');
+		let newValue = value;
+		const signedEvent = contractEvent?.filter(
+			(contractEventData: ContractEvent) =>
+				contractEventData.status?.toString() === (EventStatuses?.SIGNED?.toString?.() ?? '')
+		) ?? [];
+		if (signedEvent.length > 0) {
+			const signedEventString = signedEvent.map(
+				(contractEventData: ContractEvent) => {
+					let ipProp = '';
+					if (contractEventData.ipInfo) {
+						const json = JSON.parse(contractEventData.ipInfo);
+						if (json) {
+							ipProp = `<p>IP: ${json.ip}</p>
+							<p>Location: ${json.city}, ${json.country_name}</p>
+							<p>Timezone: ${json.timezone}, ${json.utc_offset}</p>`;
+						}
 					}
-					if (sourceCell.hasAttribute('data-cell-bg')) {
-						newCell.setAttribute('data-cell-bg', sourceCell.getAttribute('data-cell-bg') || '');
-					}
-
-					// Создаем внутренний контейнер
-					const cellInner = document.createElement('div');
-					cellInner.className = 'ql-table-cell-inner';
-					cellInner.setAttribute('data-table-id', tableId);
-					cellInner.setAttribute('data-row-id', rowId);
-					cellInner.setAttribute('data-col-id', colIds[index]);
-					cellInner.setAttribute('data-rowspan', rowspan || '1');
-					cellInner.setAttribute('data-colspan', colspan || '1');
-					cellInner.setAttribute('contenteditable', 'true');
-
-					// Копируем содержимое как чистые элементы
-					Array.from(sourceCell.children).forEach(child => {
-						const cleanElement = document.createElement(child.tagName.toLowerCase());
-						cleanElement.innerHTML = child.innerHTML;
-						cellInner.appendChild(cleanElement);
-					});
-					// 2. Если ячейка была пустая, добавляем минимальную структуру
-					if (cellInner.childNodes.length === 0) {
-						const p = document.createElement('p');
-						p.innerHTML = '<br>';
-						cellInner.appendChild(p);
-					}
-
-					newCell.appendChild(cellInner);
-					newRow.appendChild(newCell);
-					index += parseInt(colspan || '1', 10);
-				});
-
-				tbody.appendChild(newRow);
-			});
-
-			newTable.appendChild(tbody);
-			newWrapper.appendChild(newTable);
-
-			// Заменяем старую таблицу новой
-			if (sourceWrapper.parentNode) {
-				sourceWrapper.parentNode.replaceChild(newWrapper, sourceWrapper);
-			}
-		});
-
-		// Возвращаем преобразованный HTML
-		return doc.documentElement.innerHTML;
-	}
-
-	const removeParentSpan = (element: HTMLElement | null) => {
-		// Проверяем, что элемент существует
-		if (element) {
-			// Получаем родительский элемент
-			const parent = element.parentElement;
-			// Проверяем, является ли родительский элемент тегом <span>
-			if (parent && parent.tagName.toLowerCase() === 'span') {
-				// Перемещаем текущий элемент перед родительским
-				parent.parentNode?.insertBefore(element, parent);
-				// Удаляем родительский элемент
-				parent.remove();
-			}
+					const signFind = signs.find(
+						(signData) =>
+							signData.email === contractEventData.email &&
+							signData.fullName === contractEventData.name
+					);
+					return `
+				<tr>
+				  <td> 
+					<p><b>${contractEventData.name}</b></p>
+					<p><b>${contractEventData.email}</b></p>
+				  </td> 
+				  <td>
+					<p>
+					  ${dayjs(contractEventData.createTime).format(
+						'YYYY-MM-DD @ HH:mm:ss'
+					)} GMT
+					</p>
+				  </td>         
+				  <td>
+					${ipProp}
+				  </td>
+				  <td>
+					<img src='${signFind ? signFind.base64 : ''}' alt="signature" />
+				  </td>
+				</tr>`;
+				}
+			);
+			newValue = `${newValue}
+		  <br>
+		  <h3 class="ql-align-center">Signature Certificate</h3>
+		  <br>
+		  <table>
+		  <colgroup><col width="500"><col width="500"></colgroup>
+		  <tbody>
+			<tr>
+			  <td class="ql-size-small ql-align-center">Document ID</td>
+			  <td class="ql-size-small ql-align-center">Document name</td>
+			</tr>
+			<tr>
+			  <td class="ql-align-center"><b>${contract.controlLink}</b></td>
+			  <td class="ql-align-center"><b>${contract.contractName}</b></td>
+			</tr>
+		  </tbody>
+		</table>
+		  <br> 
+			<table>
+			  <colgroup><col width="330"><col width="170"><col width="250"><col width="250"></colgroup>
+			  <tbody>
+				<tr>
+				  <td class="ql-size-small">Signed by</td>
+				  <td class="ql-size-small">When</td>
+				  <td class="ql-size-small">Where</td>
+				  <td class="ql-size-small">Signature</td>
+				</tr>
+				${signedEventString.join('')} 
+			  </tbody>
+			</table>`;
 		}
+
+		return newValue;
 	};
+
 	const handleChangeText = useDebouncedCallback(
 		async (
 			content: string,

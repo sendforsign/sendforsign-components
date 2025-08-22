@@ -4,7 +4,7 @@ import utc from 'dayjs/plugin/utc';
 import { View, StyleSheet } from '@react-pdf/renderer';
 import { PdfAuditTrailHeader } from './pdf-audit-trail-header/pdf-audit-trail-header';
 import { PdfAuditTrailBody } from './pdf-audit-trail-body/pdf-audit-trail-body';
-import { Row } from '../../../../../config/types'; 
+import { Row } from '../../../../../../config/types'; 
 type Props = {
 	rows: Row[];
 };

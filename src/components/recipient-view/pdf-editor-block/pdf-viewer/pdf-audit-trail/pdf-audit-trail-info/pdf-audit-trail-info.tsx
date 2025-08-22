@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { Text, View, StyleSheet } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { Contract } from '../../../../../config/types'; 
+import { Contract } from '../../../../../../config/types'; 
 type Props = {
 	contract: Contract;
 };

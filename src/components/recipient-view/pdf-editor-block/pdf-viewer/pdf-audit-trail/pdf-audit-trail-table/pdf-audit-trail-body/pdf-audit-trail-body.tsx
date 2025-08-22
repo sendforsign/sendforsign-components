@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View, StyleSheet, Image } from '@react-pdf/renderer';
-import { Row } from '../../../../../../config/types';
+import { Row } from '../../../../../../../config/types';
 
 type Props = {
 	rows: Row[];

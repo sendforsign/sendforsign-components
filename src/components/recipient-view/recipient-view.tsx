@@ -33,9 +33,8 @@ import { FluentEditorBlock } from './fluent-editor-block';
 import { SignModal } from './sign-modal';
 import { ApproveModal } from './approve-modal';
 import { Notification } from './notification';
-import { PdfViewer } from './pdf-viewer/pdf-viewer';
-import { PdfViewerPrint } from './pdf-viewer-print/pdf-viewer-print';
 import { removeAilineTags } from '../../utils';
+import { PdfEditorBlock } from './pdf-editor-block/pdf-editor-block';
 
 interface DataType {
     key?: string;
@@ -726,24 +725,7 @@ export const RecipientView: FC<RecipientViewProps> = ({ recipientKey }) => {
                                                             />
                                                         )}
                                                         {contract.contractType?.toString() === ContractType.PDF.toString() ?
-                                                            <>
-                                                                {contract.audit ? (
-                                                                    <PdfViewerPrint
-                                                                        onLoad={(data) => {
-                                                                            console.log(
-                                                                                'PdfViewerPrint',
-                                                                                data,
-                                                                            );
-                                                                        }}
-                                                                    />
-                                                                ) : (
-                                                                    <PdfViewer
-                                                                    // onLoad={(data) => {
-                                                                    //     // console.log('data', data, pagePlaceholders.current);
-                                                                    // }}
-                                                                    />
-                                                                )}
-                                                            </>
+                                                            <PdfEditorBlock />
                                                             :
                                                             <FluentEditorBlock value={contractValue.contractValue as string} />
                                                         }

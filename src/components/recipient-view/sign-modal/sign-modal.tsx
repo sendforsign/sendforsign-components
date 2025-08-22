@@ -37,13 +37,14 @@ export const SignModal = () => {
 	const padRef = useRef<any>(null);
 
 	useEffect(() => {
-		if (contract &&
+		if (signModal &&
+			contract &&
 			contract.fullname &&
 			contract.email) {
 			setFullName(contract.fullname);
 			setEmail(contract.email);
 		}
-	}, [contract]);
+	}, [contract, signModal]);
 	// console.log('contractKey 10');
 	const handleOk = async () => {
 		if (fullName && email) {

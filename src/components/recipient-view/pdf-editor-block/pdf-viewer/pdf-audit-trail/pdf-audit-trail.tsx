@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'; 
 import { PdfAuditTrailInfo } from './pdf-audit-trail-info/pdf-audit-trail-info';
 import { PdfAuditTrailTable } from './pdf-audit-trail-table/pdf-audit-trail-table';
-import { Contract, Row } from '../../../../config/types';
+import { Contract, Row } from '../../../../../config/types';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 type Props = {
