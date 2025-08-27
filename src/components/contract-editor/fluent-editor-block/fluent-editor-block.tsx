@@ -70,6 +70,51 @@ FluentEditor.register({ 'modules/markdownShortcuts': MarkdownShortcuts }, true);
 // 	},
 // 	true
 // );
+
+// Converts blob: image sources to base64 data URLs within a given HTMLElement or HTML string
+const blobToDataUrl = (blob: Blob): Promise<string> => new Promise((resolve, reject) => {
+	const reader = new FileReader();
+	reader.onload = () => resolve(reader.result as string);
+	reader.onerror = (e) => reject(e);
+	reader.readAsDataURL(blob);
+});
+
+const fetchBlobToDataUrl = async (url: string): Promise<string> => {
+	const response = await fetch(url);
+	const blob = await response.blob();
+	return blobToDataUrl(blob);
+};
+
+const replaceBlobImagesInElement = async (root: HTMLElement) => {
+	const images = Array.from(root.querySelectorAll('img')) as HTMLImageElement[];
+	const tasks: Promise<void>[] = [];
+	for (const img of images) {
+		const src = img.getAttribute('src') || '';
+		if (src.startsWith('blob:')) {
+			tasks.push((async () => {
+				try {
+					const dataUrl = await fetchBlobToDataUrl(src);
+					img.setAttribute('src', dataUrl);
+					img.setAttribute('alt', 'signature');
+					img.removeAttribute('data-src');
+					img.removeAttribute('data-image-id');
+					img.removeAttribute('devui-editorx-image');
+					img.removeAttribute('style');
+				} catch (e) {
+					console.error('Failed to convert blob image to base64', e);
+				}
+			})());
+		}
+	}
+	await Promise.all(tasks);
+};
+
+export const convertBlobImagesInHtml = async (html: string): Promise<string> => {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, 'text/html');
+	await replaceBlobImagesInElement(doc.body);
+	return doc.body.innerHTML;
+};
 export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 	const TOOLBAR_CONFIG = [
 		['undo', 'redo', 'clean'], //'format-painter'
@@ -596,6 +641,13 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 				}
 			}
 			contentTmp = tempDiv.innerHTML;
+
+			// Normalize blob: image src to base64 data URLs before saving
+			try {
+				contentTmp = await convertBlobImagesInHtml(contentTmp);
+			} catch (e) {
+				console.error('Failed to normalize blob images', e);
+			}
 
 			let body = {};
 			let changed = false;
