@@ -1959,6 +1959,45 @@ export const removeAilineTags = (html: string) => {
 	});
 	return doc.body.innerHTML;
 };
+
+// Функция для очистки лишних элементов редактора
+export const cleanEditorHTML = (html: string) => {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, 'text/html');
+	
+	// Удаляем лишние span элементы с классом ql-ui
+	const qlUiSpans = doc.querySelectorAll('span.ql-ui');
+	qlUiSpans.forEach((span) => {
+		if (span.getAttribute('contenteditable') === 'false') {
+			span.remove();
+		}
+	});
+	
+	// Удаляем пустые параграфы
+	const emptyParagraphs = doc.querySelectorAll('p');
+	emptyParagraphs.forEach((p) => {
+		if (p.innerHTML.trim() === '' || p.innerHTML === '<br>') {
+			p.remove();
+		}
+	});
+	
+	// Удаляем лишние <br> теги в начале и конце элементов
+	const elements = doc.querySelectorAll('div, p, li');
+	elements.forEach((element) => {
+		// Удаляем <br> в начале
+		while (element.firstChild && element.firstChild.nodeType === Node.ELEMENT_NODE && 
+			   (element.firstChild as Element).tagName.toLowerCase() === 'br') {
+			element.removeChild(element.firstChild);
+		}
+		// Удаляем <br> в конце
+		while (element.lastChild && element.lastChild.nodeType === Node.ELEMENT_NODE && 
+			   (element.lastChild as Element).tagName.toLowerCase() === 'br') {
+			element.removeChild(element.lastChild);
+		}
+	});
+	
+	return doc.body.innerHTML;
+};
 // Обновленная функция wrapTextNodes
 export const wrapTextNodes = (html: string) => {
 	const parser = new DOMParser();
@@ -1970,13 +2009,18 @@ export const wrapTextNodes = (html: string) => {
 			const textContent = node.textContent;
 			if (
 				textContent &&
+				textContent.trim() !== '' && // Проверяем, что текст не пустой
 				!textContent.startsWith('{{{') &&
 				!textContent.endsWith('}}}') &&
 				!node.parentNode?.nodeName.toLowerCase().startsWith('placeholder') &&
 				!node.parentNode?.nodeName.toLowerCase().startsWith('sign') &&
 				!node.parentNode?.nodeName.toLowerCase().startsWith('fullname') &&
 				!node.parentNode?.nodeName.toLowerCase().startsWith('date') &&
-				!node.parentNode?.nodeName.toLowerCase().startsWith('email')
+				!node.parentNode?.nodeName.toLowerCase().startsWith('email') &&
+				// Проверяем, что родительский элемент не является специальным
+				!node.parentNode?.nodeName.toLowerCase().startsWith('ailine') &&
+				// Проверяем, что это не пустые пробелы или переносы строк
+				textContent.trim().length > 0
 			) {
 				const wrappedNode = doc.createElement('ailine');
 				wrappedNode.setAttribute('value', valueCounter.toString());
@@ -1988,6 +2032,7 @@ export const wrapTextNodes = (html: string) => {
 				valueCounter++;
 			}
 		} else {
+			// Рекурсивно обрабатываем дочерние узлы
 			node.childNodes.forEach(traverseNodes);
 		}
 	};

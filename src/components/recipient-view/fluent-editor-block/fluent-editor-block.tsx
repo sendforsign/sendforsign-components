@@ -300,133 +300,128 @@ export const FluentEditorBlock = ({ value }: Props) => {
 		return newValue;
 	};
 
-	const handleChangeText = useDebouncedCallback(
-		async (
-			content: string,
-			needCheck: boolean = true,
-			email: boolean = false
-		) => {
-			let contentTmp = content;
+	const handleChangeText = async (
+		content: string,
+		needCheck: boolean = true,
+		email: boolean = false
+	) => {
+		let contentTmp = content;
 
-			const tempDiv = document.createElement('div');
-			tempDiv.innerHTML = contentTmp;
-			for (let index = 0; index < placeholder.length; index++) {
-				if (
-					placeholder[index].view?.toString() !==
-					PlaceholderView.SIGNATURE.toString()
-				) {
-					let tag = `placeholder${placeholder[index].id}`;
-					if (placeholder[index].specialType) {
-						switch (placeholder[index].specialType) {
-							case SpecialType.DATE:
-								tag = `date${placeholder[index].id}`;
-								break;
+		const tempDiv = document.createElement('div');
+		tempDiv.innerHTML = contentTmp;
+		for (let index = 0; index < placeholder.length; index++) {
+			if (
+				placeholder[index].view?.toString() !==
+				PlaceholderView.SIGNATURE.toString()
+			) {
+				let tag = `placeholder${placeholder[index].id}`;
+				if (placeholder[index].specialType) {
+					switch (placeholder[index].specialType) {
+						case SpecialType.DATE:
+							tag = `date${placeholder[index].id}`;
+							break;
 
-							case SpecialType.FULLNAME:
-								tag = `fullname${placeholder[index].id}`;
-								break;
+						case SpecialType.FULLNAME:
+							tag = `fullname${placeholder[index].id}`;
+							break;
 
-							case SpecialType.EMAIL:
-								tag = `email${placeholder[index].id}`;
-								break;
+						case SpecialType.EMAIL:
+							tag = `email${placeholder[index].id}`;
+							break;
 
-							case SpecialType.SIGN:
-								tag = `sign${placeholder[index].id}`;
-								break;
+						case SpecialType.SIGN:
+							tag = `sign${placeholder[index].id}`;
+							break;
 
-							case SpecialType.INITIALS:
-								tag = `initials${placeholder[index].id}`;
-								break;
-						}
-					}
-					const elements = tempDiv.getElementsByTagName(tag);
-					for (let i = 0; i < elements.length; i++) {
-						let element: any = elements[i];
-						removeParentSpan(element);
+						case SpecialType.INITIALS:
+							tag = `initials${placeholder[index].id}`;
+							break;
 					}
 				}
-			}
-			contentTmp = tempDiv.innerHTML;
-
-			let body = {};
-			let changed = false;
-			let contractValueTmp = '';
-			if (needCheck) {
-				body = {
-					shareLink: contract.shareLink,
-				};
-				await axios
-					.post(BASE_URL + ApiEntity.CHECK_CONTRACT_CHANGED, body, {
-						headers: {
-							Accept: 'application/vnd.api+json',
-							'Content-Type': 'application/vnd.api+json',
-						},
-						responseType: 'json',
-					})
-					.then((payload: any) => {
-						//console.log('CHECK_CONTRACT_VALUE read', payload);
-						if (payload.data.changed && payload.data.contractValue) {
-							changed = payload.data.changed;
-							setContractValue(payload.data.contractValue);
-							contractValueTmp = payload.data.contractValue;
-						}
-					})
-					.catch((error) => {
-						setNotification({
-							text:
-								error.response && error.response.data && error.response.data.message
-									? error.response.data.message
-									: error.message,
-						});
-					});
-			} else {
-				contractValueTmp = contentTmp;
-			}
-			if (!changed) {
-				body = {
-					shareLink: contract.shareLink,
-					contractValue: contentTmp,
-				};
-				await axios
-					.post(BASE_URL + ApiEntity.RECIPIENT_CONTRACT, body, {
-						headers: {
-							Accept: 'application/vnd.api+json',
-							// 'Content-Type': 'application/vnd.api+json',
-						},
-						responseType: 'json',
-					})
-					.then((payload: any) => {
-						//console.log('editor read', payload);
-						if (email) {
-							sendEmail();
-						}
-						// setDocumentCurrentSaved(true); 
-						// setIsDone(true);
-						setContractValue({ contractValue: payload.data.contractValue, changeTime: payload.data.changeTime });
-					})
-					.catch((error) => {
-						setNotification({
-							text:
-								error.response &&
-									error.response.data &&
-									error.response.data.message
-									? error.response.data.message
-									: error.message,
-						});
-					});
-			} else {
-				if (contractValueTmp) {
-					fluentRef?.current?.clipboard.dangerouslyPasteHTML(contractValueTmp);
+				const elements = tempDiv.getElementsByTagName(tag);
+				for (let i = 0; i < elements.length; i++) {
+					let element: any = elements[i];
+					removeParentSpan(element);
 				}
-				setNotification({
-					text: 'Contract updated. Please, reload the page.',
+			}
+		}
+		contentTmp = tempDiv.innerHTML;
+
+		let body = {};
+		let changed = false;
+		let contractValueTmp = '';
+		if (needCheck) {
+			body = {
+				shareLink: contract.shareLink,
+			};
+			await axios
+				.post(BASE_URL + ApiEntity.CHECK_CONTRACT_CHANGED, body, {
+					headers: {
+						Accept: 'application/vnd.api+json',
+						'Content-Type': 'application/vnd.api+json',
+					},
+					responseType: 'json',
+				})
+				.then((payload: any) => {
+					//console.log('CHECK_CONTRACT_VALUE read', payload);
+					if (payload.data.changed && payload.data.contractValue) {
+						changed = payload.data.changed;
+						setContractValue(payload.data.contractValue);
+						contractValueTmp = payload.data.contractValue;
+					}
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response && error.response.data && error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
 				});
+		} else {
+			contractValueTmp = contentTmp;
+		}
+		if (!changed) {
+			body = {
+				shareLink: contract.shareLink,
+				contractValue: contentTmp,
+			};
+			await axios
+				.post(BASE_URL + ApiEntity.RECIPIENT_CONTRACT, body, {
+					headers: {
+						Accept: 'application/vnd.api+json',
+						// 'Content-Type': 'application/vnd.api+json',
+					},
+					responseType: 'json',
+				})
+				.then((payload: any) => {
+					//console.log('editor read', payload);
+					if (email) {
+						sendEmail();
+					}
+					// setDocumentCurrentSaved(true); 
+					// setIsDone(true);
+					setContractValue({ contractValue: payload.data.contractValue, changeTime: payload.data.changeTime });
+				})
+				.catch((error) => {
+					setNotification({
+						text:
+							error.response &&
+								error.response.data &&
+								error.response.data.message
+								? error.response.data.message
+								: error.message,
+					});
+				});
+		} else {
+			if (contractValueTmp) {
+				fluentRef?.current?.clipboard.dangerouslyPasteHTML(contractValueTmp);
 			}
-		},
-		5000,
-		// The maximum time func is allowed to be delayed before it's invoked:
-		{ maxWait: 5000 }
-	);
+			setNotification({
+				text: 'Contract updated. Please, reload the page.',
+			});
+		}
+	};
 	const sendEmail = async () => {
 		let body = {
 			shareLink: contract.shareLink,

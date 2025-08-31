@@ -97,10 +97,11 @@ export const RecipientView: FC<RecipientViewProps> = ({ recipientKey }) => {
                 .then(async (payload: any) => {
                     console.log('payload', payload);
                     first.current = true;
-                    let value =
-                        payload.data.contractType.toString() === ContractType.PDF.toString()
-                            ? payload.data.contractValue
-                            : delColorFromHtml(payload.data.contractValue);
+                    // let value =
+                    //     payload.data.contractType.toString() === ContractType.PDF.toString()
+                    //         ? payload.data.contractValue
+                    //         : delColorFromHtml(payload.data.contractValue);
+                    let value = payload.data.contractValue;
                     if (
                         payload.data.contractType.toString() !== ContractType.PDF.toString() &&
                         !payload.data.isDone
@@ -135,7 +136,7 @@ export const RecipientView: FC<RecipientViewProps> = ({ recipientKey }) => {
                         contractValue: value,
                     });
                     setIsDone(payload.data.isDone);
-                    if (
+                    if (!payload.data.audit &&
                         payload.data.isDone &&
                         (payload.data.view.toString().includes(ShareLinkView.SIGN) ||
                             payload.data.view.toString().includes(ShareLinkView.APPROVE))

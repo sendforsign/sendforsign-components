@@ -21,7 +21,7 @@ import {
 	PlaceholderView,
 	SpecialType,
 } from '../../../config/enum';
-import { addBlotClass, wrapTextNodes } from '../../../utils';
+import { addBlotClass, wrapTextNodes, cleanEditorHTML } from '../../../utils';
 
 import '@opentiny/fluent-editor/style.css';
 import 'highlight.js/styles/atom-one-dark.css'
@@ -233,11 +233,42 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 				});
 				const setValue = async () => {
 					// debugger;
-					let processedValue = wrapTextNodes(value); // Обрабатываем HTML 
+					// Применяем wrapTextNodes только если это необходимо
+					let processedValue = value;
+					
+					// Логируем исходный HTML для отладки
+					console.log('Original HTML:', value);
+					
+					// Проверяем, нужно ли применять wrapTextNodes
+					// Применяем только если в HTML есть элементы, которые нужно обработать
+					const shouldWrapTextNodes = value.includes('<li>') || value.includes('<p>') || value.includes('<div>');
+					
+					if (shouldWrapTextNodes) {
+						processedValue = wrapTextNodes(value); // Обрабатываем HTML 
+						console.log('After wrapTextNodes:', processedValue);
+					}
+					
 					if (processedValue.includes('quill-better-table-wrapper')) {
 						processedValue = convertQuillTablesInHTML(processedValue);
 					}
-					fluentRef.current && (fluentRef.current.root.innerHTML = processedValue);
+					
+					// Очищаем HTML от лишних элементов редактора
+					processedValue = cleanEditorHTML(processedValue);
+					console.log('After cleanEditorHTML:', processedValue);
+					
+					// Используем setContents для правильной обработки HTML
+					try {
+						// Сначала очищаем содержимое
+						fluentRef.current?.setContents([]);
+						// Затем вставляем новый контент
+						fluentRef?.current?.clipboard.dangerouslyPasteHTML(processedValue);
+					} catch (error) {
+						console.error('Error setting content:', error);
+						// Fallback к прямому присваиванию
+						if (fluentRef.current && fluentRef.current.root) {
+							fluentRef.current.root.innerHTML = processedValue;
+						}
+					}
 					setLoad(false);
 					setRefreshPlaceholders(refreshPlaceholders + 1);
 					if (!placeholderClassFill.current) {
@@ -641,6 +672,9 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 				}
 			}
 			contentTmp = tempDiv.innerHTML;
+
+			// Очищаем HTML от лишних элементов редактора перед сохранением
+			contentTmp = cleanEditorHTML(contentTmp);
 
 			// Normalize blob: image src to base64 data URLs before saving
 			try {
