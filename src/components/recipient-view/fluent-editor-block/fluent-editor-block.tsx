@@ -269,7 +269,7 @@ export const FluentEditorBlock = ({ value }: Props) => {
 		  <br>
 		  <h3 class="ql-align-center">Signature Certificate</h3>
 		  <br>
-		  <table>
+		  <table style="background-color: rgb(242, 242, 242);">
 		  <colgroup><col width="500"><col width="500"></colgroup>
 		  <tbody>
 			<tr>
@@ -283,7 +283,7 @@ export const FluentEditorBlock = ({ value }: Props) => {
 		  </tbody>
 		</table>
 		  <br> 
-			<table>
+			<table style="background-color: rgb(242, 242, 242);">
 			  <colgroup><col width="330"><col width="170"><col width="250"><col width="250"></colgroup>
 			  <tbody>
 				<tr>

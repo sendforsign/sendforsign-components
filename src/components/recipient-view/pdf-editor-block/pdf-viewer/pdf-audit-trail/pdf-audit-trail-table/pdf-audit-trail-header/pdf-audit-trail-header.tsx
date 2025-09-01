@@ -10,25 +10,28 @@ export const PdfAuditTrailHeader = () => {
   const styles = StyleSheet.create({
     container: {
       flexDirection: 'row',
-      borderBottomColor: '#bff0fd',
-      backgroundColor: '#bff0fd',
+      borderBottomColor: '#f6f6f6',
+      backgroundColor: '#f6f6f6',
       borderBottomWidth: 1,
       alignItems: 'center',
       height: 24,
-      textAlign: 'center',
+      textAlign: 'left',
       fontWeight: 'bold',
+      fontSize: 10,
+      paddingLeft: 8,
       flexGrow: 1,
     },
     signedBy: {
-      width: '25%',
+      width: '33%',
+      paddingLeft: 16,
     },
     when: {
-      width: '20%',
+      width: '12%',
     },
     where: {
-      width: '20%',
+      width: '30%',
     },
-    signature: { width: '30%' },
+    signature: { width: '25%' },
   });
 
   return (
