@@ -36,18 +36,12 @@ import { Notification } from './notification';
 import { removeAilineTags } from '../../utils';
 import { PdfEditorBlock } from './pdf-editor-block/pdf-editor-block';
 
-interface DataType {
-    key?: string;
-    name?: string;
-    status?: string;
-    createdAt?: string;
-    createdBy?: string;
-}
 export interface RecipientViewProps {
     recipientKey: string;
+    onChange?: (data: { status: string; }) => void;
 }
 
-export const RecipientView: FC<RecipientViewProps> = ({ recipientKey }) => {
+export const RecipientView: FC<RecipientViewProps> = ({ recipientKey, onChange }) => {
     const [notification, setNotification] = useState({});
     const [isDone, setIsDone] = useState(false);
     const [fillPlaceholderBefore, setFillPlaceholderBefore] = useState(false);

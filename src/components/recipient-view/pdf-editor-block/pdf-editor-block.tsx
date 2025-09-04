@@ -392,8 +392,9 @@ export const PdfEditorBlock = ({
     const sendPdf = async () => {
         const formData = new FormData();
         const pdfFile = (await getArrayBuffer('pdfFile')) as ArrayBuffer;
-
+        console.log('pdfFile', pdfFile);
         const mergedPdf = (await addPlaceholderToPdf(pdfFile)) as ArrayBuffer;
+        console.log('mergedPdf', mergedPdf);
         const blob = new Blob([mergedPdf], { type: 'application/pdf' });
         formData.append('pdf', blob);
 
