@@ -1964,7 +1964,7 @@ export const removeAilineTags = (html: string) => {
 export const cleanEditorHTML = (html: string) => {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, 'text/html');
-	
+
 	// Удаляем лишние span элементы с классом ql-ui
 	const qlUiSpans = doc.querySelectorAll('span.ql-ui');
 	qlUiSpans.forEach((span) => {
@@ -1972,7 +1972,7 @@ export const cleanEditorHTML = (html: string) => {
 			span.remove();
 		}
 	});
-	
+
 	// Удаляем пустые параграфы
 	const emptyParagraphs = doc.querySelectorAll('p');
 	emptyParagraphs.forEach((p) => {
@@ -1980,22 +1980,28 @@ export const cleanEditorHTML = (html: string) => {
 			p.remove();
 		}
 	});
-	
+
 	// Удаляем лишние <br> теги в начале и конце элементов
 	const elements = doc.querySelectorAll('div, p, li');
 	elements.forEach((element) => {
 		// Удаляем <br> в начале
-		while (element.firstChild && element.firstChild.nodeType === Node.ELEMENT_NODE && 
-			   (element.firstChild as Element).tagName.toLowerCase() === 'br') {
+		while (
+			element.firstChild &&
+			element.firstChild.nodeType === Node.ELEMENT_NODE &&
+			(element.firstChild as Element).tagName.toLowerCase() === 'br'
+		) {
 			element.removeChild(element.firstChild);
 		}
 		// Удаляем <br> в конце
-		while (element.lastChild && element.lastChild.nodeType === Node.ELEMENT_NODE && 
-			   (element.lastChild as Element).tagName.toLowerCase() === 'br') {
+		while (
+			element.lastChild &&
+			element.lastChild.nodeType === Node.ELEMENT_NODE &&
+			(element.lastChild as Element).tagName.toLowerCase() === 'br'
+		) {
 			element.removeChild(element.lastChild);
 		}
 	});
-	
+
 	return doc.body.innerHTML;
 };
 // Обновленная функция wrapTextNodes
@@ -2114,4 +2120,189 @@ export const generateTableHTML = (tableData: any) => {
         </tbody>
       </table>
     </div>`;
+};
+// Converts blob: image sources to base64 data URLs within a given HTMLElement or HTML string
+const blobToDataUrl = (blob: Blob): Promise<string> =>
+	new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onload = () => resolve(reader.result as string);
+		reader.onerror = (e) => reject(e);
+		reader.readAsDataURL(blob);
+	});
+
+const fetchBlobToDataUrl = async (url: string): Promise<string> => {
+	const response = await fetch(url);
+	const blob = await response.blob();
+	return blobToDataUrl(blob);
+};
+
+const replaceBlobImagesInElement = async (root: HTMLElement) => {
+	const images = Array.from(root.querySelectorAll('img')) as HTMLImageElement[];
+	const tasks: Promise<void>[] = [];
+	for (const img of images) {
+		const src = img.getAttribute('src') || '';
+		if (src.startsWith('blob:')) {
+			tasks.push(
+				(async () => {
+					try {
+						const dataUrl = await fetchBlobToDataUrl(src);
+						img.setAttribute('src', dataUrl);
+						img.setAttribute('alt', 'signature');
+						img.removeAttribute('data-src');
+						img.removeAttribute('data-image-id');
+						img.removeAttribute('devui-editorx-image');
+						img.removeAttribute('style');
+					} catch (e) {
+						console.error('Failed to convert blob image to base64', e);
+					}
+				})()
+			);
+		}
+	}
+	await Promise.all(tasks);
+};
+
+export const convertBlobImagesInHtml = async (
+	html: string
+): Promise<string> => {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, 'text/html');
+	await replaceBlobImagesInElement(doc.body);
+	return doc.body.innerHTML;
+};
+
+const generateId = () => {
+	return Math.random().toString(36).substr(2, 10);
+};
+
+export const convertQuillTablesInHTML = (htmlString: string) => {
+	// Создаем временный DOM-документ
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(htmlString, 'text/html');
+
+	// Находим все исходные таблицы
+	const sourceTables = doc.querySelectorAll('.quill-better-table-wrapper');
+
+	sourceTables.forEach((sourceWrapper) => {
+		const sourceTable = sourceWrapper.querySelector('.quill-better-table');
+		if (!sourceTable) return;
+
+		// Создаем новый контейнер таблицы
+		const newWrapper = document.createElement('div');
+		newWrapper.className = 'ql-table-wrapper';
+		newWrapper.setAttribute('contenteditable', 'false');
+		const tableId = generateId();
+		newWrapper.setAttribute('data-table-id', tableId);
+
+		// Создаем новую таблицу
+		const newTable = document.createElement('table');
+		newTable.className = 'ql-table';
+		newTable.setAttribute('data-table-id', tableId);
+		newTable.setAttribute('cellpadding', '0');
+		newTable.setAttribute('cellspacing', '0');
+		newTable.style.marginRight = 'auto';
+		newTable.style.width = '100%';
+
+		let colIds: string[] = [];
+		// Копируем colgroup из исходной таблицы
+		const sourceColgroup = sourceTable.querySelector('colgroup');
+		if (sourceColgroup) {
+			const colgroup = sourceColgroup.cloneNode(true) as HTMLTableColElement;
+			colgroup.setAttribute('data-table-id', tableId);
+			colgroup.setAttribute('contenteditable', 'false');
+			const cols = colgroup.querySelectorAll('col');
+
+			// Генерируем colIds для каждого столбца
+			cols.forEach((col) => {
+				const colId = generateId();
+				col.setAttribute('data-col-id', colId);
+				colIds.push(colId);
+			});
+			newTable.appendChild(colgroup);
+		}
+
+		// Создаем тело таблицы
+		const tbody = document.createElement('tbody');
+		tbody.setAttribute('data-table-id', tableId);
+
+		// Обрабатываем строки
+		const sourceRows = sourceTable.querySelectorAll('tr');
+		sourceRows.forEach((sourceRow) => {
+			const rowId = generateId();
+			const newRow = document.createElement('tr');
+			newRow.className = 'ql-table-row';
+			newRow.setAttribute('data-table-id', tableId);
+			newRow.setAttribute('data-row-id', rowId);
+
+			// Обрабатываем ячейки
+			const sourceCells = Array.from(sourceRow.querySelectorAll('td'));
+			let index = 0;
+			sourceCells.forEach((sourceCell) => {
+				const newCell = document.createElement('td');
+				newCell.className = 'ql-table-cell';
+				newCell.setAttribute('data-table-id', tableId);
+				newCell.setAttribute('data-row-id', rowId);
+				newCell.setAttribute('data-col-id', colIds[index]);
+
+				// Копируем атрибуты объединения ячеек
+				const rowspan = sourceCell.getAttribute('rowspan');
+				const colspan = sourceCell.getAttribute('colspan');
+				if (rowspan) newCell.setAttribute('rowspan', rowspan);
+				if (colspan) newCell.setAttribute('colspan', colspan);
+
+				// Копируем стили
+				if (sourceCell.hasAttribute('style')) {
+					newCell.setAttribute('style', sourceCell.getAttribute('style') || '');
+				}
+				if (sourceCell.hasAttribute('data-cell-bg')) {
+					newCell.setAttribute(
+						'data-cell-bg',
+						sourceCell.getAttribute('data-cell-bg') || ''
+					);
+				}
+
+				// Создаем внутренний контейнер
+				const cellInner = document.createElement('div');
+				cellInner.className = 'ql-table-cell-inner';
+				cellInner.setAttribute('data-table-id', tableId);
+				cellInner.setAttribute('data-row-id', rowId);
+				cellInner.setAttribute('data-col-id', colIds[index]);
+				cellInner.setAttribute('data-rowspan', rowspan || '1');
+				cellInner.setAttribute('data-colspan', colspan || '1');
+				cellInner.setAttribute('contenteditable', 'true');
+
+				// Копируем содержимое как чистые элементы
+				Array.from(sourceCell.children).forEach((child) => {
+					const cleanElement = document.createElement(
+						child.tagName.toLowerCase()
+					);
+					cleanElement.innerHTML = child.innerHTML;
+					cellInner.appendChild(cleanElement);
+				});
+				// 2. Если ячейка была пустая, добавляем минимальную структуру
+				if (cellInner.childNodes.length === 0) {
+					const p = document.createElement('p');
+					p.innerHTML = '<br>';
+					cellInner.appendChild(p);
+				}
+
+				newCell.appendChild(cellInner);
+				newRow.appendChild(newCell);
+				index += parseInt(colspan || '1', 10);
+			});
+
+			tbody.appendChild(newRow);
+		});
+
+		newTable.appendChild(tbody);
+		newWrapper.appendChild(newTable);
+
+		// Заменяем старую таблицу новой
+		if (sourceWrapper.parentNode) {
+			sourceWrapper.parentNode.replaceChild(newWrapper, sourceWrapper);
+		}
+	});
+
+	// Возвращаем преобразованный HTML
+	return doc.documentElement.innerHTML;
 };

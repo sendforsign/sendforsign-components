@@ -389,27 +389,51 @@ export const PdfEditorBlock = ({
             };
         }
     };
+    // const sendPdf = async () => {
+    //     const formData = new FormData();
+    //     const pdfFile = (await getArrayBuffer('pdfFile')) as ArrayBuffer;
+    //     console.log('pdfFile', pdfFile);
+    //     const mergedPdf = (await addPlaceholderToPdf(pdfFile)) as ArrayBuffer;
+    //     console.log('mergedPdf', mergedPdf);
+    //     const blob = new Blob([mergedPdf], { type: 'application/pdf' });
+    //     formData.append('pdf', blob);
+
+    //     let url = `${BASE_URL}${ApiEntity.RECIPIENT_EMAIL_SIGN_PDF}?shareLink=${contract.shareLink}`;
+
+    //     const response = await axios
+    //         .post(url, formData, {
+    //             responseType: 'json',
+    //         })
+    //         .catch((error) => {
+    //             setNotification({
+    //                 text:
+    //                     error.response &&
+    //                         error.response.data &&
+    //                         error.response.data.message
+    //                         ? error.response.data.message
+    //                         : error.message,
+    //             });
+    //         });
+    // };
     const sendPdf = async () => {
-        const formData = new FormData();
-        const pdfFile = (await getArrayBuffer('pdfFile')) as ArrayBuffer;
-        console.log('pdfFile', pdfFile);
-        const mergedPdf = (await addPlaceholderToPdf(pdfFile)) as ArrayBuffer;
-        console.log('mergedPdf', mergedPdf);
-        const blob = new Blob([mergedPdf], { type: 'application/pdf' });
-        formData.append('pdf', blob);
-
-        let url = `${BASE_URL}${ApiEntity.RECIPIENT_EMAIL_SIGN_PDF}?shareLink=${contract.shareLink}`;
-
-        const response = await axios
-            .post(url, formData, {
+        let body = {
+            shareLink: contract.shareLink,
+        };
+        await axios
+            .post(BASE_URL + ApiEntity.RECIPIENT_SIGN_EMAIL, body, {
+                headers: {
+                    Accept: 'application/vnd.api+json',
+                    'Content-Type': 'application/vnd.api+json',
+                },
                 responseType: 'json',
+            })
+            .then((payload: any) => {
+                //console.log('editor read', payload);
             })
             .catch((error) => {
                 setNotification({
                     text:
-                        error.response &&
-                            error.response.data &&
-                            error.response.data.message
+                        error.response && error.response.data && error.response.data.message
                             ? error.response.data.message
                             : error.message,
                 });

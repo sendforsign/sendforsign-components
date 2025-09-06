@@ -16,7 +16,7 @@ import hljs from 'highlight.js'
 import { useTemplateEditorContext } from '../template-editor-context';
 import { BASE_URL } from '../../../config/config';
 import { Action, ApiEntity } from '../../../config/enum';
-import { addBlotClass } from '../../../utils';
+import { addBlotClass, convertBlobImagesInHtml } from '../../../utils';
 import '@opentiny/fluent-editor/style.css';
 import 'highlight.js/styles/atom-one-dark.css'
 import 'katex/dist/katex.min.css'
@@ -135,6 +135,13 @@ export const FluentEditorBlock = ({ value, fluentRef }: Props) => {
 	}, [container]);
 	const handleChangeText = useDebouncedCallback(
 		async (content: string) => {
+			let contentTmp = content;
+			// Normalize blob: image src to base64 data URLs before saving
+			try {
+				contentTmp = await convertBlobImagesInHtml(contentTmp);
+			} catch (e) {
+				console.error('Failed to normalize blob images', e);
+			}
 			let body = {
 				data: {
 					action: Action.UPDATE,
