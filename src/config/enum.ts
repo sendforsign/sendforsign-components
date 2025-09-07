@@ -13,6 +13,7 @@ export const enum ShareLinkViewText {
 export const enum ApiEntity {
 	CONTRACT = 'contract',
 	RECIPIENT_CONTRACT = 'recipient_contract',
+	RECIPIENT_CONTRACT_STATUS = 'recipient_contract_status',
 	USER = 'user',
 	CLIENT = 'client',
 	TEMPLATE = 'template',

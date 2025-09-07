@@ -17,4 +17,5 @@ export const Primary: Story = (args) => (
 );
 Primary.args = {
     recipientKey: '',
+    onChange: (data) => { console.log(data); },
 };

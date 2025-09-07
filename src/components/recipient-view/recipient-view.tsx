@@ -38,7 +38,7 @@ import { PdfEditorBlock } from './pdf-editor-block/pdf-editor-block';
 
 export interface RecipientViewProps {
     recipientKey: string;
-    onChange?: (data: { status: string; }) => void;
+    onChange?: (data: { status: string; recipientKey: string }) => void;
 }
 
 export const RecipientView: FC<RecipientViewProps> = ({ recipientKey, onChange }) => {
@@ -294,7 +294,27 @@ export const RecipientView: FC<RecipientViewProps> = ({ recipientKey, onChange }
             getSigns();
         }
     }, [refreshSigns]);
-
+    useEffect(() => {
+        const getStatus = async () => {
+            const url = `${BASE_URL}${ApiEntity.RECIPIENT_CONTRACT_STATUS}?shareLink=${recipientKey}`;
+            await axios
+                .get(url, {
+                    headers: {
+                        Accept: 'application/vnd.api+json',
+                        'Content-Type': 'application/vnd.api+json',
+                    },
+                    responseType: 'json',
+                })
+                .then((payload) => {
+                    if (onChange) {
+                        onChange({ status: payload.data.status, recipientKey: recipientKey });
+                    }
+                });
+        };
+        if (onChange && sign) {
+            getStatus();
+        }
+    }, [onChange, sign]);
     const getSignIPInfo = async () => {
         // debugger;
         await axios
