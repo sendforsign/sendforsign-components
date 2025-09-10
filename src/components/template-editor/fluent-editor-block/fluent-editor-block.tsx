@@ -147,7 +147,7 @@ export const FluentEditorBlock = ({ value, fluentRef }: Props) => {
 					action: Action.UPDATE,
 					clientKey: !token ? clientKey : undefined,
 					userKey: userKey,
-					template: { templateKey: templateKey, value: content },
+					template: { templateKey: templateKey, value: contentTmp },
 				},
 			};
 			await axios
