@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { useDebouncedCallback } from 'use-debounce';
 import FluentEditor from '@opentiny/fluent-editor';
 // import QuillBetterTable from 'quill-better-table';
 import ImageToolbarButtons from '@opentiny/fluent-editor';
@@ -15,10 +14,8 @@ import { BASE_URL } from '../../../config/config';
 import {
 	Action,
 	ApiEntity,
-	ContractAction,
 	ContractType,
 	EventStatuses,
-	PlaceholderColor,
 	PlaceholderView,
 	SpecialType,
 	Tags,
@@ -44,29 +41,6 @@ FluentEditor.register({ 'modules/table-up': TableUp }, true);
 FluentEditor.register({ 'modules/markdownShortcuts': MarkdownShortcuts }, true);
 
 export const FluentEditorBlock = ({ value }: Props) => {
-	// const TOOLBAR_CONFIG = [
-	// 	['undo', 'redo', 'clean'], //'format-painter'
-	// 	[
-	// 		{ header: [1, 2, 3, 4, 5, 6, false] },
-	// 		{ font: [] },
-	// 		{ size: [false, '12px', '14px', '16px', '18px', '20px', '24px', '32px', '36px', '48px', '72px'] },
-	// 		{ 'line-height': [false, '1.2', '1.5', '1.75', '2', '3', '4', '5'] },
-	// 	],
-	// 	['bold', 'italic', 'strike', 'underline', 'divider'],
-	// 	[{ color: [] }, { background: [] }],
-	// 	[{ align: '' }, { align: 'center' }, { align: 'right' }, { align: 'justify' }],
-	// 	[{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
-	// 	[{ script: 'sub' }, { script: 'super' }],
-	// 	[{ indent: '-1' }, { indent: '+1' }],
-	// 	[{ direction: 'rtl' }],
-	// 	['link', 'blockquote', 'code'], //'code-block'
-	// 	['image', 'formula'], //'file'
-	// 	//'screenshot', 'fullscreen''emoji', 'video'
-	// 	[{ 'table-up': [] }],
-	// ];
-	// (window as any).hljs = hljs;
-	// (window as any).katex = katex;
-	// (window as any).Html2Canvas = Html2Canvas;
 	dayjs.extend(utc);
 	const fluentRef = useRef<any>();
 
@@ -81,15 +55,11 @@ export const FluentEditorBlock = ({ value }: Props) => {
 		setNotification,
 		setContractValue,
 		contractValue,
-		setIsDone,
 		placeholder,
-		setPlaceholder,
 		placeholdersFilling,
 		setPlaceholdersFilling
 	} = useRecipientViewContext();
 	const container = document.querySelector('#contract-editor-container');
-	const placeholderClassFill = useRef(false);
-	const focusElementRef = useRef('');
 
 	useEffect(() => {
 		if (document.querySelector('#contract-editor-container') && !fluentRef.current) {
@@ -100,20 +70,7 @@ export const FluentEditorBlock = ({ value }: Props) => {
 					image: false,
 					table: false,
 					'table-up': false,
-					// 'syntax': { hljs },
-					// 'emoji-toolbar': true,
-					// 'file': true,
-					// 'mention': {
-					// 	itemKey: 'cn',
-					// 	searchKey,
-					// 	search(term) {
-					// 		return mentionList.filter((item) => {
-					// 			return item[searchKey] && String(item[searchKey]).includes(term)
-					// 		})
-					// 	},
-					// },
 				},
-				// trackChanges: 'user'
 				readOnly: true
 			});
 		}
@@ -131,6 +88,10 @@ export const FluentEditorBlock = ({ value }: Props) => {
 			if (processedValue && !contract?.audit) {
 				// console.log('contractEventsData', contractEventsData);
 				fluentRef?.current.clipboard.dangerouslyPasteHTML(processedValue);
+				setContractValue({
+					changeTime: contractValue.changeTime,
+					contractValue: processedValue,
+				});
 			} else if (processedValue && contract.audit) {
 				console.log('contract', contract);
 				if (signs && signs.length > 0 && contract.audit) {
