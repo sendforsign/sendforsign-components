@@ -2,127 +2,75 @@ import { SpecialType, Tags } from '../config/enum';
 import { Placeholder } from '../config/types';
 
 export const delColorFromHtml = (value: string) => {
-	let textTmp = value;
-	// return value;
-	let tag = `<span style="`;
-	let array = textTmp?.split(tag);
-	let resultText = '';
-	if (array) {
-		for (let i = 0; i < array.length; i++) {
-			if (array.length > 1) {
-				if (i === 0) {
-					resultText += array[i];
-				} else {
-					resultText += `<span style="`;
-					let lineArr: string | any[] = [];
-					for (let k = 0; k <= 5; k++) {
-						switch (k) {
-							case 0:
-								tag = `;"><placeholder`;
-								break;
-							case 1:
-								tag = `;"><date`;
-								break;
-							case 2:
-								tag = `;"><fullname`;
-								break;
-							case 3:
-								tag = `;"><email`;
-								break;
-							case 4:
-								tag = `;"><sign`;
-								break;
-							case 5:
-								tag = `;"><initials`;
-								break;
-						}
-						lineArr = array[i].split(tag);
-						if (lineArr.length === 2) {
-							break;
-						}
-					}
-					if (lineArr.length === 2) {
-						for (let j = 0; j < lineArr.length; j++) {
-							if (j === 0) {
-								resultText += tag;
-							} else {
-								resultText += lineArr[j];
-							}
-						}
-					} else {
-						resultText += array[i];
-					}
-				}
-			} else {
-				resultText = array[i];
-			}
-		}
-		textTmp = resultText;
-	}
-	let count = 0;
-	for (let tagId = 0; tagId < 5; tagId++) {
-		switch (tagId) {
-			case 0:
-				tag = `placeholder`;
-				count = 40;
-				break;
-			case 1:
-				tag = `date`;
-				count = 20;
-				break;
-			case 2:
-				tag = `fullname`;
-				count = 20;
-				break;
-			case 3:
-				tag = `email`;
-				count = 20;
-				break;
-			case 4:
-				tag = `sign`;
-				count = 20;
-				break;
-		}
-		for (let id = 1; id <= count; id++) {
-			let tagFind = `<${tag}${id} class=`;
-			array = textTmp?.split(tagFind);
-			resultText = '';
-			if (array) {
-				for (let i = 0; i < array.length; i++) {
-					if (array.length > 1) {
-						if (i === 0) {
-							resultText += array[i];
-						} else {
-							resultText += `<${tag}${id} class=`;
-							tagFind = `</${tag}${id}>`;
-							const lineArr = array[i].split(tagFind);
-							for (let j = 0; j < lineArr.length; j++) {
-								if (j === 0) {
-									tagFind = `"${tag}Class${id}" contenteditable="false"`;
-									const elArray = lineArr[j].split(tagFind);
-									for (let k = 0; k < elArray.length; k++) {
-										if (k === 0) {
-											resultText += `${elArray[k]}${tagFind}>`;
-										} else {
-											let valueTmp = elArray[k].split('>');
-											resultText += `${valueTmp[1]}</${tag}${id}>`;
-										}
-									}
-								} else {
-									resultText += lineArr[j];
-								}
-							}
-						}
-					} else {
-						resultText = array[i];
-					}
-				}
-				textTmp = resultText;
-			}
-		}
-	}
+	try {
+		// Создаем DOM парсер для универсальной работы с HTML
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(value, 'text/html');
 
-	return textTmp;
+		// Обрабатываем span элементы с style атрибутами
+		// Вместо удаления span элемента, извлекаем его содержимое
+		const spanElements = doc.querySelectorAll('span[style]');
+		spanElements.forEach((span) => {
+			// Проверяем, содержит ли span специфические теги
+			const hasSpecialTags = Array.from(span.children).some((child) =>
+				child.tagName.toLowerCase().includes('placeholder') ||
+				child.tagName.toLowerCase().includes('date') ||
+				child.tagName.toLowerCase().includes('fullname') ||
+				child.tagName.toLowerCase().includes('email') ||
+				child.tagName.toLowerCase().includes('sign') ||
+				child.tagName.toLowerCase().includes('initials')
+			);
+
+			if (hasSpecialTags) {
+				// Создаем DocumentFragment для временного хранения содержимого
+				const fragment = document.createDocumentFragment();
+				
+				// Перемещаем все дочерние узлы span в fragment
+				while (span.firstChild) {
+					fragment.appendChild(span.firstChild);
+				}
+				
+				// Заменяем span элемент его содержимым
+				span.parentNode?.replaceChild(fragment, span);
+			}
+		});
+
+		// Определяем теги и их максимальные ID для обработки
+		const tagConfigs = [
+			{ tag: 'placeholder', maxId: 40 },
+			{ tag: 'date', maxId: 20 },
+			{ tag: 'fullname', maxId: 20 },
+			{ tag: 'email', maxId: 20 },
+			{ tag: 'sign', maxId: 20 },
+		];
+
+		// Обрабатываем каждый тип тега
+		tagConfigs.forEach((config) => {
+			for (let id = 1; id <= config.maxId; id++) {
+				const selector = `${config.tag}${id}`;
+				const elements = doc.querySelectorAll(selector);
+
+				elements.forEach((element) => {
+					// Устанавливаем класс
+					const className = `${config.tag}Class${id}`;
+					element.className = className;
+
+					// Устанавливаем contenteditable="false"
+					element.setAttribute('contenteditable', 'false');
+
+					// Удаляем style атрибут (убираем цвет)
+					element.removeAttribute('style');
+				});
+			}
+		});
+
+		// Возвращаем обработанный HTML
+		return doc.body.innerHTML;
+	} catch (error) {
+		// В случае ошибки возвращаем исходный текст
+		console.error('Error in delColorFromHtml:', error);
+		return value;
+	}
 };
 export const addActualColors = (
 	audit: boolean,
@@ -187,103 +135,96 @@ export const changeValueInTag = (
 	text: string,
 	color: string,
 	placeholders: Placeholder[]
-  ) => {
-	let textTmp = text;
-	let contenteditable = false;
-  
-	if (tagFind.includes('placeholder')) {
-	  for (let i = 0; i < placeholders.length; i++) {
-		const findTag = `"${tagFind}Class${placeholders[i].id}" contenteditable="false"`;
-		if (textTmp.includes(findTag)) {
-		  contenteditable = true;
-		  break;
-		}
-	  }
-	} else {
-	  contenteditable = true;
-	}
-	let tag = `<${tagFind}${id} class=`;
-	let array = textTmp?.split(tag);
-	let resultText = '';
-	if (array) {
-	  for (let i = 0; i < array.length; i++) {
-		if (array.length > 1) {
-		  if (i === 0) {
-			resultText += array[i];
-		  } else {
-			resultText += `<${tagFind}${id} class=`;
-			tag = `</${tagFind}${id}>`;
-			const lineArr = array[i].split(tag);
-			for (let j = 0; j < lineArr.length; j++) {
-			  if (j === 0) {
-				tag = contenteditable
-				  ? `"${tagFind}Class${id}" contenteditable="false"`
-				  : `"${tagFind}Class${id}"`;
-				const elArray = lineArr[j].split(tag);
-				for (let k = 0; k < elArray.length; k++) {
-				  if (k === 0) {
-					resultText += contenteditable
-					  ? `${elArray[k]}"${tagFind}Class${id}" contenteditable="false" style="background-color:${color};">`
-					  : `${elArray[k]}"${tagFind}Class${id}" style="background-color:${color};">`;
-				  } else {
-					resultText += `${value}</${tagFind}${id}>`;
-				  }
-				}
-			  } else {
-				resultText += lineArr[j];
-			  }
-			}
-		  }
+) => {
+	try {
+		// Создаем DOM парсер для универсальной работы с HTML
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(text, 'text/html');
+
+		// Определяем селектор для поиска элементов
+		const selector = `${tagFind}${id}`;
+		const elements = doc.querySelectorAll(selector);
+
+		// Проверяем, нужно ли устанавливать contenteditable="false"
+		let shouldSetContentEditable = false;
+		if (tagFind.includes('placeholder')) {
+			// Проверяем, есть ли среди placeholders элементы с contenteditable="false"
+			shouldSetContentEditable = placeholders.some((placeholder) => {
+				const classSelector = `${tagFind}Class${placeholder.id}`;
+				const existingElements = doc.querySelectorAll(
+					`[class*="${classSelector}"][contenteditable="false"]`
+				);
+				return existingElements.length > 0;
+			});
 		} else {
-		  resultText = array[i];
+			shouldSetContentEditable = true;
 		}
-	  }
-	  textTmp = resultText;
+
+		// Обрабатываем найденные элементы
+		elements.forEach((element) => {
+			// Устанавливаем значение
+			element.textContent = value;
+
+			// Устанавливаем класс
+			const className = `${tagFind}Class${id}`;
+			element.className = className;
+
+			// Устанавливаем contenteditable если нужно
+			if (shouldSetContentEditable) {
+				element.setAttribute('contenteditable', 'false');
+			}
+
+			// Устанавливаем стиль с цветом фона, если это элемент с поддержкой style
+			if (element instanceof HTMLElement) {
+				element.style.backgroundColor = color;
+			}
+		});
+
+		// Возвращаем обработанный HTML
+		return doc.body.innerHTML;
+	} catch (error) {
+		// В случае ошибки возвращаем исходный текст
+		console.error('Error in changeValueInTag:', error);
+		return text;
 	}
-	return textTmp;
-  };
+};
 export const changeColorInTag = (
 	tagFind: string,
 	id: number,
 	text: string,
 	color: string
 ) => {
-	let textTmp = text;
-	let tag = `<${tagFind}${id} class=`;
-	let array = textTmp?.split(tag);
-	let resultText = '';
-	if (array) {
-		for (let i = 0; i < array.length; i++) {
-			if (array.length > 1) {
-				if (i === 0) {
-					resultText += array[i];
-				} else {
-					resultText += `<${tagFind}${id} class=`;
-					tag = `</${tagFind}${id}>`;
-					const lineArr = array[i].split(tag);
-					for (let j = 0; j < lineArr.length; j++) {
-						if (j === 0) {
-							tag = `"${tagFind}Class${id}" contenteditable="false"`;
-							const elArray = lineArr[j].split(tag);
-							for (let k = 0; k < elArray.length; k++) {
-								if (k === 0) {
-									resultText += `${elArray[k]}"${tagFind}Class${id}" contenteditable="false" style="background-color:${color};"`;
-								} else {
-									resultText += `${elArray[k]}</${tagFind}${id}>`;
-								}
-							}
-						} else {
-							resultText += lineArr[j];
-						}
-					}
-				}
-			} else {
-				resultText = array[i];
+	try {
+		// Создаем DOM парсер для универсальной работы с HTML
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(text, 'text/html');
+
+		// Определяем селектор для поиска элементов
+		const selector = `${tagFind}${id}`;
+		const elements = doc.querySelectorAll(selector);
+
+		// Обрабатываем найденные элементы
+		elements.forEach((element) => {
+			// Устанавливаем класс
+			const className = `${tagFind}Class${id}`;
+			element.className = className;
+
+			// Устанавливаем contenteditable="false"
+			element.setAttribute('contenteditable', 'false');
+
+			// Устанавливаем стиль с цветом фона
+			if (element instanceof HTMLElement) {
+				element.style.backgroundColor = color;
 			}
-		}
-		textTmp = resultText;
+		});
+
+		// Возвращаем обработанный HTML
+		return doc.body.innerHTML;
+	} catch (error) {
+		// В случае ошибки возвращаем исходный текст
+		console.error('Error in changeColorInTag:', error);
+		return text;
 	}
-	return textTmp;
 };
 
 const generateId = () => {
@@ -298,7 +239,7 @@ export const convertQuillTablesInHTML = (htmlString: string) => {
 	// Находим все исходные таблицы
 	const sourceTables = doc.querySelectorAll('.quill-better-table-wrapper');
 
-	sourceTables.forEach(sourceWrapper => {
+	sourceTables.forEach((sourceWrapper) => {
 		const sourceTable = sourceWrapper.querySelector('.quill-better-table');
 		if (!sourceTable) return;
 
@@ -328,7 +269,7 @@ export const convertQuillTablesInHTML = (htmlString: string) => {
 			const cols = colgroup.querySelectorAll('col');
 
 			// Генерируем colIds для каждого столбца
-			cols.forEach(col => {
+			cols.forEach((col) => {
 				const colId = generateId();
 				col.setAttribute('data-col-id', colId);
 				colIds.push(colId);
@@ -342,7 +283,7 @@ export const convertQuillTablesInHTML = (htmlString: string) => {
 
 		// Обрабатываем строки
 		const sourceRows = sourceTable.querySelectorAll('tr');
-		sourceRows.forEach(sourceRow => {
+		sourceRows.forEach((sourceRow) => {
 			const rowId = generateId();
 			const newRow = document.createElement('tr');
 			newRow.className = 'ql-table-row';
@@ -352,7 +293,7 @@ export const convertQuillTablesInHTML = (htmlString: string) => {
 			// Обрабатываем ячейки
 			const sourceCells = Array.from(sourceRow.querySelectorAll('td'));
 			let index = 0;
-			sourceCells.forEach(sourceCell => {
+			sourceCells.forEach((sourceCell) => {
 				const newCell = document.createElement('td');
 				newCell.className = 'ql-table-cell';
 				newCell.setAttribute('data-table-id', tableId);
@@ -370,7 +311,10 @@ export const convertQuillTablesInHTML = (htmlString: string) => {
 					newCell.setAttribute('style', sourceCell.getAttribute('style') || '');
 				}
 				if (sourceCell.hasAttribute('data-cell-bg')) {
-					newCell.setAttribute('data-cell-bg', sourceCell.getAttribute('data-cell-bg') || '');
+					newCell.setAttribute(
+						'data-cell-bg',
+						sourceCell.getAttribute('data-cell-bg') || ''
+					);
 				}
 
 				// Создаем внутренний контейнер
@@ -384,8 +328,10 @@ export const convertQuillTablesInHTML = (htmlString: string) => {
 				cellInner.setAttribute('contenteditable', 'true');
 
 				// Копируем содержимое как чистые элементы
-				Array.from(sourceCell.children).forEach(child => {
-					const cleanElement = document.createElement(child.tagName.toLowerCase());
+				Array.from(sourceCell.children).forEach((child) => {
+					const cleanElement = document.createElement(
+						child.tagName.toLowerCase()
+					);
 					cleanElement.innerHTML = child.innerHTML;
 					cellInner.appendChild(cleanElement);
 				});
@@ -415,7 +361,7 @@ export const convertQuillTablesInHTML = (htmlString: string) => {
 
 	// Возвращаем преобразованный HTML
 	return doc.documentElement.innerHTML;
-}
+};
 
 export const removeParentSpan = (element: HTMLElement | null) => {
 	// Проверяем, что элемент существует
