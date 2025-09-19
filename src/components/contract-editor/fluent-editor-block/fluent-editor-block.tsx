@@ -200,8 +200,8 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 					const shouldWrapTextNodes = value.includes('<li>') || value.includes('<p>') || value.includes('<div>');
 
 					if (shouldWrapTextNodes) {
-						processedValue = wrapTextNodes(value); // Обрабатываем HTML 
-						console.log('After wrapTextNodes:', processedValue);
+						// processedValue = wrapTextNodes(value); // Обрабатываем HTML 
+						// console.log('After wrapTextNodes:', processedValue);
 					}
 
 					if (processedValue.includes('quill-better-table-wrapper')) {

@@ -24,7 +24,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Contract, ContractEvent, ContractSign, ContractValue, EventStatus, Placeholder } from '../../config/types';
 import { RecipientViewContext } from './recipient-view-context';
-import { addActualColors, delColorFromHtml, changeValueInTag } from '../../utils/util-for-share';
+import { addActualColors,  changeValueInTag } from '../../utils/util-for-share';
 import { ResultModal } from './result-modal/result-modal';
 import useSaveArrayBuffer from '../../hooks/use-save-array-buffer';
 import Link from 'antd/es/typography/Link';
@@ -100,7 +100,7 @@ export const RecipientView: FC<RecipientViewProps> = ({ recipientKey, onChange }
                         payload.data.contractType.toString() !== ContractType.PDF.toString() &&
                         !payload.data.isDone
                     ) {
-                        value = removeAilineTags(value);
+                        // value = removeAilineTags(value);
                         value = addActualColors(
                             payload.data.audit,
                             payload.data.shareLink,

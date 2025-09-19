@@ -263,7 +263,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					// debugger;
 					let value = '';
 					if (contractTmp.value) {
-						value = removeAilineTags(contractTmp.value);
+						// value = removeAilineTags(contractTmp.value);
+						value = contractTmp.value;
 						value = delColorFromHtml(value);
 					} else {
 						value = '<div></div>';

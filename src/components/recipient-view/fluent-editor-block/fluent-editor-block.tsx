@@ -20,7 +20,7 @@ import {
 	SpecialType,
 	Tags,
 } from '../../../config/enum';
-import { addBlotClass, removeAilineTags, wrapTextNodes } from '../../../utils';
+import { addBlotClass } from '../../../utils';
 
 import '@opentiny/fluent-editor/style.css';
 import 'quill-table-up/index.css'
@@ -79,9 +79,9 @@ export const FluentEditorBlock = ({ value }: Props) => {
 	useEffect(() => {
 		if (contract?.contractType?.toString() !== ContractType.PDF.toString() &&
 			fluentRef.current) {
-			let processedValue = removeAilineTags(value);
-			processedValue = wrapTextNodes(value); // Обрабатываем HTML 
-			// let processedValue = value; // Обрабатываем HTML 
+			// let processedValue = removeAilineTags(value);
+			// processedValue = wrapTextNodes(value); // Обрабатываем HTML 
+			let processedValue = value; // Обрабатываем HTML 
 			if (processedValue.includes('quill-better-table-wrapper')) {
 				processedValue = convertQuillTablesInHTML(processedValue);
 			}

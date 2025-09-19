@@ -214,10 +214,9 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						if (!editor?.contains(target) && hasChanges) {
 							console.log('addEventListener');
 							hasChanges = false;
-							let contentTmp = removeAilineTags(
-								quillRef?.current?.root?.innerHTML as string
-							);
-							contentTmp = wrapTextNodes(contentTmp);
+							let contentTmp = quillRef?.current?.root?.innerHTML as string
+							//);
+							// contentTmp = wrapTextNodes(contentTmp);
 							// quillRef?.current?.clipboard.dangerouslyPasteHTML(
 							// 	contentTmp,
 							// 	'silent'
@@ -244,7 +243,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 
 	useEffect(() => {
 		const setValue = async () => {
-			const processedValue = wrapTextNodes(value); // Обрабатываем HTML
+			// const processedValue = wrapTextNodes(value); // Обрабатываем HTML
+			const processedValue = value; // Обрабатываем HTML
 			quillRef?.current?.clipboard.dangerouslyPasteHTML(processedValue, 'user');
 			// debugger;
 			setLoad(false);
@@ -309,8 +309,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -364,10 +364,9 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 
 					const styleSheet = document.styleSheets[0]; // Получаем первый стиль
 					styleSheet.insertRule(
-						`.${tagClass} { background-color: ${
-							placeholder[index].color
-								? placeholder[index].color
-								: PlaceholderColor.OTHER
+						`.${tagClass} { background-color: ${placeholder[index].color
+							? placeholder[index].color
+							: PlaceholderColor.OTHER
 						} }`,
 						styleSheet.cssRules.length
 					);
@@ -441,10 +440,9 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 								}
 								const styleSheet = document.styleSheets[0]; // Получаем первый стиль
 								styleSheet.insertRule(
-									`.${tagClass} { background-color: ${
-										payload.data.placeholders[index].color
-											? payload.data.placeholders[index].color
-											: PlaceholderColor.OTHER
+									`.${tagClass} { background-color: ${payload.data.placeholders[index].color
+										? payload.data.placeholders[index].color
+										: PlaceholderColor.OTHER
 									} }`,
 									styleSheet.cssRules.length
 								);
@@ -457,8 +455,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 					setNotification({
 						text:
 							error.response &&
-							error.response.data &&
-							error.response.data.message
+								error.response.data &&
+								error.response.data.message
 								? error.response.data.message
 								: error.message,
 					});
@@ -560,8 +558,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						setNotification({
 							text:
 								error.response &&
-								error.response.data &&
-								error.response.data.message
+									error.response.data &&
+									error.response.data.message
 									? error.response.data.message
 									: error.message,
 						});
@@ -597,8 +595,8 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						setNotification({
 							text:
 								error.response &&
-								error.response.data &&
-								error.response.data.message
+									error.response.data &&
+									error.response.data.message
 									? error.response.data.message
 									: error.message,
 						});
