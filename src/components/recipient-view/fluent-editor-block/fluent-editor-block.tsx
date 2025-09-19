@@ -206,21 +206,21 @@ export const FluentEditorBlock = ({ value }: Props) => {
 					);
 					return `
 				<tr>
-				  <td> 
+				  <td style="background-color: rgb(242, 242, 242);"> 
 					<p><b>${contractEventData.name}</b></p>
 					<p><b>${contractEventData.email}</b></p>
 				  </td> 
-				  <td>
+				  <td style="background-color: rgb(242, 242, 242);">
 					<p>
 					  ${dayjs(contractEventData.createTime).format(
 						'YYYY-MM-DD @ HH:mm:ss'
 					)} GMT
 					</p>
 				  </td>         
-				  <td>
+				  <td style="background-color: rgb(242, 242, 242);">
 					${ipProp}
 				  </td>
-				  <td>
+				  <td style="background-color: rgb(242, 242, 242);">
 					<img src='${signFind ? signFind.base64 : ''}' alt="signature" />
 				  </td>
 				</tr>`;
@@ -230,28 +230,28 @@ export const FluentEditorBlock = ({ value }: Props) => {
 		  <br>
 		  <h3 class="ql-align-center">Signature Certificate</h3>
 		  <br>
-		  <table style="background-color: rgb(242, 242, 242);">
+		  <table>
 		  <colgroup><col width="500"><col width="500"></colgroup>
 		  <tbody>
 			<tr>
-			  <td class="ql-size-small ql-align-center">Document ID</td>
-			  <td class="ql-size-small ql-align-center">Document name</td>
+			  <td class="ql-size-small ql-align-center" style="background-color: rgb(242, 242, 242);">Document ID</td>
+			  <td class="ql-size-small ql-align-center" style="background-color: rgb(242, 242, 242);">Document name</td>
 			</tr>
 			<tr>
-			  <td class="ql-align-center"><b>${contract.controlLink}</b></td>
-			  <td class="ql-align-center"><b>${contract.contractName}</b></td>
+			  <td class="ql-align-center" style="background-color: rgb(242, 242, 242);"><b>${contract.controlLink}</b></td>
+			  <td class="ql-align-center" style="background-color: rgb(242, 242, 242);"><b>${contract.contractName}</b></td>
 			</tr>
 		  </tbody>
 		</table>
 		  <br> 
-			<table style="background-color: rgb(242, 242, 242);">
+			<table>
 			  <colgroup><col width="330"><col width="170"><col width="250"><col width="250"></colgroup>
 			  <tbody>
 				<tr>
-				  <td class="ql-size-small">Signed by</td>
-				  <td class="ql-size-small">When</td>
-				  <td class="ql-size-small">Where</td>
-				  <td class="ql-size-small">Signature</td>
+				  <td class="ql-size-small" style="background-color: rgb(242, 242, 242);">Signed by</td>
+				  <td class="ql-size-small" style="background-color: rgb(242, 242, 242);">When</td>
+				  <td class="ql-size-small" style="background-color: rgb(242, 242, 242);">Where</td>
+				  <td class="ql-size-small" style="background-color: rgb(242, 242, 242);">Signature</td>
 				</tr>
 				${signedEventString.join('')} 
 			  </tbody>
