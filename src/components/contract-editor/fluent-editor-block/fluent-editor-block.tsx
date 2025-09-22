@@ -185,6 +185,7 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 			});
 			if (fluentRef.current) {
 				fluentRef.current.on('text-change', () => {
+					setDocumentCurrentSaved(false);
 					handleChangeText(fluentRef?.current?.root?.innerHTML as string);
 				});
 				const setValue = async () => {
@@ -209,7 +210,7 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 					}
 
 					// Очищаем HTML от лишних элементов редактора
-					processedValue = cleanEditorHTML(processedValue);
+					// processedValue = cleanEditorHTML(processedValue);
 					console.log('After cleanEditorHTML:', processedValue);
 
 					// Используем setContents для правильной обработки HTML

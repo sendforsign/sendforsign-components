@@ -53,6 +53,7 @@ export const PdfBlockDnd = () => {
 		contractName,
 		pagePlaceholder,
 		setPagePlaceholder,
+		setDocumentCurrentSaved
 	} = useContractEditorContext();
 	dayjs.extend(utc);
 	const [contractSigns, setContractSigns] = useState<ContractSign[]>([]);
@@ -299,6 +300,7 @@ export const PdfBlockDnd = () => {
 			setPdfData(arrayBuffer);
 			setContinueLoad(false);
 			setLoad(false);
+			setDocumentCurrentSaved(true);
 		};
 		getValue();
 		return () => {

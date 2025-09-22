@@ -2043,7 +2043,7 @@ export const wrapTextNodes = (html: string) => {
 		}
 	};
 
-	traverseNodes(doc.body);
+	// traverseNodes(doc.body);
 	return doc.body.innerHTML;
 };
 

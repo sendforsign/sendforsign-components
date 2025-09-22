@@ -24,6 +24,8 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 	} = useContractListContext();
 	const [currentKey, setCurrentKey] = useState('');
 	const [load, setLoad] = useState(false);
+	const [documentSaved, setDocumentSaved] = useState(false);
+	const [pendingClose, setPendingClose] = useState(false);
 	const { Title, Text } = Typography;
 
 	useEffect(() => {
@@ -38,19 +40,28 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 		}
 	}, [contractModal]);
 
+	useEffect(() => {
+		if (pendingClose && documentSaved) {
+			// Если документ сохранен и мы ждем закрытия, закрываем модальное окно
+			setPendingClose(false);
+			setContractKey('');
+			setContractModal(false);
+			setRefreshContracts(refreshContracts + 1);
+			setDocumentSaved(false); // Сбрасываем состояние для следующего использования
+		}
+	}, [documentSaved, pendingClose]);
+
 	const handleCancel = () => {
-		// debugger;
-		setContractKey('');
-		setContractModal(false);
-		setRefreshContracts(refreshContracts + 1);
-		// clearParams();
+		if (documentSaved) {
+			// Если документ уже сохранен, закрываем сразу
+			setContractKey('');
+			setContractModal(false);
+			setRefreshContracts(refreshContracts + 1);
+		} else {
+			// Если документ не сохранен, ждем пока он сохранится
+			setPendingClose(true);
+		}
 	};
-	// const handleStep = (e: any) => {
-	// 	console.log('handleStep', e);
-	// };
-	// const handleSave = (e: any) => {
-	// 	console.log('handleSave', e);
-	// };
 	return (
 		<Modal
 			key={id}
@@ -86,6 +97,7 @@ export const ModalView: FC<ModalViewProps> = ({ id }) => {
 						userKey={userKey}
 						contractKey={contractKey}
 						ai={aiShow}
+						onDocumentSave={(e: any) => setDocumentSaved(e.documentSaved)}
 					/>
 				</Space>
 			)}
