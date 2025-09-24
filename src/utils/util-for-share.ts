@@ -163,7 +163,12 @@ export const changeValueInTag = (
 		// Обрабатываем найденные элементы
 		elements.forEach((element) => {
 			// Устанавливаем значение
-			element.textContent = value;
+			// Если значение содержит HTML (например, <img .../>), вставляем как HTML
+			if (value.trim().startsWith('<') && element instanceof HTMLElement) {
+				element.innerHTML = value;
+			} else {
+				element.textContent = value;
+			}
 
 			// Устанавливаем класс
 			const className = `${tagFind}Class${id}`;

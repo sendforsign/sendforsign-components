@@ -467,6 +467,29 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 		if (placeholderChange.isSpecial || readonlyCurrent.current) {
 			return;
 		}
+		let text = quillRef?.current?.root.innerHTML;
+		text = changeValueInTag(
+			placeholderChange.isSpecial
+				? placeholderChange.specialType === SpecialType.DATE
+					? Tags.DATE
+					: placeholderChange.specialType === SpecialType.FULLNAME
+						? Tags.FULLNAME
+						: placeholderChange.specialType === SpecialType.EMAIL
+							? Tags.EMAIL
+							: Tags.SIGN
+				: Tags.PLACEHOLDER,
+			placeholderChange.id ? (placeholderChange.id as number) : 0,
+			placeholderChange.value
+				? (placeholderChange.value as string)
+				: `{{{${placeholderChange.name as string}}}}`,
+			placeholderChange.color
+				? placeholderChange.color
+				: PlaceholderColor.OTHER,
+			text as string
+		);
+		quillRef?.current?.clipboard.dangerouslyPasteHTML(text, 'user');
+		quillRef?.current?.blur();
+
 		let body = {
 			data: {
 				action: Action.UPDATE,
@@ -500,29 +523,6 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 							: error.message,
 				});
 			});
-
-		let text = quillRef?.current?.root.innerHTML;
-		text = changeValueInTag(
-			placeholderChange.isSpecial
-				? placeholderChange.specialType === SpecialType.DATE
-					? Tags.DATE
-					: placeholderChange.specialType === SpecialType.FULLNAME
-						? Tags.FULLNAME
-						: placeholderChange.specialType === SpecialType.EMAIL
-							? Tags.EMAIL
-							: Tags.SIGN
-				: Tags.PLACEHOLDER,
-			placeholderChange.id ? (placeholderChange.id as number) : 0,
-			placeholderChange.value
-				? (placeholderChange.value as string)
-				: `{{{${placeholderChange.name as string}}}}`,
-			placeholderChange.color
-				? placeholderChange.color
-				: PlaceholderColor.OTHER,
-			text as string
-		);
-		quillRef?.current?.clipboard.dangerouslyPasteHTML(text, 'user');
-		quillRef?.current?.blur();
 	};
 	const handleAddPlaceholder = async () => {
 		let placeholdersTmp = [...placeholder];
