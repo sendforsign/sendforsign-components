@@ -284,6 +284,7 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 					setSignCount(payload.data.length);
 					if (payload.data.length > 0) {
 						setReadonly(true);
+						setDocumentCurrentSaved(true);
 					}
 				})
 				.catch((error) => {
@@ -582,6 +583,7 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 					});
 			} else {
 				setReadonly(true);
+				setDocumentCurrentSaved(true);
 				if (contractValueTmp) {
 					fluentRef?.current?.clipboard.dangerouslyPasteHTML(contractValueTmp);
 				}
