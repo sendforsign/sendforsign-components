@@ -20,13 +20,13 @@ import {
 	SpecialType,
 	Tags,
 } from '../../../config/enum';
-import { addBlotClass } from '../../../utils';
+import { addBlotClass, convertQuillTablesInHTML } from '../../../utils';
 
 import '@opentiny/fluent-editor/style.css';
 import 'quill-table-up/index.css'
 import 'quill-table-up/table-creator.css'
 import { useRecipientViewContext } from '../recipient-view-context';
-import { changeValueInTag, convertQuillTablesInHTML, removeParentSpan } from '../../../utils/util-for-share';
+import { changeValueInTag, removeParentSpan } from '../../../utils/util-for-share';
 import { ContractEvent } from '../../../config/types';
 
 type Props = {

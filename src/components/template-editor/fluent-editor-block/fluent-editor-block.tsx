@@ -16,7 +16,7 @@ import hljs from 'highlight.js'
 import { useTemplateEditorContext } from '../template-editor-context';
 import { BASE_URL } from '../../../config/config';
 import { Action, ApiEntity } from '../../../config/enum';
-import { addBlotClass, convertBlobImagesInHtml } from '../../../utils';
+import { addBlotClass, convertBlobImagesInHtml, convertQuillTablesInHTML } from '../../../utils';
 import '@opentiny/fluent-editor/style.css';
 import 'highlight.js/styles/atom-one-dark.css'
 import 'katex/dist/katex.min.css'
@@ -127,7 +127,11 @@ export const FluentEditorBlock = ({ value, fluentRef }: Props) => {
 						handleChangeText(fluentRef?.current?.root?.innerHTML as string);
 					}
 				);
-				fluentRef.current && (fluentRef.current.root.innerHTML = value);
+				let valueTmp = value;
+				if (valueTmp.includes('quill-better-table-wrapper')) {
+					valueTmp = convertQuillTablesInHTML(valueTmp);
+				}
+				fluentRef.current && (fluentRef.current.root.innerHTML = valueTmp);
 				setRefreshPlaceholders(refreshPlaceholders + 1);
 
 			}
