@@ -1,5 +1,5 @@
 import React from 'react';
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-webpack5';
 
 import { ContractList } from '../components/contract-list';
 import { ContractListProps } from '../components/contract-list/contract-list';

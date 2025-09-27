@@ -21,7 +21,7 @@ import {
 	PlaceholderView,
 	SpecialType,
 } from '../../../config/enum';
-import { addBlotClass, wrapTextNodes, cleanEditorHTML, convertBlobImagesInHtml, convertQuillTablesInHTML } from '../../../utils';
+import { addBlotClass, wrapTextNodes, cleanEditorHTML, convertBlobImagesInHtml, convertQuillTablesInHTML, convertHTMLTablesToQuillFormat } from '../../../utils';
 
 import '@opentiny/fluent-editor/style.css';
 import 'highlight.js/styles/atom-one-dark.css'
@@ -63,13 +63,7 @@ for (let index = 1; index <= 40; index++) {
 }
 
 FluentEditor.register({ 'modules/table-up': TableUp }, true);
-FluentEditor.register({ 'modules/markdownShortcuts': MarkdownShortcuts }, true);
-// FluentEditor.register(
-// 	{
-// 		'modules/better-table': QuillBetterTable,
-// 	},
-// 	true
-// );
+FluentEditor.register({ 'modules/markdownShortcuts': MarkdownShortcuts }, true); 
 
 export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 	const TOOLBAR_CONFIG = [
@@ -207,6 +201,10 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 
 					if (processedValue.includes('quill-better-table-wrapper')) {
 						processedValue = convertQuillTablesInHTML(processedValue);
+					}
+					// Преобразуем обычные HTML таблицы в формат ql-table
+					if (processedValue.includes('<table>') && !processedValue.includes('ql-table-wrapper')) {
+						processedValue = convertHTMLTablesToQuillFormat(processedValue);
 					}
 
 					// Очищаем HTML от лишних элементов редактора

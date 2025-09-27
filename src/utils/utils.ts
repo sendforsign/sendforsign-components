@@ -2306,3 +2306,130 @@ export const convertQuillTablesInHTML = (htmlString: string) => {
 	// Возвращаем преобразованный HTML
 	return doc.documentElement.innerHTML;
 };
+
+export const convertHTMLTablesToQuillFormat = (htmlString: string) => {
+	// Создаем временный DOM-документ
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(htmlString, 'text/html');
+
+	// Находим все обычные HTML таблицы
+	const sourceTables = doc.querySelectorAll('table');
+
+	sourceTables.forEach((sourceTable) => {
+		// Создаем новый контейнер таблицы
+		const newWrapper = document.createElement('div');
+		newWrapper.className = 'ql-table-wrapper';
+		newWrapper.setAttribute('contenteditable', 'false');
+		const tableId = generateId();
+		newWrapper.setAttribute('data-table-id', tableId);
+
+		// Создаем новую таблицу
+		const newTable = document.createElement('table');
+		newTable.className = 'ql-table';
+		newTable.setAttribute('data-table-id', tableId);
+		newTable.setAttribute('cellpadding', '0');
+		newTable.setAttribute('cellspacing', '0');
+		newTable.style.marginRight = 'auto';
+		newTable.style.width = '100%';
+
+		// Определяем количество столбцов для создания colgroup
+		let maxCols = 0;
+		const rows = sourceTable.querySelectorAll('tr');
+		rows.forEach((row) => {
+			const cells = row.querySelectorAll('td, th');
+			let colCount = 0;
+			cells.forEach((cell) => {
+				const colspan = parseInt(cell.getAttribute('colspan') || '1', 10);
+				colCount += colspan;
+			});
+			maxCols = Math.max(maxCols, colCount);
+		});
+
+		// Создаем colgroup
+		const colgroup = document.createElement('colgroup');
+		colgroup.setAttribute('data-table-id', tableId);
+		colgroup.setAttribute('contenteditable', 'false');
+		
+		let colIds: string[] = [];
+		for (let i = 0; i < maxCols; i++) {
+			const col = document.createElement('col');
+			const colId = generateId();
+			col.setAttribute('data-col-id', colId);
+			colIds.push(colId);
+			colgroup.appendChild(col);
+		}
+		newTable.appendChild(colgroup);
+
+		// Создаем тело таблицы
+		const tbody = document.createElement('tbody');
+		tbody.setAttribute('data-table-id', tableId);
+
+		// Обрабатываем строки
+		rows.forEach((sourceRow) => {
+			const rowId = generateId();
+			const newRow = document.createElement('tr');
+			newRow.className = 'ql-table-row';
+			newRow.setAttribute('data-table-id', tableId);
+			newRow.setAttribute('data-row-id', rowId);
+
+			// Обрабатываем ячейки
+			const sourceCells = Array.from(sourceRow.querySelectorAll('td, th'));
+			let colIndex = 0;
+			sourceCells.forEach((sourceCell) => {
+				const newCell = document.createElement('td');
+				newCell.className = 'ql-table-cell';
+				newCell.setAttribute('data-table-id', tableId);
+				newCell.setAttribute('data-row-id', rowId);
+				newCell.setAttribute('data-col-id', colIds[colIndex]);
+
+				// Копируем атрибуты объединения ячеек
+				const rowspan = sourceCell.getAttribute('rowspan');
+				const colspan = sourceCell.getAttribute('colspan');
+				if (rowspan) newCell.setAttribute('rowspan', rowspan);
+				if (colspan) newCell.setAttribute('colspan', colspan);
+
+				// Копируем стили
+				if (sourceCell.hasAttribute('style')) {
+					newCell.setAttribute('style', sourceCell.getAttribute('style') || '');
+				}
+
+				// Создаем внутренний контейнер
+				const cellInner = document.createElement('div');
+				cellInner.className = 'ql-table-cell-inner';
+				cellInner.setAttribute('data-table-id', tableId);
+				cellInner.setAttribute('data-row-id', rowId);
+				cellInner.setAttribute('data-col-id', colIds[colIndex]);
+				cellInner.setAttribute('data-rowspan', rowspan || '1');
+				cellInner.setAttribute('data-colspan', colspan || '1');
+				cellInner.setAttribute('contenteditable', 'true');
+
+				// Копируем содержимое ячейки
+				cellInner.innerHTML = sourceCell.innerHTML;
+
+				// Если ячейка была пустая, добавляем минимальную структуру
+				if (cellInner.childNodes.length === 0 || cellInner.textContent?.trim() === '') {
+					const p = document.createElement('p');
+					p.innerHTML = '<br>';
+					cellInner.appendChild(p);
+				}
+
+				newCell.appendChild(cellInner);
+				newRow.appendChild(newCell);
+				colIndex += parseInt(colspan || '1', 10);
+			});
+
+			tbody.appendChild(newRow);
+		});
+
+		newTable.appendChild(tbody);
+		newWrapper.appendChild(newTable);
+
+		// Заменяем старую таблицу новой
+		if (sourceTable.parentNode) {
+			sourceTable.parentNode.replaceChild(newWrapper, sourceTable);
+		}
+	});
+
+	// Возвращаем преобразованный HTML
+	return doc.documentElement.innerHTML;
+};

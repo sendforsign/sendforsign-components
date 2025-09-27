@@ -1,7 +1,4 @@
 import React, { useEffect } from 'react';
-// import './html-block.css';
-// import QuillNamespace from 'quill';
-// import QuillBetterTable from 'quill-better-table';
 import FluentEditor from '@opentiny/fluent-editor';
 import ImageToolbarButtons from '@opentiny/fluent-editor';
 import QuillBetterTable from 'quill-better-table';
@@ -16,7 +13,7 @@ import hljs from 'highlight.js'
 import { useTemplateEditorContext } from '../template-editor-context';
 import { BASE_URL } from '../../../config/config';
 import { Action, ApiEntity } from '../../../config/enum';
-import { addBlotClass, convertBlobImagesInHtml, convertQuillTablesInHTML } from '../../../utils';
+import { addBlotClass, convertBlobImagesInHtml, convertQuillTablesInHTML, convertHTMLTablesToQuillFormat } from '../../../utils';
 import '@opentiny/fluent-editor/style.css';
 import 'highlight.js/styles/atom-one-dark.css'
 import 'katex/dist/katex.min.css'
@@ -27,23 +24,11 @@ type Props = {
 	fluentRef: React.MutableRefObject<FluentEditor | undefined>;
 };
 
-// QuillNamespace.register(
-// 	{
-// 		'modules/better-table': QuillBetterTable,
-// 	},
-// 	true
-// );
 for (let index = 1; index <= 40; index++) {
 	addBlotClass(index);
 }
 FluentEditor.register({ 'modules/table-up': TableUp }, true);
 FluentEditor.register({ 'modules/markdownShortcuts': MarkdownShortcuts }, true);
-FluentEditor.register(
-	{
-		'modules/better-table': QuillBetterTable,
-	},
-	true
-);
 export const FluentEditorBlock = ({ value, fluentRef }: Props) => {
 	const TOOLBAR_CONFIG = [
 		['undo', 'redo', 'clean'], //'format-painter'
@@ -130,6 +115,10 @@ export const FluentEditorBlock = ({ value, fluentRef }: Props) => {
 				let valueTmp = value;
 				if (valueTmp.includes('quill-better-table-wrapper')) {
 					valueTmp = convertQuillTablesInHTML(valueTmp);
+				}
+				// Преобразуем обычные HTML таблицы в формат ql-table
+				if (valueTmp.includes('<table>') && !valueTmp.includes('ql-table-wrapper')) {
+					valueTmp = convertHTMLTablesToQuillFormat(valueTmp);
 				}
 				fluentRef.current && (fluentRef.current.root.innerHTML = valueTmp);
 				setRefreshPlaceholders(refreshPlaceholders + 1);

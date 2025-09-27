@@ -1,5 +1,5 @@
 import React from 'react';
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-webpack5';
 
 import { ContractEditor } from '../components/contract-editor';
 import { ContractEditorProps } from '../components/contract-editor/contract-editor';
