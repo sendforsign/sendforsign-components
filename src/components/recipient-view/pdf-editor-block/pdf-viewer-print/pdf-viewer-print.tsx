@@ -42,13 +42,13 @@ export const PdfViewerPrint = ({
           setNumPages(numPages);
         }}
         onSourceError={() => {
-          console.log('PdfViewer onSourceError');
+          // console.log('PdfViewer onSourceError');
         }}
         onLoadError={() => {
-          console.log('PdfViewer onLoadError');
+          // console.log('PdfViewer onLoadError');
         }}
         onError={() => {
-          console.log('PdfViewer error');
+          // console.log('PdfViewer error');
         }}
       >
         {new Array(numPages).fill(0).map((_, i) => {
@@ -60,7 +60,7 @@ export const PdfViewerPrint = ({
               pageNumber={i + 1}
               // scale={scale}
               onLoadSuccess={(data) => {
-                console.log('onLoadSuccess', new Date().getMilliseconds());
+                // console.log('onLoadSuccess', new Date().getMilliseconds());
 
                 onAdjustTextSize();
                 if (onLoad) {

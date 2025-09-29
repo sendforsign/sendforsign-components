@@ -212,7 +212,7 @@ export const HtmlBlock = ({ value, quillRef }: Props) => {
 						const target = e.target as HTMLElement;
 						const editor = editorContainer.querySelector('.ql-editor');
 						if (!editor?.contains(target) && hasChanges) {
-							console.log('addEventListener');
+							// console.log('addEventListener');
 							hasChanges = false;
 							let contentTmp = quillRef?.current?.root?.innerHTML as string
 							//);

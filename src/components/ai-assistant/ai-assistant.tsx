@@ -122,11 +122,11 @@ export const AiAssistant: FC<AiAssistantProps> = ({
 			body: body.current,
 			headers: headers.current,
 			onError: (e: any) => {
-				console.log(e);
+				// console.log(e);
 				setIsThinking(false);
 			},
 			onResponse: (response: any) => {
-				console.log('response', response);
+				// console.log('response', response);
 				setIsThinking(false); // Stop thinking when request completes
 			},
 		});

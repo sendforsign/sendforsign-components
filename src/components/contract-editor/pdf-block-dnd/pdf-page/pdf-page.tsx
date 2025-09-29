@@ -274,7 +274,7 @@ export const PdfPage = ({
 		};
 	}, [div]);
 	useEffect(() => {
-		console.log('onChange3');
+		// console.log('onChange3');
 		if (
 			currPagePlaceholder &&
 			currPagePlaceholder.length > 0 &&
@@ -304,7 +304,7 @@ export const PdfPage = ({
 			}
 			setCurrPagePlaceholder(pagePlaceholderTmp);
 			currPagePl.current = pagePlaceholderTmp;
-			console.log('onChange4', placeholderChange);
+			// console.log('onChange4', placeholderChange);
 		}
 	}, [placeholderChange, currPagePlaceholder]);
 	useEffect(() => {
@@ -447,7 +447,7 @@ export const PdfPage = ({
 			pageNumber={pageNumber + 1}
 			// scale={scale}
 			onLoadSuccess={(e) => {
-				console.log('onLoadSuccess', new Date().getMilliseconds());
+				// console.log('onLoadSuccess', new Date().getMilliseconds());
 				setReady(true);
 			}}
 			onDragOver={(e) => {

@@ -204,7 +204,7 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 	const handleCreate = async () => {
 		if (contractType && !templateKey) {
 			let input = null;
-			console.log('contractType', contractType);
+			// console.log('contractType', contractType);
 			switch (contractType) {
 				case ContractTypeText.DOCX.toString():
 					setLoad(true);
@@ -397,8 +397,8 @@ export const ChooseContractType = ({ allowPdf, allowAi }: Props) => {
 	const handleChoose = async (e: any) => {
 		// debugger;
 		let contractTypeTmp = e.toString().split('_');
-		console.log('e', e);
-		console.log('contractTypeTmp', contractTypeTmp[1]);
+		// console.log('e', e);
+		// console.log('contractTypeTmp', contractTypeTmp[1]);
 		if (
 			contractTypeTmp[1] === ContractTypeText.DOCX.toString() ||
 			contractTypeTmp[1] === ContractTypeText.PDF.toString()

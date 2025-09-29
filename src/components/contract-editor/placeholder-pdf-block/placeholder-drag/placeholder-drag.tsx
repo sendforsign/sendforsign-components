@@ -131,7 +131,7 @@ export const PlaceholderDrag = ({
 
 				break;
 		}
-		console.log('onChange1', currPlaceholder.current);
+		// console.log('onChange1', currPlaceholder.current);
 		if (onChange) {
 			onChange({ placeholder: currPlaceholder.current });
 		}

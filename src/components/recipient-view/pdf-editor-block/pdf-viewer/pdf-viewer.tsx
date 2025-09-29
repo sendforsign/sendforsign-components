@@ -63,7 +63,7 @@ export const PdfViewer = ({
           // Если это первая инициализация, сохраняем начальную ширину и устанавливаем масштаб
       if (!isInitialized) {
         const initialScale = e / (CANVAS_WIDTH * PAGE_SCALE);
-        console.log('Initial resize', e, initialScale);
+        // console.log('Initial resize', e, initialScale);
         setScale(initialScale);
         setInitialWidth(e);
         setIsInitialized(true);
@@ -79,7 +79,7 @@ export const PdfViewer = ({
       if (isInitialized && e !== initialWidth) {
         setIsScaleStable(false); // Масштаб меняется
         const newScale = e / (CANVAS_WIDTH * PAGE_SCALE);
-        console.log('User resize', e, newScale);
+        // console.log('User resize', e, newScale);
         setScale(newScale);
         setInitialWidth(e);
         lastProcessedWidth.current = e;
@@ -120,7 +120,7 @@ export const PdfViewer = ({
               // scale={scale}
               scale={scale * PAGE_SCALE}
               onLoadSuccess={(data) => {
-                console.log('onLoadSuccess', data, scale);
+                // console.log('onLoadSuccess', data, scale);
 
                 // Вызываем onAdjustTextSize только при первой загрузке страницы и когда PDF не загружается
                 // Также проверяем, что масштаб стабилен (не меняется в данный момент)

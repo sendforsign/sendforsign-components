@@ -60,7 +60,7 @@ export const PdfEditorBlock = ({
             const arrayBuffer: ArrayBuffer = (await getArrayBuffer(
                 'pdfFile'
             )) as ArrayBuffer;
-            console.log('pdfFileLoad', pdfFileLoad, arrayBuffer);
+            // console.log('pdfFileLoad', pdfFileLoad, arrayBuffer);
             return setPdfData(arrayBuffer);
         };
         getValue();
@@ -271,7 +271,7 @@ export const PdfEditorBlock = ({
             signs.length > 0 &&
             contract.contractType?.toString() === ContractType.PDF.toString()
         ) {
-            console.log('contractSignsData1', signs);
+            // console.log('contractSignsData1', signs);
             render();
         }
     }, [signs]);
@@ -536,10 +536,10 @@ export const PdfEditorBlock = ({
                 onBtnClick={handleBtn}
                 onAdjustTextSize={adjustTextSize}
                 onLoad={(data) => {
-                    console.log(
-                        'PdfViewerPrint',
-                        data,
-                    );
+                    // console.log(
+                    //     'PdfViewerPrint',
+                    //     data,
+                    // );
                 }}
             />
         ) : (

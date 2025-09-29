@@ -337,7 +337,7 @@ export const PlaceholderPdfBlock = () => {
 			(pl) => pl.id?.toString() === id.toString() && !pl.isSpecial
 		);
 		placeholderTmp[holderIndex] = placeholderChange;
-		console.log('onChange2', placeholderChange);
+		// console.log('onChange2', placeholderChange);
 		setPlaceholderChange(placeholderChange);
 		setPlaceholder(placeholderTmp);
 	};

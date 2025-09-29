@@ -89,7 +89,7 @@ export const RecipientView: FC<RecipientViewProps> = ({ recipientKey, onChange }
                     responseType: 'json',
                 })
                 .then(async (payload: any) => {
-                    console.log('payload', payload);
+                    // console.log('payload', payload);
                     first.current = true;
                     // let value =
                     //     payload.data.contractType.toString() === ContractType.PDF.toString()
@@ -290,7 +290,7 @@ export const RecipientView: FC<RecipientViewProps> = ({ recipientKey, onChange }
                 });
         };
         if (refreshSigns > 0) {
-            console.log('refreshSigns', refreshSigns);
+            // console.log('refreshSigns', refreshSigns);
             getSigns();
         }
     }, [refreshSigns]);

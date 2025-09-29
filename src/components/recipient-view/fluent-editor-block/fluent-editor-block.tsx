@@ -93,7 +93,7 @@ export const FluentEditorBlock = ({ value }: Props) => {
 					contractValue: processedValue,
 				});
 			} else if (processedValue && contract.audit) {
-				console.log('contract', contract);
+				// console.log('contract', contract);
 				if (signs && signs.length > 0 && contract.audit) {
 					fluentRef.current.clipboard.dangerouslyPasteHTML(
 						auditTrailList(processedValue as string)
@@ -181,7 +181,7 @@ export const FluentEditorBlock = ({ value }: Props) => {
 	}, [placeholdersFilling]);
 
 	const auditTrailList = (value: string): string => {
-		console.log('8');
+		// console.log('8');
 		let newValue = value;
 		const signedEvent = contractEvent?.filter(
 			(contractEventData: ContractEvent) =>

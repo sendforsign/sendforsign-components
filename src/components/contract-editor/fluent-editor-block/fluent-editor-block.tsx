@@ -188,7 +188,7 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 					let processedValue = value;
 
 					// Логируем исходный HTML для отладки
-					console.log('Original HTML:', value);
+					// console.log('Original HTML:', value);
 
 					// Проверяем, нужно ли применять wrapTextNodes
 					// Применяем только если в HTML есть элементы, которые нужно обработать
@@ -209,7 +209,7 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 
 					// Очищаем HTML от лишних элементов редактора
 					// processedValue = cleanEditorHTML(processedValue);
-					console.log('After cleanEditorHTML:', processedValue);
+					// console.log('After cleanEditorHTML:', processedValue);
 
 					// Используем setContents для правильной обработки HTML
 					try {
