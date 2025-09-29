@@ -89,7 +89,6 @@ table.quill-better-table td {
 	border-radius: 4px;
 	border: 1px solid #d0e0c7;
 	color: black;
-	font-family: inherit !important;
 }
 
 .ant-space-item:has(> #contractActionsFooter) {
