@@ -255,7 +255,8 @@ export const FluentEditorBlock = ({ value }: Props) => {
 				</tr>
 				${signedEventString.join('')} 
 			  </tbody>
-			</table>`;
+			</table>
+			<p styles={{marginTop:'200px'}}>Share link: ${contract.shareLink}</p>`;
 		}
 
 		return newValue;
