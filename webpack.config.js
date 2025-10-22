@@ -25,17 +25,9 @@ module.exports = (args) => {
             // Allow importing ESM without explicit file extensions from some packages
             fullySpecified: false,
             extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".css"], // Удалите ".jsx-runtime" из списка
-            mainFields: ['browser', 'module', 'main'],
-            fallback: {
-                "fs": false,
-                "path": false,
-                "crypto": false
-            },
             alias: {
                 "react/jsx-dev-runtime": "react/jsx-dev-runtime",
                 "react/jsx-runtime": "react/jsx-runtime",
-                // Fix ESM subpath imports inside @opentiny/fluent-editor which use extension-less paths
-                "quill/core": "quill/core.js",
                 "quill/core/selection": "quill/core/selection.js",
                 "quill/core/emitter": "quill/core/emitter.js",
                 "quill/themes/base": "quill/themes/base.js"
@@ -62,10 +54,7 @@ module.exports = (args) => {
                                 noEmit: false,
                                 module: 'ESNext',
                                 moduleResolution: 'Bundler',
-                                skipLibCheck: true,
-                                noImplicitAny: false,
                             },
-                            transpileOnly: true,
                         },
                     }],
                     exclude: /node_modules/,
@@ -97,26 +86,6 @@ module.exports = (args) => {
                     parser: { requireContext: false }
                 }
             ],
-        },
-        ignoreWarnings: [
-            /Failed to parse source map/,
-            /Module not found/,
-            /Can't resolve/,
-            /TS2322/,
-            /TS2345/,
-            /BREAKING CHANGE/,
-            /quill\/core/,
-            /quill\/themes/,
-            /Error: Can't resolve/
-        ],
-        stats: {
-            warnings: false,
-            errors: false
-        },
-        bail: false,
-        mode: 'production',
-        optimization: {
-            minimize: false
         },
     }
 };
