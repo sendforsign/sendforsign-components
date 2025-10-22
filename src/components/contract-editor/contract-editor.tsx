@@ -130,6 +130,7 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 	const [placeholder, setPlaceholder] = useState<Placeholder[]>([]);
 	const [recipientFilling, setRecipientFilling] = useState<Recipient[]>([]);
 	const [placeholderPdf, setPlaceholderPdf] = useState<Placeholder>({});
+	const [placeholderHtml, setPlaceholderHtml] = useState<Placeholder>({});
 	const [placeholderChange, setPlaceholderChange] = useState<Placeholder>({});
 	const [placeholderDelete, setPlaceholderDelete] = useState<string>('');
 	const [focusElement, setFocusElement] = useState<string>('');
@@ -582,6 +583,8 @@ export const ContractEditor: FC<ContractEditorProps> = ({
 					setRecipientFilling,
 					placeholderPdf,
 					setPlaceholderPdf,
+					placeholderHtml,
+					setPlaceholderHtml,
 					placeholderVisible,
 					setPlaceholderVisible,
 					aiVisible,

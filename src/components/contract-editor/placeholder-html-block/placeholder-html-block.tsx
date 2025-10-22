@@ -4,13 +4,6 @@ import {
 	Card,
 	Typography,
 	Button,
-	Input,
-	Radio,
-	Row,
-	Tooltip,
-	Col,
-	Popover,
-	Divider,
 	Select,
 } from 'antd';
 import FluentEditor from '@opentiny/fluent-editor';
@@ -24,7 +17,6 @@ import {
 	PlaceholderColor,
 	PlaceholderFill,
 	PlaceholderTypeText,
-	PlaceholderView,
 	SpecialType,
 	Tags,
 } from '../../../config/enum';
@@ -33,17 +25,14 @@ import { Placeholder, Recipient } from '../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faCircle,
-	faCircleQuestion,
-	faCopy,
-	faGear,
-	faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { parseDate } from 'pdf-lib';
 import {
 	changeValueInTag,
 	generateTableHTML,
-	getIcon,
+	updatePlaceholderClass,
 } from '../../../utils';
+import { PlaceholderDrag } from './placeholder-drag';
 
 type Props = {
 	quillRef: React.MutableRefObject<FluentEditor | undefined>;
@@ -308,106 +297,106 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			}
 		}
 	}, [refreshPagePlaceholders]);
-	const updatePlaceholderClass = ({
-		id,
-		specialType,
-		recipientKey,
-		owner,
-		deleteClass,
-	}: {
-		id: number;
-		specialType?: number;
-		recipientKey?: string;
-		owner?: boolean;
-		deleteClass?: boolean;
-	}) => {
-		if (!specialType) {
-			let placeholderFind = placeholder.find(
-				(pl) => pl.id?.toString() === id.toString() && !pl.isSpecial
-			) as Placeholder;
+	// const updatePlaceholderClass = ({
+	// 	id,
+	// 	specialType,
+	// 	recipientKey,
+	// 	owner,
+	// 	deleteClass,
+	// }: {
+	// 	id: number;
+	// 	specialType?: number;
+	// 	recipientKey?: string;
+	// 	owner?: boolean;
+	// 	deleteClass?: boolean;
+	// }) => {
+	// 	if (!specialType) {
+	// 		let placeholderFind = placeholder.find(
+	// 			(pl) => pl.id?.toString() === id.toString() && !pl.isSpecial
+	// 		) as Placeholder;
 
-			if (placeholderFind && placeholderFind.id) {
-				if (!deleteClass) {
-					let color = '';
-					if (owner) {
-						color = PlaceholderColor.OWNER;
-					} else {
-						if (recipientKey) {
-							const recipientFind = placeholderRecipients.current.find(
-								(recipient) => recipient.recipientKey === recipientKey
-							);
-							if (recipientFind) {
-								color = recipientFind.color as string;
-							}
-						}
-					}
-					const styleSheet = document.styleSheets[0]; // Получаем первый стиль
-					styleSheet.insertRule(
-						`.placeholderClass${placeholderFind.id} { background-color: ${color ? color : PlaceholderColor.OTHER
-						} }`,
-						styleSheet.cssRules.length
-					);
-				} else {
-					const styleSheets = document.styleSheets;
+	// 		if (placeholderFind && placeholderFind.id) {
+	// 			if (!deleteClass) {
+	// 				let color = '';
+	// 				if (owner) {
+	// 					color = PlaceholderColor.OWNER;
+	// 				} else {
+	// 					if (recipientKey) {
+	// 						const recipientFind = placeholderRecipients.current.find(
+	// 							(recipient) => recipient.recipientKey === recipientKey
+	// 						);
+	// 						if (recipientFind) {
+	// 							color = recipientFind.color as string;
+	// 						}
+	// 					}
+	// 				}
+	// 				const styleSheet = document.styleSheets[0]; // Получаем первый стиль
+	// 				styleSheet.insertRule(
+	// 					`.placeholderClass${placeholderFind.id} { background-color: ${color ? color : PlaceholderColor.OTHER
+	// 					} }`,
+	// 					styleSheet.cssRules.length
+	// 				);
+	// 			} else {
+	// 				const styleSheets = document.styleSheets;
 
-					for (let i = 0; i < styleSheets.length; i++) {
-						const rules = styleSheets[i].cssRules || styleSheets[i].rules; // Для кроссбраузерной совместимости
-						for (let j = 0; j < rules.length; j++) {
-							if (
-								(rules[j] as CSSStyleRule).selectorText ===
-								`.placeholderClass${placeholderFind.id}`
-							) {
-								// Удаляем стиль из правила
-								(rules[j] as CSSStyleRule).style.removeProperty(
-									'background-color'
-								);
-								break; // Выходим из цикла, если нашли и удалили
-							}
-						}
-					}
-				}
-			}
-		} else {
-			let tagClass = '';
-			switch (specialType) {
-				case SpecialType.DATE:
-					tagClass = `dateClass${id}`;
-					break;
+	// 				for (let i = 0; i < styleSheets.length; i++) {
+	// 					const rules = styleSheets[i].cssRules || styleSheets[i].rules; // Для кроссбраузерной совместимости
+	// 					for (let j = 0; j < rules.length; j++) {
+	// 						if (
+	// 							(rules[j] as CSSStyleRule).selectorText ===
+	// 							`.placeholderClass${placeholderFind.id}`
+	// 						) {
+	// 							// Удаляем стиль из правила
+	// 							(rules[j] as CSSStyleRule).style.removeProperty(
+	// 								'background-color'
+	// 							);
+	// 							break; // Выходим из цикла, если нашли и удалили
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	} else {
+	// 		let tagClass = '';
+	// 		switch (specialType) {
+	// 			case SpecialType.DATE:
+	// 				tagClass = `dateClass${id}`;
+	// 				break;
 
-				case SpecialType.FULLNAME:
-					tagClass = `fullnameClass${id}`;
-					break;
+	// 			case SpecialType.FULLNAME:
+	// 				tagClass = `fullnameClass${id}`;
+	// 				break;
 
-				case SpecialType.EMAIL:
-					tagClass = `emailClass${id}`;
-					break;
+	// 			case SpecialType.EMAIL:
+	// 				tagClass = `emailClass${id}`;
+	// 				break;
 
-				case SpecialType.SIGN:
-					tagClass = `signClass${id}`;
-					break;
+	// 			case SpecialType.SIGN:
+	// 				tagClass = `signClass${id}`;
+	// 				break;
 
-				case SpecialType.INITIALS:
-					tagClass = `initialsClass${id}`;
-					break;
-			}
-			let color = '';
-			if (recipientKey) {
-				const recipientFind = placeholderRecipients.current.find(
-					(recipient) => recipient.recipientKey === recipientKey
-				);
-				if (recipientFind) {
-					color = recipientFind.color as string;
-				}
-			}
-			const styleSheet = document.styleSheets[0]; // Получаем первый стиль
-			styleSheet.insertRule(
-				`.${tagClass} { background-color: ${color ? color : PlaceholderColor.OTHER
-				} }`,
-				styleSheet.cssRules.length
-			);
-		}
-		quillRef?.current?.clipboard.dangerouslyPasteHTML(0, '', 'user');
-	};
+	// 			case SpecialType.INITIALS:
+	// 				tagClass = `initialsClass${id}`;
+	// 				break;
+	// 		}
+	// 		let color = '';
+	// 		if (recipientKey) {
+	// 			const recipientFind = placeholderRecipients.current.find(
+	// 				(recipient) => recipient.recipientKey === recipientKey
+	// 			);
+	// 			if (recipientFind) {
+	// 				color = recipientFind.color as string;
+	// 			}
+	// 		}
+	// 		const styleSheet = document.styleSheets[0]; // Получаем первый стиль
+	// 		styleSheet.insertRule(
+	// 			`.${tagClass} { background-color: ${color ? color : PlaceholderColor.OTHER
+	// 			} }`,
+	// 			styleSheet.cssRules.length
+	// 		);
+	// 	}
+	// 	quillRef?.current?.clipboard.dangerouslyPasteHTML(0, '', 'user');
+	// };
 	const deleteTag = (placeholderDelete: Placeholder) => {
 		let tagName = '';
 		if (placeholderDelete.isSpecial) {
@@ -586,7 +575,7 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				});
 			});
 	};
-	const handleInsertPlaceholder = (holderInsert: Placeholder) => {
+	const handleInsert = (holderInsert: Placeholder) => {
 		const position = quillRef?.current?.getSelection();
 		//console.log('position', position, quillRef);
 		if (!holderInsert.isSpecial) {
@@ -621,6 +610,9 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 					owner:
 						holderInsert.fillingType === PlaceholderFill.CREATOR ? true : false,
 					recipientKey: holderInsert.externalRecipientKey,
+					placeholder: placeholder,
+					placeholderRecipients: placeholderRecipients.current,
+					quillRef: quillRef.current,
 				});
 			}
 		} else {
@@ -675,10 +667,13 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				owner:
 					holderInsert.fillingType === PlaceholderFill.CREATOR ? true : false,
 				recipientKey: holderInsert.externalRecipientKey,
+				placeholder: placeholder,
+				placeholderRecipients: placeholderRecipients.current,
+				quillRef: quillRef.current,
 			});
 		}
 	};
-	const handleDeletePlaceholder = async (holderDelete: Placeholder) => {
+	const handleDelete = async (holderDelete: Placeholder) => {
 		setDelLoad(true);
 		let placeholdersTmp = [...placeholder];
 		const holderIndex = placeholdersTmp.findIndex(
@@ -823,6 +818,8 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 
 				break;
 		}
+		placeholdersTmp[holderIndex] = placeholderChange;
+		handleChangeSelect(selectedOtion, placeholdersTmp);
 	};
 	const handleEnter = (placeholderChange: Placeholder) => {
 		changeValue(placeholderChange);
@@ -859,11 +856,17 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				updatePlaceholderClass({
 					id: placeholderTmp[holderIndex].id as number,
 					owner: true,
+					placeholder: placeholder,
+					placeholderRecipients: placeholderRecipients.current,
+					quillRef: quillRef.current,
 				});
 			} else {
 				updatePlaceholderClass({
 					id: placeholderTmp[holderIndex].id as number,
 					owner: false,
+					placeholder: placeholder,
+					placeholderRecipients: placeholderRecipients.current,
+					quillRef: quillRef.current,
 				});
 			}
 		} else {
@@ -871,11 +874,19 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 			placeholderTmp[holderIndex].externalRecipientKey = e.target.value;
 			body.data.placeholder.fillingType = PlaceholderFill.SPECIFIC;
 			body.data.placeholder.externalRecipientKey = e.target.value;
-
+			const recipientFind = placeholderRecipients.current?.find(
+				(recipient) => recipient.recipientKey === e.target.value
+			);
+			if (recipientFind) {
+				placeholderTmp[holderIndex].color = recipientFind.color;
+			}
 			updatePlaceholderClass({
 				id: placeholderTmp[holderIndex].id as number,
 				owner: false,
 				recipientKey: e.target.value,
+				placeholder: placeholder,
+				placeholderRecipients: placeholderRecipients.current,
+				quillRef: quillRef.current,
 			});
 		}
 		setPlaceholder(placeholderTmp);
@@ -946,283 +957,299 @@ export const PlaceholderHtmlBlock = ({ quillRef }: Props) => {
 				/>
 				{selectedPlaceholders &&
 					selectedPlaceholders.map((holder) => {
+						const find = selectedPlaceholders.find(
+							(selectedPlaceholder) =>
+								selectedPlaceholder.placeholderKey === holder.placeholderKey
+						);
 						return (
-							<Space
-								className='ph-style'
-								draggable={!readonlyCurrent.current}
-								direction='vertical'
-								size={2}
-								style={{ display: 'flex' }}
-								key={holder.placeholderKey}
-							>
-								<Row wrap={false} align={'middle'}>
-									<Col>
-										<Tooltip title='Click to insert the placeholder at the current cursor position in the text.'>
-											<div>
-												<Button
-													disabled={readonlyCurrent.current}
-													style={{ background: `${holder.color} ` }}
-													size='small'
-													type='text'
-													icon={
-														<FontAwesomeIcon
-															icon={getIcon(holder)}
-															size='sm'
-															onClick={() => {
-																handleInsertPlaceholder(holder);
-															}}
-														/>
-													}
-												/>
-											</div>
-										</Tooltip>
-									</Col>
-									<Col flex={'auto'}>
-										<Input
-											readOnly={
-												holder.view?.toString() !==
-													PlaceholderView.SIGNATURE.toString() &&
-													!holder.isSpecial &&
-													!readonlyCurrent.current
-													? false
-													: true
-											}
-											id={`PlaceholderName${holder.id} `}
-											placeholder='Enter placeholder name'
-											variant='borderless'
-											value={holder.name}
-											onChange={(e: any) => handleChange(e, holder)}
-											onBlur={(e: any) => handleBlur(e, holder)}
-											onFocus={
-												holder.view?.toString() !==
-													PlaceholderView.SIGNATURE.toString() &&
-													!holder.isSpecial &&
-													!readonlyCurrent.current
-													? handleFocus
-													: undefined
-											}
-										/>
-									</Col>
-									<Col flex={'auto'}></Col>
-									{holder.view?.toString() !==
-										PlaceholderView.SIGNATURE.toString() &&
-										!holder.isSpecial &&
-										!holder.isTable ? (
-										<Col flex='24px'>
-											<Popover
-												content={
-													<Space
-														direction='vertical'
-														style={{ display: 'flex' }}
-													>
-														<Space>
-															<Text type='secondary'>
-																Who fills in this field:
-															</Text>
-															<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
-																<div>
-																	<Button
-																		disabled={readonlyCurrent.current}
-																		size='small'
-																		icon={
-																			<FontAwesomeIcon
-																				icon={faCircleQuestion}
-																				size='xs'
-																			/>
-																		}
-																		type='text'
-																	></Button>
-																</div>
-															</Tooltip>
-														</Space>
-														<Radio.Group
-															size='small'
-															value={
-																holder.fillingType &&
-																	holder.fillingType.toString() !==
-																	PlaceholderFill.SPECIFIC.toString()
-																	? holder.fillingType?.toString()
-																	: holder.fillingType &&
-																		holder.fillingType.toString() ===
-																		PlaceholderFill.SPECIFIC.toString() &&
-																		holder.externalRecipientKey &&
-																		placeholderRecipients.current &&
-																		placeholderRecipients.current.length > 0
-																		? placeholderRecipients.current.find(
-																			(placeholderRecipient) =>
-																				placeholderRecipient.recipientKey?.includes(
-																					holder.externalRecipientKey as string
-																				)
-																		)?.recipientKey
-																		: '1'
-															}
-															onChange={(e: any) =>
-																handleChangeFilling(e, holder.id as number)
-															}
-														>
-															<Space direction='vertical'>
-																<Radio value={PlaceholderFill.NONE.toString()}>
-																	None
-																</Radio>
-																<Radio
-																	value={PlaceholderFill.CREATOR.toString()}
-																>
-																	Contract owner
-																</Radio>
-																{placeholderRecipients.current &&
-																	placeholderRecipients.current.length > 0 &&
-																	placeholderRecipients.current.map(
-																		(placeholderRecipient) => {
-																			return (
-																				<Radio
-																					value={
-																						placeholderRecipient.recipientKey
-																					}
-																				>
-																					{placeholderRecipient.fullname}
-																				</Radio>
-																			);
-																		}
-																	)}
-															</Space>
-														</Radio.Group>
-														<Divider style={{ margin: 0 }} />
-														<Button
-															disabled={readonlyCurrent.current}
-															loading={delLoad}
-															block
-															danger
-															type='text'
-															onClick={() => {
-																handleDeletePlaceholder(holder);
-															}}
-														>
-															Delete
-														</Button>
-														<Divider style={{ margin: 0 }} />
-														<Popover
-															content={
-																<Space direction='vertical'>
-																	<Text type='secondary'>
-																		Placeholder Key: {holder.placeholderKey}
-																	</Text>
-																	<Button
-																		size='small'
-																		icon={
-																			<FontAwesomeIcon
-																				icon={faCopy}
-																				size='sm'
-																				color='#5d5d5d'
-																			/>
-																		}
-																		onClick={() =>
-																			navigator.clipboard.writeText(
-																				holder.placeholderKey || 'N/A'
-																			)
-																		}
-																	>
-																		Copy
-																	</Button>
-																</Space>
-															}
-															trigger='click'
-														>
-															<Button size='small'>
-																{holder.placeholderKey}
-															</Button>
-														</Popover>
-													</Space>
-												}
-												trigger='click'
-											>
-												<div>
-													<Button
-														disabled={readonlyCurrent.current}
-														size='small'
-														type='text'
-														icon={<FontAwesomeIcon icon={faGear} size='xs' />}
-													/>
-												</div>
-											</Popover>
-										</Col>
-									) : (
-										<Col flex='24px'>
-											<Popover
-												content={
-													<Space
-														direction='vertical'
-														style={{ display: 'flex' }}
-													>
-														<Popover
-															content={
-																<Space direction='vertical'>
-																	<Text type='secondary'>
-																		Placeholder Key: {holder.placeholderKey}
-																	</Text>
-																	<Button
-																		size='small'
-																		icon={
-																			<FontAwesomeIcon
-																				icon={faCopy}
-																				size='sm'
-																				color='#5d5d5d'
-																			/>
-																		}
-																		onClick={() =>
-																			navigator.clipboard.writeText(
-																				holder.placeholderKey || 'N/A'
-																			)
-																		}
-																	>
-																		Copy
-																	</Button>
-																</Space>
-															}
-															trigger='click'
-														>
-															<Button size='small'>
-																{holder.placeholderKey}
-															</Button>
-														</Popover>
-													</Space>
-												}
-												trigger='click'
-											>
-												<div>
-													<Button
-														disabled={readonlyCurrent.current}
-														size='small'
-														type='text'
-														icon={<FontAwesomeIcon icon={faGear} size='xs' />}
-													/>
-												</div>
-											</Popover>
-										</Col>
-									)}
-								</Row>
-								{holder.view?.toString() !==
-									PlaceholderView.SIGNATURE.toString() &&
-									!holder.isSpecial &&
-									!holder.isTable && (
-										<Input
-											readOnly={readonlyCurrent.current}
-											id={`PlaceholderValue${holder.id} `}
-											placeholder='Enter value'
-											value={holder.value}
-											onChange={(e: any) => handleChange(e, holder)}
-											onBlur={(e: any) => handleBlur(e, holder)}
-											onPressEnter={() => handleEnter(holder)}
-											onFocus={
-												holder.view?.toString() !==
-													PlaceholderView.SIGNATURE.toString() &&
-													!holder.isSpecial &&
-													!readonlyCurrent.current
-													? handleFocus
-													: undefined
-											}
-										/>
-									)}
-							</Space>
+							<PlaceholderDrag
+								placeholder={holder}
+								recipients={placeholderRecipients.current}
+								readonly={readonlyCurrent.current}
+								style={!find ? { display: 'none' } : undefined}
+								onChange={(e: any) => handleChange(e, holder)}
+								onDelete={() => handleDelete(holder)}
+								onInsert={(e: any) => handleInsert(e)}
+								onBlur={(e: any) => handleBlur(e, holder)}
+								onEnter={() => handleEnter(holder)}
+								onChangeFilling={(e: any) => handleChangeFilling(e, holder.id as number)}
+							/>
+							// <Space
+							// 	className='ph-style'
+							// 	draggable={!readonlyCurrent.current}
+							// 	direction='vertical'
+							// 	size={2}
+							// 	style={{ display: 'flex' }}
+							// 	key={holder.placeholderKey}
+							// >
+							// 	<Row wrap={false} align={'middle'}>
+							// 		<Col>
+							// 			<Tooltip title='Click to insert the placeholder at the current cursor position in the text.'>
+							// 				<div>
+							// 					<Button
+							// 						disabled={readonlyCurrent.current}
+							// 						style={{ background: `${holder.color} ` }}
+							// 						size='small'
+							// 						type='text'
+							// 						icon={
+							// 							<FontAwesomeIcon
+							// 								icon={getIcon(holder)}
+							// 								size='sm'
+							// 								onClick={() => {
+							// 									handleInsertPlaceholder(holder);
+							// 								}}
+							// 							/>
+							// 						}
+							// 					/>
+							// 				</div>
+							// 			</Tooltip>
+							// 		</Col>
+							// 		<Col flex={'auto'}>
+							// 			<Input
+							// 				readOnly={
+							// 					holder.view?.toString() !==
+							// 						PlaceholderView.SIGNATURE.toString() &&
+							// 						!holder.isSpecial &&
+							// 						!readonlyCurrent.current
+							// 						? false
+							// 						: true
+							// 				}
+							// 				id={`PlaceholderName${holder.id} `}
+							// 				placeholder='Enter placeholder name'
+							// 				variant='borderless'
+							// 				value={holder.name}
+							// 				onChange={(e: any) => handleChange(e, holder)}
+							// 				onBlur={(e: any) => handleBlur(e, holder)}
+							// 				onFocus={
+							// 					holder.view?.toString() !==
+							// 						PlaceholderView.SIGNATURE.toString() &&
+							// 						!holder.isSpecial &&
+							// 						!readonlyCurrent.current
+							// 						? handleFocus
+							// 						: undefined
+							// 				}
+							// 			/>
+							// 		</Col>
+							// 		<Col flex={'auto'}></Col>
+							// 		{holder.view?.toString() !==
+							// 			PlaceholderView.SIGNATURE.toString() &&
+							// 			!holder.isSpecial &&
+							// 			!holder.isTable ? (
+							// 			<Col flex='24px'>
+							// 				<Popover
+							// 					content={
+							// 						<Space
+							// 							direction='vertical'
+							// 							style={{ display: 'flex' }}
+							// 						>
+							// 							<Space>
+							// 								<Text type='secondary'>
+							// 									Who fills in this field:
+							// 								</Text>
+							// 								<Tooltip title='Set who fills in this field: a contract owner when creating a contract from this template or an external recipient when opening a contract.'>
+							// 									<div>
+							// 										<Button
+							// 											disabled={readonlyCurrent.current}
+							// 											size='small'
+							// 											icon={
+							// 												<FontAwesomeIcon
+							// 													icon={faCircleQuestion}
+							// 													size='xs'
+							// 												/>
+							// 											}
+							// 											type='text'
+							// 										></Button>
+							// 									</div>
+							// 								</Tooltip>
+							// 							</Space>
+							// 							<Radio.Group
+							// 								size='small'
+							// 								value={
+							// 									holder.fillingType &&
+							// 										holder.fillingType.toString() !==
+							// 										PlaceholderFill.SPECIFIC.toString()
+							// 										? holder.fillingType?.toString()
+							// 										: holder.fillingType &&
+							// 											holder.fillingType.toString() ===
+							// 											PlaceholderFill.SPECIFIC.toString() &&
+							// 											holder.externalRecipientKey &&
+							// 											placeholderRecipients.current &&
+							// 											placeholderRecipients.current.length > 0
+							// 											? placeholderRecipients.current.find(
+							// 												(placeholderRecipient) =>
+							// 													placeholderRecipient.recipientKey?.includes(
+							// 														holder.externalRecipientKey as string
+							// 													)
+							// 											)?.recipientKey
+							// 											: '1'
+							// 								}
+							// 								onChange={(e: any) =>
+							// 									handleChangeFilling(e, holder.id as number)
+							// 								}
+							// 							>
+							// 								<Space direction='vertical'>
+							// 									<Radio value={PlaceholderFill.NONE.toString()}>
+							// 										None
+							// 									</Radio>
+							// 									<Radio
+							// 										value={PlaceholderFill.CREATOR.toString()}
+							// 									>
+							// 										Contract owner
+							// 									</Radio>
+							// 									{placeholderRecipients.current &&
+							// 										placeholderRecipients.current.length > 0 &&
+							// 										placeholderRecipients.current.map(
+							// 											(placeholderRecipient) => {
+							// 												return (
+							// 													<Radio
+							// 														value={
+							// 															placeholderRecipient.recipientKey
+							// 														}
+							// 													>
+							// 														{placeholderRecipient.fullname}
+							// 													</Radio>
+							// 												);
+							// 											}
+							// 										)}
+							// 								</Space>
+							// 							</Radio.Group>
+							// 							<Divider style={{ margin: 0 }} />
+							// 							<Button
+							// 								disabled={readonlyCurrent.current}
+							// 								loading={delLoad}
+							// 								block
+							// 								danger
+							// 								type='text'
+							// 								onClick={() => {
+							// 									handleDeletePlaceholder(holder);
+							// 								}}
+							// 							>
+							// 								Delete
+							// 							</Button>
+							// 							<Divider style={{ margin: 0 }} />
+							// 							<Popover
+							// 								content={
+							// 									<Space direction='vertical'>
+							// 										<Text type='secondary'>
+							// 											Placeholder Key: {holder.placeholderKey}
+							// 										</Text>
+							// 										<Button
+							// 											size='small'
+							// 											icon={
+							// 												<FontAwesomeIcon
+							// 													icon={faCopy}
+							// 													size='sm'
+							// 													color='#5d5d5d'
+							// 												/>
+							// 											}
+							// 											onClick={() =>
+							// 												navigator.clipboard.writeText(
+							// 													holder.placeholderKey || 'N/A'
+							// 												)
+							// 											}
+							// 										>
+							// 											Copy
+							// 										</Button>
+							// 									</Space>
+							// 								}
+							// 								trigger='click'
+							// 							>
+							// 								<Button size='small'>
+							// 									{holder.placeholderKey}
+							// 								</Button>
+							// 							</Popover>
+							// 						</Space>
+							// 					}
+							// 					trigger='click'
+							// 				>
+							// 					<div>
+							// 						<Button
+							// 							disabled={readonlyCurrent.current}
+							// 							size='small'
+							// 							type='text'
+							// 							icon={<FontAwesomeIcon icon={faGear} size='xs' />}
+							// 						/>
+							// 					</div>
+							// 				</Popover>
+							// 			</Col>
+							// 		) : (
+							// 			<Col flex='24px'>
+							// 				<Popover
+							// 					content={
+							// 						<Space
+							// 							direction='vertical'
+							// 							style={{ display: 'flex' }}
+							// 						>
+							// 							<Popover
+							// 								content={
+							// 									<Space direction='vertical'>
+							// 										<Text type='secondary'>
+							// 											Placeholder Key: {holder.placeholderKey}
+							// 										</Text>
+							// 										<Button
+							// 											size='small'
+							// 											icon={
+							// 												<FontAwesomeIcon
+							// 													icon={faCopy}
+							// 													size='sm'
+							// 													color='#5d5d5d'
+							// 												/>
+							// 											}
+							// 											onClick={() =>
+							// 												navigator.clipboard.writeText(
+							// 													holder.placeholderKey || 'N/A'
+							// 												)
+							// 											}
+							// 										>
+							// 											Copy
+							// 										</Button>
+							// 									</Space>
+							// 								}
+							// 								trigger='click'
+							// 							>
+							// 								<Button size='small'>
+							// 									{holder.placeholderKey}
+							// 								</Button>
+							// 							</Popover>
+							// 						</Space>
+							// 					}
+							// 					trigger='click'
+							// 				>
+							// 					<div>
+							// 						<Button
+							// 							disabled={readonlyCurrent.current}
+							// 							size='small'
+							// 							type='text'
+							// 							icon={<FontAwesomeIcon icon={faGear} size='xs' />}
+							// 						/>
+							// 					</div>
+							// 				</Popover>
+							// 			</Col>
+							// 		)}
+							// 	</Row>
+							// 	{holder.view?.toString() !==
+							// 		PlaceholderView.SIGNATURE.toString() &&
+							// 		!holder.isSpecial &&
+							// 		!holder.isTable && (
+							// 			<Input
+							// 				readOnly={readonlyCurrent.current}
+							// 				id={`PlaceholderValue${holder.id} `}
+							// 				placeholder='Enter value'
+							// 				value={holder.value}
+							// 				onChange={(e: any) => handleChange(e, holder)}
+							// 				onBlur={(e: any) => handleBlur(e, holder)}
+							// 				onPressEnter={() => handleEnter(holder)}
+							// 				onFocus={
+							// 					holder.view?.toString() !==
+							// 						PlaceholderView.SIGNATURE.toString() &&
+							// 						!holder.isSpecial &&
+							// 						!readonlyCurrent.current
+							// 						? handleFocus
+							// 						: undefined
+							// 				}
+							// 			/>
+							// 		)}
+							// </Space>
 						);
 					})}
 

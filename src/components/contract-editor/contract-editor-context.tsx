@@ -65,6 +65,8 @@ export type TContractEditorContextType = {
 	setPagePlaceholder: (pagePlaceholder: PagePlaceholder[]) => void;
 	placeholderPdf: Placeholder;
 	setPlaceholderPdf: (placeholder: Placeholder) => void;
+	placeholderHtml: Placeholder;
+	setPlaceholderHtml: (placeholder: Placeholder) => void;
 	placeholderVisible: boolean;
 	setPlaceholderVisible: (placeholderVisible: boolean) => void;
 	aiVisible: boolean;

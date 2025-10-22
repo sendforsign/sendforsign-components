@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
 	Space,
 	Typography,
@@ -12,15 +12,10 @@ import {
 	Divider,
 } from 'antd';
 import { useContractEditorContext } from '../../contract-editor-context';
-import { BASE_URL } from '../../../../config/config';
 import {
-	Action,
-	ApiEntity,
-	PlaceholderColor,
 	PlaceholderFill,
 	PlaceholderView,
 } from '../../../../config/enum';
-import axios from 'axios';
 import { Placeholder, Recipient } from '../../../../config/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -37,7 +32,11 @@ type Props = {
 	placeholder: Placeholder;
 	recipients?: Recipient[];
 	onChange?: (data: any) => void;
-	onDelete?: (data: any) => void;
+	onChangeFilling?: (data: any) => void;
+	onDelete?: () => void;
+	onInsert?: (data: any) => void;
+	onBlur?: (data: any) => void;
+	onEnter?: () => void;
 };
 
 export const PlaceholderDrag = ({
@@ -46,19 +45,15 @@ export const PlaceholderDrag = ({
 	placeholder,
 	recipients,
 	onChange,
+	onChangeFilling,
 	onDelete,
+	onInsert,
+	onBlur,
+	onEnter
 }: Props) => {
 	const currPlaceholder = useRef<Placeholder>(placeholder);
 	const {
-		apiKey,
-		userKey,
-		token,
-		contractKey,
-		clientKey,
-		setPlaceholderPdf,
-		setNotification,
-		refreshOnlyPlaceholders,
-		setRefreshOnlyPlaceholders,
+		setPlaceholderHtml,
 	} = useContractEditorContext();
 
 	const { Text } = Typography;
@@ -73,212 +68,11 @@ export const PlaceholderDrag = ({
 		}),
 		[currPlaceholder.current]
 	);
-	const handleInsertPlaceholder = () => {
-		setPlaceholderPdf(currPlaceholder.current);
-	};
-	const handleDeletePlaceholder = async () => {
-		let body = {
-			data: {
-				action: Action.DELETE,
-				clientKey: !token ? clientKey : undefined,
-				contractKey: contractKey,
-				placeholder: {
-					placeholderKey: currPlaceholder.current.placeholderKey,
-				},
-			},
-		};
-		await axios
-			.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-				headers: {
-					Accept: 'application/vnd.api+json',
-					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-					Authorization: token ? `Bearer ${token}` : undefined,
-				},
-				responseType: 'json',
-			})
-			.then((payload: any) => {
-				if (onDelete) {
-					onDelete({ placeholder: currPlaceholder.current });
-				}
-			})
-			.catch((error) => {
-				setNotification({
-					text:
-						error.response && error.response.data && error.response.data.message
-							? error.response.data.message
-							: error.message,
-				});
-			});
-	};
-	const handleChange = (e: any) => {
-		if (currPlaceholder.current.isSpecial || readonly) {
-			return;
-		}
-		switch (e.target.id) {
-			case 'PlaceholderName':
-				currPlaceholder.current.name = e.target.value;
 
-				break;
+	useEffect(() => {
+		currPlaceholder.current = placeholder;
+	}, [placeholder]);
 
-			case 'PlaceholderValue':
-				currPlaceholder.current.value = e.target.value;
-
-				break;
-		}
-		// console.log('onChange1', currPlaceholder.current);
-		if (onChange) {
-			onChange({ placeholder: currPlaceholder.current });
-		}
-	};
-	const handleBlur = async (e: any) => {
-		if (currPlaceholder.current.isSpecial || readonly) {
-			return;
-		}
-		switch (e.target.id) {
-			case 'PlaceholderName':
-				let body = {
-					data: {
-						action: Action.UPDATE,
-						clientKey: !token ? clientKey : undefined,
-						contractKey: contractKey,
-						placeholder: {
-							placeholderKey: currPlaceholder.current.placeholderKey,
-							name: currPlaceholder.current.name,
-						},
-					},
-				};
-				await axios
-					.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-						headers: {
-							Accept: 'application/vnd.api+json',
-							'Content-Type': 'application/vnd.api+json',
-							'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-							Authorization: token ? `Bearer ${token}` : undefined,
-						},
-						responseType: 'json',
-					})
-					.then((payload: any) => { })
-					.catch((error) => {
-						setNotification({
-							text:
-								error.response &&
-									error.response.data &&
-									error.response.data.message
-									? error.response.data.message
-									: error.message,
-						});
-					});
-				break;
-			case 'PlaceholderValue':
-				changeValue();
-				break;
-		}
-	};
-	const changeValue = async () => {
-		if (currPlaceholder.current.isSpecial || readonly) {
-			return;
-		}
-		let body = {
-			data: {
-				action: Action.UPDATE,
-				clientKey: !token ? clientKey : undefined,
-				contractKey: contractKey,
-				placeholder: {
-					placeholderKey: currPlaceholder.current.placeholderKey,
-					value: currPlaceholder.current.value,
-				},
-			},
-		};
-		await axios
-			.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-				headers: {
-					Accept: 'application/vnd.api+json',
-					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-					Authorization: token ? `Bearer ${token}` : undefined,
-				},
-				responseType: 'json',
-			})
-			.then((payload: any) => { })
-			.catch((error) => {
-				setNotification({
-					text:
-						error.response && error.response.data && error.response.data.message
-							? error.response.data.message
-							: error.message,
-				});
-			});
-	};
-	const handleEnter = () => {
-		changeValue();
-	};
-	const handleChangeFilling = async (e: any) => {
-		let body = {
-			data: {
-				action: Action.UPDATE,
-				clientKey: !token ? clientKey : undefined,
-				contractKey: contractKey,
-				placeholder: {
-					placeholderKey: currPlaceholder.current.placeholderKey,
-					fillingType: 1,
-					externalRecipientKey: '',
-				},
-			},
-		};
-		if (
-			e.target.value.toString() === PlaceholderFill.NONE.toString() ||
-			e.target.value.toString() === PlaceholderFill.CREATOR.toString() ||
-			e.target.value.toString() === PlaceholderFill.ANY.toString()
-		) {
-			currPlaceholder.current.fillingType = e.target.value;
-			body.data.placeholder.fillingType = e.target.value;
-			currPlaceholder.current.externalRecipientKey = '';
-			body.data.placeholder.externalRecipientKey = '';
-			if (e.target.value.toString() === PlaceholderFill.CREATOR.toString()) {
-				currPlaceholder.current.color = PlaceholderColor.OWNER;
-			} else {
-				currPlaceholder.current.color = PlaceholderColor.OTHER;
-			}
-		} else {
-			currPlaceholder.current.fillingType = PlaceholderFill.SPECIFIC;
-			currPlaceholder.current.externalRecipientKey = e.target.value;
-			body.data.placeholder.fillingType = PlaceholderFill.SPECIFIC;
-			body.data.placeholder.externalRecipientKey = e.target.value;
-			const recipientFind = recipients?.find(
-				(recipient) => recipient.recipientKey === e.target.value
-			);
-			if (recipientFind) {
-				currPlaceholder.current.color = recipientFind.color;
-			}
-		}
-		if (onChange) {
-			onChange({ placeholder: currPlaceholder.current });
-		}
-		// setPlaceholder(placeholderTmp);
-		await axios
-			.post(BASE_URL + ApiEntity.PLACEHOLDER, body, {
-				headers: {
-					Accept: 'application/vnd.api+json',
-					'Content-Type': 'application/vnd.api+json',
-					'x-sendforsign-key': !token && apiKey ? apiKey : undefined, //process.env.SENDFORSIGN_API_KEY,
-					Authorization: token ? `Bearer ${token}` : undefined,
-				},
-				responseType: 'json',
-			})
-			.then((payload: any) => {
-				setRefreshOnlyPlaceholders(refreshOnlyPlaceholders + 1);
-			})
-			.catch((error) => {
-				setNotification({
-					text:
-						error.response && error.response.data && error.response.data.message
-							? error.response.data.message
-							: error.message,
-				});
-			});
-	};
-	// console.log('readonly', readonly);
 	return (
 		<div
 			id={`placeholder${currPlaceholder.current.placeholderKey?.replaceAll(
@@ -291,7 +85,7 @@ export const PlaceholderDrag = ({
 					'placeholderKey',
 					currPlaceholder.current.placeholderKey as string
 				);
-				setPlaceholderPdf(currPlaceholder.current);
+				setPlaceholderHtml(currPlaceholder.current)
 			}}
 			style={style}
 			role={'PlaceholderBlock'}
@@ -319,7 +113,9 @@ export const PlaceholderDrag = ({
 											icon={getIcon(currPlaceholder.current)}
 											size='sm'
 											onClick={() => {
-												handleInsertPlaceholder();
+												if (onInsert) {
+													onInsert(currPlaceholder.current)
+												};
 											}}
 										/>
 									}
@@ -341,8 +137,8 @@ export const PlaceholderDrag = ({
 							placeholder='Enter placeholder name'
 							value={currPlaceholder.current.name}
 							variant='borderless'
-							onChange={(e: any) => handleChange(e)}
-							onBlur={(e: any) => handleBlur(e)}
+							onChange={(e: any) => onChange?.(e)}
+							onBlur={(e: any) => onBlur?.(e)}
 						/>
 					</Col>
 					<Col flex={'auto'}></Col>
@@ -392,7 +188,7 @@ export const PlaceholderDrag = ({
 														)?.recipientKey
 														: '1'
 											}
-											onChange={(e: any) => handleChangeFilling(e)}
+											onChange={(e: any) => onChangeFilling?.(e)}
 										>
 											<Space direction='vertical'>
 												<Radio value={PlaceholderFill.NONE.toString()}>
@@ -420,7 +216,7 @@ export const PlaceholderDrag = ({
 											danger
 											type='text'
 											onClick={() => {
-												handleDeletePlaceholder();
+												onDelete?.();
 											}}
 										>
 											Delete
@@ -479,15 +275,16 @@ export const PlaceholderDrag = ({
 				</Row>
 				{currPlaceholder.current.view?.toString() !==
 					PlaceholderView.SIGNATURE.toString() &&
-					!currPlaceholder.current.isSpecial && (
+					!currPlaceholder.current.isSpecial &&
+					!currPlaceholder.current.isTable && (
 						<Input
 							id='PlaceholderValue'
 							placeholder='Enter value'
 							readOnly={readonly}
 							value={currPlaceholder.current.value}
-							onChange={(e: any) => handleChange(e)}
-							onBlur={(e: any) => handleBlur(e)}
-							onPressEnter={() => handleEnter()}
+							onChange={(e: any) => onChange?.(e)}
+							onBlur={(e: any) => onBlur?.(e)}
+							onPressEnter={() => onEnter?.()}
 						/>
 					)}
 			</Space>

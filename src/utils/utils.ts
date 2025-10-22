@@ -2,8 +2,13 @@ import * as Mammoth from 'mammoth/mammoth.browser';
 // import FluentEditor from 'quill';
 import FluentEditor from '@opentiny/fluent-editor';
 import Inline from 'quill/blots/inline';
-import { Placeholder } from '../config/types';
-import { PlaceholderView, SpecialType, Tags } from '../config/enum';
+import { Placeholder, Recipient } from '../config/types';
+import {
+	PlaceholderColor,
+	PlaceholderView,
+	SpecialType,
+	Tags,
+} from '../config/enum';
 import {
 	faAt,
 	faCalendarDays,
@@ -2349,7 +2354,7 @@ export const convertHTMLTablesToQuillFormat = (htmlString: string) => {
 		const colgroup = document.createElement('colgroup');
 		colgroup.setAttribute('data-table-id', tableId);
 		colgroup.setAttribute('contenteditable', 'false');
-		
+
 		let colIds: string[] = [];
 		for (let i = 0; i < maxCols; i++) {
 			const col = document.createElement('col');
@@ -2407,7 +2412,10 @@ export const convertHTMLTablesToQuillFormat = (htmlString: string) => {
 				cellInner.innerHTML = sourceCell.innerHTML;
 
 				// Если ячейка была пустая, добавляем минимальную структуру
-				if (cellInner.childNodes.length === 0 || cellInner.textContent?.trim() === '') {
+				if (
+					cellInner.childNodes.length === 0 ||
+					cellInner.textContent?.trim() === ''
+				) {
 					const p = document.createElement('p');
 					p.innerHTML = '<br>';
 					cellInner.appendChild(p);
@@ -2432,4 +2440,112 @@ export const convertHTMLTablesToQuillFormat = (htmlString: string) => {
 
 	// Возвращаем преобразованный HTML
 	return doc.documentElement.innerHTML;
+};
+export const updatePlaceholderClass = ({
+	id,
+	specialType,
+	recipientKey,
+	owner,
+	deleteClass,
+	placeholder,
+	placeholderRecipients,
+	quillRef,
+}: {
+	id: number;
+	specialType?: number;
+	recipientKey?: string;
+	owner?: boolean;
+	deleteClass?: boolean;
+	placeholder: Placeholder[];
+	placeholderRecipients: Recipient[];
+	quillRef: FluentEditor | undefined;
+}) => {
+	if (!specialType) {
+		let placeholderFind = placeholder.find(
+			(pl) => pl.id?.toString() === id.toString() && !pl.isSpecial
+		) as Placeholder;
+
+		if (placeholderFind && placeholderFind.id) {
+			if (!deleteClass) {
+				let color = '';
+				if (owner) {
+					color = PlaceholderColor.OWNER;
+				} else {
+					if (recipientKey) {
+						const recipientFind = placeholderRecipients.find(
+							(recipient) => recipient.recipientKey === recipientKey
+						);
+						if (recipientFind) {
+							color = recipientFind.color as string;
+						}
+					}
+				}
+				const styleSheet = document.styleSheets[0]; // Получаем первый стиль
+				styleSheet.insertRule(
+					`.placeholderClass${placeholderFind.id} { background-color: ${
+						color ? color : PlaceholderColor.OTHER
+					} }`,
+					styleSheet.cssRules.length
+				);
+			} else {
+				const styleSheets = document.styleSheets;
+
+				for (let i = 0; i < styleSheets.length; i++) {
+					const rules = styleSheets[i].cssRules || styleSheets[i].rules; // Для кроссбраузерной совместимости
+					for (let j = 0; j < rules.length; j++) {
+						if (
+							(rules[j] as CSSStyleRule).selectorText ===
+							`.placeholderClass${placeholderFind.id}`
+						) {
+							// Удаляем стиль из правила
+							(rules[j] as CSSStyleRule).style.removeProperty(
+								'background-color'
+							);
+							break; // Выходим из цикла, если нашли и удалили
+						}
+					}
+				}
+			}
+		}
+	} else {
+		let tagClass = '';
+		switch (specialType) {
+			case SpecialType.DATE:
+				tagClass = `dateClass${id}`;
+				break;
+
+			case SpecialType.FULLNAME:
+				tagClass = `fullnameClass${id}`;
+				break;
+
+			case SpecialType.EMAIL:
+				tagClass = `emailClass${id}`;
+				break;
+
+			case SpecialType.SIGN:
+				tagClass = `signClass${id}`;
+				break;
+
+			case SpecialType.INITIALS:
+				tagClass = `initialsClass${id}`;
+				break;
+		}
+		let color = '';
+		if (recipientKey) {
+			const recipientFind = placeholderRecipients.find(
+				(recipient) => recipient.recipientKey === recipientKey
+			);
+			if (recipientFind) {
+				color = recipientFind.color as string;
+			}
+		}
+		const styleSheet = document.styleSheets[0]; // Получаем первый стиль
+		styleSheet.insertRule(
+			`.${tagClass} { background-color: ${
+				color ? color : PlaceholderColor.OTHER
+			} }`,
+			styleSheet.cssRules.length
+		);
+	}
+	quillRef?.clipboard.dangerouslyPasteHTML(0, '', 'user');
 };

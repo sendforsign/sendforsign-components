@@ -8,6 +8,7 @@ import TableUp, { defaultCustomSelect, TableAlign, TableMenuSelect, TableMenuCon
 import hljs from 'highlight.js'
 import Html2Canvas from 'html2canvas'
 import katex from 'katex'
+import { useDrop } from 'react-dnd';
 
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -20,8 +21,11 @@ import {
 	PlaceholderColor,
 	PlaceholderView,
 	SpecialType,
+	PlaceholderFill,
+	Tags,
 } from '../../../config/enum';
-import { addBlotClass, wrapTextNodes, cleanEditorHTML, convertBlobImagesInHtml, convertQuillTablesInHTML, convertHTMLTablesToQuillFormat } from '../../../utils';
+import { Placeholder, Recipient } from '../../../config/types';
+import { addBlotClass, wrapTextNodes, cleanEditorHTML, convertBlobImagesInHtml, convertQuillTablesInHTML, convertHTMLTablesToQuillFormat, generateTableHTML, updatePlaceholderClass } from '../../../utils';
 
 import '@opentiny/fluent-editor/style.css';
 import 'highlight.js/styles/atom-one-dark.css'
@@ -121,6 +125,35 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 	const placeholderClassFill = useRef(false);
 	const focusElementRef = useRef('');
 
+	// Drop functionality for HTML editor
+	const [, drop] = useDrop(
+		() => ({
+			accept: `chosePlaceholder`,
+			drop: async (item: any, monitor) => {
+				if (readonly) {
+					return undefined;
+				}
+				
+				const placeholder = item.chosePlaceholder;
+				if (!placeholder || !fluentRef.current) {
+					return undefined;
+				}
+
+				// Get cursor position in the editor
+				const selection = fluentRef.current.getSelection();
+				const position = selection ? selection.index : 0;
+
+				// Insert placeholder at cursor position
+				await insertPlaceholder(placeholder, position);
+			},
+			collect: (monitor) => ({
+				isOver: monitor.isOver(),
+				canDrop: monitor.canDrop(),
+			}),
+		}),
+		[readonly, fluentRef.current]
+	);
+
 	useEffect(() => {
 		if (focusElement) {
 			focusElementRef.current = focusElement;
@@ -141,7 +174,7 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 								clean: {
 									name: 'clean',
 									icon: (FluentEditor.import('ui/icons') as Record<string, string>).clean,
-									apply(el: HTMLImageElement, toolbarButtons: ImageToolbarButtons) {
+									apply(el: HTMLImageElement, toolbarButtons: any) {
 										(toolbarButtons as any).clear(el);
 										el.removeAttribute('width');
 										el.removeAttribute('height');
@@ -174,8 +207,7 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 					// 		})
 					// 	},
 					// },
-				},
-				trackChanges: 'user'
+				}
 			});
 			if (fluentRef.current) {
 				fluentRef.current.on('text-change', () => {
@@ -435,6 +467,153 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 				});
 		}
 	};
+
+	// Function to insert placeholder into the editor
+	const insertPlaceholder = async (placeholderItem: any, position: number) => {
+		if (!fluentRef.current) return;
+
+		if (!placeholderItem.isSpecial) {
+			let value = '';
+			if (placeholderItem.isTable) {
+				value = generateTableHTML(JSON.parse(placeholderItem.value as string));
+				fluentRef.current.clipboard.dangerouslyPasteHTML(
+					position,
+					value,
+					'user'
+				);
+			} else {
+				value = placeholderItem.value as string;
+				const empty = placeholderItem.value
+					? placeholderItem.value?.replace(/\s/g, '')
+					: '';
+
+				const maxPlaceholderId =
+					placeholder && placeholder.length > 0 
+						? Math.max(...placeholder.map((ph: any) => ph.id || 0)) + 1
+						: 1;
+
+				const placeholderId = placeholderItem.id ? placeholderItem.id : maxPlaceholderId;
+				const backgroundColor = placeholderItem.color || PlaceholderColor.OTHER;
+
+				fluentRef.current.clipboard.dangerouslyPasteHTML(
+					position,
+					`<placeholder${placeholderId} className={placeholderClass${placeholderId}} contenteditable="false" style="background-color: ${backgroundColor}">${empty ? value : `{{{${placeholderItem.name}}}}`}</placeholder${placeholderId}>`,
+					'user'
+				);
+			}
+		} else {
+			let tag = '';
+			const backgroundColor = placeholderItem.color || PlaceholderColor.OTHER;
+			
+			switch (placeholderItem.specialType) {
+				case SpecialType.DATE:
+					const date = placeholderItem.value ? placeholderItem.value : '';
+					tag = `<date${placeholderItem.id} className={dateClass${placeholderItem.id}} contenteditable="false" style="background-color: ${backgroundColor}">${date ? date : `{{{${placeholderItem.name}}}}`}</date${placeholderItem.id}>`;
+					break;
+
+				case SpecialType.FULLNAME:
+					tag = `<fullname${placeholderItem.id} className={fullnameClass${placeholderItem.id}} contenteditable="false" style="background-color: ${backgroundColor}">${placeholderItem.value ? placeholderItem.value : `{{{${placeholderItem.name}}}}`}</fullname${placeholderItem.id}>`;
+					break;
+
+				case SpecialType.EMAIL:
+					tag = `<email${placeholderItem.id} className={emailClass${placeholderItem.id}} contenteditable="false" style="background-color: ${backgroundColor}">${placeholderItem.value ? placeholderItem.value : `{{{${placeholderItem.name}}}}`}</email${placeholderItem.id}>`;
+					break;
+
+				case SpecialType.SIGN:
+					tag = `<sign${placeholderItem.id} className={signClass${placeholderItem.id}} contenteditable="false" style="background-color: ${backgroundColor}">${`{{{${placeholderItem.name}}}}`}</sign${placeholderItem.id}>`;
+					break;
+
+				case SpecialType.INITIALS:
+					tag = `<initials${placeholderItem.id} className={initialsClass${placeholderItem.id}} contenteditable="false" style="background-color: ${backgroundColor}">${placeholderItem.value ?
+						`<img
+									alt='initials'
+									src={${placeholderItem.value}} 
+									style={{ objectFit: 'contain' }}
+							/>`
+						: `{{{${placeholderItem.name}}}}`
+						}</initials${placeholderItem.id}>`;
+					break;
+			}
+			fluentRef.current.clipboard.dangerouslyPasteHTML(
+				position,
+				tag,
+				'user'
+			);
+		}
+	};
+
+	// // Function to update placeholder class styling
+	// const updatePlaceholderClass = ({
+	// 	id,
+	// 	specialType,
+	// 	recipientKey,
+	// 	owner,
+	// 	deleteClass,
+	// }: {
+	// 	id: number;
+	// 	specialType?: number;
+	// 	recipientKey?: string;
+	// 	owner?: boolean;
+	// 	deleteClass?: boolean;
+	// }) => {
+	// 	if (!specialType) {
+	// 		let placeholderFind = placeholder.find(
+	// 			(pl: any) => pl.id?.toString() === id.toString() && !pl.isSpecial
+	// 		) as any;
+
+	// 		if (placeholderFind && placeholderFind.id) {
+	// 			if (!deleteClass) {
+	// 				let color = '';
+	// 				if (owner) {
+	// 					color = PlaceholderColor.OWNER;
+	// 				} else {
+	// 					if (recipientKey) {
+	// 						// Find recipient color from context
+	// 						color = PlaceholderColor.OTHER; // Default color
+	// 					}
+	// 				}
+	// 				const styleSheet = document.styleSheets[0];
+	// 				styleSheet.insertRule(
+	// 					`.placeholderClass${placeholderFind.id} { background-color: ${color ? color : PlaceholderColor.OTHER
+	// 					} }`,
+	// 					styleSheet.cssRules.length
+	// 				);
+	// 			}
+	// 		}
+	// 	} else {
+	// 		let tagClass = '';
+	// 		switch (specialType) {
+	// 			case SpecialType.DATE:
+	// 				tagClass = `dateClass${id}`;
+	// 				break;
+	// 			case SpecialType.FULLNAME:
+	// 				tagClass = `fullnameClass${id}`;
+	// 				break;
+	// 			case SpecialType.EMAIL:
+	// 				tagClass = `emailClass${id}`;
+	// 				break;
+	// 			case SpecialType.SIGN:
+	// 				tagClass = `signClass${id}`;
+	// 				break;
+	// 			case SpecialType.INITIALS:
+	// 				tagClass = `initialsClass${id}`;
+	// 				break;
+	// 		}
+	// 		let color = '';
+	// 		if (recipientKey) {
+	// 			// Find recipient color from context
+	// 			color = PlaceholderColor.OTHER; // Default color
+	// 		}
+	// 		const styleSheet = document.styleSheets[0];
+	// 		styleSheet.insertRule(
+	// 			`.${tagClass} { background-color: ${color ? color : PlaceholderColor.OTHER
+	// 			} }`,
+	// 			styleSheet.cssRules.length
+	// 		);
+	// 	}
+	// 	fluentRef?.current?.clipboard.dangerouslyPasteHTML(0, '', 'user');
+	// };
+
 	const removeParentSpan = (element: HTMLElement | null) => {
 		// Проверяем, что элемент существует
 		if (element) {
@@ -622,7 +801,7 @@ export const FluentEditorBlock = ({ fluentRef, value }: Props) => {
 			});
 	};
 	return (
-		<div id='contract-editor-container'>
+		<div id='contract-editor-container' ref={drop}>
 			{/* Тулбар будет автоматически вставлен FluentEditor внутрь этого контейнера, но мы хотим явно обернуть его */}
 		</div>
 	);
