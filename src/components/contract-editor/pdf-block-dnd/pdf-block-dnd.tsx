@@ -209,7 +209,7 @@ export const PdfBlockDnd = () => {
 					}
 				}
 				const pdfBytes = await pdfDoc.save();
-				await merger.add(pdfBytes.buffer);
+				await merger.add(pdfBytes.buffer as ArrayBuffer);
 				// console.log(
 				// 	'contractEventData',
 				// 	contractEvent.current,

@@ -77,7 +77,7 @@ export const FluentEditorBlock = ({ value, fluentRef }: Props) => {
 								clean: {
 									name: 'clean',
 									icon: (FluentEditor.import('ui/icons') as Record<string, string>).clean,
-									apply(el: HTMLImageElement, toolbarButtons: ImageToolbarButtons) {
+									apply(el: HTMLImageElement, toolbarButtons: any) {
 										(toolbarButtons as any).clear(el);
 										el.removeAttribute('width');
 										el.removeAttribute('height');
@@ -101,7 +101,7 @@ export const FluentEditorBlock = ({ value, fluentRef }: Props) => {
 					'syntax': { hljs },
 					'file': true,
 				},
-				trackChanges: 'user'
+				// trackChanges: 'user'
 			});
 
 			if (fluentRef.current) {

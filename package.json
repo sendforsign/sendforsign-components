@@ -1,6 +1,6 @@
 {
 	"name": "sendforsign",
-	"version": "2.0.3",
+	"version": "2.0.4",
 	"description": "Sendforsign components",
 	"main": "/dist/index",
 	"typings": "dist/index",

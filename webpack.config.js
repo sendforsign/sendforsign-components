@@ -1,10 +1,38 @@
 const path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const webpack = require('webpack');
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 module.exports = (args) => {
     return {
         // plugins: [new BundleAnalyzerPlugin()],
+        plugins: [
+            new webpack.NormalModuleReplacementPlugin(
+                /^quill\/core$/,
+                (resource) => {
+                    // Redirect quill/core imports to a custom module that re-exports what we need
+                    resource.request = path.resolve(__dirname, 'src/utils/quill-core-shim.ts');
+                }
+            ),
+            new webpack.NormalModuleReplacementPlugin(
+                /^quill\/core\/selection$/,
+                (resource) => {
+                    resource.request = 'quill/core/selection.js';
+                }
+            ),
+            new webpack.NormalModuleReplacementPlugin(
+                /^quill\/core\/emitter$/,
+                (resource) => {
+                    resource.request = 'quill/core/emitter.js';
+                }
+            ),
+            new webpack.NormalModuleReplacementPlugin(
+                /^quill\/themes\/base$/,
+                (resource) => {
+                    resource.request = 'quill/themes/base.js';
+                }
+            )
+        ],
         mode: isDevelopment ? 'development' : 'production',
         entry: './src/index.ts',
         devtool: isDevelopment ? 'eval-source-map' : 'source-map',
@@ -27,11 +55,9 @@ module.exports = (args) => {
             extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".css"], // Удалите ".jsx-runtime" из списка
             alias: {
                 "react/jsx-dev-runtime": "react/jsx-dev-runtime",
-                "react/jsx-runtime": "react/jsx-runtime",
-                "quill/core/selection": "quill/core/selection.js",
-                "quill/core/emitter": "quill/core/emitter.js",
-                "quill/themes/base": "quill/themes/base.js"
-            }
+                "react/jsx-runtime": "react/jsx-runtime"
+            },
+            mainFields: ['browser', 'module', 'main']
         },
         externals: {
             lodash: {
