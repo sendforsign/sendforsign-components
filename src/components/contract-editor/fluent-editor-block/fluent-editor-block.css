@@ -11,3 +11,19 @@
     z-index: 1001;
     font-family: 'Inter';
 }
+
+.ql-size.ql-picker .ql-picker-label::before, .ql-size.ql-picker .ql-picker-item::before {
+    content: "Font size"!important;
+}
+
+.ql-size.ql-picker .ql-picker-label[data-value]::before, .ql-size.ql-picker .ql-picker-item[data-value]::before {
+    content: attr(data-value)!important;
+}
+
+.ql-line-height.ql-picker .ql-picker-label::before, .ql-line-height.ql-picker .ql-picker-item::before {
+    content: "Line"!important;
+}
+
+.ql-line-height.ql-picker .ql-picker-label[data-value]::before, .ql-line-height.ql-picker .ql-picker-item[data-value]::before {
+    content: attr(data-value)!important;
+}
